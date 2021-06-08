@@ -1,0 +1,16 @@
+{
+  "name": "delbem/service-tracker",
+  "type": "wordpress-plugin",
+  "authors": [
+    {
+      "name": "Rodrigo Del Bem",
+      "email": "rodrigodelbem@gmail.com"
+    }
+  ],
+  "require": {},
+  "autoload": {
+    "psr-4": {
+      "ServiceTracker\\": "./src"
+    }
+  }
+}
