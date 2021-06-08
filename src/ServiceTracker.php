@@ -1,7 +1,9 @@
 <?php
+defined( 'ABSPATH' ) or die( 'You do not have permission to access this file on its own.' );
 require_once plugin_dir_path( __DIR__ ) . '/vendor/autoload.php';
 
 use ServiceTracker\Sql\Activate;
+use ServiceTracker\Sql\Uninstall;
 
 if ( ! class_exists( 'ServiceTracker' ) ) {
 
@@ -32,9 +34,11 @@ if ( ! class_exists( 'ServiceTracker' ) ) {
 		}
 
 		function enqueue() {
-			wp_enqueue_script( 'service-tracker-script', $this->base_plugin_uri . 'assets/js/app.js', array( 'wp-element' ), time(), false );
+			if ( $_GET['page'] === 'service_tracker' ) {
+				wp_enqueue_script( 'service-tracker-script', $this->base_plugin_uri . 'assets/js/app.js', array( 'wp-element' ), time(), false );
 
-			wp_enqueue_style( 'service-tracker-style', $this->base_plugin_uri . 'assets/css/style.css', array(), null );
+				wp_enqueue_style( 'service-tracker-style', $this->base_plugin_uri . 'assets/css/style.css', array(), null );
+			}
 		}
 
 		/**
@@ -45,6 +49,10 @@ if ( ! class_exists( 'ServiceTracker' ) ) {
 		function activate() {
 			Activate::activate();
 		}
+
+		function uninstall() {
+			Uninstall::uninstall();
+		}
 	}
 
 	$serviceTracker = new ServiceTracker();
@@ -52,7 +60,8 @@ if ( ! class_exists( 'ServiceTracker' ) ) {
 	$serviceTracker->register();
 
 	// On activation
-	register_activation_hook( __FILE__, array( $serviceTracker, 'activate' ) );
+	register_activation_hook( $serviceTracker->base_path . 'Service_Tracker_init.php', array( $serviceTracker, 'activate' ) );
 
-	// On deactivation
+	// On uninstall
+	register_uninstall_hook( $serviceTracker->base_path . 'Service_Tracker_init.php', array( $serviceTracker, 'uninstall' ) );
 }
