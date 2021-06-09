@@ -25,6 +25,7 @@ class Activate {
 		$main_sql_create_progress  = 'CREATE TABLE ' . $tablename_progress . ' (';
 		$main_sql_create_progress .= 'id INT(10) UNSIGNED AUTO_INCREMENT PRIMARY KEY,';
 		$main_sql_create_progress .= ' id_case INT(10) NOT NULL,';
+		$main_sql_create_progress .= ' id_user INT(20) NOT NULL,'; // this will be filled with the user's ID
 		$main_sql_create_progress .= ' created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,';
 		$main_sql_create_progress .= ' text TEXT)';
 		maybe_create_table( $tablename_progress, $main_sql_create_progress );
@@ -33,6 +34,7 @@ class Activate {
 		$main_sql_create_uploads  = 'CREATE TABLE ' . $tablename_uploads . ' (';
 		$main_sql_create_uploads .= 'id INT(10) UNSIGNED AUTO_INCREMENT PRIMARY KEY,';
 		$main_sql_create_uploads .= ' id_case INT(10) NOT NULL,';
+		$main_sql_create_uploads .= ' id_user INT(20) NOT NULL,'; // this will be filled with the user's ID
 		$main_sql_create_uploads .= ' docs VARCHAR(255),';
 		$main_sql_create_uploads .= ' sent VARCHAR(255),';
 		$main_sql_create_uploads .= ' status VARCHAR(255),';

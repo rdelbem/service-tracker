@@ -46,9 +46,10 @@ if ( ! class_exists( 'ServiceTracker' ) ) {
 		}
 
 		function api() {
-			// start Api end points
+			// register api end points
 			$api = new Api();
 			$api->register_cases();
+			$api->register_progress();
 		}
 
 		/**
