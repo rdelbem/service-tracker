@@ -45,11 +45,18 @@ if ( ! class_exists( 'ServiceTracker' ) ) {
 				wp_enqueue_style( 'service-tracker-style', $this->base_plugin_uri . 'assets/css/style.css', array(), null );
 		}
 
+		/**
+		 * It will create the custom api end points
+		 * using Api class
+		 *
+		 * @return void
+		 */
 		function api() {
-			// register api end points
-			$api = new Api();
-			$api->register_cases();
-			$api->register_progress();
+			$api_cases = new Api( 'cases', 'user' );
+			$api_cases->register_api();
+
+			$api_progress = new Api( 'progress', 'case' );
+			$api_progress->register_api();
 		}
 
 		/**

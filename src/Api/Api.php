@@ -5,48 +5,57 @@ use ServiceTracker\Sql\Sql;
 
 class Api {
 
-	public function register_cases() {
-		add_action(
-			'rest_api_init',
-			function() {
-				register_rest_route(
-					'service-tracker/v1',
-					'/cases/(?P<id_user>\d+)',
-					array(
-						'methods'  => 'GET',
-						'callback' => array( $this, 'get_cases' ),
-					)
-				);
-			}
+	public $api_type;
+
+	public $api_argument;
+
+	function __construct( $type, $required_argument ) {
+		$this->api_type = $type;
+
+		$this->api_argument = $required_argument;
+	}
+
+	public function register_api() {
+		add_action( 'rest_api_init', array( $this, 'custom_api' ) );
+	}
+
+	public function custom_api() {
+		register_rest_route(
+			'service-tracker/v1',
+			'/' . $this->api_type . '/(?P<id_' . $this->api_argument . '>\d+)',
+			array(
+				'methods'  => 'GET',
+				'callback' => array( $this, 'get_from_db' ),
+			),
+			array(
+				'methods'  => 'POST',
+				'callback' => array( $this, 'post_' . $this->api_type . '' ),
+			)
 		);
 	}
 
-	public function register_progress() {
-		add_action(
-			'rest_api_init',
-			function() {
-				register_rest_route(
-					'service-tracker/v1',
-					'/progress/(?P<id_case>\d+)',
-					array(
-						'methods'  => 'GET',
-						'callback' => array( $this, 'get_progress' ),
-					)
-				);
-			}
-		);
+	public function get_from_db( $data ) {
+		$db_name = $this->api_type;
+
+		$sql = new Sql( 'servicetracker_' . $db_name . '' );
+
+		if ( $db_name === 'cases' ) {
+			return $sql->get_by( array( 'id_user' => $data['id_user'] ) );
+		}
+
+		if ( $db_name === 'progress' ) {
+			return $sql->get_by( array( 'id_case' => $data['id_case'] ) );
+		}
+
 	}
 
-	function get_cases( $data ) {
-		$sql = new Sql( 'servicetracker_cases' );
 
-		return $sql->get_by( array( 'id_user' => $data['id_user'] ) );
+	function post_cases( $data ) {
+		return 123;
 	}
 
-	function get_progress( $data ) {
-		$sql = new Sql( 'servicetracker_progress' );
+	function post_progress( $data ) {
 
-		return $sql->get_by( array( 'id_case' => $data['id_case'] ) );
 	}
 
 
