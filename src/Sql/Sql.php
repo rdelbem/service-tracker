@@ -36,9 +36,18 @@ class Sql {
 			return false;
 		}
 
-		$wpdb->insert( $this->tableName, $data );
+		try {
 
-		return $wpdb->insert_id;
+			$wpdb->insert( $this->tableName, $data );
+
+			return $wpdb->insert_id;
+
+		} catch ( \Throwable $th ) {
+
+			return array( 'error', $th );
+
+		}
+
 	}
 
 	/**

@@ -15,28 +15,51 @@ if ( ! class_exists( 'ServiceTracker' ) ) {
 
 		public $base_plugin_uri;
 
+		public $nonce;
+
 		function __construct() {
 			$this->base_path = plugin_dir_path( __DIR__ );
 
 			$this->base_plugin_uri = plugin_dir_url( __DIR__ );
+
+			$this->nonce();
+		}
+
+		function nonce() {
+			add_action(
+				'init',
+				function() {
+					$this->nonce = wp_create_nonce( 'wp_rest' );
+				}
+			);
+
 		}
 
 		function register() {
 			if ( isset( $_GET['page'] ) && $_GET['page'] === 'service_tracker' ) {
 
 				add_action( 'admin_enqueue_scripts', array( $this, 'enqueue' ) );
+			}
 
+			if ( ! class_exists( 'WooCommerce' ) ) {
+				$this->add_client_role();
 			}
 
 			add_action( 'admin_menu', array( $this, 'add_admin_pages' ) );
 		}
 
-		public function add_admin_pages() {
+		function add_client_role() {
+			add_role( 'client', 'Client', get_role( 'subscriber' )->capabilities );
+		}
+
+		function add_admin_pages() {
 			add_menu_page( 'Service Tracker', 'Service Tracker', 'manage_options', 'service_tracker', array( $this, 'admin_index' ), 'dashicons-universal-access-alt', 10 );
 		}
 
-		public function admin_index() {
-			require_once $this->base_path . '/src/templates/admin_view.php';
+		function admin_index() {
+
+			echo $this->nonce;
+			// require_once $this->base_path . '/src/templates/admin_view.php';
 		}
 
 		function enqueue() {
@@ -52,10 +75,10 @@ if ( ! class_exists( 'ServiceTracker' ) ) {
 		 * @return void
 		 */
 		function api() {
-			$api_cases = new Api( 'cases', 'user' );
+			$api_cases = new Api( 'cases', 'user', $this->nonce );
 			$api_cases->register_api();
 
-			$api_progress = new Api( 'progress', 'case' );
+			$api_progress = new Api( 'progress', 'case', $this->nonce );
 			$api_progress->register_api();
 		}
 
