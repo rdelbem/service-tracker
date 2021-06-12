@@ -3,6 +3,9 @@ namespace ServiceTracker\Api;
 
 use ServiceTracker\Sql\Sql;
 use \WP_REST_Server;
+use \WP_REST_Request;
+
+// ver isso https://developer.wordpress.org/rest-api/extending-the-rest-api/adding-custom-endpoints/#permissions-callback
 
 class Api {
 
@@ -27,23 +30,18 @@ class Api {
 	 */
 	public $db_name;
 
-
-	public $nonce;
-
 	/**
 	 * Constructor for the Api custom routes endpoints
 	 *
 	 * @param String 'cases', 'progress' or 'upload' -> this must match the table name
 	 * @param String 'user', 'case' -> dynamic value, it relates to the unique id of an user or a case
 	 */
-	public function __construct( $type, $required_argument, $nonce ) {
+	public function __construct( $type, $required_argument ) {
 		$this->api_type = $type;
 
 		$this->db_name = $type;
 
 		$this->api_argument = $required_argument;
-
-		$this->nonce = $nonce;
 	}
 
 	public function register_api() {
@@ -55,51 +53,91 @@ class Api {
 			'service-tracker/v1',
 			'/' . $this->api_type . '/(?P<id_' . $this->api_argument . '>\d+)',
 			array(
-				'methods'  => WP_REST_Server::READABLE,
-				'callback' => array( $this, 'read' ),
+				'methods'             => WP_REST_Server::READABLE,
+				'callback'            => array( $this, 'read' ),
+				'permission_callback' => function () {
+					return current_user_can( 'publish_posts' );
+				},
+			)/*
+			,
+			array(
+			'methods'  => WP_REST_Server::EDITABLE,
+			'callback' => array( $this, 'update' ),
 			),
 			array(
-				'methods'  => WP_REST_Server::CREATABLE,
-				'callback' => array( $this, 'create' ),
-			),
+			'methods'  => WP_REST_Server::DELETABLE,
+			'callback' => array( $this, 'delete' ),
+			) */
+		);
+
+		register_rest_route(
+			'service-tracker/v1',
+			'/' . $this->api_type . '/(?P<id_' . $this->api_argument . '>\d+)',
 			array(
-				'methods'  => WP_REST_Server::EDITABLE,
-				'callback' => array( $this, 'update' ),
-			),
-			array(
-				'methods'  => WP_REST_Server::DELETABLE,
-				'callback' => array( $this, 'delete' ),
+				'methods'             => WP_REST_Server::CREATABLE,
+				'callback'            => array( $this, 'create' ),
+				'permission_callback' => function () {
+					return current_user_can( 'publish_posts' );
+				},
 			)
 		);
 	}
 
 	function create( $data ) {
+		/*
+			  if ( ! check_ajax_referer( 'wp_rest', 'X-WP-Nonce', false ) ) {
+			return 'Sorry, you are not authorized!';
+		} */
 
-		! is_array( $data ) ? $data_array = array( $data ) : $data_array = $data;
-
-		$sql = new Sql( 'servicetracker_' . $this->db_name . '' );
-
-		if ( $this->db_name === 'cases' ) {
-			return 123;
-			// return $sql->insert( $data_array );
+		if ( empty( $data ) ) {
+			return;
 		}
 
-		if ( $this->db_name === 'progress' ) {
-			return $sql->insert( $data_array );
+		try {
+
+			$sql = new Sql( 'servicetracker_' . $this->db_name . '' );
+
+			if ( $this->db_name === 'cases' ) {
+				return $sql->insert(
+					array(
+						'id_user' => 12,
+						'title'   => 'olá',
+					)
+				);
+			}
+
+			if ( $this->db_name === 'progress' ) {
+				return $sql->insert( $data );
+			}
+		} catch ( Exception $error ) {
+			return $error;
 		}
 
 	}
 
 	public function read( $data ) {
+		if ( empty( $data ) ) {
+			return;
+		}
 
 		$sql = new Sql( 'servicetracker_' . $this->db_name . '' );
 
 		if ( $this->db_name === 'cases' ) {
-			return $sql->get_by( array( 'id_user' => $data['id_user'] ) );
+			try {
+				$response = $sql->get_by( array( 'id_user' => $data['id_user'] ) );
+				return $response;
+			} catch ( Exception $error ) {
+				return 'Unfortunetlly, an error ocurred: ' . $error;
+			}
 		}
 
 		if ( $this->db_name === 'progress' ) {
-			return $sql->get_by( array( 'id_case' => $data['id_case'] ) );
+			try {
+				$response = $sql->get_by( array( 'id_case' => $data['id_case'] ) );
+				return $response;
+			} catch ( Exception $error ) {
+				return 'Unfortunetlly, an error ocurred: ' . $error;
+			}
 		}
 
 	}

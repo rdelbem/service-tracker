@@ -1,6 +1,7 @@
 <?php
 namespace ServiceTracker\Sql;
 
+defined( 'ABSPATH' ) or die( 'You do not have permission to access this file on its own.' );
 /**
  * Class which has helper functions to get data from the database
  */
@@ -40,11 +41,11 @@ class Sql {
 
 			$wpdb->insert( $this->tableName, $data );
 
-			return $wpdb->insert_id;
+			return 'Success, data was inserted at id ' . $wpdb->insert_id;
 
 		} catch ( \Throwable $th ) {
 
-			return array( 'error', $th );
+			return 'Error: ' . $th;
 
 		}
 

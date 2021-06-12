@@ -12,3 +12,4 @@ defined( 'ABSPATH' ) or die( 'You do not have permission to access this file on 
 
 // Main class
 	require_once __DIR__ . '/src/ServiceTracker.php';
+

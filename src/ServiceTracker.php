@@ -15,25 +15,13 @@ if ( ! class_exists( 'ServiceTracker' ) ) {
 
 		public $base_plugin_uri;
 
-		public $nonce;
 
 		function __construct() {
 			$this->base_path = plugin_dir_path( __DIR__ );
 
 			$this->base_plugin_uri = plugin_dir_url( __DIR__ );
-
-			$this->nonce();
 		}
 
-		function nonce() {
-			add_action(
-				'init',
-				function() {
-					$this->nonce = wp_create_nonce( 'wp_rest' );
-				}
-			);
-
-		}
 
 		function register() {
 			if ( isset( $_GET['page'] ) && $_GET['page'] === 'service_tracker' ) {
@@ -57,15 +45,23 @@ if ( ! class_exists( 'ServiceTracker' ) ) {
 		}
 
 		function admin_index() {
-
-			echo $this->nonce;
-			// require_once $this->base_path . '/src/templates/admin_view.php';
+			require_once $this->base_path . '/src/templates/admin_view.php';
 		}
 
 		function enqueue() {
-				wp_enqueue_script( 'service-tracker-script', $this->base_plugin_uri . 'assets/js/app.js', array( 'wp-element' ), time(), false );
+			wp_enqueue_script( 'service-tracker-script', $this->base_plugin_uri . 'assets/js/app.js', array( 'wp-element' ), time(), false );
 
-				wp_enqueue_style( 'service-tracker-style', $this->base_plugin_uri . 'assets/css/style.css', array(), null );
+			wp_localize_script(
+				'service-tracker-script',
+				'data',
+				array(
+					'root_url' => get_site_url(),
+					'api_url'  => 'service-tracker/v1',
+					'nonce'    => wp_create_nonce( 'wp_rest' ),
+				)
+			);
+
+			wp_enqueue_style( 'service-tracker-style', $this->base_plugin_uri . 'assets/css/style.css', array(), null );
 		}
 
 		/**
@@ -75,10 +71,10 @@ if ( ! class_exists( 'ServiceTracker' ) ) {
 		 * @return void
 		 */
 		function api() {
-			$api_cases = new Api( 'cases', 'user', $this->nonce );
+			$api_cases = new Api( 'cases', 'user' );
 			$api_cases->register_api();
 
-			$api_progress = new Api( 'progress', 'case', $this->nonce );
+			$api_progress = new Api( 'progress', 'case' );
 			$api_progress->register_api();
 		}
 
