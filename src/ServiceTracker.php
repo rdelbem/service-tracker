@@ -25,7 +25,6 @@ if ( ! class_exists( 'ServiceTracker' ) ) {
 
 		function register() {
 			if ( isset( $_GET['page'] ) && $_GET['page'] === 'service_tracker' ) {
-
 				add_action( 'admin_enqueue_scripts', array( $this, 'enqueue' ) );
 			}
 

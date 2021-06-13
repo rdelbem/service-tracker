@@ -4,6 +4,7 @@ namespace ServiceTracker\Api;
 use ServiceTracker\Sql\Sql;
 use \WP_REST_Server;
 use \WP_REST_Request;
+use \WP_REST_Response;
 
 // ver isso https://developer.wordpress.org/rest-api/extending-the-rest-api/adding-custom-endpoints/#permissions-callback
 
@@ -55,9 +56,7 @@ class Api {
 			array(
 				'methods'             => WP_REST_Server::READABLE,
 				'callback'            => array( $this, 'read' ),
-				'permission_callback' => function () {
-					return current_user_can( 'publish_posts' );
-				},
+				'permission_callback' => array( $this, 'user_verification' ),
 			)/*
 			,
 			array(
@@ -76,22 +75,32 @@ class Api {
 			array(
 				'methods'             => WP_REST_Server::CREATABLE,
 				'callback'            => array( $this, 'create' ),
-				'permission_callback' => function () {
-					return current_user_can( 'publish_posts' );
-				},
+				'permission_callback' => array( $this, 'user_verification' ),
 			)
 		);
 	}
 
-	function create( $data ) {
-		/*
-			  if ( ! check_ajax_referer( 'wp_rest', 'X-WP-Nonce', false ) ) {
-			return 'Sorry, you are not authorized!';
-		} */
+	function user_verification() {
+		return current_user_can( 'publish_posts' );
+	}
+
+	function create( WP_REST_Request $data ) {
 
 		if ( empty( $data ) ) {
 			return;
 		}
+
+		$headers = $data->get_headers();
+		$nonce   = $headers['x_wp_nonce'][0];
+
+		if ( ! wp_verify_nonce( $nonce, 'wp_rest' ) ) {
+			return new WP_REST_Response( 'Sorry, invalid credentials', 422 );
+		}
+
+		$body          = $data->get_body();
+		$json_to_array = json_decode( $body );
+		$id_user       = $json_to_array->id_user;
+		$title         = $json_to_array->title;
 
 		try {
 
@@ -100,14 +109,20 @@ class Api {
 			if ( $this->db_name === 'cases' ) {
 				return $sql->insert(
 					array(
-						'id_user' => 12,
-						'title'   => 'olá',
+						'id_user' => $id_user,
+						'title'   => $title,
 					)
 				);
 			}
 
+			//verificar isso
 			if ( $this->db_name === 'progress' ) {
-				return $sql->insert( $data );
+				return $sql->insert(
+					array(
+						'id_user' => $id_user,
+						'title'   => $title,
+					)
+				);
 			}
 		} catch ( Exception $error ) {
 			return $error;

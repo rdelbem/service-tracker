@@ -41,7 +41,7 @@ class Sql {
 
 			$wpdb->insert( $this->tableName, $data );
 
-			return 'Success, data was inserted at id ' . $wpdb->insert_id;
+			return 'Success, data was inserted' . $wpdb->insert_id;
 
 		} catch ( \Throwable $th ) {
 
