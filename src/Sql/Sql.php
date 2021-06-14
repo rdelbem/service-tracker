@@ -134,6 +134,10 @@ class Sql {
 	 * @return Int - Num rows deleted
 	 */
 	public function delete( array $conditionValue ) {
+		if ( empty( $conditionValue ) ) {
+			return;
+		}
+
 		global $wpdb;
 
 		$deleted = $wpdb->delete( $this->tableName, $conditionValue );

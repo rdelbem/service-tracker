@@ -6,8 +6,6 @@ use \WP_REST_Server;
 use \WP_REST_Request;
 use \WP_REST_Response;
 
-// ver isso https://developer.wordpress.org/rest-api/extending-the-rest-api/adding-custom-endpoints/#permissions-callback
-
 class Api {
 
 	/**
@@ -57,16 +55,27 @@ class Api {
 				'methods'             => WP_REST_Server::READABLE,
 				'callback'            => array( $this, 'read' ),
 				'permission_callback' => array( $this, 'user_verification' ),
-			)/*
-			,
+			)
+		);
+
+		register_rest_route(
+			'service-tracker/v1',
+			'/' . $this->api_type . '/(?P<id>\d+)',
 			array(
-			'methods'  => WP_REST_Server::EDITABLE,
-			'callback' => array( $this, 'update' ),
-			),
+				'methods'             => WP_REST_Server::EDITABLE,
+				'callback'            => array( $this, 'update' ),
+				'permission_callback' => array( $this, 'user_verification' ),
+			)
+		);
+
+		register_rest_route(
+			'service-tracker/v1',
+			'/' . $this->api_type . '/(?P<id>\d+)',
 			array(
-			'methods'  => WP_REST_Server::DELETABLE,
-			'callback' => array( $this, 'delete' ),
-			) */
+				'methods'             => WP_REST_Server::DELETABLE,
+				'callback'            => array( $this, 'delete' ),
+				'permission_callback' => array( $this, 'user_verification' ),
+			)
 		);
 
 		register_rest_route(
@@ -80,12 +89,11 @@ class Api {
 		);
 	}
 
-	function user_verification() {
+	public function user_verification() {
 		return current_user_can( 'publish_posts' );
 	}
 
-	function create( WP_REST_Request $data ) {
-
+	public function security_check( $data ) {
 		if ( empty( $data ) ) {
 			return;
 		}
@@ -96,17 +104,24 @@ class Api {
 		if ( ! wp_verify_nonce( $nonce, 'wp_rest' ) ) {
 			return new WP_REST_Response( 'Sorry, invalid credentials', 422 );
 		}
+	}
 
-		$body          = $data->get_body();
-		$json_to_array = json_decode( $body );
-		$id_user       = $json_to_array->id_user;
-		$title         = $json_to_array->title;
+	public function create( WP_REST_Request $data ) {
+
+		$this->security_check( $data );
+
+		$body = $data->get_body();
+		$body = json_decode( $body );
 
 		try {
 
 			$sql = new Sql( 'servicetracker_' . $this->db_name . '' );
 
 			if ( $this->db_name === 'cases' ) {
+
+				$id_user = $body->id_user;
+				$title   = $body->title;
+
 				return $sql->insert(
 					array(
 						'id_user' => $id_user,
@@ -115,12 +130,17 @@ class Api {
 				);
 			}
 
-			//verificar isso
 			if ( $this->db_name === 'progress' ) {
+
+				$id_user = $body->id_user;
+				$id_case = $body->id_case;
+				$text    = $body->text;
+
 				return $sql->insert(
 					array(
 						'id_user' => $id_user,
-						'title'   => $title,
+						'id_case' => $id_case,
+						'text'    => $text,
 					)
 				);
 			}
@@ -131,9 +151,8 @@ class Api {
 	}
 
 	public function read( $data ) {
-		if ( empty( $data ) ) {
-			return;
-		}
+
+		$this->security_check( $data );
 
 		$sql = new Sql( 'servicetracker_' . $this->db_name . '' );
 
@@ -157,12 +176,64 @@ class Api {
 
 	}
 
+	public function update( $data ) {
+		$this->security_check( $data );
 
-	function update( $data ) {
+		$sql = new Sql( 'servicetracker_' . $this->db_name . '' );
+
+		return 123;
+
+		/*
+		  if ( $this->db_name === 'cases' ) {
+			try {
+
+			} catch ( Exception $error ) {
+				return 'Unfortunetlly, an error ocurred: ' . $error;
+			}
+		}
+
+		if ( $this->db_name === 'progress' ) {
+			try {
+
+			} catch ( Exception $error ) {
+				return 'Unfortunetlly, an error ocurred: ' . $error;
+			}
+		} */
 
 	}
 
-	function delete( $data ) {
+	public function delete( $data ) {
+		$this->security_check( $data );
+
+		$sql = new Sql( 'servicetracker_' . $this->db_name . '' );
+
+		if ( $this->db_name === 'cases' ) {
+			try {
+				$delete = $sql->delete( array( 'id' => $data['id'] ) );
+
+				if ( $delete === 0 ) {
+					return 'Error: No entry was found with id ' . $data['id'];
+				} elseif ( $delete === 1 ) {
+					return 'Success: deleted entry with id ' . $data['id'];
+				}
+			} catch ( \Throwable $th ) {
+				return $th;
+			}
+		}
+
+		if ( $this->db_name === 'progress' ) {
+			try {
+				$delete = $sql->delete( array( 'id' => $data['id'] ) );
+
+				if ( $delete === 0 ) {
+					return 'Error: No entry was found with id ' . $data['id'];
+				} elseif ( $delete === 1 ) {
+					return 'Success: deleted entry with id ' . $data['id'];
+				}
+			} catch ( \Throwable $th ) {
+				return $th;
+			}
+		}
 
 	}
 
