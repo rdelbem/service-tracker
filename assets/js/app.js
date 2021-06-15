@@ -1,5 +1,7 @@
 console.log(data);
 
+const sample = { id_user: 12, title: "Caso extremamente complexo" };
+
 //GET
 async function get_teste() {
   const grab = await fetch(
@@ -39,12 +41,13 @@ async function delete_teste() {
 //UPDATE
 async function update_teste() {
   const grab = await fetch(
-    "https://aulasplugin.local/wp-json/service-tracker/v1/cases/6",
+    "https://aulasplugin.local/wp-json/service-tracker/v1/progress/1",
     {
       method: "PUT",
       headers: {
         "X-WP-Nonce": data.nonce,
       },
+      body: JSON.stringify(sample),
     }
   );
 
@@ -52,9 +55,8 @@ async function update_teste() {
 
   console.log(res);
 }
-update_teste();
+//update_teste();
 
-const xdx = { id_user: 12, title: "99999999" };
 //POST
 async function teste() {
   const grab = await fetch(
@@ -65,7 +67,7 @@ async function teste() {
         "X-WP-Nonce": data.nonce,
         "Content-type": "application/json",
       },
-      body: JSON.stringify(xdx),
+      body: JSON.stringify(sample),
     }
   );
 
@@ -73,3 +75,24 @@ async function teste() {
 
   console.log(res);
 }
+//teste();
+
+//get_teste();
+
+//POST
+async function toggle() {
+  const grab = await fetch(
+    "https://aulasplugin.local/wp-json/service-tracker/v1/cases-status/1",
+    {
+      method: "POST",
+      headers: {
+        "X-WP-Nonce": data.nonce,
+      },
+    }
+  );
+
+  const res = await grab.json();
+
+  console.log(res);
+}
+//toggle();

@@ -29,6 +29,9 @@ class Api {
 	 */
 	public $db_name;
 
+
+	public $api_methods = array( WP_REST_Server::READABLE, WP_REST_Server::EDITABLE, WP_REST_Server::DELETABLE, WP_REST_Server::CREATABLE );
+
 	/**
 	 * Constructor for the Api custom routes endpoints
 	 *
@@ -48,6 +51,8 @@ class Api {
 	}
 
 	public function custom_api() {
+
+		// Case title and Progress text routes
 		register_rest_route(
 			'service-tracker/v1',
 			'/' . $this->api_type . '/(?P<id_' . $this->api_argument . '>\d+)',
@@ -84,6 +89,17 @@ class Api {
 			array(
 				'methods'             => WP_REST_Server::CREATABLE,
 				'callback'            => array( $this, 'create' ),
+				'permission_callback' => array( $this, 'user_verification' ),
+			)
+		);
+
+		// Status route
+		register_rest_route(
+			'service-tracker/v1',
+			'/cases-status/(?P<id>\d+)',
+			array(
+				'methods'             => WP_REST_Server::EDITABLE,
+				'callback'            => array( $this, 'toggle_status' ),
 				'permission_callback' => array( $this, 'user_verification' ),
 			)
 		);
@@ -126,6 +142,7 @@ class Api {
 					array(
 						'id_user' => $id_user,
 						'title'   => $title,
+						'status'  => 'open',
 					)
 				);
 			}
@@ -177,28 +194,67 @@ class Api {
 	}
 
 	public function update( $data ) {
+
 		$this->security_check( $data );
+
+		$body = $data->get_body();
+		$body = json_decode( $body );
 
 		$sql = new Sql( 'servicetracker_' . $this->db_name . '' );
 
-		return 123;
+		if ( $this->db_name === 'cases' ) {
 
-		/*
-		  if ( $this->db_name === 'cases' ) {
+			$title = $body->title;
+
 			try {
 
+				$response = $sql->update(
+					array(
+						'title' => $title,
+					),
+					array(
+						'id' => $data['id'],
+					)
+				);
+
+				if ( $response === 0 ) {
+					return 'Error: couldn\'t update title at ' . $data['id'];
+				}
+
+				if ( $response === 1 ) {
+					return 'Success: title updated at ' . $data['id'];
+				}
 			} catch ( Exception $error ) {
 				return 'Unfortunetlly, an error ocurred: ' . $error;
 			}
 		}
 
 		if ( $this->db_name === 'progress' ) {
+
+			$text = $body->text;
+
 			try {
 
+				$response = $sql->update(
+					array(
+						'text' => $text,
+					),
+					array(
+						'id' => $data['id'],
+					)
+				);
+
+				if ( $response === 0 ) {
+					return 'Error: couldn\'t update title at ' . $data['id'];
+				}
+
+				if ( $response === 1 ) {
+					return 'Success: title updated at ' . $data['id'];
+				}
 			} catch ( Exception $error ) {
 				return 'Unfortunetlly, an error ocurred: ' . $error;
 			}
-		} */
+		}
 
 	}
 
@@ -233,6 +289,49 @@ class Api {
 			} catch ( \Throwable $th ) {
 				return $th;
 			}
+		}
+
+	}
+
+	public function toggle_status( $data ) {
+		$this->security_check( $data );
+
+		if ( $this->db_name === 'progress' ) {
+			return;
+		}
+
+		$sql      = new Sql( 'servicetracker_cases' );
+		$response = $sql->get_by( array( 'id' => $data['id'] ) );
+		$response = (array) $response[0];
+
+		try {
+			if ( $response['status'] === 'open' ) {
+				$toggle = $sql->update(
+					array(
+						'status' => 'close',
+					),
+					array(
+						'id' => $data['id'],
+					)
+				);
+
+				return $toggle;
+			}
+
+			if ( $response['status'] === 'close' ) {
+				$toggle = $sql->update(
+					array(
+						'status' => 'open',
+					),
+					array(
+						'id' => $data['id'],
+					)
+				);
+
+				return $toggle;
+			}
+		} catch ( \Throwable $th ) {
+			return $th;
 		}
 
 	}

@@ -18,6 +18,7 @@ class Activate {
 		$main_sql_create_cases .= 'id INT(10) UNSIGNED AUTO_INCREMENT PRIMARY KEY,';
 		$main_sql_create_cases .= ' id_user INT(20) NOT NULL,'; // this will be filled with the user's ID
 		$main_sql_create_cases .= ' created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,';
+		$main_sql_create_cases .= ' status VARCHAR(255),';
 		$main_sql_create_cases .= ' title VARCHAR(255))';
 		maybe_create_table( $tablename_cases, $main_sql_create_cases );
 

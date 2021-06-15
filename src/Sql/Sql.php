@@ -121,9 +121,12 @@ class Sql {
 			return false;
 		}
 
-		$updated = $wpdb->update( $this->tableName, $data, $conditionValue );
-
-		return $updated;
+		try {
+			$updated = $wpdb->update( $this->tableName, $data, $conditionValue );
+			return $updated;
+		} catch ( \Throwable $th ) {
+			return $th;
+		}
 	}
 
 	/**
