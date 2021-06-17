@@ -70,10 +70,10 @@ if ( ! class_exists( 'ServiceTracker' ) ) {
 		 * @return void
 		 */
 		function api() {
-			$api_cases = new Api( 'cases', 'user' );
+			$api_cases = new Api( 'cases', '_user' );
 			$api_cases->register_api();
 
-			$api_progress = new Api( 'progress', 'case' );
+			$api_progress = new Api( 'progress', '_case' );
 			$api_progress->register_api();
 		}
 

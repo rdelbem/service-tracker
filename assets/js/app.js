@@ -1,6 +1,6 @@
 console.log(data);
 
-const sample = { id_user: 12, title: "Caso extremamente complexo" };
+const sample = { id_user: 12, title: "Caso mediano" };
 
 //GET
 async function get_teste() {
@@ -18,12 +18,12 @@ async function get_teste() {
 
   console.log(res);
 }
-//get_teste();
+get_teste();
 
 //DELETE
 async function delete_teste() {
   const grab = await fetch(
-    "https://aulasplugin.local/wp-json/service-tracker/v1/cases/3",
+    "https://aulasplugin.local/wp-json/service-tracker/v1/cases/4",
     {
       method: "DELETE",
       headers: {
@@ -41,7 +41,7 @@ async function delete_teste() {
 //UPDATE
 async function update_teste() {
   const grab = await fetch(
-    "https://aulasplugin.local/wp-json/service-tracker/v1/progress/1",
+    "https://aulasplugin.local/wp-json/service-tracker/v1/cases/1",
     {
       method: "PUT",
       headers: {

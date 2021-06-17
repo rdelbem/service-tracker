@@ -52,58 +52,17 @@ class Api {
 
 	public function custom_api() {
 
-		// $register_route = new Routes($this->api_type, $this->argument, $type(if read, creat etc), $);
+		// Routes for the API CRUD
+		$this->register_new_route( '', 'api_argument', WP_REST_Server::READABLE, array( $this, 'read' ) );
 
-		register_rest_route(
-			'service-tracker/v1',
-			'/' . $this->api_type . '/(?P<id_' . $this->api_argument . '>\d+)',
-			array(
-				'methods'             => WP_REST_Server::READABLE,
-				'callback'            => array( $this, 'read' ),
-				'permission_callback' => array( $this, 'user_verification' ),
-			)
-		);
+		$this->register_new_route( '', '', WP_REST_Server::EDITABLE, array( $this, 'update' ) );
 
-		register_rest_route(
-			'service-tracker/v1',
-			'/' . $this->api_type . '/(?P<id>\d+)',
-			array(
-				'methods'             => WP_REST_Server::EDITABLE,
-				'callback'            => array( $this, 'update' ),
-				'permission_callback' => array( $this, 'user_verification' ),
-			)
-		);
+		$this->register_new_route( '', '', WP_REST_Server::DELETABLE, array( $this, 'delete' ) );
 
-		register_rest_route(
-			'service-tracker/v1',
-			'/' . $this->api_type . '/(?P<id>\d+)',
-			array(
-				'methods'             => WP_REST_Server::DELETABLE,
-				'callback'            => array( $this, 'delete' ),
-				'permission_callback' => array( $this, 'user_verification' ),
-			)
-		);
+		$this->register_new_route( '', 'api_argument', WP_REST_Server::CREATABLE, array( $this, 'create' ) );
 
-		register_rest_route(
-			'service-tracker/v1',
-			'/' . $this->api_type . '/(?P<id_' . $this->api_argument . '>\d+)',
-			array(
-				'methods'             => WP_REST_Server::CREATABLE,
-				'callback'            => array( $this, 'create' ),
-				'permission_callback' => array( $this, 'user_verification' ),
-			)
-		);
-
-		// Toggle Status route
-		register_rest_route(
-			'service-tracker/v1',
-			'/cases-status/(?P<id>\d+)',
-			array(
-				'methods'             => WP_REST_Server::EDITABLE,
-				'callback'            => array( $this, 'toggle_status' ),
-				'permission_callback' => array( $this, 'user_verification' ),
-			)
-		);
+		// Route for the Toggle of the cases statuses
+		$this->register_new_route( 'cases-status', '', WP_REST_Server::CREATABLE, array( $this, 'toggle_status' ) );
 	}
 
 	public function user_verification() {
@@ -121,6 +80,27 @@ class Api {
 		if ( ! wp_verify_nonce( $nonce, 'wp_rest' ) ) {
 			return new WP_REST_Response( 'Sorry, invalid credentials', 422 );
 		}
+	}
+
+	public function register_new_route( $api_type, $api_argument, $method, $callback ) {
+
+		if ( $api_type === '' ) {
+			$api_type = $this->api_type;
+		}
+
+		if ( $api_argument === 'api_argument' ) {
+			$api_argument = $this->api_argument;
+		}
+
+		register_rest_route(
+			'service-tracker/v1',
+			'/' . $api_type . '/(?P<id' . $api_argument . '>\d+)',
+			array(
+				'methods'             => $method,
+				'callback'            => $callback,
+				'permission_callback' => array( $this, 'user_verification' ),
+			)
+		);
 	}
 
 	public function create( WP_REST_Request $data ) {
