@@ -52,7 +52,8 @@ class Api {
 
 	public function custom_api() {
 
-		// Case title and Progress text routes
+		// $register_route = new Routes($this->api_type, $this->argument, $type(if read, creat etc), $);
+
 		register_rest_route(
 			'service-tracker/v1',
 			'/' . $this->api_type . '/(?P<id_' . $this->api_argument . '>\d+)',
@@ -93,7 +94,7 @@ class Api {
 			)
 		);
 
-		// Status route
+		// Toggle Status route
 		register_rest_route(
 			'service-tracker/v1',
 			'/cases-status/(?P<id>\d+)',
