@@ -29,9 +29,6 @@ class Api {
 	 */
 	public $db_name;
 
-
-	public $api_methods = array( WP_REST_Server::READABLE, WP_REST_Server::EDITABLE, WP_REST_Server::DELETABLE, WP_REST_Server::CREATABLE );
-
 	/**
 	 * Constructor for the Api custom routes endpoints
 	 *
@@ -61,7 +58,7 @@ class Api {
 
 		$this->register_new_route( '', 'api_argument', WP_REST_Server::CREATABLE, array( $this, 'create' ) );
 
-		// Route for the Toggle of the cases statuses
+		// Route for the Toggle of the statuses of the cases
 		$this->register_new_route( 'cases-status', '', WP_REST_Server::CREATABLE, array( $this, 'toggle_status' ) );
 	}
 

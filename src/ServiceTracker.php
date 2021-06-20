@@ -23,19 +23,20 @@ if ( ! class_exists( 'ServiceTracker' ) ) {
 		}
 
 
-		function register() {
-			if ( isset( $_GET['page'] ) && $_GET['page'] === 'service_tracker' ) {
-				add_action( 'admin_enqueue_scripts', array( $this, 'enqueue' ) );
-			}
-
-			if ( ! class_exists( 'WooCommerce' ) ) {
-				$this->add_client_role();
-			}
+		function run() {
+			add_action( 'admin_enqueue_scripts', array( $this, 'enqueue' ) );
 
 			add_action( 'admin_menu', array( $this, 'add_admin_pages' ) );
+
+			$this->add_client_role();
+
+			$this->api();
 		}
 
 		function add_client_role() {
+			if ( class_exists( 'WooCommerce' ) ) {
+				return;
+			}
 			add_role( 'client', 'Client', get_role( 'subscriber' )->capabilities );
 		}
 
@@ -47,7 +48,11 @@ if ( ! class_exists( 'ServiceTracker' ) ) {
 			require_once $this->base_path . '/src/templates/admin_view.php';
 		}
 
-		function enqueue() {
+		function enqueue( $hook ) {
+			if ( 'toplevel_page_service_tracker' !== $hook ) {
+				return;
+			}
+
 			wp_enqueue_script( 'service-tracker-script', $this->base_plugin_uri . 'assets/js/app.js', array( 'wp-element' ), time(), false );
 
 			wp_localize_script(
@@ -98,9 +103,7 @@ if ( ! class_exists( 'ServiceTracker' ) ) {
 
 	$serviceTracker = new ServiceTracker();
 
-	$serviceTracker->register();
-
-	$serviceTracker->api();
+	$serviceTracker->run();
 
 	// On activation
 	register_activation_hook( $serviceTracker->base_path . 'Service_Tracker_init.php', array( $serviceTracker, 'activate' ) );
