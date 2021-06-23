@@ -91,6 +91,7 @@ class Service_Tracker {
 		$this->load_dependencies();
 		// $this->set_locale();
 		$this->define_admin_hooks();
+		$this->api();
 		// $this->define_public_hooks();
 	}
 
@@ -114,6 +115,16 @@ class Service_Tracker {
 
 		$this->loader = new Service_Tracker_Loader();
 
+	}
+
+	private function api() {
+		$serviceTracker_Api_cases = new Service_Tracker_Api( 'cases', '_user' );
+
+		$this->loader->add_action( 'rest_api_init', $serviceTracker_Api_cases, 'custom_api' );
+
+		$serviceTracker_Api_progress = new Service_Tracker_Api( 'progress', '_case' );
+
+		$this->loader->add_action( 'rest_api_init', $serviceTracker_Api_progress, 'custom_api' );
 	}
 
 	/**
@@ -149,8 +160,11 @@ class Service_Tracker {
 		$plugin_admin = new Service_Tracker_Admin( $this->get_plugin_name(), $this->get_version() );
 
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_styles' );
+
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_scripts' );
+
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'localize_scripts' );
+
 		$this->loader->add_action( 'admin_menu', $plugin_admin, 'admin_page' );
 
 	}

@@ -1,7 +1,7 @@
 <?php
 namespace ServiceTracker\includes;
 
-use ServiceTracker\includes\Sql;
+use ServiceTracker\includes\Service_Tracker_Sql;
 use \WP_REST_Server;
 use \WP_REST_Request;
 use \WP_REST_Response;
@@ -43,10 +43,6 @@ class Service_Tracker_Api {
 		$this->api_argument = $required_argument;
 	}
 
-	public function register_api() {
-		add_action( 'rest_api_init', array( $this, 'custom_api' ) );
-	}
-
 	public function custom_api() {
 
 		// Routes for the API CRUD
@@ -75,7 +71,7 @@ class Service_Tracker_Api {
 		$nonce   = $headers['x_wp_nonce'][0];
 
 		if ( ! wp_verify_nonce( $nonce, 'wp_rest' ) ) {
-			return new WP_REST_Response( 'Sorry, invalid credentials', 422 );
+			return new WP_REST_Response( 'Sorry, invalid credentials' );
 		}
 	}
 
@@ -100,6 +96,24 @@ class Service_Tracker_Api {
 		);
 	}
 
+	public function read( $data ) {
+
+		$this->security_check( $data );
+
+		$sql = new Service_Tracker_Sql( 'servicetracker_' . $this->db_name . '' );
+
+		if ( $this->db_name === 'cases' ) {
+			$response = $sql->get_by( array( 'id_user' => $data['id_user'] ) );
+			return $response;
+		}
+
+		if ( $this->db_name === 'progress' ) {
+			$response = $sql->get_by( array( 'id_case' => $data['id_case'] ) );
+			return $response;
+		}
+
+	}
+
 	public function create( WP_REST_Request $data ) {
 
 		$this->security_check( $data );
@@ -107,68 +121,36 @@ class Service_Tracker_Api {
 		$body = $data->get_body();
 		$body = json_decode( $body );
 
-		try {
-
-			$sql = new Sql( 'servicetracker_' . $this->db_name . '' );
-
-			if ( $this->db_name === 'cases' ) {
-
-				$id_user = $body->id_user;
-				$title   = $body->title;
-
-				return $sql->insert(
-					array(
-						'id_user' => $id_user,
-						'title'   => $title,
-						'status'  => 'open',
-					)
-				);
-			}
-
-			if ( $this->db_name === 'progress' ) {
-
-				$id_user = $body->id_user;
-				$id_case = $body->id_case;
-				$text    = $body->text;
-
-				return $sql->insert(
-					array(
-						'id_user' => $id_user,
-						'id_case' => $id_case,
-						'text'    => $text,
-					)
-				);
-			}
-		} catch ( Exception $error ) {
-			return $error;
-		}
-
-	}
-
-	public function read( $data ) {
-
-		$this->security_check( $data );
-
-		$sql = new Sql( 'servicetracker_' . $this->db_name . '' );
+		$sql = new Service_Tracker_Sql( 'servicetracker_' . $this->db_name . '' );
 
 		if ( $this->db_name === 'cases' ) {
-			try {
-				$response = $sql->get_by( array( 'id_user' => $data['id_user'] ) );
-				return $response;
-			} catch ( Exception $error ) {
-				return 'Unfortunetlly, an error ocurred: ' . $error;
-			}
+
+			$id_user = $body->id_user;
+			$title   = $body->title;
+
+			return $sql->insert(
+				array(
+					'id_user' => $id_user,
+					'title'   => $title,
+					'status'  => 'open',
+				)
+			);
 		}
 
 		if ( $this->db_name === 'progress' ) {
-			try {
-				$response = $sql->get_by( array( 'id_case' => $data['id_case'] ) );
-				return $response;
-			} catch ( Exception $error ) {
-				return 'Unfortunetlly, an error ocurred: ' . $error;
-			}
-		}
 
+			$id_user = $body->id_user;
+			$id_case = $body->id_case;
+			$text    = $body->text;
+
+			return $sql->insert(
+				array(
+					'id_user' => $id_user,
+					'id_case' => $id_case,
+					'text'    => $text,
+				)
+			);
+		}
 	}
 
 	public function update( $data ) {
@@ -178,60 +160,22 @@ class Service_Tracker_Api {
 		$body = $data->get_body();
 		$body = json_decode( $body );
 
-		$sql = new Sql( 'servicetracker_' . $this->db_name . '' );
+		$sql = new Service_Tracker_Sql( 'servicetracker_' . $this->db_name . '' );
 
 		if ( $this->db_name === 'cases' ) {
-
-			$title = $body->title;
-
-			try {
-
-				$response = $sql->update(
-					array(
-						'title' => $title,
-					),
-					array(
-						'id' => $data['id'],
-					)
-				);
-
-				if ( $response === 0 ) {
-					return 'Error: couldn\'t update title at ' . $data['id'];
-				}
-
-				if ( $response === 1 ) {
-					return 'Success: title updated at ' . $data['id'];
-				}
-			} catch ( Exception $error ) {
-				return 'Unfortunetlly, an error ocurred: ' . $error;
-			}
+			$title    = $body->title;
+			$response = $sql->update(
+				array( 'title' => $title ),
+				array( 'id' => $data['id'] )
+			);
 		}
 
 		if ( $this->db_name === 'progress' ) {
-
-			$text = $body->text;
-
-			try {
-
-				$response = $sql->update(
-					array(
-						'text' => $text,
-					),
-					array(
-						'id' => $data['id'],
-					)
-				);
-
-				if ( $response === 0 ) {
-					return 'Error: couldn\'t update title at ' . $data['id'];
-				}
-
-				if ( $response === 1 ) {
-					return 'Success: title updated at ' . $data['id'];
-				}
-			} catch ( Exception $error ) {
-				return 'Unfortunetlly, an error ocurred: ' . $error;
-			}
+			$text     = $body->text;
+			$response = $sql->update(
+				array( 'text' => $text ),
+				array( 'id' => $data['id'] )
+			);
 		}
 
 	}
@@ -239,34 +183,14 @@ class Service_Tracker_Api {
 	public function delete( $data ) {
 		$this->security_check( $data );
 
-		$sql = new Sql( 'servicetracker_' . $this->db_name . '' );
+		$sql = new Service_Tracker_Sql( 'servicetracker_' . $this->db_name . '' );
 
 		if ( $this->db_name === 'cases' ) {
-			try {
-				$delete = $sql->delete( array( 'id' => $data['id'] ) );
-
-				if ( $delete === 0 ) {
-					return 'Error: No entry was found with id ' . $data['id'];
-				} elseif ( $delete === 1 ) {
-					return 'Success: deleted entry with id ' . $data['id'];
-				}
-			} catch ( \Throwable $th ) {
-				return $th;
-			}
+			$delete = $sql->delete( array( 'id' => $data['id'] ) );
 		}
 
 		if ( $this->db_name === 'progress' ) {
-			try {
-				$delete = $sql->delete( array( 'id' => $data['id'] ) );
-
-				if ( $delete === 0 ) {
-					return 'Error: No entry was found with id ' . $data['id'];
-				} elseif ( $delete === 1 ) {
-					return 'Success: deleted entry with id ' . $data['id'];
-				}
-			} catch ( \Throwable $th ) {
-				return $th;
-			}
+			$delete = $sql->delete( array( 'id' => $data['id'] ) );
 		}
 
 	}
@@ -278,40 +202,27 @@ class Service_Tracker_Api {
 			return;
 		}
 
-		$sql      = new Sql( 'servicetracker_cases' );
+		$sql      = new Service_Tracker_Sql( 'servicetracker_cases' );
 		$response = $sql->get_by( array( 'id' => $data['id'] ) );
 		$response = (array) $response[0];
 
-		try {
-			if ( $response['status'] === 'open' ) {
-				$toggle = $sql->update(
-					array(
-						'status' => 'close',
-					),
-					array(
-						'id' => $data['id'],
-					)
-				);
+		if ( $response['status'] === 'open' ) {
+			$toggle = $sql->update(
+				array( 'status' => 'close' ),
+				array( 'id' => $data['id'] )
+			);
 
-				return $toggle;
-			}
-
-			if ( $response['status'] === 'close' ) {
-				$toggle = $sql->update(
-					array(
-						'status' => 'open',
-					),
-					array(
-						'id' => $data['id'],
-					)
-				);
-
-				return $toggle;
-			}
-		} catch ( \Throwable $th ) {
-			return $th;
+			return $toggle;
 		}
 
+		if ( $response['status'] === 'close' ) {
+			$toggle = $sql->update(
+				array( 'status' => 'open' ),
+				array( 'id' => $data['id'] )
+			);
+
+			return $toggle;
+		}
 	}
 
 }

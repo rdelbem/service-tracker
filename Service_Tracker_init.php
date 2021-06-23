@@ -16,14 +16,14 @@
  * Domain Path: languages
  */
 
-defined( 'ABSPATH' ) or die( 'You do not have permission to access this file on its own.' );
+defined( 'WPINC' ) or die();
 
 require_once plugin_dir_path( __FILE__ ) . '/vendor/autoload.php';
 
 use ServiceTracker\includes\Service_Tracker_Activator;
 use ServiceTracker\Service_Tracker_Uninstall;
-// use ServiceTracker\src\ServiceTracker;
 use ServiceTracker\includes\Service_Tracker;
+use ServiceTracker\includes\Service_Tracker_Api;
 
 define( 'SERVICE_TRACKER_VERSION', '1.0.0' );
 
@@ -44,4 +44,3 @@ register_uninstall_hook( __FILE__, 'uninstall_st_service_tracker' );
 $ST_serviceTracker = new Service_Tracker();
 
 $ST_serviceTracker->run();
-

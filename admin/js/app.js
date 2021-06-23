@@ -18,7 +18,7 @@ async function get_teste() {
 
   console.log(res);
 }
-get_teste();
+//get_teste();
 
 //DELETE
 async function delete_teste() {

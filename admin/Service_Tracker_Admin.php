@@ -104,7 +104,7 @@ class Service_Tracker_Admin {
 	}
 
 	public function admin_index() {
-		require_once plugin_dir_path( __FILE__ ) . '/partials/service-tracker-admin-display.php';
+		echo '<div id="root"></div>';
 	}
 
 }
