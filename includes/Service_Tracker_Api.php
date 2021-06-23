@@ -1,12 +1,12 @@
 <?php
-namespace ServiceTracker\src\Api;
+namespace ServiceTracker\includes;
 
-use ServiceTracker\src\Sql\Sql;
+use ServiceTracker\includes\Sql;
 use \WP_REST_Server;
 use \WP_REST_Request;
 use \WP_REST_Response;
 
-class Api {
+class Service_Tracker_Api {
 
 	/**
 	 * This variable refers to either one of the three tables the plugin uses

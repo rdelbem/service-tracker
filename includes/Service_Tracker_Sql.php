@@ -1,12 +1,7 @@
 <?php
-namespace ServiceTracker\src\Sql;
+namespace ServiceTracker\includes;
 
-defined( 'ABSPATH' ) or die( 'You do not have permission to access this file on its own.' );
-/**
- * Class which has helper functions to get data from the database
- */
-
-class Sql {
+class Service_Tracker_Sql {
 	/**
 	 * The current table name
 	 *

@@ -16,7 +16,7 @@ class ComposerStaticInita1c3f2669fea2498beb51d23e8edaf17
     public static $prefixDirsPsr4 = array (
         'ServiceTracker\\' => 
         array (
-            0 => __DIR__ . '/../..' . '/src',
+            0 => __DIR__ . '/../..' . '/',
         ),
     );
 

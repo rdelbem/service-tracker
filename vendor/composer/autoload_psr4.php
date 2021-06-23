@@ -6,5 +6,5 @@ $vendorDir = dirname(dirname(__FILE__));
 $baseDir = dirname($vendorDir);
 
 return array(
-    'ServiceTracker\\' => array($baseDir . '/src'),
+    'ServiceTracker\\' => array($baseDir . '/'),
 );

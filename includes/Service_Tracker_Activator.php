@@ -1,11 +1,11 @@
 <?php
-namespace ServiceTracker\src\Sql;
-
-class Activate {
+namespace ServiceTracker\includes;
 
 	/**
 	 * This is called on activation, it will create the necessary tables.
 	 */
+
+class Service_Tracker_Activator {
 
 	public static function activate() {
 

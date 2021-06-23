@@ -1,18 +1,18 @@
 <?php
-namespace ServiceTracker\Sql;
+namespace ServiceTracker;
 
-class Uninstall {
+class Service_Tracker_Uninstall {
 
 	/**
-	 * This class will drop all tables on uninstallation
+	 * This class will drop all tables
 	 */
 
 	public static function uninstall() {
 		global $wpdb;
 		$tableArray = array(
-			'ServiceTracker_cases',
-			'ServiceTracker_progress',
-			'ServiceTracker_uploads',
+			'servicetracker_cases',
+			'servicetracker_progress',
+			'servicetracker_uploads',
 		);
 
 		foreach ( $tableArray as $tablename ) {
