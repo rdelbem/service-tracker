@@ -1,5 +1,5 @@
 <?php
- namespace ServiceTracker\includes;
+namespace ServiceTracker\includes;
 
 use ServiceTracker\includes\Service_Tracker_Loader;
 use ServiceTracker\includes\Service_Tracker_i18n;

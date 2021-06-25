@@ -1,7 +1,25 @@
 import React from "react";
+import Wrapper from "./components/layout/Wrapper";
+import Clients from "./components/layout/Clients";
+import Progress from "./components/layout/Progress";
 
-function App() {
-  console.log(getUsers());
-  return <h1>OI</h1>;
+//App reducer
+function AppReducer(state, action) {
+  switch (action.type) {
+    case value:
+      break;
+
+    default:
+      return state;
+  }
 }
-export default App;
+
+//App bootstrap
+export default function App() {
+  return (
+    <Wrapper>
+      <Clients />
+      <Progress />
+    </Wrapper>
+  );
+}

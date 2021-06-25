@@ -5,7 +5,8 @@
   "dependencies": {
     "axios": "^0.21.1",
     "react": "^16.7.0",
-    "react-dom": "^16.7.0"
+    "react-dom": "^16.7.0",
+    "react-icons": "^4.2.0"
   },
   "devDependencies": {
     "@babel/preset-es2015": "^7.0.0-beta.53",

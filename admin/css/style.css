@@ -1,0 +1,63 @@
+:root {
+  --button-bground: #373952;
+  --button-bground-hover: #4a4c64;
+  --text-color-light: #e8e8e8;
+  --scroll: #a0a0a0;
+}
+
+.wrapper {
+  margin-top: 1rem;
+  margin-right: 1.4rem;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: row;
+}
+
+.clients-list-container {
+  max-height: 80vh;
+  width: 35%;
+  padding: 0.5rem;
+  overflow-y: scroll;
+}
+
+.clients-list-container::-webkit-scrollbar {
+  width: 0.4rem;
+}
+
+.clients-list-container::-webkit-scrollbar-thumb {
+  background: var(--scroll);
+  border-radius: 10px;
+}
+
+.progress-container {
+  height: 400px;
+  width: 65%;
+  padding: 0.5rem;
+}
+
+.client {
+  padding: 0.2rem;
+  margin: 0.2rem;
+  background-color: var(--button-bground);
+  border-radius: 3px;
+}
+
+.client:hover {
+  cursor: pointer;
+  background-color: var(--button-bground-hover);
+}
+
+.client h3 {
+  color: var(--text-color-light) !important;
+}
+
+.icon-client {
+  margin-bottom: -1px;
+  margin-right: 0.3rem;
+  margin-left: 0.8rem;
+}
+
+.icon-edit {
+  margin-right: 0.8rem;
+  float: right;
+}
