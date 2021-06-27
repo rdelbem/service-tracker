@@ -3,6 +3,9 @@
   --button-bground-hover: #4a4c64;
   --text-color-light: #e8e8e8;
   --scroll: #a0a0a0;
+  --color-light: #fffcf0;
+  --color-mild: #fff8e0;
+  --toggle-icon: ;
 }
 
 .wrapper {
@@ -29,10 +32,29 @@
   border-radius: 10px;
 }
 
-.progress-container {
+.cases-container {
   height: 400px;
   width: 65%;
   padding: 0.5rem;
+}
+
+.case-title {
+  border-left: 3px solid green;
+  border-radius: 5px;
+  margin-top: 0.4rem;
+  background-color: var(--color-light);
+  padding: 0.2rem 1.2rem;
+  transition: all 0.4s;
+}
+
+.case-title:hover {
+  background-color: var(--color-mild);
+  cursor: pointer;
+}
+
+.case-icon {
+  float: right;
+  font-size: 1.3rem;
 }
 
 .client {
@@ -40,6 +62,7 @@
   margin: 0.2rem;
   background-color: var(--button-bground);
   border-radius: 3px;
+  transition: all 0.4s;
 }
 
 .client:hover {
