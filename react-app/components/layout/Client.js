@@ -1,15 +1,28 @@
-import React from "react";
+import React, { useContext } from "react";
+import InViewContext from "../../context/inView/inViewContext";
 import { IoPersonOutline } from "react-icons/io5";
 import { FiEdit } from "react-icons/fi";
+import CasesContext from "../../context/cases/casesContext";
 
-//possivelmente inserir lastname
+//TODO: inserir lastname
 export default function Client({ id, name }) {
+  const inViewContext = useContext(InViewContext);
+  const { updateId } = inViewContext;
+  const casesContext = useContext(CasesContext);
+  const { getCases } = casesContext;
+
   return (
-    <div className="client">
+    <div
+      onClick={() => {
+        updateId(id);
+        getCases(id);
+      }}
+      className="client"
+    >
       <div className="name-and-icon">
         <h3>
           <IoPersonOutline className="icon-client" />
-          {name}
+          id: {id} | {name}
           <FiEdit className="icon-edit" />
         </h3>
       </div>

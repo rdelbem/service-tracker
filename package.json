@@ -7,6 +7,7 @@
     "react": "^16.7.0",
     "react-dom": "^16.7.0",
     "react-icons": "^4.2.0",
+    "react-tooltip": "^4.2.21",
     "react-transition-group": "^4.4.2"
   },
   "devDependencies": {
