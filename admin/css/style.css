@@ -5,6 +5,8 @@
   --scroll: #a0a0a0;
   --color-light: #fffcf0;
   --color-mild: #fff8e0;
+  --color-mild-grey: #d9d9d9;
+  --color-mild-blue: #5564bd;
 
   --color-green-light: #008000;
   --color-green-dark: #016b01;
@@ -36,9 +38,19 @@
 }
 
 .cases-container {
-  height: 400px;
+  height: 70vh;
   width: 65%;
   padding: 0.5rem;
+  overflow-y: scroll;
+}
+
+.cases-container::-webkit-scrollbar {
+  width: 0.4rem;
+}
+
+.cases-container::-webkit-scrollbar-thumb {
+  background: var(--scroll);
+  border-radius: 10px;
 }
 
 .case-title {
@@ -47,6 +59,7 @@
   background-color: var(--color-light);
   padding: 0.2rem 1.2rem;
   transition: all 0.4s;
+  z-index: 10;
 }
 
 .case-title:hover {
@@ -58,6 +71,7 @@
 .case-icon {
   float: right;
   font-size: 1.3rem;
+  margin-left: 0.2rem;
 }
 
 .client {
@@ -130,6 +144,19 @@
   border: 1px solid var(--color-green-light);
 }
 
+.case-input {
+  border: 1px solid var(--color-green-light) !important;
+  padding: 0.2rem !important;
+  border-radius: 20px !important;
+  font-weight: bold !important;
+  width: 10rem;
+  transition: all 0.5s;
+}
+
+.case-input:focus {
+  width: 20rem;
+}
+
 /*SPINNER*/
 .lds-ellipsis {
   display: inline-block;
@@ -187,3 +214,70 @@
   }
 }
 /*SPINNER*/
+
+.editing-title {
+  padding: 1rem;
+  border-radius: 0 0 10px 10px;
+  background-color: var(--color-mild-grey);
+  margin: 0 0.4rem;
+}
+
+.btn {
+  border-radius: 20px;
+  padding: 0.3rem 0.5rem;
+  margin: 0.3rem;
+  font-weight: bold;
+  color: var(--text-color-light);
+  cursor: pointer;
+}
+
+.edit-input {
+  border: 1px solid var(--color-green-light) !important;
+  border-radius: 20px !important;
+  font-weight: bold !important;
+  width: 10rem;
+  transition: all 0.5s;
+}
+
+.edit-input:focus {
+  width: 20rem;
+}
+
+.btn:hover {
+  filter: drop-shadow(0px 5px 5px rgba(0, 0, 0, 0.5));
+}
+
+.btn:focus {
+  filter: drop-shadow(0px 2px 3px rgba(0, 0, 0, 0.5));
+}
+
+.btn-save {
+  background-color: var(--color-green-light);
+  border: 1px solid var(--color-green-light);
+}
+
+.btn-dismiss {
+  background-color: var(--color-mild-blue);
+  border: 1px solid var(--color-mild-blue);
+}
+
+/*TRANSITION FOR EDITING*/
+
+.editing-enter {
+  transform: scaleY(0);
+  transform-origin: top;
+}
+.editing-enter-active {
+  transform: scaleY(1);
+  transition: all 300ms;
+}
+.editing-exit {
+  transform: scaleY(1);
+}
+.editing-exit-active {
+  transform: scaleY(0);
+  transform-origin: top;
+  transition: all 300ms;
+}
+
+/*END TRANSITION FOR EDITING*/

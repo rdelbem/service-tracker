@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import Case from "./Case";
 import ReactTooltip from "react-tooltip";
 import CasesContext from "../../context/cases/casesContext";
@@ -7,6 +7,8 @@ import Spinner from "../../components/layout/Spinner";
 export default function Cases() {
   const casesContext = useContext(CasesContext);
   const { state, postCase, currentUserInDisplay } = casesContext;
+
+  const [caseTitle, setCaseTitle] = useState("");
 
   if (state.loadingCases) {
     return (
@@ -35,15 +37,28 @@ export default function Cases() {
   if (state.cases.length === 0 && !state.loadingCases && currentUserInDisplay) {
     return (
       <div className="cases-container">
-        <button
-          onClick={(e) => {
-            e.preventDefault();
-            postCase(currentUserInDisplay, "dindo");
-          }}
-          className="add-case"
-        >
-          Add case
-        </button>
+        <form>
+          <input
+            className="case-input"
+            placeholder="Case name"
+            onChange={(e) => {
+              let title = e.target.value;
+              setCaseTitle(title);
+            }}
+            type="text"
+            value={caseTitle}
+          />
+          <button
+            onClick={(e) => {
+              e.preventDefault();
+              caseTitle !== "" && postCase(currentUserInDisplay, caseTitle);
+              setCaseTitle("");
+            }}
+            className="add-case"
+          >
+            Add case
+          </button>
+        </form>
         <div>
           <center>
             <h3>No cases yet! Include a new one!</h3>
@@ -55,15 +70,28 @@ export default function Cases() {
 
   return (
     <div className="cases-container">
-      <button
-        onClick={(e) => {
-          e.preventDefault();
-          postCase(currentUserInDisplay, "teste");
-        }}
-        className="add-case"
-      >
-        Add case
-      </button>
+      <form>
+        <input
+          className="case-input"
+          placeholder="Case name"
+          onChange={(e) => {
+            let title = e.target.value;
+            setCaseTitle(title);
+          }}
+          type="text"
+          value={caseTitle}
+        />
+        <button
+          onClick={(e) => {
+            e.preventDefault();
+            caseTitle !== "" && postCase(currentUserInDisplay, caseTitle);
+            setCaseTitle("");
+          }}
+          className="add-case"
+        >
+          Add case
+        </button>
+      </form>
       {state.cases.map((item) => (
         <Case {...item} />
       ))}

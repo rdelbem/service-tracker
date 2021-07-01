@@ -14,27 +14,22 @@ export default function ClientsState(props) {
 
   const [state, dispatch] = useReducer(AppReducer, initialState);
 
-  //search users
-  const searchUsers = async (text) => {
-    //initial search, before any typed search
-    if (typeof text === "undefined") {
-      const res = await axios.get(api_url_users, {
-        headers: {
-          "X-WP-Nonce": data.nonce,
-        },
-      });
+  //get users
+  const getUsers = async () => {
+    const res = await axios.get(api_url_users, {
+      headers: {
+        "X-WP-Nonce": data.nonce,
+      },
+    });
 
-      dispatch({
-        type: GET_USERS,
-        payload: res.data,
-      });
-    } else {
-      //TODO: search by user input
-    }
+    dispatch({
+      type: GET_USERS,
+      payload: res.data,
+    });
   };
 
   useEffect(() => {
-    searchUsers();
+    getUsers();
   }, []);
 
   return (

@@ -15,7 +15,7 @@ export default function Client({ id, name }) {
     <div
       onClick={() => {
         updateId(id);
-        getCases(id);
+        getCases(id, false);
       }}
       className="client"
     >
