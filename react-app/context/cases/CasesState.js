@@ -58,7 +58,7 @@ export default function CasesState(props) {
     const dataToPost = { id_user: id, title: title };
 
     try {
-      const res = await axios.post(`${apiUrlCases}/${id}`, dataToPost, {
+      const postCase = await axios.post(`${apiUrlCases}/${id}`, dataToPost, {
         headers: {
           "X-WP-Nonce": data.nonce,
           "Content-type": "application/json",
@@ -94,19 +94,6 @@ export default function CasesState(props) {
 
   const toggleCase = async (id) => {
     try {
-      /*const res = await axios.post(`${apiUrlCases}-status/${id}`, {
-        headers: {
-          "X-WP-Nonce": data.nonce,
-        },
-      }); */
-
-      const grab = await fetch(`${apiUrlCases}-status/${id}`, {
-        method: "POST",
-        headers: {
-          "X-WP-Nonce": data.nonce,
-        },
-      });
-
       let currentCases = [...state.cases];
 
       currentCases.forEach((element) => {
@@ -130,6 +117,12 @@ export default function CasesState(props) {
           user: id,
           cases: currentCases,
           loadingCases: state.loadingCases,
+        },
+      });
+
+      const toggleCase = await axios.post(`${apiUrlCases}-status/${id}`, null, {
+        headers: {
+          "X-WP-Nonce": data.nonce,
         },
       });
     } catch (error) {
@@ -161,8 +154,7 @@ export default function CasesState(props) {
         },
       });
 
-      const grab = await fetch(`${apiUrlCases}/${id}`, {
-        method: "DELETE",
+      const deleteCase = await axios.delete(`${apiUrlCases}/${id}`, {
         headers: {
           "X-WP-Nonce": data.nonce,
         },
@@ -181,7 +173,7 @@ export default function CasesState(props) {
       return;
     }
 
-    const idTitleObj = { id_user: id_user, title: newTitle };
+    const idTitleObj = JSON.stringify({ id_user: id_user, title: newTitle });
 
     try {
       const cases = state.cases;
@@ -200,13 +192,11 @@ export default function CasesState(props) {
         },
       });
 
-      const grab = await fetch(`${apiUrlCases}/${id}`, {
-        method: "PUT",
+      const update = await axios.put(`${apiUrlCases}/${id}`, idTitleObj, {
         headers: {
           "X-WP-Nonce": data.nonce,
           "Content-type": "application/json",
         },
-        body: JSON.stringify(idTitleObj),
       });
     } catch (error) {
       alert(
