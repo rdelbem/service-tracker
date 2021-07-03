@@ -1,4 +1,4 @@
-import { GET_CASES, GET_USERS, IN_VIEW } from "./types";
+import { GET_CASES, GET_STATUS, GET_USERS, IN_VIEW } from "./types";
 
 export default function AppReducer(state, action) {
   switch (action.type) {
@@ -16,7 +16,12 @@ export default function AppReducer(state, action) {
     case IN_VIEW:
       return {
         view: action.payload.view,
-        id: action.payload.id,
+        id: action.payload.id, //user id
+      };
+    case GET_STATUS:
+      return {
+        status: action.payload.status,
+        loadingStatus: action.payload.loadingStatus,
       };
 
     default:

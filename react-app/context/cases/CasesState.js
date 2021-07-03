@@ -1,9 +1,10 @@
 import React, { useReducer, useContext } from "react";
-import { toast } from "react-toastify";
-import AppReducer from "../AppReducer";
-import axios from "axios";
 import CasesContext from "./casesContext";
+import AppReducer from "../AppReducer";
 import InViewContext from "../../context/inView/inViewContext";
+
+import { toast } from "react-toastify";
+import axios from "axios";
 import { GET_CASES } from "../types";
 
 export default function CasesState(props) {

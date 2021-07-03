@@ -892,6 +892,7 @@ Object.defineProperty(exports, "__esModule", {
 var GET_USERS = exports.GET_USERS = "GET_USERS";
 var GET_CASES = exports.GET_CASES = "GET_CASES";
 var IN_VIEW = exports.IN_VIEW = "IN_VIEW";
+var GET_STATUS = exports.GET_STATUS = "GET_STATUS";
 
 /***/ }),
 /* 12 */
@@ -1742,7 +1743,12 @@ function AppReducer(state, action) {
     case _types.IN_VIEW:
       return {
         view: action.payload.view,
-        id: action.payload.id
+        id: action.payload.id //user id
+      };
+    case _types.GET_STATUS:
+      return {
+        status: action.payload.status,
+        loadingStatus: action.payload.loadingStatus
       };
 
     default:
@@ -32676,6 +32682,10 @@ var _InViewState = __webpack_require__(107);
 
 var _InViewState2 = _interopRequireDefault(_InViewState);
 
+var _progressState = __webpack_require__(111);
+
+var _progressState2 = _interopRequireDefault(_progressState);
+
 var _CasesContainer = __webpack_require__(108);
 
 var _CasesContainer2 = _interopRequireDefault(_CasesContainer);
@@ -32699,17 +32709,21 @@ function App() {
       wp.element.createElement(
         _CasesState2.default,
         null,
-        wp.element.createElement(_reactToastify.ToastContainer, null),
         wp.element.createElement(
-          _Wrapper2.default,
+          _progressState2.default,
           null,
-          wp.element.createElement(_Clients2.default, null),
+          wp.element.createElement(_reactToastify.ToastContainer, null),
           wp.element.createElement(
-            _CasesContainer2.default,
+            _Wrapper2.default,
             null,
-            wp.element.createElement(_Initial2.default, null),
-            wp.element.createElement(_Cases2.default, null),
-            wp.element.createElement(_Progress2.default, null)
+            wp.element.createElement(_Clients2.default, null),
+            wp.element.createElement(
+              _CasesContainer2.default,
+              null,
+              wp.element.createElement(_Initial2.default, null),
+              wp.element.createElement(_Cases2.default, null),
+              wp.element.createElement(_Progress2.default, null)
+            )
           )
         )
       )
@@ -38528,6 +38542,10 @@ var _inViewContext = __webpack_require__(3);
 
 var _inViewContext2 = _interopRequireDefault(_inViewContext);
 
+var _progressContext = __webpack_require__(110);
+
+var _progressContext2 = _interopRequireDefault(_progressContext);
+
 var _dateformat = __webpack_require__(73);
 
 var _dateformat2 = _interopRequireDefault(_dateformat);
@@ -38556,6 +38574,10 @@ function Case(_ref) {
   var inViewContext = (0, _react.useContext)(_inViewContext2.default);
   var updateIdView = inViewContext.updateIdView;
 
+
+  var progressContext = (0, _react.useContext)(_progressContext2.default);
+  var getStatus = progressContext.getStatus;
+
   var _useState = (0, _react.useState)(false),
       _useState2 = _slicedToArray(_useState, 2),
       editing = _useState2[0],
@@ -38579,7 +38601,7 @@ function Case(_ref) {
       wp.element.createElement(
         "small",
         null,
-        (0, _dateformat2.default)(created_at, "d/m/yyyy, HH:MM")
+        (0, _dateformat2.default)(created_at, "dd/mm/yyyy, HH:MM")
       ),
       wp.element.createElement(
         "h3",
@@ -38590,6 +38612,7 @@ function Case(_ref) {
             className: "the-title",
             onClick: function onClick() {
               updateIdView(inViewContext.state.id, "progress");
+              getStatus(id, false);
             }
           },
           title
@@ -51570,16 +51593,29 @@ var _inViewContext = __webpack_require__(3);
 
 var _inViewContext2 = _interopRequireDefault(_inViewContext);
 
+var _progressContext = __webpack_require__(110);
+
+var _progressContext2 = _interopRequireDefault(_progressContext);
+
+var _Spinner = __webpack_require__(21);
+
+var _Spinner2 = _interopRequireDefault(_Spinner);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function Progress() {
   var inViewContext = (0, _react.useContext)(_inViewContext2.default);
-  var state = inViewContext.state;
+  var progressContext = (0, _react.useContext)(_progressContext2.default);
+  var state = progressContext.state;
 
   //Required for navigation purposes
 
-  if (state.view !== "progress") {
+  if (inViewContext.state.view !== "progress") {
     return wp.element.createElement(_react.Fragment, null);
+  }
+
+  if (state.loadingStatus) {
+    return wp.element.createElement(_Spinner2.default, null);
   }
 
   return wp.element.createElement(
@@ -52555,23 +52591,23 @@ var _react = __webpack_require__(0);
 
 var _react2 = _interopRequireDefault(_react);
 
-var _reactToastify = __webpack_require__(38);
+var _casesContext = __webpack_require__(8);
+
+var _casesContext2 = _interopRequireDefault(_casesContext);
 
 var _AppReducer = __webpack_require__(18);
 
 var _AppReducer2 = _interopRequireDefault(_AppReducer);
 
-var _axios = __webpack_require__(29);
-
-var _axios2 = _interopRequireDefault(_axios);
-
-var _casesContext = __webpack_require__(8);
-
-var _casesContext2 = _interopRequireDefault(_casesContext);
-
 var _inViewContext = __webpack_require__(3);
 
 var _inViewContext2 = _interopRequireDefault(_inViewContext);
+
+var _reactToastify = __webpack_require__(38);
+
+var _axios = __webpack_require__(29);
+
+var _axios2 = _interopRequireDefault(_axios);
 
 var _types = __webpack_require__(11);
 
@@ -53183,6 +53219,157 @@ function Initial() {
         )
       )
     )
+  );
+}
+
+/***/ }),
+/* 110 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _react = __webpack_require__(0);
+
+var ProgressContext = (0, _react.createContext)();
+
+exports.default = ProgressContext;
+
+/***/ }),
+/* 111 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
+
+exports.default = ProgressState;
+
+var _react = __webpack_require__(0);
+
+var _react2 = _interopRequireDefault(_react);
+
+var _inViewContext = __webpack_require__(3);
+
+var _inViewContext2 = _interopRequireDefault(_inViewContext);
+
+var _AppReducer = __webpack_require__(18);
+
+var _AppReducer2 = _interopRequireDefault(_AppReducer);
+
+var _progressContext = __webpack_require__(110);
+
+var _progressContext2 = _interopRequireDefault(_progressContext);
+
+var _types = __webpack_require__(11);
+
+var _reactToastify = __webpack_require__(38);
+
+var _axios = __webpack_require__(29);
+
+var _axios2 = _interopRequireDefault(_axios);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; }
+
+function ProgressState(props) {
+  var _this = this;
+
+  var inViewContext = (0, _react.useContext)(_inViewContext2.default);
+  var currentUserInDisplay = inViewContext.state.id.toString();
+
+  var initialState = {
+    status: [],
+    loadingStatus: false
+  };
+
+  var _useReducer = (0, _react.useReducer)(_AppReducer2.default, initialState),
+      _useReducer2 = _slicedToArray(_useReducer, 2),
+      state = _useReducer2[0],
+      dispatch = _useReducer2[1];
+
+  var apiUrlProgress = data.root_url + "/wp-json/" + data.api_url + "/progress";
+
+  //onlyFetch means this function will retrieve plain data from api, without state update
+  var getStatus = function () {
+    var _ref = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee(id, onlyFetch) {
+      var res;
+      return regeneratorRuntime.wrap(function _callee$(_context) {
+        while (1) {
+          switch (_context.prev = _context.next) {
+            case 0:
+              _context.prev = 0;
+
+              if (!onlyFetch) {
+                dispatch({
+                  type: _types.GET_STATUS,
+                  payload: {
+                    status: state.status,
+                    loadingStatus: true
+                  }
+                });
+              }
+
+              _context.next = 4;
+              return _axios2.default.get(apiUrlProgress + "/" + id, {
+                headers: {
+                  "X-WP-Nonce": data.nonce
+                }
+              });
+
+            case 4:
+              res = _context.sent;
+
+
+              if (!onlyFetch) {
+                dispatch({
+                  type: _types.GET_STATUS,
+                  payload: {
+                    status: res.data,
+                    loadingStatus: false
+                  }
+                });
+              }
+              return _context.abrupt("return", res.data);
+
+            case 9:
+              _context.prev = 9;
+              _context.t0 = _context["catch"](0);
+
+              alert("Hum, we had an error: " + _context.t0);
+
+            case 12:
+            case "end":
+              return _context.stop();
+          }
+        }
+      }, _callee, _this, [[0, 9]]);
+    }));
+
+    return function getStatus(_x, _x2) {
+      return _ref.apply(this, arguments);
+    };
+  }();
+
+  return wp.element.createElement(
+    _progressContext2.default.Provider,
+    {
+      value: {
+        state: state,
+        getStatus: getStatus
+      }
+    },
+    props.children
   );
 }
 

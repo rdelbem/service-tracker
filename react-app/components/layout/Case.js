@@ -2,6 +2,7 @@ import React, { useContext, useState, Fragment } from "react";
 import { CSSTransition } from "react-transition-group";
 import CasesContext from "../../context/cases/casesContext";
 import InViewContext from "../../context/inView/inViewContext";
+import ProgressContext from "../../context/progress/progressContext";
 import dateformat from "dateformat";
 import { BsToggleOn, BsToggleOff } from "react-icons/bs";
 import { FiEdit } from "react-icons/fi";
@@ -14,6 +15,9 @@ export default function Case({ id, id_user, status, created_at, title }) {
   const inViewContext = useContext(InViewContext);
   const { updateIdView } = inViewContext;
 
+  const progressContext = useContext(ProgressContext);
+  const { getStatus } = progressContext;
+
   const [editing, setEditing] = useState(false);
   const [newTitle, setNewTitle] = useState("");
 
@@ -24,12 +28,13 @@ export default function Case({ id, id_user, status, created_at, title }) {
   return (
     <Fragment>
       <div className="case-title" style={borderStatus}>
-        <small>{dateformat(created_at, "d/m/yyyy, HH:MM")}</small>
+        <small>{dateformat(created_at, "dd/mm/yyyy, HH:MM")}</small>
         <h3>
           <span
             className="the-title"
             onClick={() => {
               updateIdView(inViewContext.state.id, "progress");
+              getStatus(id, false);
             }}
           >
             {title}

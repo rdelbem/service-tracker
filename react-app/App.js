@@ -6,6 +6,7 @@ import Progress from "./components/layout/Progress";
 import ClientsState from "./context/clients/ClientsState";
 import CasesState from "./context/cases/CasesState";
 import InViewState from "./context/inView/InViewState";
+import ProgressState from "./context/progress/progressState";
 import CasesContainer from "./components/layout/CasesContainer";
 import Initial from "./components/layout/Initial";
 import { ToastContainer } from "react-toastify";
@@ -16,15 +17,17 @@ export default function App() {
     <InViewState>
       <ClientsState>
         <CasesState>
-          <ToastContainer />
-          <Wrapper>
-            <Clients />
-            <CasesContainer>
-              <Initial />
-              <Cases />
-              <Progress />
-            </CasesContainer>
-          </Wrapper>
+          <ProgressState>
+            <ToastContainer />
+            <Wrapper>
+              <Clients />
+              <CasesContainer>
+                <Initial />
+                <Cases />
+                <Progress />
+              </CasesContainer>
+            </Wrapper>
+          </ProgressState>
         </CasesState>
       </ClientsState>
     </InViewState>
