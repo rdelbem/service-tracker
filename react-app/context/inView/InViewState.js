@@ -11,15 +11,19 @@ export default function InViewState(props) {
 
   const [state, dispatch] = useReducer(AppReducer, initialState);
 
-  const updateId = (id) => {
-    dispatch({ type: IN_VIEW, payload: { view: state.view, id: id } });
+  const updateIdView = (id, view) => {
+    dispatch({ type: IN_VIEW, payload: { view: view, id: id } });
   };
+
+  useEffect(() => {
+    updateIdView(state.id, "init");
+  }, []);
 
   return (
     <InViewContext.Provider
       value={{
         state,
-        updateId,
+        updateIdView,
       }}
     >
       {props.children}

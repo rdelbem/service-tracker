@@ -1,20 +1,19 @@
 import React, { useContext } from "react";
 import InViewContext from "../../context/inView/inViewContext";
-import { IoPersonOutline } from "react-icons/io5";
-import { FiEdit } from "react-icons/fi";
 import CasesContext from "../../context/cases/casesContext";
+import { IoPersonOutline } from "react-icons/io5";
 
 //TODO: inserir lastname
 export default function Client({ id, name }) {
   const inViewContext = useContext(InViewContext);
-  const { updateId } = inViewContext;
+  const { updateIdView } = inViewContext;
   const casesContext = useContext(CasesContext);
   const { getCases } = casesContext;
 
   return (
     <div
       onClick={() => {
-        updateId(id);
+        updateIdView(id, "cases");
         getCases(id, false);
       }}
       className="client"
@@ -23,7 +22,6 @@ export default function Client({ id, name }) {
         <h3>
           <IoPersonOutline className="icon-client" />
           id: {id} | {name}
-          <FiEdit className="icon-edit" />
         </h3>
       </div>
     </div>

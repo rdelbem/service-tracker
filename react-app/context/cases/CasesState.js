@@ -1,4 +1,5 @@
 import React, { useReducer, useContext } from "react";
+import { toast } from "react-toastify";
 import AppReducer from "../AppReducer";
 import axios from "axios";
 import CasesContext from "./casesContext";
@@ -8,7 +9,7 @@ import { GET_CASES } from "../types";
 export default function CasesState(props) {
   const inViewContext = useContext(InViewContext);
   const currentUserInDisplay = inViewContext.state.id.toString();
-  let inputTextCaseTitle = "";
+
   const initialState = {
     user: "",
     cases: [],
@@ -84,6 +85,16 @@ export default function CasesState(props) {
           loadingCases: false,
         },
       });
+
+      toast.success("Case added!", {
+        position: "bottom-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      });
     } catch (error) {
       alert(
         "Hum, it was impossible to complete this task. We had an error: " +
@@ -95,15 +106,18 @@ export default function CasesState(props) {
   const toggleCase = async (id) => {
     try {
       let currentCases = [...state.cases];
+      let notice;
 
       currentCases.forEach((element) => {
         if (element.id.toString() === id.toString()) {
           switch (element.status) {
             case "close":
               element.status = "open";
+              notice = "open";
               break;
             case "open":
               element.status = "close";
+              notice = "closed";
               break;
             default:
               break;
@@ -118,6 +132,16 @@ export default function CasesState(props) {
           cases: currentCases,
           loadingCases: state.loadingCases,
         },
+      });
+
+      toast.info(`Case is now ${notice}`, {
+        position: "bottom-right",
+        autoClose: 5000,
+        hideProgressBar: true,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
       });
 
       const toggleCase = await axios.post(`${apiUrlCases}-status/${id}`, null, {
@@ -152,6 +176,16 @@ export default function CasesState(props) {
           cases: filteredCases,
           loadingCases: state.loadingCases,
         },
+      });
+
+      toast.warn("Case deleted!", {
+        position: "bottom-right",
+        autoClose: 5000,
+        hideProgressBar: true,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
       });
 
       const deleteCase = await axios.delete(`${apiUrlCases}/${id}`, {
@@ -190,6 +224,16 @@ export default function CasesState(props) {
           cases: cases,
           loadingCases: state.loadingCases,
         },
+      });
+
+      toast.success("Case edited!", {
+        position: "bottom-right",
+        autoClose: 5000,
+        hideProgressBar: true,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
       });
 
       const update = await axios.put(`${apiUrlCases}/${id}`, idTitleObj, {

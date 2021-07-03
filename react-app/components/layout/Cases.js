@@ -1,42 +1,30 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useState, Fragment } from "react";
 import Case from "./Case";
 import ReactTooltip from "react-tooltip";
 import CasesContext from "../../context/cases/casesContext";
+import InViewContext from "../../context/inView/inViewContext";
 import Spinner from "../../components/layout/Spinner";
 
 export default function Cases() {
+  const inViewContext = useContext(InViewContext);
+
   const casesContext = useContext(CasesContext);
   const { state, postCase, currentUserInDisplay } = casesContext;
 
   const [caseTitle, setCaseTitle] = useState("");
 
-  if (state.loadingCases) {
-    return (
-      <div className="cases-container">
-        <Spinner />
-      </div>
-    );
+  //Required for navigation purposes
+  if (inViewContext.state.view !== "cases") {
+    return <Fragment></Fragment>;
   }
 
-  if (
-    state.cases.length === 0 &&
-    !state.loadingCases &&
-    !currentUserInDisplay
-  ) {
-    return (
-      <div className="cases-container">
-        <div>
-          <center>
-            <h3>Click on a client name, to se hers/his cases!</h3>
-          </center>
-        </div>
-      </div>
-    );
+  if (state.loadingCases) {
+    return <Spinner />;
   }
 
   if (state.cases.length === 0 && !state.loadingCases && currentUserInDisplay) {
     return (
-      <div className="cases-container">
+      <Fragment>
         <form>
           <input
             className="case-input"
@@ -64,12 +52,12 @@ export default function Cases() {
             <h3>No cases yet! Include a new one!</h3>
           </center>
         </div>
-      </div>
+      </Fragment>
     );
   }
 
   return (
-    <div className="cases-container">
+    <Fragment>
       <form>
         <input
           className="case-input"
@@ -101,6 +89,6 @@ export default function Cases() {
         effect="solid"
         data-delay-show="1000"
       />
-    </div>
+    </Fragment>
   );
 }

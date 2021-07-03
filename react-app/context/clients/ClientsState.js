@@ -14,7 +14,32 @@ export default function ClientsState(props) {
 
   const [state, dispatch] = useReducer(AppReducer, initialState);
 
-  //get users
+  const searchUsers = (query) => {
+    //escape special characters
+    const specialChar = /[-!$%^&*()_+|~=`{}\[\]:";'<>?,.\/]/;
+    const specialCharRegEx = new RegExp(specialChar, "g");
+    if (specialCharRegEx.test(query)) return;
+
+    if (query === "") getUsers();
+
+    const usersInState = state.users;
+    const regex = new RegExp(query, "gi");
+    let foundUsers = [];
+
+    usersInState.forEach((user, index) => {
+      if (regex.test(user.name) && query !== "") {
+        foundUsers.push(usersInState[index]);
+      }
+    });
+
+    if (foundUsers.length > 0) {
+      dispatch({
+        type: GET_USERS,
+        payload: { users: foundUsers, loadingUsers: false },
+      });
+    }
+  };
+
   const getUsers = async () => {
     const res = await axios.get(api_url_users, {
       headers: {
@@ -24,7 +49,7 @@ export default function ClientsState(props) {
 
     dispatch({
       type: GET_USERS,
-      payload: res.data,
+      payload: { users: res.data, loadingUsers: false },
     });
   };
 
@@ -36,6 +61,7 @@ export default function ClientsState(props) {
     <ClientsContext.Provider
       value={{
         state,
+        searchUsers,
       }}
     >
       {props.children}

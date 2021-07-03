@@ -4,8 +4,8 @@ export default function AppReducer(state, action) {
   switch (action.type) {
     case GET_USERS:
       return {
-        users: action.payload,
-        loadingUsers: false,
+        users: action.payload.users,
+        loadingUsers: action.payload.loadingUsers,
       };
     case GET_CASES:
       return {
