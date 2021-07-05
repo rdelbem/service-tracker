@@ -1,12 +1,14 @@
 :root {
   --color-blue-dark: #373952;
   --color-blue-dark-hover: #4a4c64;
+  --color-blue-dark-clicked: #5d607e;
   --text-color-light: #e8e8e8;
   --scroll: #a0a0a0;
   --color-light: #fffcf0;
   --color-mild: #fff8e0;
   --color-mild-grey: #d9d9d9;
   --color-mild-blue: #5564bd;
+  --color-plain-blue: #4e67f5;
 
   --color-green-light: #008000;
   --color-green-dark: #016b01;
@@ -94,12 +96,23 @@
   transition: all 0.4s;
 }
 
-.client:hover {
+.client-active {
+  padding: 0.2rem;
+  margin: 0.2rem;
+  background-color: var(--color-blue-dark-clicked);
+  border-radius: 3px;
+  transition: all 0.4s;
+  border-left: 10px solid var(--color-plain-blue);
+}
+
+.client:hover,
+.client-active:hover {
   cursor: pointer;
   background-color: var(--color-blue-dark-hover);
 }
 
-.client h3 {
+.client h3,
+.client-active h3 {
   color: var(--text-color-light) !important;
 }
 
@@ -271,6 +284,71 @@
 .btn-dismiss {
   background-color: var(--color-mild-blue);
   border: 1px solid var(--color-mild-blue);
+}
+
+.status {
+  display: flex;
+  flex-direction: column;
+  background-color: var(--color-light);
+  margin-bottom: 0.3rem;
+  border-radius: 6px;
+  padding: 0.5rem;
+  border-left: 4px solid var(--color-green-light);
+}
+
+.status-icon {
+  cursor: pointer;
+  font-size: 1.3rem;
+  margin-left: 0.2rem;
+  float: right;
+  margin-top: -2px;
+}
+
+.status-text {
+  width: 100%;
+}
+
+.record {
+  display: flex;
+  flex-direction: row;
+}
+
+.status-textarea {
+  font-size: 1.1rem !important;
+  background-color: var(--color-light);
+  padding: 0;
+  box-sizing: border-box;
+  width: 100% !important;
+  max-width: 100% !important;
+  resize: none;
+}
+
+.status-textarea::-webkit-scrollbar {
+  width: 0.3rem;
+  border-radius: 5px;
+}
+
+.status-textarea::-webkit-scrollbar-thumb {
+  background-color: var(--color-blue-dark);
+}
+
+.remove-border {
+  border: none;
+}
+
+.date-edit {
+  display: flex;
+  flex-direction: row;
+  margin: 0.5rem;
+}
+
+.date {
+  white-space: nowrap;
+}
+
+.edit {
+  display: inline-block;
+  width: 100%;
 }
 
 /*TRANSITION FOR EDITING*/

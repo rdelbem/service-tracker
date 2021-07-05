@@ -13,10 +13,14 @@ export default function Client({ id, name }) {
   return (
     <div
       onClick={() => {
-        updateIdView(id, "cases");
+        updateIdView(id, "cases", name);
         getCases(id, false);
       }}
-      className="client"
+      className={
+        inViewContext.state.id.toString() === id.toString()
+          ? "client-active"
+          : "client"
+      }
     >
       <div className="name-and-icon">
         <h3>

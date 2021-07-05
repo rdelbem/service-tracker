@@ -33,8 +33,12 @@ export default function Case({ id, id_user, status, created_at, title }) {
           <span
             className="the-title"
             onClick={() => {
-              updateIdView(inViewContext.state.id, "progress");
-              getStatus(id, false);
+              updateIdView(
+                inViewContext.state.id,
+                "progress",
+                inViewContext.state.name
+              );
+              getStatus(id, false, title);
             }}
           >
             {title}

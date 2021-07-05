@@ -12,6 +12,7 @@ export default function ProgressState(props) {
 
   const initialState = {
     status: [],
+    caseTitle: "",
     loadingStatus: false,
   };
 
@@ -19,13 +20,14 @@ export default function ProgressState(props) {
   const apiUrlProgress = `${data.root_url}/wp-json/${data.api_url}/progress`;
 
   //onlyFetch means this function will retrieve plain data from api, without state update
-  const getStatus = async (id, onlyFetch) => {
+  const getStatus = async (id, onlyFetch, caseTitle) => {
     try {
       if (!onlyFetch) {
         dispatch({
           type: GET_STATUS,
           payload: {
             status: state.status,
+            caseTitle: state.caseTitle,
             loadingStatus: true,
           },
         });
@@ -42,6 +44,7 @@ export default function ProgressState(props) {
           type: GET_STATUS,
           payload: {
             status: res.data,
+            caseTitle: caseTitle,
             loadingStatus: false,
           },
         });

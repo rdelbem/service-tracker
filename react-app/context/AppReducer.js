@@ -17,10 +17,12 @@ export default function AppReducer(state, action) {
       return {
         view: action.payload.view,
         id: action.payload.id, //user id
+        name: action.payload.name,
       };
     case GET_STATUS:
       return {
         status: action.payload.status,
+        caseTitle: action.payload.caseTitle,
         loadingStatus: action.payload.loadingStatus,
       };
 

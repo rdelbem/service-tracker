@@ -7,12 +7,13 @@ export default function InViewState(props) {
   const initialState = {
     view: "",
     id: "",
+    name: "",
   };
 
   const [state, dispatch] = useReducer(AppReducer, initialState);
 
-  const updateIdView = (id, view) => {
-    dispatch({ type: IN_VIEW, payload: { view: view, id: id } });
+  const updateIdView = (id, view, name) => {
+    dispatch({ type: IN_VIEW, payload: { view: view, id: id, name: name } });
   };
 
   useEffect(() => {
