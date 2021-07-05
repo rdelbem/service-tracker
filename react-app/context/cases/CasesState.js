@@ -20,35 +20,37 @@ export default function CasesState(props) {
   const apiUrlCases = `${data.root_url}/wp-json/${data.api_url}/cases`;
 
   const getCases = async (id, onlyFetch) => {
-    if (!onlyFetch) {
-      dispatch({
-        type: GET_CASES,
-        payload: {
-          user: state.user,
-          cases: state.cases,
-          loadingCases: true,
+    try {
+      if (!onlyFetch) {
+        dispatch({
+          type: GET_CASES,
+          payload: {
+            user: state.user,
+            cases: state.cases,
+            loadingCases: true,
+          },
+        });
+      }
+
+      const res = await axios.get(`${apiUrlCases}/${id}`, {
+        headers: {
+          "X-WP-Nonce": data.nonce,
         },
       });
-    }
 
-    const res = await axios.get(`${apiUrlCases}/${id}`, {
-      headers: {
-        "X-WP-Nonce": data.nonce,
-      },
-    });
+      if (!onlyFetch) {
+        dispatch({
+          type: GET_CASES,
+          payload: {
+            user: state.user,
+            cases: res.data,
+            loadingCases: false,
+          },
+        });
+      }
 
-    if (!onlyFetch) {
-      dispatch({
-        type: GET_CASES,
-        payload: {
-          user: state.user,
-          cases: res.data,
-          loadingCases: false,
-        },
-      });
-    }
-
-    return res.data;
+      return res.data;
+    } catch (error) {}
   };
 
   const postCase = async (id, title) => {

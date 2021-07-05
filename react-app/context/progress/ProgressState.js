@@ -51,7 +51,10 @@ export default function ProgressState(props) {
       }
       return res.data;
     } catch (error) {
-      alert("Hum, we had an error: " + error);
+      alert(
+        "Hum, it was impossible to complete this task. We had an error: " +
+          error
+      );
     }
   };
 

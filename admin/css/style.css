@@ -316,7 +316,7 @@
 .status-textarea {
   font-size: 1.1rem !important;
   background-color: var(--color-light);
-  padding: 0;
+  padding: 0.2rem;
   box-sizing: border-box;
   width: 100% !important;
   max-width: 100% !important;
@@ -325,11 +325,11 @@
 
 .status-textarea::-webkit-scrollbar {
   width: 0.3rem;
-  border-radius: 5px;
 }
 
 .status-textarea::-webkit-scrollbar-thumb {
-  background-color: var(--color-blue-dark);
+  background-color: var(--scroll);
+  border-radius: 10px;
 }
 
 .remove-border {
