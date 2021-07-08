@@ -58,6 +58,7 @@ export default function ProgressState(props) {
     }
   };
 
+  //TODO: verify this
   const postStatus = async (id, text) => {
     if (text === "") {
       alert("Status text can not be blank!");
