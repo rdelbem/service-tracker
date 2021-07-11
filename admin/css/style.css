@@ -139,6 +139,9 @@
 .search input[type="text"] {
   font-size: medium;
   width: 100%;
+  border: 1px solid var(--color-green-light);
+  border-radius: 50px;
+  padding: 0.4rem;
 }
 
 .spinner-container {
@@ -351,6 +354,24 @@
   width: 100%;
 }
 
+.status-add-new-container {
+  padding: 1rem;
+  background-color: var(--color-light);
+  margin: 1rem 0;
+  border-radius: 10px;
+  border: 1px solid var(--color-mild-grey);
+}
+
+.status-add-new-textarea {
+  width: 100%;
+  max-width: 100%;
+}
+
+.statuses-container {
+  display: flex;
+  flex-direction: column-reverse;
+}
+
 /*TRANSITION FOR EDITING*/
 
 .editing-enter {
@@ -359,7 +380,7 @@
 }
 .editing-enter-active {
   transform: scaleY(1);
-  transition: all 300ms;
+  transition: all 400ms;
 }
 .editing-exit {
   transform: scaleY(1);
@@ -367,7 +388,7 @@
 .editing-exit-active {
   transform: scaleY(0);
   transform-origin: top;
-  transition: all 300ms;
+  transition: all 400ms;
 }
 
 /*END TRANSITION FOR EDITING*/

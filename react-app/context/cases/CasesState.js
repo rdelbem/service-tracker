@@ -9,7 +9,7 @@ import { GET_CASES } from "../types";
 
 export default function CasesState(props) {
   const inViewContext = useContext(InViewContext);
-  const currentUserInDisplay = inViewContext.state.id.toString();
+  const currentUserInDisplay = inViewContext.state.userId;
 
   const initialState = {
     user: "",
@@ -213,7 +213,7 @@ export default function CasesState(props) {
     const idTitleObj = JSON.stringify({ id_user: id_user, title: newTitle });
 
     try {
-      const cases = state.cases;
+      const cases = [...state.cases];
       cases.forEach((item) => {
         if (item.id === id) {
           item.title = newTitle;
@@ -253,11 +253,11 @@ export default function CasesState(props) {
     }
   };
 
-  if (state.user.toString() !== currentUserInDisplay) {
+  if (state.user !== currentUserInDisplay) {
     dispatch({
       type: GET_CASES,
       payload: {
-        user: inViewContext.state.id.toString(),
+        user: inViewContext.state.userId,
         cases: state.cases,
         loadingCases: state.loadingCases,
       },

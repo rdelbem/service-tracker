@@ -1,10 +1,18 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import dateformat from "dateformat";
+import InViewContext from "../../context/inView/inViewContext";
+import ProgressContext from "../../context/progress/progressContext";
 import TextareaAutosize from "react-textarea-autosize";
 import { FiEdit } from "react-icons/fi";
+import { MdDeleteForever } from "react-icons/md";
 
-export default function Status({ text, created_at }) {
-  const [editable, setEditable] = useState(true);
+export default function Status({ id, id_case, id_user, created_at, text }) {
+  const inViewContext = useContext(InViewContext);
+  const progressContext = useContext(ProgressContext);
+  const { deleteStatus, editStatus } = progressContext;
+
+  const [editable, setEditable] = useState(false);
+  const [editedText, setEditedText] = useState(text);
 
   return (
     <div className="status">
@@ -18,16 +26,37 @@ export default function Status({ text, created_at }) {
             className="status-icon"
           />
         </div>
+        <div className="delete">
+          <MdDeleteForever
+            onClick={() => deleteStatus(id, created_at)}
+            className="status-icon"
+          />
+        </div>
       </div>
       <div className="record">
         <div className="status-text">
-          <TextareaAutosize
-            readOnly={editable}
-            className={
-              editable ? "status-textarea remove-border" : "status-textarea"
-            }
-            defaultValue={text}
-          />
+          <form>
+            <TextareaAutosize
+              onChange={(e) => setEditedText(e.target.value)}
+              readOnly={!editable}
+              className={
+                editable ? "status-textarea" : "status-textarea remove-border"
+              }
+              defaultValue={text}
+            />
+            {editable && (
+              <button
+                className="btn btn-save"
+                onClick={(e) => {
+                  e.preventDefault();
+                  editStatus(id, id_user, editedText);
+                  setEditable(!editable);
+                }}
+              >
+                Save changes
+              </button>
+            )}
+          </form>
         </div>
       </div>
     </div>

@@ -16,7 +16,8 @@ export default function AppReducer(state, action) {
     case IN_VIEW:
       return {
         view: action.payload.view,
-        id: action.payload.id, //user id
+        userId: action.payload.userId, //user id
+        caseId: action.payload.caseId,
         name: action.payload.name,
       };
     case GET_STATUS:

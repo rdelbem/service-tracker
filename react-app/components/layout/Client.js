@@ -13,19 +13,19 @@ export default function Client({ id, name }) {
   return (
     <div
       onClick={() => {
-        updateIdView(id, "cases", name);
+        //false is necessery, because no case is actually in view yet
+        updateIdView(id, "", "cases", name);
         getCases(id, false);
       }}
       className={
-        inViewContext.state.id.toString() === id.toString()
+        parseInt(inViewContext.state.userId) === parseInt(id)
           ? "client-active"
           : "client"
       }
     >
       <div className="name-and-icon">
         <h3>
-          <IoPersonOutline className="icon-client" />
-          id: {id} | {name}
+          <IoPersonOutline className="icon-client" />| {name}
         </h3>
       </div>
     </div>
