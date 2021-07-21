@@ -89,10 +89,10 @@ export default function CasesState(props) {
         },
       });
 
-      toast.success("Case added!", {
+      toast.success(data.toast_case_added, {
         position: "bottom-right",
         autoClose: 5000,
-        hideProgressBar: false,
+        hideProgressBar: true,
         closeOnClick: true,
         pauseOnHover: true,
         draggable: true,
@@ -116,11 +116,11 @@ export default function CasesState(props) {
           switch (element.status) {
             case "close":
               element.status = "open";
-              notice = "open";
+              notice = data.toast_toggle_state_open_msg;
               break;
             case "open":
               element.status = "close";
-              notice = "closed";
+              notice = data.toast_toggle_state_close_msg;
               break;
             default:
               break;
@@ -137,7 +137,7 @@ export default function CasesState(props) {
         },
       });
 
-      toast.info(`Case is now ${notice}`, {
+      toast.info(`${data.toast_toggle_base_msg} ${notice}`, {
         position: "bottom-right",
         autoClose: 5000,
         hideProgressBar: true,
@@ -162,7 +162,7 @@ export default function CasesState(props) {
 
   const deleteCase = async (id, title) => {
     const confirm = window.confirm(
-      "Do you want to delete the case under the name " + title + "?"
+      data.confirm_delete_case + " " + title + "?"
     );
     if (!confirm) return;
 
@@ -181,7 +181,7 @@ export default function CasesState(props) {
         },
       });
 
-      toast.warn("Case deleted!", {
+      toast.warn(data.toast_case_deleted, {
         position: "bottom-right",
         autoClose: 5000,
         hideProgressBar: true,
@@ -206,7 +206,7 @@ export default function CasesState(props) {
 
   const editCase = async (id, id_user, newTitle) => {
     if (newTitle === "") {
-      alert("Case title can not be blank");
+      alert(data.alert_blank_case_title);
       return;
     }
 
@@ -229,7 +229,7 @@ export default function CasesState(props) {
         },
       });
 
-      toast.success("Case edited!", {
+      toast.success(data.toast_case_edited, {
         position: "bottom-right",
         autoClose: 5000,
         hideProgressBar: true,

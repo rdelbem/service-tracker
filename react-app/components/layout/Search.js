@@ -12,7 +12,7 @@ export default function Search() {
           searchUsers(e.target.value);
         }}
         type="text"
-        placeholder="Search for a client"
+        placeholder={data.search_bar}
       />
     </div>
   );

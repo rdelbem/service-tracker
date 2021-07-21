@@ -14,7 +14,7 @@ export default function Initial() {
     <Fragment>
       <div>
         <center>
-          <h3>Click on a client name, to se hers/his cases!</h3>
+          <h3>{data.home_screen}</h3>
         </center>
       </div>
     </Fragment>

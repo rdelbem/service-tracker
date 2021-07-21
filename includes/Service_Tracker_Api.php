@@ -2,6 +2,7 @@
 namespace ServiceTracker\includes;
 
 use ServiceTracker\includes\Service_Tracker_Sql;
+use ServiceTracker\includes\Service_Tracker_Mail;
 use \WP_REST_Server;
 use \WP_REST_Request;
 use \WP_REST_Response;
@@ -71,7 +72,7 @@ class Service_Tracker_Api {
 		$nonce   = $headers['x_wp_nonce'][0];
 
 		if ( ! wp_verify_nonce( $nonce, 'wp_rest' ) ) {
-			return new WP_REST_Response( 'Sorry, invalid credentials' );
+			return new WP_REST_Response( __( 'Sorry, invalid credentials', 'service-tracker' ) );
 		}
 	}
 
@@ -143,6 +144,8 @@ class Service_Tracker_Api {
 			$id_case = $body->id_case;
 			$text    = $body->text;
 
+			$send_mail = new Service_Tracker_Mail( $id_user, __( 'New status!', 'service-tracker' ), __( 'You got a new status: ', 'service-tracker' ) . $text );
+
 			return $sql->insert(
 				array(
 					'id_user' => $id_user,
@@ -181,6 +184,7 @@ class Service_Tracker_Api {
 	}
 
 	public function delete( $data ) {
+
 		$this->security_check( $data );
 
 		$sql = new Service_Tracker_Sql( 'servicetracker_' . $this->db_name . '' );
@@ -196,6 +200,7 @@ class Service_Tracker_Api {
 	}
 
 	public function toggle_status( $data ) {
+
 		$this->security_check( $data );
 
 		if ( $this->db_name === 'progress' ) {

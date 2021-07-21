@@ -28,7 +28,7 @@ export default function Cases() {
         <form>
           <input
             className="case-input"
-            placeholder="Case name"
+            placeholder={data.case_name}
             onChange={(e) => {
               let title = e.target.value;
               setCaseTitle(title);
@@ -44,12 +44,12 @@ export default function Cases() {
             }}
             className="add-case"
           >
-            Add case
+            {data.btn_add_case}
           </button>
         </form>
         <div>
           <center>
-            <h3>No cases yet! Include a new one!</h3>
+            <h3>{data.no_cases_yet}</h3>
           </center>
         </div>
       </Fragment>
@@ -61,7 +61,7 @@ export default function Cases() {
       <form>
         <input
           className="case-input"
-          placeholder="Case name"
+          placeholder={data.case_name}
           onChange={(e) => {
             let title = e.target.value;
             setCaseTitle(title);
@@ -77,7 +77,7 @@ export default function Cases() {
           }}
           className="add-case"
         >
-          Add case
+          {data.btn_add_case}
         </button>
       </form>
       {state.cases.map((item) => (

@@ -12,7 +12,7 @@
  * Author: Rodrigo Del Bem <rodrigodelbem@gmail.com>
  * Author URI: https://delbem.net
  * Plugin URI: https://delbem.net/services-tracker
- * Text Domain: ServiceTracker
+ * Text Domain: service-tracker
  * Domain Path: languages
  */
 
@@ -24,8 +24,6 @@ use ServiceTracker\includes\Service_Tracker_Activator;
 use ServiceTracker\Service_Tracker_Uninstall;
 use ServiceTracker\includes\Service_Tracker;
 use ServiceTracker\includes\Service_Tracker_Api;
-
-define( 'SERVICE_TRACKER_VERSION', '1.0.0' );
 
 function activate_st_service_tracker() {
 	Service_Tracker_Activator::activate();

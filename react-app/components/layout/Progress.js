@@ -31,7 +31,9 @@ export default function Progress() {
 
   return (
     <Fragment>
-      <h3 style={{ marginTop: "0" }}>Progress for case {state.caseTitle}</h3>
+      <h3 style={{ marginTop: "0" }}>
+        {data.title_progress_page} {state.caseTitle}
+      </h3>
       <button
         onClick={(e) => {
           e.preventDefault();
@@ -39,7 +41,7 @@ export default function Progress() {
         }}
         className={!writingStatus ? "btn btn-save" : "btn btn-dismiss"}
       >
-        {!writingStatus ? `New Status` : `Close Box`}
+        {!writingStatus ? data.new_status_btn : data.close_box_btn}
       </button>
 
       <CSSTransition
@@ -63,7 +65,7 @@ export default function Progress() {
                 postStatus(idUser, idCase, newText);
               }}
             >
-              Add this status
+              {data.add_status_btn}
             </button>
           </form>
         </div>
@@ -74,7 +76,7 @@ export default function Progress() {
           <h3>No progress is registered for this case.</h3>
         )}
         {allStatuses.length > 0 &&
-          allStatuses.map((item) => <Status {...item} />)}
+          allStatuses.map((item, index) => <Status key={index} {...item} />)}
       </div>
     </Fragment>
   );

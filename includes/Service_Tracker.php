@@ -7,6 +7,9 @@ use ServiceTracker\includes\Service_Tracker_Api;
 use ServiceTracker\admin\Service_Tracker_Admin;
 use ServiceTracker\publics\Service_Tracker_Public; // public is a reserved word in php, it had to be changed to plural
 
+// This must be hero, since PS4 determines that define should not be used in a output file
+define( 'SERVICE_TRACKER_VERSION', '1.0.0' );
+
 /**
  * The file that defines the core plugin class
  *
@@ -89,7 +92,7 @@ class Service_Tracker {
 		}
 
 		$this->load_dependencies();
-		// $this->set_locale();
+		$this->set_locale();
 		$this->define_admin_hooks();
 		$this->api();
 		// $this->define_public_hooks();
@@ -145,7 +148,7 @@ class Service_Tracker {
 	}
 
 	private function add_client_role() {
-		add_role( 'client', 'Client', get_role( 'subscriber' )->capabilities );
+		add_role( 'client', __( 'Client', 'service-tracker' ), get_role( 'subscriber' )->capabilities );
 	}
 
 	/**

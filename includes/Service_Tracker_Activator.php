@@ -30,7 +30,7 @@ class Service_Tracker_Activator {
 		$main_sql_create_progress .= ' created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,';
 		$main_sql_create_progress .= ' text TEXT)';
 		maybe_create_table( $tablename_progress, $main_sql_create_progress );
-
+		/*
 		$tablename_uploads        = 'ServiceTracker_uploads';
 		$main_sql_create_uploads  = 'CREATE TABLE ' . $tablename_uploads . ' (';
 		$main_sql_create_uploads .= 'id INT(10) UNSIGNED AUTO_INCREMENT PRIMARY KEY,';
@@ -40,7 +40,7 @@ class Service_Tracker_Activator {
 		$main_sql_create_uploads .= ' sent VARCHAR(255),';
 		$main_sql_create_uploads .= ' status VARCHAR(255),';
 		$main_sql_create_uploads .= ' created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)';
-		maybe_create_table( $tablename_uploads, $main_sql_create_uploads );
+		maybe_create_table( $tablename_uploads, $main_sql_create_uploads ); */
 	}
 
 }

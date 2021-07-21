@@ -62,7 +62,7 @@ export default function ProgressState(props) {
 
   const postStatus = async (id_user, id_case, text) => {
     if (text === "") {
-      alert("Status text can not be blank!");
+      alert(data.alert_blank_status_title);
       return;
     }
 
@@ -103,7 +103,7 @@ export default function ProgressState(props) {
         },
       });
 
-      toast.success("Status added!", {
+      toast.success(data.toast_status_added, {
         position: "bottom-right",
         autoClose: 5000,
         hideProgressBar: true,
@@ -122,15 +122,18 @@ export default function ProgressState(props) {
 
   const deleteStatus = async (id, createdAt) => {
     const confirm = window.confirm(
-      "Do you want to delete the status created in " +
+      data.confirm_delete_status +
+        " " +
         dateformat(createdAt, "dd/mm/yyyy, HH:MM") +
         "?"
     );
     if (!confirm) return;
 
     try {
-      const status = [...state.status];
-      const filteredStatuses = status.filter((status) => status.id !== id);
+      const status = state.status;
+      const filteredStatuses = status.filter((status) => {
+        return status.id !== id;
+      });
 
       dispatch({
         type: GET_STATUS,
@@ -141,7 +144,7 @@ export default function ProgressState(props) {
         },
       });
 
-      toast.warn("Status deleted!", {
+      toast.warn(data.toast_status_deleted, {
         position: "bottom-right",
         autoClose: 5000,
         hideProgressBar: true,
@@ -166,7 +169,7 @@ export default function ProgressState(props) {
 
   const editStatus = async (id, id_user, newText) => {
     if (newText === "") {
-      alert("Status can not be blank");
+      alert(data.alert_blank_status_title);
       return;
     }
 
@@ -189,7 +192,7 @@ export default function ProgressState(props) {
         },
       });
 
-      toast.success("Status edited!", {
+      toast.success(data.toast_status_edited, {
         position: "bottom-right",
         autoClose: 5000,
         hideProgressBar: true,

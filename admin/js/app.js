@@ -38080,17 +38080,20 @@ var _Spinner2 = _interopRequireDefault(_Spinner);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+
 function Clients() {
   var clientsContext = (0, _react.useContext)(_clientsContext2.default);
   var state = clientsContext.state;
 
+  var clientsArr = [].concat(_toConsumableArray(state.users));
 
   return wp.element.createElement(
     "div",
     { className: "clients-list-container" },
     wp.element.createElement(_Search2.default, null),
     state.loadingUsers && wp.element.createElement(_Spinner2.default, null),
-    state.users.map(function (client) {
+    clientsArr.map(function (client) {
       return wp.element.createElement(_Client2.default, client);
     })
   );
@@ -43644,7 +43647,7 @@ function Search() {
         searchUsers(e.target.value);
       },
       type: "text",
-      placeholder: "Search for a client"
+      placeholder: data.search_bar
     })
   );
 }
@@ -43723,7 +43726,7 @@ function Cases() {
         null,
         wp.element.createElement("input", {
           className: "case-input",
-          placeholder: "Case name",
+          placeholder: data.case_name,
           onChange: function onChange(e) {
             var title = e.target.value;
             setCaseTitle(title);
@@ -43741,7 +43744,7 @@ function Cases() {
             },
             className: "add-case"
           },
-          "Add case"
+          data.btn_add_case
         )
       ),
       wp.element.createElement(
@@ -43753,7 +43756,7 @@ function Cases() {
           wp.element.createElement(
             "h3",
             null,
-            "No cases yet! Include a new one!"
+            data.no_cases_yet
           )
         )
       )
@@ -43768,7 +43771,7 @@ function Cases() {
       null,
       wp.element.createElement("input", {
         className: "case-input",
-        placeholder: "Case name",
+        placeholder: data.case_name,
         onChange: function onChange(e) {
           var title = e.target.value;
           setCaseTitle(title);
@@ -43786,7 +43789,7 @@ function Cases() {
           },
           className: "add-case"
         },
-        "Add case"
+        data.btn_add_case
       )
     ),
     state.cases.map(function (item) {
@@ -43909,28 +43912,28 @@ function Case(_ref) {
           onClick: function onClick() {
             return deleteCase(id, title);
           },
-          "data-tip": "Delete this case",
+          "data-tip": data.tip_delete_case,
           className: "case-icon"
         }),
         status === "open" && wp.element.createElement(_bs.BsToggleOn, {
           onClick: function onClick() {
             return toggleCase(id);
           },
-          "data-tip": "This case is open! Click to close it.",
+          "data-tip": data.tip_toggle_case_open,
           className: "case-icon"
         }),
         status === "close" && wp.element.createElement(_bs.BsToggleOff, {
           onClick: function onClick() {
             return toggleCase(id);
           },
-          "data-tip": "This case is close! Click to open it.",
+          "data-tip": data.tip_toggle_case_close,
           className: "case-icon"
         }),
         wp.element.createElement(_fi.FiEdit, {
           onClick: function onClick() {
             return setEditing(!editing);
           },
-          "data-tip": "Edit the name of this case",
+          "data-tip": data.tip_edit_case,
           className: "case-icon"
         })
       )
@@ -43966,7 +43969,7 @@ function Case(_ref) {
               },
               className: "btn btn-save"
             },
-            "Save"
+            data.btn_save_case
           ),
           wp.element.createElement(
             "button",
@@ -43977,7 +43980,7 @@ function Case(_ref) {
               },
               className: "btn btn-dismiss"
             },
-            "Dismiss"
+            data.btn_dismiss_edit
           )
         )
       )
@@ -51837,6 +51840,8 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
 var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
 
 exports.default = Progress;
@@ -51911,7 +51916,8 @@ function Progress() {
     wp.element.createElement(
       "h3",
       { style: { marginTop: "0" } },
-      "Progress for case ",
+      data.title_progress_page,
+      " ",
       state.caseTitle
     ),
     wp.element.createElement(
@@ -51923,7 +51929,7 @@ function Progress() {
         },
         className: !writingStatus ? "btn btn-save" : "btn btn-dismiss"
       },
-      !writingStatus ? "New Status" : "Close Box"
+      !writingStatus ? data.new_status_btn : data.close_box_btn
     ),
     wp.element.createElement(
       _reactTransitionGroup.CSSTransition,
@@ -51954,7 +51960,7 @@ function Progress() {
                 postStatus(idUser, idCase, newText);
               }
             },
-            "Add this status"
+            data.add_status_btn
           )
         )
       )
@@ -51967,8 +51973,8 @@ function Progress() {
         null,
         "No progress is registered for this case."
       ),
-      allStatuses.length > 0 && allStatuses.map(function (item) {
-        return wp.element.createElement(_Status2.default, item);
+      allStatuses.length > 0 && allStatuses.map(function (item, index) {
+        return wp.element.createElement(_Status2.default, _extends({ key: index }, item));
       })
     )
   );
@@ -52124,7 +52130,9 @@ function Status(_ref) {
         wp.element.createElement(
           "small",
           null,
-          (0, _dateformat2.default)(created_at, "dd/mm/yyyy, HH:MM")
+          (0, _dateformat2.default)(created_at, "dd/mm/yyyy, HH:MM"),
+          " id ",
+          id
         )
       ),
       wp.element.createElement(
@@ -52154,7 +52162,12 @@ function Status(_ref) {
       wp.element.createElement(
         "div",
         { className: "status-text" },
-        wp.element.createElement(
+        !editable && wp.element.createElement(
+          "p",
+          null,
+          text
+        ),
+        editable && wp.element.createElement(
           "form",
           null,
           wp.element.createElement(_reactTextareaAutosize2.default, {
@@ -52175,7 +52188,7 @@ function Status(_ref) {
                 setEditable(!editable);
               }
             },
-            "Save changes"
+            data.btn_save_changes_status
           )
         )
       )
@@ -53309,10 +53322,10 @@ function CasesState(props) {
                 }
               });
 
-              _reactToastify.toast.success("Case added!", {
+              _reactToastify.toast.success(data.toast_case_added, {
                 position: "bottom-right",
                 autoClose: 5000,
-                hideProgressBar: false,
+                hideProgressBar: true,
                 closeOnClick: true,
                 pauseOnHover: true,
                 draggable: true,
@@ -53358,11 +53371,11 @@ function CasesState(props) {
                   switch (element.status) {
                     case "close":
                       element.status = "open";
-                      notice = "open";
+                      notice = data.toast_toggle_state_open_msg;
                       break;
                     case "open":
                       element.status = "close";
-                      notice = "closed";
+                      notice = data.toast_toggle_state_close_msg;
                       break;
                     default:
                       break;
@@ -53379,7 +53392,7 @@ function CasesState(props) {
                 }
               });
 
-              _reactToastify.toast.info("Case is now " + notice, {
+              _reactToastify.toast.info(data.toast_toggle_base_msg + " " + notice, {
                 position: "bottom-right",
                 autoClose: 5000,
                 hideProgressBar: true,
@@ -53428,7 +53441,7 @@ function CasesState(props) {
         while (1) {
           switch (_context4.prev = _context4.next) {
             case 0:
-              confirm = window.confirm("Do you want to delete the case under the name " + title + "?");
+              confirm = window.confirm(data.confirm_delete_case + " " + title + "?");
 
               if (confirm) {
                 _context4.next = 3;
@@ -53454,7 +53467,7 @@ function CasesState(props) {
                 }
               });
 
-              _reactToastify.toast.warn("Case deleted!", {
+              _reactToastify.toast.warn(data.toast_case_deleted, {
                 position: "bottom-right",
                 autoClose: 5000,
                 hideProgressBar: true,
@@ -53507,7 +53520,7 @@ function CasesState(props) {
                 break;
               }
 
-              alert("Case title can not be blank");
+              alert(data.alert_blank_case_title);
               return _context5.abrupt("return");
 
             case 3:
@@ -53530,7 +53543,7 @@ function CasesState(props) {
                 }
               });
 
-              _reactToastify.toast.success("Case edited!", {
+              _reactToastify.toast.success(data.toast_case_edited, {
                 position: "bottom-right",
                 autoClose: 5000,
                 hideProgressBar: true,
@@ -53860,7 +53873,7 @@ function ProgressState(props) {
                 break;
               }
 
-              alert("Status text can not be blank!");
+              alert(data.alert_blank_status_title);
               return _context2.abrupt("return");
 
             case 3:
@@ -53901,7 +53914,7 @@ function ProgressState(props) {
                 }
               });
 
-              _reactToastify.toast.success("Status added!", {
+              _reactToastify.toast.success(data.toast_status_added, {
                 position: "bottom-right",
                 autoClose: 5000,
                 hideProgressBar: true,
@@ -53940,7 +53953,7 @@ function ProgressState(props) {
         while (1) {
           switch (_context3.prev = _context3.next) {
             case 0:
-              confirm = window.confirm("Do you want to delete the status created in " + (0, _dateformat2.default)(createdAt, "dd/mm/yyyy, HH:MM") + "?");
+              confirm = window.confirm(data.confirm_delete_status + " " + (0, _dateformat2.default)(createdAt, "dd/mm/yyyy, HH:MM") + "?");
 
               if (confirm) {
                 _context3.next = 3;
@@ -53951,7 +53964,7 @@ function ProgressState(props) {
 
             case 3:
               _context3.prev = 3;
-              status = [].concat(_toConsumableArray(state.status));
+              status = state.status;
               filteredStatuses = status.filter(function (status) {
                 return status.id !== id;
               });
@@ -53966,7 +53979,7 @@ function ProgressState(props) {
                 }
               });
 
-              _reactToastify.toast.warn("Status deleted!", {
+              _reactToastify.toast.warn(data.toast_status_deleted, {
                 position: "bottom-right",
                 autoClose: 5000,
                 hideProgressBar: true,
@@ -54019,7 +54032,7 @@ function ProgressState(props) {
                 break;
               }
 
-              alert("Status can not be blank");
+              alert(data.alert_blank_status_title);
               return _context4.abrupt("return");
 
             case 3:
@@ -54042,7 +54055,7 @@ function ProgressState(props) {
                 }
               });
 
-              _reactToastify.toast.success("Status edited!", {
+              _reactToastify.toast.success(data.toast_status_edited, {
                 position: "bottom-right",
                 autoClose: 5000,
                 hideProgressBar: true,
@@ -54169,7 +54182,7 @@ function Initial() {
         wp.element.createElement(
           "h3",
           null,
-          "Click on a client name, to se hers/his cases!"
+          data.home_screen
         )
       )
     )

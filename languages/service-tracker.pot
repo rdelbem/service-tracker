@@ -1,0 +1,181 @@
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: Service Tracker\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2021-07-21 23:01+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: \n"
+"Language: \n"
+"Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Loco https://localise.biz/\n"
+"X-Loco-Version: 2.5.3; wp-5.5.5\n"
+"X-Domain: service-tracker"
+
+#: admin/Service_Tracker_Admin.php:100
+msgid "Add case"
+msgstr ""
+
+#: admin/Service_Tracker_Admin.php:112
+msgid "Add this status"
+msgstr ""
+
+#: admin/Service_Tracker_Admin.php:116
+msgid "Case added!"
+msgstr ""
+
+#: admin/Service_Tracker_Admin.php:120
+msgid "Case deleted!"
+msgstr ""
+
+#: admin/Service_Tracker_Admin.php:121
+msgid "Case edited!"
+msgstr ""
+
+#: admin/Service_Tracker_Admin.php:117
+msgid "Case is now"
+msgstr ""
+
+#: admin/Service_Tracker_Admin.php:102
+msgid "Case name"
+msgstr ""
+
+#: admin/Service_Tracker_Admin.php:127
+msgid "Case title can not be blank"
+msgstr ""
+
+#: admin/Service_Tracker_Admin.php:99
+msgid "Click on a client name, to se hers/his cases!"
+msgstr ""
+
+#: includes/Service_Tracker.php:148
+msgid "Client"
+msgstr ""
+
+#: admin/Service_Tracker_Admin.php:111
+msgid "Close box"
+msgstr ""
+
+#: admin/Service_Tracker_Admin.php:119
+msgid "closed"
+msgstr ""
+
+#: admin/Service_Tracker_Admin.php:106
+msgid "Delete this case"
+msgstr ""
+
+#: admin/Service_Tracker_Admin.php:114
+msgid "Delete this status"
+msgstr ""
+
+#: admin/Service_Tracker_Admin.php:108
+msgid "Dismiss"
+msgstr ""
+
+#: admin/Service_Tracker_Admin.php:125
+msgid "Do you want to delete the case under the name"
+msgstr ""
+
+#: admin/Service_Tracker_Admin.php:126
+msgid "Do you want to delete the status created in"
+msgstr ""
+
+#: admin/Service_Tracker_Admin.php:103
+msgid "Edit the name of this case"
+msgstr ""
+
+#: admin/Service_Tracker_Admin.php:113
+msgid "Edit this status"
+msgstr ""
+
+#. Author URI of the plugin
+msgid "https://delbem.net"
+msgstr ""
+
+#. URI of the plugin
+msgid "https://delbem.net/services-tracker"
+msgstr ""
+
+#: admin/Service_Tracker_Admin.php:129
+msgid "It was impossible to complete this task. We had an error"
+msgstr ""
+
+#: admin/Service_Tracker_Admin.php:110
+msgid "New Status"
+msgstr ""
+
+#: includes/Service_Tracker_Api.php:147
+msgid "New status!"
+msgstr ""
+
+#: admin/Service_Tracker_Admin.php:101
+msgid "No cases yet! Include a new one!"
+msgstr ""
+
+#: admin/Service_Tracker_Admin.php:118
+msgid "open"
+msgstr ""
+
+#: admin/Service_Tracker_Admin.php:109
+msgid "Progress for case"
+msgstr ""
+
+#. Author of the plugin
+msgid "Rodrigo Del Bem <rodrigodelbem@gmail.com>"
+msgstr ""
+
+#: admin/Service_Tracker_Admin.php:107
+msgid "Save"
+msgstr ""
+
+#: admin/Service_Tracker_Admin.php:115
+msgid "Save changes"
+msgstr ""
+
+#: admin/Service_Tracker_Admin.php:98
+msgid "Search for a client"
+msgstr ""
+
+#. Name of the plugin
+msgid "Service Tracker"
+msgstr ""
+
+#: includes/Service_Tracker_Api.php:75
+msgid "Sorry, invalid credentials"
+msgstr ""
+
+#: admin/Service_Tracker_Admin.php:122
+msgid "Status added!"
+msgstr ""
+
+#: admin/Service_Tracker_Admin.php:123
+msgid "Status deleted!"
+msgstr ""
+
+#: admin/Service_Tracker_Admin.php:124
+msgid "Status edited!"
+msgstr ""
+
+#: admin/Service_Tracker_Admin.php:128
+msgid "Status text can not be blank"
+msgstr ""
+
+#: admin/Service_Tracker_Admin.php:105
+msgid "This case is closed! Click to open it."
+msgstr ""
+
+#: admin/Service_Tracker_Admin.php:104
+msgid "This case is open! Click to close it."
+msgstr ""
+
+#. Description of the plugin
+msgid "This plugin offers the possibilitie to track the services you provide."
+msgstr ""
+
+#: includes/Service_Tracker_Api.php:147
+msgid "You got a new status: "
+msgstr ""

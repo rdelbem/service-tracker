@@ -18,7 +18,9 @@ export default function Status({ id, id_case, id_user, created_at, text }) {
     <div className="status">
       <div className="date-edit">
         <div className="date">
-          <small>{dateformat(created_at, "dd/mm/yyyy, HH:MM")}</small>
+          <small>
+            {dateformat(created_at, "dd/mm/yyyy, HH:MM")} id {id}
+          </small>
         </div>
         <div className="edit">
           <FiEdit
@@ -35,28 +37,31 @@ export default function Status({ id, id_case, id_user, created_at, text }) {
       </div>
       <div className="record">
         <div className="status-text">
-          <form>
-            <TextareaAutosize
-              onChange={(e) => setEditedText(e.target.value)}
-              readOnly={!editable}
-              className={
-                editable ? "status-textarea" : "status-textarea remove-border"
-              }
-              defaultValue={text}
-            />
-            {editable && (
-              <button
-                className="btn btn-save"
-                onClick={(e) => {
-                  e.preventDefault();
-                  editStatus(id, id_user, editedText);
-                  setEditable(!editable);
-                }}
-              >
-                Save changes
-              </button>
-            )}
-          </form>
+          {!editable && <p>{text}</p>}
+          {editable && (
+            <form>
+              <TextareaAutosize
+                onChange={(e) => setEditedText(e.target.value)}
+                readOnly={!editable}
+                className={
+                  editable ? "status-textarea" : "status-textarea remove-border"
+                }
+                defaultValue={text}
+              />
+              {editable && (
+                <button
+                  className="btn btn-save"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    editStatus(id, id_user, editedText);
+                    setEditable(!editable);
+                  }}
+                >
+                  {data.btn_save_changes_status}
+                </button>
+              )}
+            </form>
+          )}
         </div>
       </div>
     </div>

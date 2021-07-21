@@ -1,0 +1,180 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Service Tracker\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2021-07-21 23:01+0000\n"
+"PO-Revision-Date: 2021-07-21 20:18-0300\n"
+"Language-Team: \n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 2.4.2\n"
+"X-Loco-Version: 2.5.3; wp-5.5.5\n"
+"X-Domain: service-tracker\n"
+"Last-Translator: \n"
+"Language: pt_BR\n"
+
+#: admin/Service_Tracker_Admin.php:100
+msgid "Add case"
+msgstr "Adicionar caso"
+
+#: admin/Service_Tracker_Admin.php:112
+msgid "Add this status"
+msgstr "Adicionar status"
+
+#: admin/Service_Tracker_Admin.php:116
+msgid "Case added!"
+msgstr "Caso adicionado!"
+
+#: admin/Service_Tracker_Admin.php:120
+msgid "Case deleted!"
+msgstr "Caso deletado!"
+
+#: admin/Service_Tracker_Admin.php:121
+msgid "Case edited!"
+msgstr "Caso editado!"
+
+#: admin/Service_Tracker_Admin.php:117
+msgid "Case is now"
+msgstr "O caso está"
+
+#: admin/Service_Tracker_Admin.php:102
+msgid "Case name"
+msgstr "Nome do caso"
+
+#: admin/Service_Tracker_Admin.php:127
+msgid "Case title can not be blank"
+msgstr "O título do caso não pode ser vazio"
+
+#: admin/Service_Tracker_Admin.php:99
+msgid "Click on a client name, to se hers/his cases!"
+msgstr "Clique no nome de um cliente para ver os casos dele!"
+
+#: includes/Service_Tracker.php:148
+msgid "Client"
+msgstr "Cliente"
+
+#: admin/Service_Tracker_Admin.php:111
+msgid "Close box"
+msgstr "Fechar"
+
+#: admin/Service_Tracker_Admin.php:119
+msgid "closed"
+msgstr "encerrado"
+
+#: admin/Service_Tracker_Admin.php:106
+msgid "Delete this case"
+msgstr "Delete esse caso"
+
+#: admin/Service_Tracker_Admin.php:114
+msgid "Delete this status"
+msgstr "Delete esse status"
+
+#: admin/Service_Tracker_Admin.php:108
+msgid "Dismiss"
+msgstr "Fechar"
+
+#: admin/Service_Tracker_Admin.php:125
+msgid "Do you want to delete the case under the name"
+msgstr "Você gostaria de deletar o caso sob o nome"
+
+#: admin/Service_Tracker_Admin.php:126
+msgid "Do you want to delete the status created in"
+msgstr "Você gostaria de deletar o status criado em"
+
+#: admin/Service_Tracker_Admin.php:103
+msgid "Edit the name of this case"
+msgstr "Edite o nome desse caso"
+
+#: admin/Service_Tracker_Admin.php:113
+msgid "Edit this status"
+msgstr "Edite esse status"
+
+#. Author URI of the plugin
+msgid "https://delbem.net"
+msgstr ""
+
+#. URI of the plugin
+msgid "https://delbem.net/services-tracker"
+msgstr ""
+
+#: admin/Service_Tracker_Admin.php:129
+msgid "It was impossible to complete this task. We had an error"
+msgstr "Não foi possível completar essa tarefa. Observou-se o seguinte erro"
+
+#: admin/Service_Tracker_Admin.php:110
+msgid "New Status"
+msgstr "Novo Status"
+
+#: includes/Service_Tracker_Api.php:147
+msgid "New status!"
+msgstr "Novo status!"
+
+#: admin/Service_Tracker_Admin.php:101
+msgid "No cases yet! Include a new one!"
+msgstr "Ainda não há casos! Inclua um novo!"
+
+#: admin/Service_Tracker_Admin.php:118
+msgid "open"
+msgstr "aberto"
+
+#: admin/Service_Tracker_Admin.php:109
+msgid "Progress for case"
+msgstr "Andamento para o caso"
+
+#. Author of the plugin
+msgid "Rodrigo Del Bem <rodrigodelbem@gmail.com>"
+msgstr ""
+
+#: admin/Service_Tracker_Admin.php:107
+msgid "Save"
+msgstr "Salvar"
+
+#: admin/Service_Tracker_Admin.php:115
+msgid "Save changes"
+msgstr "Salvar mudanças"
+
+#: admin/Service_Tracker_Admin.php:98
+msgid "Search for a client"
+msgstr "Busque por um cliente"
+
+#. Name of the plugin
+msgid "Service Tracker"
+msgstr "Andamento de Serviços"
+
+#: includes/Service_Tracker_Api.php:75
+msgid "Sorry, invalid credentials"
+msgstr "Desculpe-nos, credenciais inválidas"
+
+#: admin/Service_Tracker_Admin.php:122
+msgid "Status added!"
+msgstr "Status adicionado!"
+
+#: admin/Service_Tracker_Admin.php:123
+msgid "Status deleted!"
+msgstr "Status deletado!"
+
+#: admin/Service_Tracker_Admin.php:124
+msgid "Status edited!"
+msgstr "Status editado!"
+
+#: admin/Service_Tracker_Admin.php:128
+msgid "Status text can not be blank"
+msgstr "O texto para um status não pode ser vazio"
+
+#: admin/Service_Tracker_Admin.php:105
+msgid "This case is closed! Click to open it."
+msgstr "Esse caso está agora encerrado! Clique novamente para abri-lo."
+
+#: admin/Service_Tracker_Admin.php:104
+msgid "This case is open! Click to close it."
+msgstr "Esse caso está agora aberto! Clique novamente para encerra-lo."
+
+#. Description of the plugin
+msgid "This plugin offers the possibilitie to track the services you provide."
+msgstr "Esse plugin oferece a possibilidade de se rastrear o andamento para um serviço sendo prestado."
+
+#: includes/Service_Tracker_Api.php:147
+msgid "You got a new status: "
+msgstr "Você tem um novo status "

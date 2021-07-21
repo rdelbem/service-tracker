@@ -42,28 +42,28 @@ export default function Case({ id, id_user, status, created_at, title }) {
 
           <MdDeleteForever
             onClick={() => deleteCase(id, title)}
-            data-tip="Delete this case"
+            data-tip={data.tip_delete_case}
             className="case-icon"
           />
 
           {status === "open" && (
             <BsToggleOn
               onClick={() => toggleCase(id)}
-              data-tip="This case is open! Click to close it."
+              data-tip={data.tip_toggle_case_open}
               className="case-icon"
             />
           )}
           {status === "close" && (
             <BsToggleOff
               onClick={() => toggleCase(id)}
-              data-tip="This case is close! Click to open it."
+              data-tip={data.tip_toggle_case_close}
               className="case-icon"
             />
           )}
 
           <FiEdit
             onClick={() => setEditing(!editing)}
-            data-tip="Edit the name of this case"
+            data-tip={data.tip_edit_case}
             className="case-icon"
           />
         </h3>
@@ -91,7 +91,7 @@ export default function Case({ id, id_user, status, created_at, title }) {
               }}
               className="btn btn-save"
             >
-              Save
+              {data.btn_save_case}
             </button>
             <button
               onClick={(e) => {
@@ -100,7 +100,7 @@ export default function Case({ id, id_user, status, created_at, title }) {
               }}
               className="btn btn-dismiss"
             >
-              Dismiss
+              {data.btn_dismiss_edit}
             </button>
           </form>
         </div>
