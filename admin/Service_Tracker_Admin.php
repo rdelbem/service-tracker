@@ -79,7 +79,11 @@ class Service_Tracker_Admin {
 			return;
 		}
 
-		wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/app.js', array( 'wp-element' ), $this->version, false );
+		if ( $_SERVER['SERVER_NAME'] === 'aulasplugin.local' ) {
+			wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/dev/App.js', array( 'wp-element' ), $this->version, false );
+		} else {
+			wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/prod/App.js', array( 'wp-element' ), $this->version, false );
+		}
 
 	}
 
@@ -127,6 +131,7 @@ class Service_Tracker_Admin {
 				'alert_blank_case_title'       => __( 'Case title can not be blank', 'service-tracker' ),
 				'alert_blank_status_title'     => __( 'Status text can not be blank', 'service-tracker' ),
 				'alert_error_base'             => __( 'It was impossible to complete this task. We had an error', 'service-tracker' ),
+				'no_progress_yet'              => __( 'No progress is registered for this case.', 'service-tracker' ),
 			)
 		);
 	}

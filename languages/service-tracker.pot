@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Service Tracker\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-07-21 23:01+0000\n"
+"POT-Creation-Date: 2021-07-24 00:30+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: \n"
@@ -16,79 +16,79 @@ msgstr ""
 "X-Loco-Version: 2.5.3; wp-5.5.5\n"
 "X-Domain: service-tracker"
 
-#: admin/Service_Tracker_Admin.php:100
+#: admin/Service_Tracker_Admin.php:104
 msgid "Add case"
 msgstr ""
 
-#: admin/Service_Tracker_Admin.php:112
+#: admin/Service_Tracker_Admin.php:116
 msgid "Add this status"
 msgstr ""
 
-#: admin/Service_Tracker_Admin.php:116
+#: admin/Service_Tracker_Admin.php:120
 msgid "Case added!"
 msgstr ""
 
-#: admin/Service_Tracker_Admin.php:120
+#: admin/Service_Tracker_Admin.php:124
 msgid "Case deleted!"
 msgstr ""
 
-#: admin/Service_Tracker_Admin.php:121
+#: admin/Service_Tracker_Admin.php:125
 msgid "Case edited!"
 msgstr ""
 
-#: admin/Service_Tracker_Admin.php:117
+#: admin/Service_Tracker_Admin.php:121
 msgid "Case is now"
 msgstr ""
 
-#: admin/Service_Tracker_Admin.php:102
+#: admin/Service_Tracker_Admin.php:106
 msgid "Case name"
 msgstr ""
 
-#: admin/Service_Tracker_Admin.php:127
+#: admin/Service_Tracker_Admin.php:131
 msgid "Case title can not be blank"
 msgstr ""
 
-#: admin/Service_Tracker_Admin.php:99
+#: admin/Service_Tracker_Admin.php:103
 msgid "Click on a client name, to se hers/his cases!"
 msgstr ""
 
-#: includes/Service_Tracker.php:148
+#: includes/Service_Tracker.php:151
 msgid "Client"
 msgstr ""
 
-#: admin/Service_Tracker_Admin.php:111
+#: admin/Service_Tracker_Admin.php:115
 msgid "Close box"
 msgstr ""
 
-#: admin/Service_Tracker_Admin.php:119
+#: admin/Service_Tracker_Admin.php:123
 msgid "closed"
 msgstr ""
 
-#: admin/Service_Tracker_Admin.php:106
+#: admin/Service_Tracker_Admin.php:110
 msgid "Delete this case"
 msgstr ""
 
-#: admin/Service_Tracker_Admin.php:114
+#: admin/Service_Tracker_Admin.php:118
 msgid "Delete this status"
 msgstr ""
 
-#: admin/Service_Tracker_Admin.php:108
+#: admin/Service_Tracker_Admin.php:112
 msgid "Dismiss"
 msgstr ""
 
-#: admin/Service_Tracker_Admin.php:125
+#: admin/Service_Tracker_Admin.php:129
 msgid "Do you want to delete the case under the name"
 msgstr ""
 
-#: admin/Service_Tracker_Admin.php:126
+#: admin/Service_Tracker_Admin.php:130
 msgid "Do you want to delete the status created in"
 msgstr ""
 
-#: admin/Service_Tracker_Admin.php:103
+#: admin/Service_Tracker_Admin.php:107
 msgid "Edit the name of this case"
 msgstr ""
 
-#: admin/Service_Tracker_Admin.php:113
+#: admin/Service_Tracker_Admin.php:117
 msgid "Edit this status"
 msgstr ""
 
@@ -100,11 +100,11 @@ msgstr ""
 msgid "https://delbem.net/services-tracker"
 msgstr ""
 
-#: admin/Service_Tracker_Admin.php:129
+#: admin/Service_Tracker_Admin.php:133
 msgid "It was impossible to complete this task. We had an error"
 msgstr ""
 
-#: admin/Service_Tracker_Admin.php:110
+#: admin/Service_Tracker_Admin.php:114
 msgid "New Status"
 msgstr ""
 
@@ -112,15 +112,19 @@ msgstr ""
 msgid "New status!"
 msgstr ""
 
-#: admin/Service_Tracker_Admin.php:101
+#: admin/Service_Tracker_Admin.php:105
 msgid "No cases yet! Include a new one!"
 msgstr ""
 
-#: admin/Service_Tracker_Admin.php:118
+#: admin/Service_Tracker_Admin.php:134
+msgid "No progress is registered for this case."
+msgstr ""
+
+#: admin/Service_Tracker_Admin.php:122
 msgid "open"
 msgstr ""
 
-#: admin/Service_Tracker_Admin.php:109
+#: admin/Service_Tracker_Admin.php:113
 msgid "Progress for case"
 msgstr ""
 
@@ -128,15 +132,15 @@ msgstr ""
 msgid "Rodrigo Del Bem <rodrigodelbem@gmail.com>"
 msgstr ""
 
-#: admin/Service_Tracker_Admin.php:107
+#: admin/Service_Tracker_Admin.php:111
 msgid "Save"
 msgstr ""
 
-#: admin/Service_Tracker_Admin.php:115
+#: admin/Service_Tracker_Admin.php:119
 msgid "Save changes"
 msgstr ""
 
-#: admin/Service_Tracker_Admin.php:98
+#: admin/Service_Tracker_Admin.php:102
 msgid "Search for a client"
 msgstr ""
 
@@ -148,27 +152,27 @@ msgstr ""
 msgid "Sorry, invalid credentials"
 msgstr ""
 
-#: admin/Service_Tracker_Admin.php:122
+#: admin/Service_Tracker_Admin.php:126
 msgid "Status added!"
 msgstr ""
 
-#: admin/Service_Tracker_Admin.php:123
+#: admin/Service_Tracker_Admin.php:127
 msgid "Status deleted!"
 msgstr ""
 
-#: admin/Service_Tracker_Admin.php:124
+#: admin/Service_Tracker_Admin.php:128
 msgid "Status edited!"
 msgstr ""
 
-#: admin/Service_Tracker_Admin.php:128
+#: admin/Service_Tracker_Admin.php:132
 msgid "Status text can not be blank"
 msgstr ""
 
-#: admin/Service_Tracker_Admin.php:105
+#: admin/Service_Tracker_Admin.php:109
 msgid "This case is closed! Click to open it."
 msgstr ""
 
-#: admin/Service_Tracker_Admin.php:104
+#: admin/Service_Tracker_Admin.php:108
 msgid "This case is open! Click to close it."
 msgstr ""
 

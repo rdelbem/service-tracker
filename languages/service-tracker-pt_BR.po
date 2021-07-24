@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Service Tracker\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-07-21 23:01+0000\n"
-"PO-Revision-Date: 2021-07-21 20:18-0300\n"
+"POT-Creation-Date: 2021-07-24 00:30+0000\n"
+"PO-Revision-Date: 2021-07-23 21:38-0300\n"
 "Language-Team: \n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "MIME-Version: 1.0\n"
@@ -15,79 +15,79 @@ msgstr ""
 "Last-Translator: \n"
 "Language: pt_BR\n"
 
-#: admin/Service_Tracker_Admin.php:100
+#: admin/Service_Tracker_Admin.php:104
 msgid "Add case"
 msgstr "Adicionar caso"
 
-#: admin/Service_Tracker_Admin.php:112
-msgid "Add this status"
-msgstr "Adicionar status"
-
 #: admin/Service_Tracker_Admin.php:116
+msgid "Add this status"
+msgstr "Adicione esse status"
+
+#: admin/Service_Tracker_Admin.php:120
 msgid "Case added!"
 msgstr "Caso adicionado!"
 
-#: admin/Service_Tracker_Admin.php:120
+#: admin/Service_Tracker_Admin.php:124
 msgid "Case deleted!"
 msgstr "Caso deletado!"
 
-#: admin/Service_Tracker_Admin.php:121
+#: admin/Service_Tracker_Admin.php:125
 msgid "Case edited!"
 msgstr "Caso editado!"
 
-#: admin/Service_Tracker_Admin.php:117
+#: admin/Service_Tracker_Admin.php:121
 msgid "Case is now"
-msgstr "O caso está"
+msgstr "Caso foi"
 
-#: admin/Service_Tracker_Admin.php:102
+#: admin/Service_Tracker_Admin.php:106
 msgid "Case name"
 msgstr "Nome do caso"
 
-#: admin/Service_Tracker_Admin.php:127
+#: admin/Service_Tracker_Admin.php:131
 msgid "Case title can not be blank"
-msgstr "O título do caso não pode ser vazio"
+msgstr "O título de um caso não pode ser vazio"
 
-#: admin/Service_Tracker_Admin.php:99
+#: admin/Service_Tracker_Admin.php:103
 msgid "Click on a client name, to se hers/his cases!"
 msgstr "Clique no nome de um cliente para ver os casos dele!"
 
-#: includes/Service_Tracker.php:148
+#: includes/Service_Tracker.php:151
 msgid "Client"
 msgstr "Cliente"
 
-#: admin/Service_Tracker_Admin.php:111
+#: admin/Service_Tracker_Admin.php:115
 msgid "Close box"
 msgstr "Fechar"
 
-#: admin/Service_Tracker_Admin.php:119
+#: admin/Service_Tracker_Admin.php:123
 msgid "closed"
-msgstr "encerrado"
+msgstr "fechado"
 
-#: admin/Service_Tracker_Admin.php:106
+#: admin/Service_Tracker_Admin.php:110
 msgid "Delete this case"
 msgstr "Delete esse caso"
 
-#: admin/Service_Tracker_Admin.php:114
+#: admin/Service_Tracker_Admin.php:118
 msgid "Delete this status"
 msgstr "Delete esse status"
 
-#: admin/Service_Tracker_Admin.php:108
+#: admin/Service_Tracker_Admin.php:112
 msgid "Dismiss"
 msgstr "Fechar"
 
-#: admin/Service_Tracker_Admin.php:125
+#: admin/Service_Tracker_Admin.php:129
 msgid "Do you want to delete the case under the name"
 msgstr "Você gostaria de deletar o caso sob o nome"
 
-#: admin/Service_Tracker_Admin.php:126
+#: admin/Service_Tracker_Admin.php:130
 msgid "Do you want to delete the status created in"
 msgstr "Você gostaria de deletar o status criado em"
 
-#: admin/Service_Tracker_Admin.php:103
+#: admin/Service_Tracker_Admin.php:107
 msgid "Edit the name of this case"
 msgstr "Edite o nome desse caso"
 
-#: admin/Service_Tracker_Admin.php:113
+#: admin/Service_Tracker_Admin.php:117
 msgid "Edit this status"
 msgstr "Edite esse status"
 
@@ -99,11 +99,11 @@ msgstr ""
 msgid "https://delbem.net/services-tracker"
 msgstr ""
 
-#: admin/Service_Tracker_Admin.php:129
+#: admin/Service_Tracker_Admin.php:133
 msgid "It was impossible to complete this task. We had an error"
 msgstr "Não foi possível completar essa tarefa. Observou-se o seguinte erro"
 
-#: admin/Service_Tracker_Admin.php:110
+#: admin/Service_Tracker_Admin.php:114
 msgid "New Status"
 msgstr "Novo Status"
 
@@ -111,15 +111,19 @@ msgstr "Novo Status"
 msgid "New status!"
 msgstr "Novo status!"
 
-#: admin/Service_Tracker_Admin.php:101
+#: admin/Service_Tracker_Admin.php:105
 msgid "No cases yet! Include a new one!"
 msgstr "Ainda não há casos! Inclua um novo!"
 
-#: admin/Service_Tracker_Admin.php:118
+#: admin/Service_Tracker_Admin.php:134
+msgid "No progress is registered for this case."
+msgstr "Ainda não há registros de andamento para este caso."
+
+#: admin/Service_Tracker_Admin.php:122
 msgid "open"
 msgstr "aberto"
 
-#: admin/Service_Tracker_Admin.php:109
+#: admin/Service_Tracker_Admin.php:113
 msgid "Progress for case"
 msgstr "Andamento para o caso"
 
@@ -127,49 +131,49 @@ msgstr "Andamento para o caso"
 msgid "Rodrigo Del Bem <rodrigodelbem@gmail.com>"
 msgstr ""
 
-#: admin/Service_Tracker_Admin.php:107
+#: admin/Service_Tracker_Admin.php:111
 msgid "Save"
 msgstr "Salvar"
 
-#: admin/Service_Tracker_Admin.php:115
+#: admin/Service_Tracker_Admin.php:119
 msgid "Save changes"
 msgstr "Salvar mudanças"
 
-#: admin/Service_Tracker_Admin.php:98
+#: admin/Service_Tracker_Admin.php:102
 msgid "Search for a client"
 msgstr "Busque por um cliente"
 
 #. Name of the plugin
 msgid "Service Tracker"
-msgstr "Andamento de Serviços"
+msgstr "Monitoramento de Serviços"
 
 #: includes/Service_Tracker_Api.php:75
 msgid "Sorry, invalid credentials"
-msgstr "Desculpe-nos, credenciais inválidas"
+msgstr "Acesso negado"
 
-#: admin/Service_Tracker_Admin.php:122
+#: admin/Service_Tracker_Admin.php:126
 msgid "Status added!"
 msgstr "Status adicionado!"
 
-#: admin/Service_Tracker_Admin.php:123
+#: admin/Service_Tracker_Admin.php:127
 msgid "Status deleted!"
 msgstr "Status deletado!"
 
-#: admin/Service_Tracker_Admin.php:124
+#: admin/Service_Tracker_Admin.php:128
 msgid "Status edited!"
 msgstr "Status editado!"
 
-#: admin/Service_Tracker_Admin.php:128
+#: admin/Service_Tracker_Admin.php:132
 msgid "Status text can not be blank"
-msgstr "O texto para um status não pode ser vazio"
+msgstr "O texto de um status não pode ser vazio"
 
-#: admin/Service_Tracker_Admin.php:105
+#: admin/Service_Tracker_Admin.php:109
 msgid "This case is closed! Click to open it."
-msgstr "Esse caso está agora encerrado! Clique novamente para abri-lo."
+msgstr "Esse caso está encerrado! Clique para abri-lo."
 
-#: admin/Service_Tracker_Admin.php:104
+#: admin/Service_Tracker_Admin.php:108
 msgid "This case is open! Click to close it."
-msgstr "Esse caso está agora aberto! Clique novamente para encerra-lo."
+msgstr "Esse caso foi aberto! Clique para encera-lo."
 
 #. Description of the plugin
 msgid "This plugin offers the possibilitie to track the services you provide."
@@ -177,4 +181,4 @@ msgstr "Esse plugin oferece a possibilidade de se rastrear o andamento para um s
 
 #: includes/Service_Tracker_Api.php:147
 msgid "You got a new status: "
-msgstr "Você tem um novo status "
+msgstr "Seu caso teve um novo andamento "

@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, Fragment } from "react";
 import dateformat from "dateformat";
 import InViewContext from "../../context/inView/inViewContext";
 import ProgressContext from "../../context/progress/progressContext";
@@ -24,12 +24,14 @@ export default function Status({ id, id_case, id_user, created_at, text }) {
         </div>
         <div className="edit">
           <FiEdit
+            data-tip={data.tip_edit_status}
             onClick={() => setEditable(!editable)}
             className="status-icon"
           />
         </div>
         <div className="delete">
           <MdDeleteForever
+            data-tip={data.tip_delete_status}
             onClick={() => deleteStatus(id, created_at)}
             className="status-icon"
           />
@@ -49,16 +51,26 @@ export default function Status({ id, id_case, id_user, created_at, text }) {
                 defaultValue={text}
               />
               {editable && (
-                <button
-                  className="btn btn-save"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    editStatus(id, id_user, editedText);
-                    setEditable(!editable);
-                  }}
-                >
-                  {data.btn_save_changes_status}
-                </button>
+                <Fragment>
+                  <button
+                    className="btn btn-save"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      editStatus(id, id_user, editedText);
+                      setEditable(!editable);
+                    }}
+                  >
+                    {data.btn_save_changes_status}
+                  </button>
+                  <button
+                    className="btn btn-dismiss"
+                    onClick={(e) => {
+                      setEditable(!editable);
+                    }}
+                  >
+                    {data.btn_dismiss_edit}
+                  </button>
+                </Fragment>
               )}
             </form>
           )}
