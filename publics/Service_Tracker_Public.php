@@ -1,6 +1,7 @@
 <?php
 namespace ServiceTracker\publics;
 
+use \WP_User;
 /**
  * The public-facing functionality of the plugin.
  *
@@ -61,8 +62,11 @@ class Service_Tracker_Public {
 	 * @since    1.0.0
 	 */
 	public function enqueue_styles() {
+		if ( ! has_shortcode( get_the_content(), 'service-tracker-cases-progress' ) ) {
+			return;
+		}
 
-		// wp_enqueue_style( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'css/plugin-name-public.css', array(), $this->version, 'all' );
+			wp_enqueue_style( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'css/service-tracker-public.css', array(), $this->version, 'all' );
 	}
 
 	/**
@@ -71,6 +75,9 @@ class Service_Tracker_Public {
 	 * @since    1.0.0
 	 */
 	public function enqueue_scripts() {
+		if ( ! has_shortcode( get_the_content(), 'service-tracker-cases-progress' ) ) {
+			return;
+		}
 
 		// wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/plugin-name-public.js', array( 'jquery' ), $this->version, false );
 	}

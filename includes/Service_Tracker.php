@@ -6,8 +6,9 @@ use ServiceTracker\includes\Service_Tracker_i18n;
 use ServiceTracker\includes\Service_Tracker_Api;
 use ServiceTracker\admin\Service_Tracker_Admin;
 use ServiceTracker\publics\Service_Tracker_Public; // public is a reserved word in php, it had to be changed to plural
+use ServiceTracker\publics\Service_Tracker_Public_User_Content;
 
-// This must be hero, since PS4 determines that define should not be used in a output file
+// This must be here, since PS4 determines that define should not be used in a output file
 define( 'SERVICE_TRACKER_VERSION', '1.0.0' );
 
 /**
@@ -95,7 +96,8 @@ class Service_Tracker {
 		$this->set_locale();
 		$this->define_admin_hooks();
 		$this->api();
-		// $this->define_public_hooks();
+		$this->define_public_hooks();
+		$this->public_user_content();
 	}
 
 	/**
@@ -180,12 +182,24 @@ class Service_Tracker {
 	 * @access   private
 	 */
 	private function define_public_hooks() {
+		if ( is_admin() ) {
+			return;
+		}
 
 		$plugin_public = new Service_Tracker_Public( $this->get_plugin_name(), $this->get_version() );
 
 		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_styles' );
 		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_scripts' );
 
+	}
+
+	private function public_user_content() {
+		if ( is_admin() ) {
+			return;
+		}
+
+		$public_user_content = new Service_Tracker_Public_User_Content();
+		$this->loader->add_action( 'init', $public_user_content, 'get_user_id' );
 	}
 
 	/**

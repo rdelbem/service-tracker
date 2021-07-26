@@ -1,0 +1,32 @@
+.st-container {
+  display: flex;
+  flex-direction: column;
+}
+
+.st-headers {
+  background-color: rgb(194, 194, 194);
+  padding: 1rem;
+  border-radius: 5px 5px 0 0;
+}
+
+.st-headers p {
+  display: block;
+  margin-block-start: 0em !important;
+  margin-block-end: 0em !important;
+  margin-inline-start: 0px;
+  margin-inline-end: 0px;
+}
+
+.st-ul-progress .st-li-progress {
+  list-style: none;
+}
+
+.st-li-progress:hover {
+  background-color: rgb(235, 235, 235);
+}
+
+.st-progress-container {
+  border: 1px solid rgb(194, 194, 194);
+  padding: 1rem;
+  margin-bottom: 0.5rem;
+}
