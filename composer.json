@@ -7,10 +7,12 @@
       "email": "rodrigodelbem@gmail.com"
     }
   ],
-  "require": {},
   "autoload": {
     "psr-4": {
       "ServiceTracker\\": "./"
     }
+  },
+  "require": {
+    "fightbulc/moment": "^1.33"
   }
 }

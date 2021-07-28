@@ -2,6 +2,7 @@
 namespace ServiceTracker\publics;
 
 use ServiceTracker\includes\Service_Tracker_Sql;
+use \Moment\Moment;
 use \WP_User;
 
 class Service_Tracker_Public_User_Content {
@@ -43,9 +44,39 @@ class Service_Tracker_Public_User_Content {
 	}
 
 	public function get_case_progress( $id_case ) {
-		$sql    = new Service_Tracker_Sql( 'servicetracker_progress' );
-		$status = $sql->get_by( array( 'id_case' => $id_case ) );
-		return $status;
+		$sql            = new Service_Tracker_Sql( 'servicetracker_progress' );
+		$status         = $sql->get_by( array( 'id_case' => $id_case ) );
+		$progress_array = array();
+
+		foreach ( $status as $stat ) {
+			$status_obj               = array();
+			$status_obj['created_at'] = $this->locale_translation_time( $stat->{'created_at'} );
+			$status_obj['text']       = $stat->{'text'};
+
+			array_push( $progress_array, $status_obj );
+		}
+
+		return $progress_array;
+	}
+
+	public function locale_translation_time( $date ) {
+		$locale = get_locale();
+
+		switch ( $locale ) {
+			case 'pt_BR':
+				$time_format = 'd/m/y - H:i:s';
+				break;
+			case 'en_US':
+				$time_format = 'M d/y - h:i:s a';
+				break;
+			default:
+				$time_format = 'm/d/y - h:i:s a';
+				break;
+		}
+
+		$format_date = new Moment( $date );
+
+		return $format_date->format( $time_format );
 	}
 
 	public function get_statuses_by_cases() {
@@ -57,7 +88,7 @@ class Service_Tracker_Public_User_Content {
 			 $case_obj                = array();
 			 $case_obj['case_title']  = $case->title;
 			 $case_obj['case_id']     = $case->id;
-			 $case_obj['created_at']  = $case->created_at;
+			 $case_obj['created_at']  = $this->locale_translation_time( $case->created_at );
 			 $case_obj['case_status'] = $case->status;
 			 $case_obj['progress']    = $this->get_case_progress( $case->id );
 

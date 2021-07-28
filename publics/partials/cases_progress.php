@@ -3,7 +3,7 @@
 	<?php foreach ( $user_cases_and_statuses as $case ) : ?>
 		<div class="st-headers">
 			<div class="st-case-title">
-				<small>
+				<small class="st-title-small">
 					<?php echo $case['created_at']; ?>
 				</small>
 				<p>	
@@ -19,15 +19,15 @@
 			<ul class="st-ul-progress">
 				<?php	foreach ( $case['progress'] as $status ) : ?>
 					<li class="st-li-progress"> 
-
-						<small>
-							<?php echo $status->{'created_at'}; ?>
+						<small class="st-progress-small">
+							<?php echo $status['created_at']; ?>
 						</small>
 
-						<p>
-							<?php echo $status->{'text'}; ?>
-						</p>
-							
+						<div class="st-text-container">
+							<p>
+								<?php echo $status['text']; ?>
+							</p>
+						</div>	
 					</li>
 				<?php	endforeach; ?>
 			</ul>

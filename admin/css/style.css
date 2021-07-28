@@ -39,6 +39,27 @@
   border-radius: 10px;
 }
 
+.top-icons-container {
+  padding: 0.2rem;
+}
+
+.top-icon {
+  margin-right: 0.4rem;
+  font-size: 1.3rem;
+  background-color: var(--color-mild-blue);
+  border: 1px solid transparent;
+  color: var(--text-color-light);
+  padding: 0.3rem;
+  border-radius: 1000px;
+  cursor: pointer;
+  transition: all 0.4s;
+}
+
+.top-icon:hover {
+  background-color: var(--color-plain-blue);
+  border: 1px solid var(--color-blue-dark);
+}
+
 .cases-container {
   height: 70vh;
   width: 65%;
@@ -129,7 +150,7 @@
 
 .search {
   padding: 0 0.2rem;
-  margin-bottom: 1rem;
+  margin-bottom: 0.3rem;
   display: flex;
   flex-direction: row;
   justify-content: center;
@@ -374,6 +395,37 @@
 .statuses-container {
   display: flex;
   flex-direction: column-reverse;
+}
+
+.accordion-title {
+  border: 1px solid var(--color-mild-grey);
+  background-color: var(--color-mild);
+  border-radius: 5px 5px 0 0;
+  margin-top: 0.4rem;
+  padding: 0.4rem;
+}
+.accordion-title h3 {
+  cursor: pointer;
+}
+
+.spec-container {
+  border: 1px solid var(--color-mild-grey);
+  background-color: var(--color-mild);
+  border-radius: 0 0 5px 5px;
+  padding: 0.4rem;
+  font-size: 1.1rem;
+}
+
+.spec-container ul {
+  margin-left: 2rem;
+  list-style-type: disc !important;
+}
+
+.open-accordion {
+  margin-bottom: -5px;
+  margin-right: 1rem;
+  float: right;
+  cursor: pointer;
 }
 
 /*TRANSITION FOR EDITING*/

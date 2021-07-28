@@ -4,7 +4,7 @@
 }
 
 .st-headers {
-  background-color: rgb(194, 194, 194);
+  background-color: rgb(243, 243, 243);
   padding: 1rem;
   border-radius: 5px 5px 0 0;
 }
@@ -21,12 +21,31 @@
   list-style: none;
 }
 
-.st-li-progress:hover {
-  background-color: rgb(235, 235, 235);
+.st-li-progress {
+  margin-top: 0.5rem;
+}
+
+.st-ul-progress {
+  margin: 0 0 0 !important;
+}
+
+.st-progress-small {
+  padding: 0.2rem;
+  border-radius: 5px;
+  background-color: rgb(195, 228, 255);
 }
 
 .st-progress-container {
-  border: 1px solid rgb(194, 194, 194);
+  border: 1px solid rgb(243, 243, 243);
   padding: 1rem;
   margin-bottom: 0.5rem;
+}
+
+.st-text-container {
+  margin-top: 0.5rem;
+  border-bottom: 1px solid rgb(243, 243, 243);
+}
+
+.st-text-container p {
+  margin: 0 0 0.5rem !important;
 }

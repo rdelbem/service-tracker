@@ -1,6 +1,7 @@
 import React, { useContext } from "react";
 import Client from "./Client";
 import Search from "./Search";
+import TopIcons from "./TopIcons";
 import ClientsContext from "../../context/clients/clientsContext";
 import Spinner from "./Spinner";
 
@@ -12,6 +13,8 @@ export default function Clients() {
   return (
     <div className="clients-list-container">
       <Search />
+      <TopIcons />
+
       {state.loadingUsers && <Spinner />}
       {clientsArr.map((client) => (
         <Client {...client} />
