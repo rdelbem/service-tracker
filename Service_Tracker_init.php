@@ -7,7 +7,7 @@
  * @package Service Tracker
  *
  * Plugin Name: Service Tracker
- * Version: 1.0
+ * Version: 1.0.0
  * Description: This plugin offers the possibilitie to track the services you provide.
  * Author: Rodrigo Del Bem <rodrigodelbem@gmail.com>
  * Author URI: https://delbem.net
@@ -42,3 +42,14 @@ register_uninstall_hook( __FILE__, 'uninstall_st_service_tracker' );
 $ST_serviceTracker = new Service_Tracker();
 
 $ST_serviceTracker->run();
+
+// UPDATE CHECKER
+if ( is_admin() ) {
+	require wp_normalize_path( plugin_dir_path( __FILE__ ) . 'plugin-update-checker/plugin-update-checker.php' );
+
+	$myUpdateChecker = Puc_v4_Factory::buildUpdateChecker(
+		'https://delbem.net/plugins/service-tracker/update_verification.json',
+		__FILE__, // Full path to the main plugin file or functions.php.
+		'service-tracker'
+	);
+}

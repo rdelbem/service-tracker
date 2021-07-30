@@ -11,20 +11,12 @@ class ComposerStaticInita1c3f2669fea2498beb51d23e8edaf17
         array (
             'ServiceTracker\\' => 15,
         ),
-        'M' => 
-        array (
-            'Moment\\' => 7,
-        ),
     );
 
     public static $prefixDirsPsr4 = array (
         'ServiceTracker\\' => 
         array (
             0 => __DIR__ . '/../..' . '/',
-        ),
-        'Moment\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/fightbulc/moment/src',
         ),
     );
 
