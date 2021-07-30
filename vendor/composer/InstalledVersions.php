@@ -30,7 +30,7 @@ private static $installed = array (
     'aliases' => 
     array (
     ),
-    'reference' => '8758f775d002f17e38c5a3e268631c8860539041',
+    'reference' => 'e45b88c5ca9dbc69f25e86030a22302250f72413',
     'name' => 'delbem/service-tracker',
   ),
   'versions' => 
@@ -42,7 +42,7 @@ private static $installed = array (
       'aliases' => 
       array (
       ),
-      'reference' => '8758f775d002f17e38c5a3e268631c8860539041',
+      'reference' => 'e45b88c5ca9dbc69f25e86030a22302250f72413',
     ),
     'fightbulc/moment' => 
     array (

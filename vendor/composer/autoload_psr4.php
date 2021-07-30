@@ -7,4 +7,5 @@ $baseDir = dirname($vendorDir);
 
 return array(
     'ServiceTracker\\' => array($baseDir . '/'),
+    'Moment\\' => array($vendorDir . '/fightbulc/moment/src'),
 );
