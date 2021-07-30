@@ -6,7 +6,7 @@
     'aliases' => 
     array (
     ),
-    'reference' => 'e45b88c5ca9dbc69f25e86030a22302250f72413',
+    'reference' => 'fae8dcbcf0601ebfdb7abbb04b9bbcf0ad1f38b1',
     'name' => 'delbem/service-tracker',
   ),
   'versions' => 
@@ -18,7 +18,7 @@
       'aliases' => 
       array (
       ),
-      'reference' => 'e45b88c5ca9dbc69f25e86030a22302250f72413',
+      'reference' => 'fae8dcbcf0601ebfdb7abbb04b9bbcf0ad1f38b1',
     ),
     'fightbulc/moment' => 
     array (
