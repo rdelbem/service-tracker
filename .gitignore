@@ -45,8 +45,6 @@ Thumbs.db
 # Composer #
 ##########
 !assets/js/vendor/
-wpcs/
-/vendor/
 
 # Bower #
 ##########
@@ -64,5 +62,5 @@ assets/bower_components/*
 
 # PhpStrom Project Files #
 .idea/
-library/vendors/composer
 assets/img/.DS_Store
+
