@@ -7,6 +7,7 @@ use ServiceTracker\includes\Service_Tracker_Api;
 use ServiceTracker\admin\Service_Tracker_Admin;
 use ServiceTracker\publics\Service_Tracker_Public; // public is a reserved word in php, it had to be changed to plural
 use ServiceTracker\publics\Service_Tracker_Public_User_Content;
+use ServiceTracker\includes\Service_Tracker_Updater;
 
 // This must be here, since PS4 determines that define should not be used in a output file
 define( 'SERVICE_TRACKER_VERSION', '1.0.0' );

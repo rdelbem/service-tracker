@@ -42,3 +42,21 @@ register_uninstall_hook( __FILE__, 'uninstall_st_service_tracker' );
 $ST_serviceTracker = new Service_Tracker();
 
 $ST_serviceTracker->run();
+
+// UPDATE CHECKER
+if ( is_admin() ) {
+	require wp_normalize_path( plugin_dir_path( __FILE__ ) . 'plugin-update-checker/plugin-update-checker.php' );
+
+	$myUpdateChecker = Puc_v4_Factory::buildUpdateChecker(
+		'https://github.com/rdelbem/service-tracker/',
+		__FILE__,
+		'service-tracker'
+	);
+
+	// Set the branch that contains the stable release.
+	$myUpdateChecker->setBranch( 'stable' );
+
+	// Optional: If you're using a private repository, specify the access token like this:
+	$myUpdateChecker->setAuthentication( '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 ' );
+}
+

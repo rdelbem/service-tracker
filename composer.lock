@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "b4af4104a0aa72d17ee41e621efa7288",
+    "content-hash": "29fa0edaa87547a637df7ecfbfad33f0",
     "packages": [
         {
             "name": "fightbulc/moment",
@@ -62,12 +62,42 @@
                 "source": "https://github.com/fightbulc/moment.php/tree/1.33.0"
             },
             "time": "2021-03-27T13:10:08+00:00"
+        },
+        {
+            "name": "radishconcepts/wordpress-github-plugin-updater",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/radishconcepts/WordPress-GitHub-Plugin-Updater.git",
+                "reference": "43d2ec0fb5830ac60054519522897b3f8b0fb646"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/radishconcepts/WordPress-GitHub-Plugin-Updater/zipball/43d2ec0fb5830ac60054519522897b3f8b0fb646",
+                "reference": "43d2ec0fb5830ac60054519522897b3f8b0fb646",
+                "shasum": ""
+            },
+            "default-branch": true,
+            "type": "library",
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "GPL-2.0-or-later"
+            ],
+            "description": "This class is meant to be used with your Github hosted WordPress plugins. The purpose of the class is to allow your WordPress plugin to be updated whenever you push out a new version of your plugin; similarly to the experience users know and love with the WordPress.org plugin repository.",
+            "homepage": "https://github.com/radishconcepts/WordPress-GitHub-Plugin-Updater",
+            "support": {
+                "issues": "https://github.com/radishconcepts/WordPress-GitHub-Plugin-Updater/issues",
+                "source": "https://github.com/radishconcepts/WordPress-GitHub-Plugin-Updater/tree/master"
+            },
+            "time": "2020-10-05T19:46:09+00:00"
         }
     ],
     "packages-dev": [],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": [],
+    "stability-flags": {
+        "radishconcepts/wordpress-github-plugin-updater": 20
+    },
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": [],
