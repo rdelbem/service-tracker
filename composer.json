@@ -13,7 +13,6 @@
     }
   },
   "require": {
-    "fightbulc/moment": "^1.33",
-    "radishconcepts/wordpress-github-plugin-updater": "dev-master"
+    "fightbulc/moment": "^1.33"
   }
 }
