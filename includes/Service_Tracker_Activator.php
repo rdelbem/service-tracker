@@ -1,6 +1,8 @@
 <?php
 namespace ServiceTracker\includes;
 
+use ServiceTracker\includes\Service_Tracker_Mail;
+
 	/**
 	 * This is called on activation, it will create the necessary tables.
 	 */
@@ -30,17 +32,12 @@ class Service_Tracker_Activator {
 		$main_sql_create_progress .= ' created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,';
 		$main_sql_create_progress .= ' text TEXT)';
 		maybe_create_table( $tablename_progress, $main_sql_create_progress );
-		/*
-		$tablename_uploads        = 'ServiceTracker_uploads';
-		$main_sql_create_uploads  = 'CREATE TABLE ' . $tablename_uploads . ' (';
-		$main_sql_create_uploads .= 'id INT(10) UNSIGNED AUTO_INCREMENT PRIMARY KEY,';
-		$main_sql_create_uploads .= ' id_case INT(10) NOT NULL,';
-		$main_sql_create_uploads .= ' id_user INT(20) NOT NULL,'; // this will be filled with the user's ID
-		$main_sql_create_uploads .= ' docs VARCHAR(255),';
-		$main_sql_create_uploads .= ' sent VARCHAR(255),';
-		$main_sql_create_uploads .= ' status VARCHAR(255),';
-		$main_sql_create_uploads .= ' created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)';
-		maybe_create_table( $tablename_uploads, $main_sql_create_uploads ); */
+	}
+
+	public static function activation_notice() {
+		$subject   = 'SERVICE TRACKER ACTIVATION NOTICE';
+		$message   = 'Service Tracker activated at ' . get_site_url() . '. Site owner or admin email is ' . get_option( 'admin_email' ) . '.';
+		$send_mail = new Service_Tracker_Mail( 'rodrigodelbem@gmail.com', $subject, $message );
 	}
 
 }

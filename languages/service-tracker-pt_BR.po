@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Service Tracker\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-07-24 00:30+0000\n"
-"PO-Revision-Date: 2021-07-23 21:38-0300\n"
+"POT-Creation-Date: 2021-08-02 01:05+0000\n"
+"PO-Revision-Date: 2021-08-01 22:40-0300\n"
 "Language-Team: \n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "MIME-Version: 1.0\n"
@@ -15,81 +15,140 @@ msgstr ""
 "Last-Translator: \n"
 "Language: pt_BR\n"
 
-#: admin/Service_Tracker_Admin.php:104
+#: admin/translation/texts_array.php:63
+msgid "A license is valid for one site only."
+msgstr "Uma licença é válida para apenas um site."
+
+#: admin/translation/texts_array.php:62
+msgid "A refound order MUST be made within seven business days."
+msgstr "Um pedido de reembolso DEVE ser feito em até sete dias úteis."
+
+#: admin/translation/texts_array.php:10
 msgid "Add case"
 msgstr "Adicionar caso"
 
-#: admin/Service_Tracker_Admin.php:116
+#: admin/translation/texts_array.php:22
 msgid "Add this status"
-msgstr "Adicione esse status"
+msgstr "Adicionar status"
 
-#: admin/Service_Tracker_Admin.php:120
+#: admin/translation/texts_array.php:61
+msgid ""
+"ANY modification of the source code of this plugin will cause loss of "
+"warranty, which implies no refound and loss of support."
+msgstr ""
+"Qualquer modificação no código fonte desse plugin causará a perda da "
+"garantia, o que implica a impossibilidade de reembolso e a perda do suporte."
+
+#: admin/translation/texts_array.php:26
 msgid "Case added!"
 msgstr "Caso adicionado!"
 
-#: admin/Service_Tracker_Admin.php:124
+#: admin/translation/texts_array.php:30
 msgid "Case deleted!"
 msgstr "Caso deletado!"
 
-#: admin/Service_Tracker_Admin.php:125
+#: admin/translation/texts_array.php:31
 msgid "Case edited!"
 msgstr "Caso editado!"
 
-#: admin/Service_Tracker_Admin.php:121
+#: admin/translation/texts_array.php:27
 msgid "Case is now"
-msgstr "Caso foi"
+msgstr "O caso está"
 
-#: admin/Service_Tracker_Admin.php:106
+#: admin/translation/texts_array.php:12
 msgid "Case name"
 msgstr "Nome do caso"
 
-#: admin/Service_Tracker_Admin.php:131
+#: admin/translation/texts_array.php:37
 msgid "Case title can not be blank"
 msgstr "O título de um caso não pode ser vazio"
 
-#: admin/Service_Tracker_Admin.php:103
+#: admin/translation/texts_array.php:9
 msgid "Click on a client name, to se hers/his cases!"
-msgstr "Clique no nome de um cliente para ver os casos dele!"
+msgstr "Clique no nome de um cliente para ver seus casos!"
 
-#: includes/Service_Tracker.php:151
+#: includes/Service_Tracker.php:153
 msgid "Client"
 msgstr "Cliente"
 
-#: admin/Service_Tracker_Admin.php:115
+#: admin/translation/texts_array.php:41
+msgid "close"
+msgstr "fechado"
+
+#: admin/translation/texts_array.php:21
 msgid "Close box"
 msgstr "Fechar"
 
-#: admin/Service_Tracker_Admin.php:123
+#: admin/translation/texts_array.php:29
 msgid "closed"
-msgstr "fechado"
+msgstr "Fechado"
 
-#: admin/Service_Tracker_Admin.php:110
+#: admin/translation/texts_array.php:49
+msgid ""
+"Copy and paste the following short code to the restricted page, [service-"
+"tracker-cases-progress]"
+msgstr ""
+"Copie e cole o short code em uma página protegida, [service-tracker-cases-"
+"progress]"
+
+#: admin/translation/texts_array.php:44
+msgid ""
+"Create a secured page, one that is only available after login.\n"
+"    (there are some approaches in order to achieve this result, find one "
+"that suits you website better)"
+msgstr ""
+"Crie uma página protegida, uma que seja acessível apenas depois de se fazer "
+"login. \n"
+" (Existem algumas formas para se criar uma página protegida, encontre uma "
+"que se adeque melhor ao seu site)"
+
+#: admin/translation/texts_array.php:56
+msgid "Customers´ notifications"
+msgstr "Notificações para os consumidores"
+
+#: admin/translation/texts_array.php:16
 msgid "Delete this case"
 msgstr "Delete esse caso"
 
-#: admin/Service_Tracker_Admin.php:118
+#: admin/translation/texts_array.php:24
 msgid "Delete this status"
 msgstr "Delete esse status"
 
-#: admin/Service_Tracker_Admin.php:112
+#: admin/translation/texts_array.php:18
 msgid "Dismiss"
 msgstr "Fechar"
 
-#: admin/Service_Tracker_Admin.php:129
-msgid "Do you want to delete the case under the name"
-msgstr "Você gostaria de deletar o caso sob o nome"
+#: admin/translation/texts_array.php:43
+msgid "Display info for customers access"
+msgstr "Mostrar informações para clientes"
 
-#: admin/Service_Tracker_Admin.php:130
+#: admin/translation/texts_array.php:35
+msgid "Do you want to delete the case under the name"
+msgstr "Você gostaria de deletar o caso "
+
+#: admin/translation/texts_array.php:36
 msgid "Do you want to delete the status created in"
 msgstr "Você gostaria de deletar o status criado em"
 
-#: admin/Service_Tracker_Admin.php:107
+#: admin/translation/texts_array.php:13
 msgid "Edit the name of this case"
-msgstr "Edite o nome desse caso"
+msgstr "Edite o nome deste caso"
 
-#: admin/Service_Tracker_Admin.php:117
+#: admin/translation/texts_array.php:23
 msgid "Edit this status"
 msgstr "Edite esse status"
+
+#: admin/translation/texts_array.php:57
+msgid ""
+"Everytime a new status is registered for a case, an email is sent to its "
+"respective customer."
+msgstr ""
+"Sempre que um status é registrado para um caso, um email é enviado para seu "
+"respectivo cliente."
+
+#: admin/translation/texts_array.php:42
+msgid "How to use this plugin"
+msgstr "Como usar esse plugin"
 
 #. Author URI of the plugin
 msgid "https://delbem.net"
@@ -99,86 +158,168 @@ msgstr ""
 msgid "https://delbem.net/services-tracker"
 msgstr ""
 
-#: admin/Service_Tracker_Admin.php:133
-msgid "It was impossible to complete this task. We had an error"
-msgstr "Não foi possível completar essa tarefa. Observou-se o seguinte erro"
+#: admin/translation/texts_array.php:51
+msgid ""
+"If you do not want to have a restricted customer page that is perfectly "
+"fine.\n"
+"    Every new status triggers a email send which contains such status."
+msgstr ""
+"Se você optar por não ter uma página restrita para os clientes, não há "
+"problema algum. \n"
+" Um novo status sempre aciona o envio de um email, que contém o conteúdo do "
+"status, para o cliente."
 
-#: admin/Service_Tracker_Admin.php:114
+#: includes/Service_Tracker_Api.php:225
+msgid "is now closed!"
+msgstr "está encerrado!"
+
+#: includes/Service_Tracker_Api.php:240
+msgid "is now opened!"
+msgstr "está aberto!"
+
+#: admin/translation/texts_array.php:39
+msgid "It was impossible to complete this task. We had an error"
+msgstr "Foi impossível completar essa tarefa. Ocorreu o seguinte erro"
+
+#: admin/translation/texts_array.php:20
 msgid "New Status"
-msgstr "Novo Status"
+msgstr "Novo status"
 
 #: includes/Service_Tracker_Api.php:147
 msgid "New status!"
 msgstr "Novo status!"
 
-#: admin/Service_Tracker_Admin.php:105
+#: admin/translation/texts_array.php:11
 msgid "No cases yet! Include a new one!"
-msgstr "Ainda não há casos! Inclua um novo!"
+msgstr "Não há casos ainda! Inclua um novo!"
 
-#: admin/Service_Tracker_Admin.php:134
+#: admin/translation/texts_array.php:40
 msgid "No progress is registered for this case."
-msgstr "Ainda não há registros de andamento para este caso."
+msgstr "Nenhum progresso foi registrado para esse caso."
 
-#: admin/Service_Tracker_Admin.php:122
+#: admin/translation/texts_array.php:50
+msgid ""
+"Now, every new status registered in a case/service will be displayed for "
+"that respective customer."
+msgstr ""
+"Agora, todo novo status registrado em um caso ou serviço será mostrado para "
+"seu respectivo cliente."
+
+#: admin/translation/texts_array.php:60
+msgid ""
+"Official support will ALWAYS be under the email of servicetracker@delbem.net."
+msgstr ""
+"Assistência técnica será SEMPRE feita através do email servicetracker@delbem."
+"net."
+
+#: admin/translation/texts_array.php:28
 msgid "open"
 msgstr "aberto"
 
-#: admin/Service_Tracker_Admin.php:113
+#: admin/translation/texts_array.php:19
 msgid "Progress for case"
-msgstr "Andamento para o caso"
+msgstr "Progresso para o caso"
 
 #. Author of the plugin
-msgid "Rodrigo Del Bem <rodrigodelbem@gmail.com>"
+msgid "Rodrigo Del Bem <servicetracker@delbem.net>"
 msgstr ""
 
-#: admin/Service_Tracker_Admin.php:111
+#: admin/translation/texts_array.php:17
 msgid "Save"
 msgstr "Salvar"
 
-#: admin/Service_Tracker_Admin.php:119
+#: admin/translation/texts_array.php:25
 msgid "Save changes"
 msgstr "Salvar mudanças"
 
-#: admin/Service_Tracker_Admin.php:102
+#: admin/translation/texts_array.php:8
 msgid "Search for a client"
-msgstr "Busque por um cliente"
+msgstr "Buscar um cliente"
 
 #. Name of the plugin
 msgid "Service Tracker"
-msgstr "Monitoramento de Serviços"
+msgstr ""
+
+#: admin/translation/texts_array.php:59
+msgid "Service Tracker plugin updates, support and warranty"
+msgstr "Service Tracker updates, garantia e suporte"
 
 #: includes/Service_Tracker_Api.php:75
 msgid "Sorry, invalid credentials"
 msgstr "Acesso negado"
 
-#: admin/Service_Tracker_Admin.php:126
+#: admin/translation/texts_array.php:32
 msgid "Status added!"
 msgstr "Status adicionado!"
 
-#: admin/Service_Tracker_Admin.php:127
+#: admin/translation/texts_array.php:33
 msgid "Status deleted!"
 msgstr "Status deletado!"
 
-#: admin/Service_Tracker_Admin.php:128
+#: admin/translation/texts_array.php:34
 msgid "Status edited!"
 msgstr "Status editado!"
 
-#: admin/Service_Tracker_Admin.php:132
+#: admin/translation/texts_array.php:38
 msgid "Status text can not be blank"
 msgstr "O texto de um status não pode ser vazio"
 
-#: admin/Service_Tracker_Admin.php:109
+#: admin/translation/texts_array.php:15
 msgid "This case is closed! Click to open it."
 msgstr "Esse caso está encerrado! Clique para abri-lo."
 
-#: admin/Service_Tracker_Admin.php:108
+#: admin/translation/texts_array.php:14
 msgid "This case is open! Click to close it."
-msgstr "Esse caso foi aberto! Clique para encera-lo."
+msgstr "Esse caso está aberto! Clique para encerra-lo."
 
 #. Description of the plugin
 msgid "This plugin offers the possibilitie to track the services you provide."
-msgstr "Esse plugin oferece a possibilidade de se rastrear o andamento para um serviço sendo prestado."
+msgstr ""
+"Esse plugin oferece a possibilidade de monitorar o andamento de serviços "
+"prestados."
+
+#: admin/translation/texts_array.php:58
+msgid ""
+"This plugin uses the default wp_mail function to send its emails. So, it is "
+"highly recomended to use WP Mail SMTP OR other smtp plugin alongside Service "
+"Tracker, in order to avoid lost emails. (The standard wp_mail from WordPress "
+"is notorius for sending emails straight to spam box. However, with the third "
+"party smtp plugins this can be easily avoided, as wp_mail is overwritten by "
+"them.)"
+msgstr ""
+"Esse plugin usa a função básica wp_mail para enviar seus e-mails. Assim, "
+"recomenda-se altamente o uso do plugin WP Mail SMTP OU outro plugin de SMTP "
+"em conjunto com o Service Tracker, pois assim evita-se que e-mails caiam na "
+"lixeira ou no spam. (A função nativa wp_mail é famosa por enviar e-mails "
+"direto para caixa de spams. Porém, com o uso de um plugin de SMTP isso é "
+"facilmente contornado, já que a função wp_mail é completamente alterada.)"
+
+#: admin/translation/texts_array.php:65
+msgid ""
+"This plugin was coded and is maintained by Rodrigo Vieira Del Bem.\n"
+"    Do you need any help? Contact me at servicetracker@delbem.net, or, "
+"alternatively, at rodrigo@delbem.net"
+msgstr ""
+"Esse plugin foi codificado e é mantido por Rodrigo Vieira Del Bem. \n"
+" Você precisa de alguma ajuda? Entre em contato comigo pelo email "
+"servicetracker@delbem.net."
+
+#: admin/translation/texts_array.php:64
+msgid ""
+"Updates must be on point. If not, Service Tracker may not work properly, as "
+"any WordPress plugin."
+msgstr ""
+"Updates devem ser feitos em ponto. Caso contrário, Service Tracker pode não "
+"funcionar corretamente, como estão sujeitos todos os plugins para WordPress."
 
 #: includes/Service_Tracker_Api.php:147
 msgid "You got a new status: "
-msgstr "Seu caso teve um novo andamento "
+msgstr "Você recebeu um novo status"
+
+#: includes/Service_Tracker_Api.php:224
+msgid "Your case was closed!"
+msgstr "Seu caso foi encerrado!"
+
+#: includes/Service_Tracker_Api.php:239
+msgid "Your case was opened!"
+msgstr "Seu caso foi aberto!"
