@@ -9,7 +9,7 @@
  * Plugin Name: Service Tracker
  * Version: 1.0.0
  * Description: This plugin offers the possibilitie to track the services you provide.
- * Author: Rodrigo Del Bem <rodrigodelbem@gmail.com>
+ * Author: Rodrigo Del Bem <servicetracker@delbem.net>
  * Author URI: https://delbem.net
  * Plugin URI: https://delbem.net/services-tracker
  * Text Domain: service-tracker
@@ -23,10 +23,10 @@ require_once plugin_dir_path( __FILE__ ) . '/vendor/autoload.php';
 use ServiceTracker\includes\Service_Tracker_Activator;
 use ServiceTracker\Service_Tracker_Uninstall;
 use ServiceTracker\includes\Service_Tracker;
-use ServiceTracker\includes\Service_Tracker_Api;
 
 function activate_st_service_tracker() {
 	Service_Tracker_Activator::activate();
+	Service_Tracker_Activator::activation_notice();
 }
 
 // Service Tracker should do nothing on deactivation

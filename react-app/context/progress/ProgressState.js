@@ -53,10 +53,7 @@ export default function ProgressState(props) {
       }
       return res.data;
     } catch (error) {
-      alert(
-        "Hum, it was impossible to complete this task. We had an error: " +
-          error
-      );
+      alert(data.alert_error_base + error);
     }
   };
 
@@ -66,7 +63,11 @@ export default function ProgressState(props) {
       return;
     }
 
-    const dataToPost = { id_user: id_user, id_case: id_case, text: text };
+    const dataToPost = {
+      id_user: id_user,
+      id_case: id_case,
+      text: text,
+    };
 
     try {
       const postStatus = await axios.post(
@@ -113,10 +114,7 @@ export default function ProgressState(props) {
         progress: undefined,
       });
     } catch (error) {
-      alert(
-        "Hum, it was impossible to complete this task. We had an error: " +
-          error
-      );
+      alert(data.alert_error_base + error);
     }
   };
 
@@ -160,10 +158,7 @@ export default function ProgressState(props) {
         },
       });
     } catch (error) {
-      alert(
-        "Hum, it was impossible to complete this task. We had an error: " +
-          error
-      );
+      alert(data.alert_error_base + error);
     }
   };
 
@@ -209,10 +204,7 @@ export default function ProgressState(props) {
         },
       });
     } catch (error) {
-      alert(
-        "Hum, it was impossible to complete this task. We had an error: " +
-          error
-      );
+      alert(data.alert_error_base + error);
     }
   };
 

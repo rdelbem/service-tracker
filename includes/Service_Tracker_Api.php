@@ -33,7 +33,7 @@ class Service_Tracker_Api {
 	/**
 	 * Constructor for the Api custom routes endpoints
 	 *
-	 * @param String 'cases', 'progress' or 'upload' -> this must match the table name
+	 * @param String 'cases', 'progress' -> this must match the table name
 	 * @param String 'user', 'case' -> dynamic value, it relates to the unique id of an user or a case
 	 */
 	public function __construct( $type, $required_argument ) {
@@ -210,11 +210,19 @@ class Service_Tracker_Api {
 		$sql      = new Service_Tracker_Sql( 'servicetracker_cases' );
 		$response = $sql->get_by( array( 'id' => $data['id'] ) );
 		$response = (array) $response[0];
+		$id_user  = $response['id_user'];
+		$title    = $response['title'];
 
 		if ( $response['status'] === 'open' ) {
 			$toggle = $sql->update(
 				array( 'status' => 'close' ),
 				array( 'id' => $data['id'] )
+			);
+
+			$send_mail = new Service_Tracker_Mail(
+				$id_user,
+				__( 'Your case was closed!', 'service-tracker' ),
+				$title . ' - ' . __( 'is now closed!', 'service-tracker' )
 			);
 
 			return $toggle;
@@ -224,6 +232,12 @@ class Service_Tracker_Api {
 			$toggle = $sql->update(
 				array( 'status' => 'open' ),
 				array( 'id' => $data['id'] )
+			);
+
+			$send_mail = new Service_Tracker_Mail(
+				$id_user,
+				__( 'Your case was opened!', 'service-tracker' ),
+				$title . ' - ' . __( 'is now opened!', 'service-tracker' )
 			);
 
 			return $toggle;

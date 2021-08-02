@@ -58,12 +58,18 @@ export default function Progress() {
                 setNewText(e.target.value);
               }}
               className="status-add-new-textarea"
+              value={newText}
             />
             <button
               className="btn btn-save"
               onClick={(e) => {
                 e.preventDefault();
-                postStatus(idUser, idCase, newText);
+                if (newText.trim() === "") {
+                  alert(data.alert_blank_status_title);
+                  return;
+                }
+                postStatus(idUser, idCase, newText.trim());
+                setNewText("");
               }}
             >
               {data.add_status_btn}
