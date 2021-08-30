@@ -2,7 +2,13 @@
 ##########
 # Ignore all directories called node_modules in current folder and any subfolders.
 node_modules/
-/node_modules/
+react-app/
+admin/js/dev/
+package.json
+package-lock.json
+README.md
+.babelrc
+webpack.config.js
 
 # Packages #
 ############
