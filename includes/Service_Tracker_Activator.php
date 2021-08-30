@@ -15,7 +15,7 @@ class Service_Tracker_Activator {
 
 		global $wpdb;
 
-		$tablename_cases        = 'ServiceTracker_cases';
+		$tablename_cases        = 'servicetracker_cases';
 		$main_sql_create_cases  = 'CREATE TABLE ' . $tablename_cases . ' (';
 		$main_sql_create_cases .= 'id INT(10) UNSIGNED AUTO_INCREMENT PRIMARY KEY,';
 		$main_sql_create_cases .= ' id_user INT(20) NOT NULL,'; // this will be filled with the user's ID
@@ -24,7 +24,7 @@ class Service_Tracker_Activator {
 		$main_sql_create_cases .= ' title VARCHAR(255))';
 		maybe_create_table( $tablename_cases, $main_sql_create_cases );
 
-		$tablename_progress        = 'ServiceTracker_progress';
+		$tablename_progress        = 'servicetracker_progress';
 		$main_sql_create_progress  = 'CREATE TABLE ' . $tablename_progress . ' (';
 		$main_sql_create_progress .= 'id INT(10) UNSIGNED AUTO_INCREMENT PRIMARY KEY,';
 		$main_sql_create_progress .= ' id_case INT(10) NOT NULL,';
