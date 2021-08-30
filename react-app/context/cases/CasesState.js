@@ -50,7 +50,9 @@ export default function CasesState(props) {
       }
 
       return res.data;
-    } catch (error) {}
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   const postCase = async (id, title) => {

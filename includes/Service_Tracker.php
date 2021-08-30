@@ -4,11 +4,14 @@ namespace ServiceTracker\includes;
 use ServiceTracker\includes\Service_Tracker_Loader;
 use ServiceTracker\includes\Service_Tracker_i18n;
 use ServiceTracker\includes\Service_Tracker_Api;
+use ServiceTracker\includes\Service_Tracker_Api_Cases;
+use ServiceTracker\includes\Service_Tracker_Api_Progress;
+use ServiceTracker\includes\Service_Tracker_Api_Toggle;
 use ServiceTracker\admin\Service_Tracker_Admin;
 use ServiceTracker\publics\Service_Tracker_Public; // public is a reserved word in php, it had to be changed to plural
 use ServiceTracker\publics\Service_Tracker_Public_User_Content;
 
-// This must be here, since PS4 determines that define should not be used in a output file
+// This must be here, since PSR4 determines that define should not be used in an output file
 define( 'SERVICE_TRACKER_VERSION', '1.0.0' );
 
 /**
@@ -123,13 +126,17 @@ class Service_Tracker {
 	}
 
 	private function api() {
-		$serviceTracker_Api_cases = new Service_Tracker_Api( 'cases', '_user' );
+		$serviceTracker_api_cases = new Service_Tracker_Api_Cases();
 
-		$this->loader->add_action( 'rest_api_init', $serviceTracker_Api_cases, 'custom_api' );
+		$this->loader->add_action( 'rest_api_init', $serviceTracker_api_cases, 'run' );
 
-		$serviceTracker_Api_progress = new Service_Tracker_Api( 'progress', '_case' );
+		$serviceTracker_api_progress = new Service_Tracker_Api_Progress();
 
-		$this->loader->add_action( 'rest_api_init', $serviceTracker_Api_progress, 'custom_api' );
+		$this->loader->add_action( 'rest_api_init', $serviceTracker_api_progress, 'run' );
+
+		$serviceTracker_api_toggle = new Service_Tracker_Api_Toggle();
+
+		$this->loader->add_action( 'rest_api_init', $serviceTracker_api_toggle, 'run' );
 	}
 
 	/**
