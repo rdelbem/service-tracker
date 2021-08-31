@@ -16,7 +16,7 @@ use \WP_REST_Response;
  */
 class Service_Tracker_Api_Cases extends Service_Tracker_Api implements Service_Tracker_Api_Contract {
 
-	public $sql;
+	private $sql;
 
 	public function run() {
 		$this->custom_api();
