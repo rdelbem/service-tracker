@@ -13,14 +13,18 @@ use \WP_REST_Response;
 /**
  * This class will resolve api calls intended to manipulate the cases table.
  * It extends the API class that serves as a model.
+ *
+ * ENDPOINT => wp-json/service-tracker/v1/progress/[case_id]
  */
 class Service_Tracker_Api_Cases extends Service_Tracker_Api implements Service_Tracker_Api_Contract {
 
 	private $sql;
 
+	private const DB = 'servicetracker_cases';
+
 	public function run() {
 		$this->custom_api();
-		$this->sql = new Service_Tracker_Sql( 'servicetracker_cases' );
+		$this->sql = new Service_Tracker_Sql( self::DB );
 	}
 
 	public function custom_api() {
