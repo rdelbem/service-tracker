@@ -14,15 +14,18 @@ use \WP_REST_Response;
 /**
  * This class will resolve api calls intended to manipulate the progress table.
  * It extends the API class that serves as a model.
+ *
+ * ENDPOINT => wp-json/service-tracker/v1/cases/[user_id]
  */
 class Service_Tracker_Api_Progress extends Service_Tracker_Api implements Service_Tracker_Api_Contract {
 
-	public $sql;
+	private $sql;
+
+	private const DB = 'servicetracker_progress';
 
 	public function run() {
 		$this->custom_api();
-		$this->sql = new Service_Tracker_Sql( 'servicetracker_progress' );
-
+		$this->sql = new Service_Tracker_Sql( self::DB );
 	}
 
 	public function custom_api() {

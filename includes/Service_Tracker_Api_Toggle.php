@@ -9,21 +9,21 @@ use \WP_REST_Request;
 
 class Service_Tracker_Api_Toggle extends Service_Tracker_Api {
 
-	public $sql;
+	private $sql;
 
 	/**
 	 * The messages that will be sent over email
 	 *
 	 * @var array
 	 */
-	public $closed;
+	private $closed;
 
 	/**
 	 * The messages that will be sent over email
 	 *
 	 * @var array
 	 */
-	public $opened;
+	private $opened;
 
 	public function __construct() {
 		$this->closed = array( __( 'Your case was closed!', 'service-tracker' ), __( 'is now closed!', 'service-tracker' ) );
