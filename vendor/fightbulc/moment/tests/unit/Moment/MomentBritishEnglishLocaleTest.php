@@ -10,12 +10,12 @@ use PHPUnit\Framework\TestCase;
 
 class MomentBritishEnglishLocaleTest extends TestCase
 {
-    public function setUp(): void
+    public function setUp()
     {
         Moment::setLocale('en_GB');
     }
 
-    public function testWeekdayNames(): void
+    public function testWeekdayNames()
     {
         $startingDate = '2015-01-04T00:00:00+0000';
 
@@ -39,7 +39,7 @@ class MomentBritishEnglishLocaleTest extends TestCase
         }
     }
 
-    public function testMonthNames(): void
+    public function testMonthNames()
     {
         $startingDate = '2015-01-04T00:00:00+0000';
 
@@ -68,7 +68,7 @@ class MomentBritishEnglishLocaleTest extends TestCase
         }
     }
 
-    public function testFormat(): void
+    public function testFormat()
     {
         $a = array(
             array('l, d F Y, G:i:s', 'Saturday, 12 June 2010, 22:00:00'),
@@ -105,7 +105,7 @@ class MomentBritishEnglishLocaleTest extends TestCase
 //        }
 //    }
 
-    public function testOrdinalsFormat(): void
+    public function testOrdinalsFormat()
     {
         $moment = new Moment('2010-06-02T00:00:00+0000');
         self::assertEquals('2nd', $moment->format('jS'));
@@ -113,7 +113,7 @@ class MomentBritishEnglishLocaleTest extends TestCase
         self::assertEquals('12th', $moment->format('jS'));
     }
 
-	public function testRelative(): void
+	public function testRelative()
 	{
 		Moment::setLocale('en_GB');
 

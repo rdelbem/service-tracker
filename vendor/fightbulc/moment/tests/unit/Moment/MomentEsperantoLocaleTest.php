@@ -6,12 +6,12 @@ use PHPUnit\Framework\TestCase;
 
 class MomentEsperantoLocaleTest extends TestCase
 {
-    public function setUp(): void
+    public function setUp()
     {
         Moment::setLocale('eo');
     }
 
-    public function testWeekdayNames(): void
+    public function testWeekdayNames()
     {
         $startingDate = '2015-01-04T00:00:00+0000';
 
@@ -35,7 +35,7 @@ class MomentEsperantoLocaleTest extends TestCase
         }
     }
 
-    public function testMonthNames(): void
+    public function testMonthNames()
     {
         $startingDate = '2015-01-04T00:00:00+0000';
 
@@ -64,7 +64,7 @@ class MomentEsperantoLocaleTest extends TestCase
         }
     }
 
-    public function testFormat(): void
+    public function testFormat()
     {
         $targetDate = new Moment('2010-06-09 15:25:50');
         $formats = array(
@@ -82,7 +82,7 @@ class MomentEsperantoLocaleTest extends TestCase
         }
     }
 
-    public function _testRelative(): void
+    public function _testRelative()
     {
         $beginningMoment = new Moment('2015-06-14 20:46:22', 'Europe/Berlin');
         $endMoment = new Moment('2015-06-14 20:48:32', 'Europe/Berlin');
@@ -90,7 +90,7 @@ class MomentEsperantoLocaleTest extends TestCase
         self::assertEquals('antaŭ 2 minutoj', $beginningMoment->from($endMoment)->getRelative());
     }
 
-    public function testRelative(): void
+    public function testRelative()
     {
         $tz = 'Europe/Berlin';
         $beginningMoment = new Moment('2010-06-12 00:00:00', $tz);

@@ -1,14 +1,13 @@
 <?php
 
-namespace Rdelbem\WPMailerClass;
+namespace Rdelbem\WpMailerClass;
 
 /**
  * This class provides an easy way to call wp_mail anywhere it may be needed.
  * NOTICE - The function wp_mail is only available after wp_load is rendered.
  * So, it may not work depending on WHEN your application is hooked on.
  */
-class WPMailerClass
-{
+class WPMailerClass {
 
 	/**
 	 * User id always expected to be an int.
@@ -53,19 +52,19 @@ class WPMailerClass
 	 * @param string $subject
 	 * @param string $message
 	 */
-	public function __construct(mixed $to, string $subject, string $message)
+	public function __construct( mixed $to, string $subject, string $message ) 
 	{
-		if (is_int($to) || ctype_digit($to)) {
+		if ( is_int( $to ) || ctype_digit( $to ) ) {
 			$this->id = (int) $to;
 			$this->to = $this->getUserEmailById();
 		}
 
-		if (is_string($to) && !ctype_digit($to) && $this->isValidEmail($to)) {
+		if ( is_string( $to ) && ! ctype_digit( $to ) && $this->isValidEmail( $to ) ) {
 			$this->to = $to;
 		}
 
 		$this->subject = $subject;
-		$this->headers = ['Content-Type: text/html; charset=UTF-8', 'From:' . get_bloginfo() . ' <' . get_option('admin_email') . '>'];
+		$this->headers = ['Content-Type: text/html; charset=UTF-8', 'From:' . get_bloginfo() . ' <' . get_option( 'admin_email' ) . '>' ];
 		$this->message = $message;
 	}
 
@@ -75,9 +74,9 @@ class WPMailerClass
 	 *
 	 * @return string
 	 */
-	public function getUserEmailById()
+	public function getUserEmailById() 
 	{
-		$userInfo = get_userdata($this->id);
+		$userInfo  = get_userdata( $this->id );
 		$userEmail = $userInfo->user_email;
 		return $userEmail;
 	}
@@ -99,7 +98,7 @@ class WPMailerClass
 	public function sendEmail()
 	{
 		$result = $this->wpMailExec();
-		if (!$result) {
+		if(!$result){
 			return new \WP_Error('WPMailerClass', 'WPMailerClass could not send email');
 		}
 		return $result;
@@ -116,8 +115,8 @@ class WPMailerClass
 	 *
 	 * @return boolean
 	 */
-	public function wpMailExec()
+	public function wpMailExec() 
 	{
-		return wp_mail($this->to, $this->subject, $this->message, $this->headers);
+		return wp_mail( $this->to, $this->subject, $this->message, $this->headers );
 	}
 }
