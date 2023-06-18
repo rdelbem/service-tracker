@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkservice_tracker=self.webpackChunkservice_tracker||[]).push([[185],{185:(e,r,c)=>{c.r(r),c.d(r,{default:()=>t});c(294);function t(e){return wp.element.createElement("div",{className:"wrapper"},e.children)}}}]);

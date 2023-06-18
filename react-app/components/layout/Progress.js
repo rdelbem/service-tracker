@@ -1,5 +1,5 @@
 import React, { useState, useContext, Fragment } from "react";
-import ReactTooltip from "react-tooltip";
+import { Tooltip } from "react-tooltip";
 import { CSSTransition } from "react-transition-group";
 import InViewContext from "../../context/inView/inViewContext";
 import ProgressContext from "../../context/progress/progressContext";
@@ -83,12 +83,7 @@ export default function Progress() {
         {allStatuses.length > 0 &&
           allStatuses.map((item, index) => <Status key={index} {...item} />)}
       </div>
-      <ReactTooltip
-        place="left"
-        type="dark"
-        effect="solid"
-        data-delay-show="1000"
-      />
+      <Tooltip place="left" type="dark" effect="solid" data-delay-show="1000" />
     </Fragment>
   );
 }

@@ -11,6 +11,10 @@ class ComposerStaticInita1c3f2669fea2498beb51d23e8edaf17
         array (
             'ServiceTracker\\' => 15,
         ),
+        'R' => 
+        array (
+            'Rdelbem\\WPMailerClass\\' => 22,
+        ),
         'M' => 
         array (
             'Moment\\' => 7,
@@ -21,6 +25,10 @@ class ComposerStaticInita1c3f2669fea2498beb51d23e8edaf17
         'ServiceTracker\\' => 
         array (
             0 => __DIR__ . '/../..' . '/',
+        ),
+        'Rdelbem\\WPMailerClass\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/rdelbem/wp-mailer-class/src',
         ),
         'Moment\\' => 
         array (

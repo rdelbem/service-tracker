@@ -5,7 +5,7 @@ import ClientsContext from "./clientsContext";
 import { GET_USERS } from "../types";
 
 export default function ClientsState(props) {
-  const api_url_users = `${data.root_url}/wp-json/wp/v2/users?roles=client`;
+  const api_url_users = data.users_api_url;
 
   const initialState = {
     users: [],

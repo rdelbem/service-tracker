@@ -1,33 +1,41 @@
-<?php return array (
-  'root' => 
-  array (
-    'pretty_version' => 'dev-main',
-    'version' => 'dev-main',
-    'aliases' => 
-    array (
+<?php return array(
+    'root' => array(
+        'name' => 'delbem/service-tracker',
+        'pretty_version' => 'dev-main',
+        'version' => 'dev-main',
+        'reference' => 'b9bfeb6a2b88d265395e3798998b84e8582e80ea',
+        'type' => 'wordpress-plugin',
+        'install_path' => __DIR__ . '/../../',
+        'aliases' => array(),
+        'dev' => true,
     ),
-    'reference' => 'e45b88c5ca9dbc69f25e86030a22302250f72413',
-    'name' => 'delbem/service-tracker',
-  ),
-  'versions' => 
-  array (
-    'delbem/service-tracker' => 
-    array (
-      'pretty_version' => 'dev-main',
-      'version' => 'dev-main',
-      'aliases' => 
-      array (
-      ),
-      'reference' => 'e45b88c5ca9dbc69f25e86030a22302250f72413',
+    'versions' => array(
+        'delbem/service-tracker' => array(
+            'pretty_version' => 'dev-main',
+            'version' => 'dev-main',
+            'reference' => 'b9bfeb6a2b88d265395e3798998b84e8582e80ea',
+            'type' => 'wordpress-plugin',
+            'install_path' => __DIR__ . '/../../',
+            'aliases' => array(),
+            'dev_requirement' => false,
+        ),
+        'fightbulc/moment' => array(
+            'pretty_version' => '1.34',
+            'version' => '1.34.0.0',
+            'reference' => 'c813018ff87dfe77353f838908fc644cc5536b50',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../fightbulc/moment',
+            'aliases' => array(),
+            'dev_requirement' => false,
+        ),
+        'rdelbem/wp-mailer-class' => array(
+            'pretty_version' => '1.0.1',
+            'version' => '1.0.1.0',
+            'reference' => '6a2b73a51134ddc21e0356ca6cc2c386815dfa15',
+            'type' => 'wordpress-utility-class',
+            'install_path' => __DIR__ . '/../rdelbem/wp-mailer-class',
+            'aliases' => array(),
+            'dev_requirement' => false,
+        ),
     ),
-    'fightbulc/moment' => 
-    array (
-      'pretty_version' => '1.33.0',
-      'version' => '1.33.0.0',
-      'aliases' => 
-      array (
-      ),
-      'reference' => '435d68e481ab0a716358926fb51966e696d297e3',
-    ),
-  ),
 );

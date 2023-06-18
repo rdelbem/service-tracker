@@ -1,19 +1,22 @@
-import React from "react";
-//components
-import Wrapper from "./components/layout/Wrapper";
-import Clients from "./components/layout/Clients";
-import Cases from "./components/layout/Cases";
-import Progress from "./components/layout/Progress";
-import CasesContainer from "./components/layout/CasesContainer";
-import Initial from "./components/layout/Initial";
-import HowToUse from "./components/layout/HowToUse";
-//contexts
-import ClientsState from "./context/clients/ClientsState";
-import CasesState from "./context/cases/CasesState";
-import InViewState from "./context/inView/InViewState";
-import ProgressState from "./context/progress/progressState";
+import React, { lazy } from "react";
 //libs
 import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
+//contexts
+const ClientsState = lazy(() => import("./context/clients/ClientsState"));
+const CasesState = lazy(() => import("./context/cases/CasesState"));
+const InViewState = lazy(() => import("./context/inView/InViewState"));
+const ProgressState = lazy(() => import("./context/progress/ProgressState"));
+
+//compoenents
+const Wrapper = lazy(() => import("./components/layout/Wrapper"));
+const Clients = lazy(() => import("./components/layout/Clients"));
+const HowToUse = lazy(() => import("./components/layout/HowToUse"));
+const Cases = lazy(() => import("./components/layout/Cases"));
+const Progress = lazy(() => import("./components/layout/Progress"));
+const CasesContainer = lazy(() => import("./components/layout/CasesContainer"));
+const Initial = lazy(() => import("./components/layout/Initial"));
 
 //App bootstrap
 export default function App() {

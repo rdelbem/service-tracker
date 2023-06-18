@@ -1,6 +1,6 @@
 import React, { useContext, useState, Fragment } from "react";
 import Case from "./Case";
-import ReactTooltip from "react-tooltip";
+import { Tooltip } from "react-tooltip";
 import CasesContext from "../../context/cases/casesContext";
 import InViewContext from "../../context/inView/inViewContext";
 import Spinner from "../../components/layout/Spinner";
@@ -83,7 +83,8 @@ export default function Cases() {
       {state.cases.map((item) => (
         <Case {...item} />
       ))}
-      <ReactTooltip
+      <Tooltip
+        id="service-tracker"
         place="left"
         type="dark"
         effect="solid"
