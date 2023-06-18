@@ -6,12 +6,12 @@ use PHPUnit\Framework\TestCase;
 
 class MomentPolishLocaleTest extends TestCase
 {
-    public function setUp(): void
+    public function setUp()
     {
         Moment::setLocale('pl_PL');
     }
 
-    public function testWeekdayNames(): void
+    public function testWeekdayNames()
     {
         $startingDate = '2016-01-29T00:00:00+0000';
 
@@ -35,7 +35,7 @@ class MomentPolishLocaleTest extends TestCase
         }
     }
 
-    public function testDayMonthFormat001(): void
+    public function testDayMonthFormat001()
     {
         $string = '2015-06-14 20:46:22';
         $moment = new Moment($string, 'Europe/Berlin');
@@ -46,13 +46,13 @@ class MomentPolishLocaleTest extends TestCase
         self::assertEquals('8 marca', $moment->format('j F'));
     }
 
-    public function testDayMonthFormat002(): void
+    public function testDayMonthFormat002()
     {
         $moment = new Moment('2016-01-03 16:17:07', 'Europe/Berlin');
         self::assertEquals('3 grudnia', $moment->subtractMonths(1)->format('j F'));
     }
 
-    public function testMonthFormatFN(): void
+    public function testMonthFormatFN()
     {
         $startingDate = '2016-01-01T00:00:00+0000';
 
@@ -81,7 +81,7 @@ class MomentPolishLocaleTest extends TestCase
     }
 
 
-    public function testMinutes(): void
+    public function testMinutes()
     {
         $past = new Moment('2016-01-03 16:17:07', 'Europe/Berlin');
 
@@ -95,7 +95,7 @@ class MomentPolishLocaleTest extends TestCase
         self::assertEquals('13 minut temu', $relative->getRelative());
     }
 
-    public function testLastWeekWeekend(): void
+    public function testLastWeekWeekend()
     {
         $past = new Moment('2016-04-10');
         self::assertEquals('ostatnia niedziela', $past->calendar(false, new Moment('2016-04-12')));

@@ -91,7 +91,6 @@ class Moment extends \DateTime
      * @return static|false         Returns a new Moment instance or FALSE on failure.
      * @throws MomentException
      */
-    #[\ReturnTypeWillChange]
     public static function createFromFormat($format, $time, $timezone = null, FormatsInterface $formatsInterface = null)
     {
         // handle diverse format types
@@ -213,7 +212,6 @@ class Moment extends \DateTime
      *
      * @return \DateTime|Moment
      */
-    #[\ReturnTypeWillChange]
     public function setTimezone($timezone)
     {
         if ($this->immutableMode)
@@ -240,7 +238,6 @@ class Moment extends \DateTime
      * @return string
      * @throws MomentException
      */
-    #[\ReturnTypeWillChange]
     public function format($format = null, $formatsInterface = null)
     {
         // set default format
@@ -594,7 +591,6 @@ class Moment extends \DateTime
      *
      * @return self|\DateTime
      */
-    #[\ReturnTypeWillChange]
     public function setDate($year, $month, $day)
     {
         if ($this->immutableMode)
@@ -696,7 +692,6 @@ class Moment extends \DateTime
      *
      * @return $this|\DateTime
      */
-    #[\ReturnTypeWillChange]
     public function setTime($hour, $minute, $second = null, $microseconds = null)
     {
         if ($this->immutableMode)

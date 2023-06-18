@@ -6,12 +6,12 @@ use PHPUnit\Framework\TestCase;
 
 class MomentFrenchLocaleTest extends TestCase
 {
-    public function setUp(): void
+    public function setUp()
     {
         Moment::setLocale('fr_FR');
     }
 
-    public function testWeekdayNames(): void
+    public function testWeekdayNames()
     {
         $startingDate = '2015-01-04T00:00:00+0000';
 
@@ -36,7 +36,7 @@ class MomentFrenchLocaleTest extends TestCase
         }
     }
 
-    public function testMonthNames(): void
+    public function testMonthNames()
     {
         $startingDate = '2015-01-04T00:00:00+0000';
 
@@ -66,7 +66,7 @@ class MomentFrenchLocaleTest extends TestCase
         }
     }
 
-    public function testFormat(): void
+    public function testFormat()
     {
         $a = array(
             array('l, F d Y, g:i:s a',                  'dimanche, février 14 2010, 3:25:50 pm'),
@@ -82,7 +82,7 @@ class MomentFrenchLocaleTest extends TestCase
         }
     }
 
-    public function testRelative(): void
+    public function testRelative()
     {
         $beginningMoment = new Moment('2015-06-14 20:46:22', 'Europe/Berlin');
         $endMoment = new Moment('2015-06-14 20:48:32', 'Europe/Berlin');

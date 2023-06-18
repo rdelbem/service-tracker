@@ -18,12 +18,12 @@ use PHPUnit\Framework\TestCase;
 
 class MomentCanadianFrenchLocaleTest extends TestCase
 {
-    public function setUp(): void
+    public function setUp()
     {
         Moment::setLocale('fr_CA');
     }
 
-    public function testWeekdayNames(): void
+    public function testWeekdayNames()
     {
         $startingDate = '2015-01-04T00:00:00+0000';
 
@@ -48,7 +48,7 @@ class MomentCanadianFrenchLocaleTest extends TestCase
         }
     }
 
-    public function testMonthNames(): void
+    public function testMonthNames()
     {
         $startingDate = '2015-01-04T00:00:00+0000';
 
@@ -78,7 +78,7 @@ class MomentCanadianFrenchLocaleTest extends TestCase
         }
     }
 
-    public function testFormat(): void
+    public function testFormat()
     {
         $a = array(
             array('l, F d Y, g:i:s a', 'dimanche, février 14 2010, 3:25:50 pm'),
@@ -94,7 +94,7 @@ class MomentCanadianFrenchLocaleTest extends TestCase
         }
     }
 
-    public function testOrdinalsFormat(): void
+    public function testOrdinalsFormat()
     {
         $moment = new Moment('2010-06-02T00:00:00+0000');
         self::assertEquals('2', $moment->format('jS'));
@@ -102,7 +102,7 @@ class MomentCanadianFrenchLocaleTest extends TestCase
         self::assertEquals('1er', $moment->format('jS'));
     }
 
-    public function testRelative(): void
+    public function testRelative()
     {
         $beginningMoment = new Moment('2015-06-14 20:46:22', 'Europe/Berlin');
         $endMoment = new Moment('2015-06-14 20:48:32', 'Europe/Berlin');

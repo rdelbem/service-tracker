@@ -6,12 +6,12 @@ use PHPUnit\Framework\TestCase;
 
 class MomentGermanLocaleTest extends TestCase
 {
-    public function setUp(): void
+    public function setUp()
     {
         Moment::setLocale('de_DE');
     }
 
-    public function testWeekdayNames(): void
+    public function testWeekdayNames()
     {
         $startingDate = '2015-01-04T00:00:00+0000';
 
@@ -36,7 +36,7 @@ class MomentGermanLocaleTest extends TestCase
         }
     }
 
-    public function testMonthNames(): void
+    public function testMonthNames()
     {
         $startingDate = '2015-01-04T00:00:00+0000';
 
@@ -66,7 +66,7 @@ class MomentGermanLocaleTest extends TestCase
         }
     }
 
-    public function testHirbodIssueLocaleDate001(): void
+    public function testHirbodIssueLocaleDate001()
     {
         // @see: https://github.com/fightbulc/moment.php/issues/50
 
@@ -79,7 +79,7 @@ class MomentGermanLocaleTest extends TestCase
         self::assertEquals('08. März', $moment->format('d. F'));
     }
 
-    public function testHirbodIssueLocaleDate002(): void
+    public function testHirbodIssueLocaleDate002()
     {
         // @see: https://github.com/fightbulc/moment.php/issues/61
 
@@ -87,7 +87,7 @@ class MomentGermanLocaleTest extends TestCase
         self::assertEquals('03. Dezember', $moment->subtractMonths(1)->format('d. F'));
     }
 
-    public function testMonthsNominativeFallback(): void
+    public function testMonthsNominativeFallback()
     {
         $moment = new Moment('2016-01-03 16:17:07', 'Europe/Berlin');
         self::assertEquals('Januar 2016', $moment->format('f Y'));

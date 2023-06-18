@@ -7,7 +7,7 @@ class MomentSimilarLocaleTest extends MomentBritishEnglishLocaleTest
     /**
      * @throws MomentException
      */
-    public function setUp(): void
+    public function setUp()
     {
         Moment::setLocale('en', true);
     }

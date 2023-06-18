@@ -4,20 +4,20 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "6a851b3a88eca0ee4ebb487bb692f949",
+    "content-hash": "ab7e6d059cc5e210c4edacbf27de76f2",
     "packages": [
         {
             "name": "fightbulc/moment",
-            "version": "1.34",
+            "version": "1.33.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/fightbulc/moment.php.git",
-                "reference": "c813018ff87dfe77353f838908fc644cc5536b50"
+                "reference": "435d68e481ab0a716358926fb51966e696d297e3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/fightbulc/moment.php/zipball/c813018ff87dfe77353f838908fc644cc5536b50",
-                "reference": "c813018ff87dfe77353f838908fc644cc5536b50",
+                "url": "https://api.github.com/repos/fightbulc/moment.php/zipball/435d68e481ab0a716358926fb51966e696d297e3",
+                "reference": "435d68e481ab0a716358926fb51966e696d297e3",
                 "shasum": ""
             },
             "require": {
@@ -59,22 +59,22 @@
             ],
             "support": {
                 "issues": "https://github.com/fightbulc/moment.php/issues",
-                "source": "https://github.com/fightbulc/moment.php/tree/1.34"
+                "source": "https://github.com/fightbulc/moment.php/tree/1.33.0"
             },
-            "time": "2023-01-26T21:18:59+00:00"
+            "time": "2021-03-27T13:10:08+00:00"
         },
         {
             "name": "rdelbem/wp-mailer-class",
-            "version": "1.0.1",
+            "version": "1.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/rdelbem/WP-mailer-class.git",
-                "reference": "6a2b73a51134ddc21e0356ca6cc2c386815dfa15"
+                "reference": "c3d66f6e7398b9d69f028070be9fe09e7e9e85b3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/rdelbem/WP-mailer-class/zipball/6a2b73a51134ddc21e0356ca6cc2c386815dfa15",
-                "reference": "6a2b73a51134ddc21e0356ca6cc2c386815dfa15",
+                "url": "https://api.github.com/repos/rdelbem/WP-mailer-class/zipball/c3d66f6e7398b9d69f028070be9fe09e7e9e85b3",
+                "reference": "c3d66f6e7398b9d69f028070be9fe09e7e9e85b3",
                 "shasum": ""
             },
             "require-dev": {
@@ -83,7 +83,7 @@
             "type": "wordpress-utility-class",
             "autoload": {
                 "psr-4": {
-                    "Rdelbem\\WPMailerClass\\": "src/"
+                    "Rdelbem\\WPMailerClass\\": "./src"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -99,9 +99,9 @@
             "description": "Just a simple wrapper around the wp_mail function, now you can easily send an email from within WP without having to set a header by youself. We also provide some error handling",
             "support": {
                 "issues": "https://github.com/rdelbem/WP-mailer-class/issues",
-                "source": "https://github.com/rdelbem/WP-mailer-class/tree/1.0.1"
+                "source": "https://github.com/rdelbem/WP-mailer-class/tree/1.0.0"
             },
-            "time": "2023-06-03T21:58:00+00:00"
+            "time": "2023-01-29T04:53:15+00:00"
         }
     ],
     "packages-dev": [],
