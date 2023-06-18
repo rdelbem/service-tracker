@@ -1,22 +1,26 @@
 {
-    "name": "rdelbem/wp-mailer-class",
-    "description": "Just a simple wrapper around the wp_mail function, now you can easily send an email from within WP without having to set a header by youself. We also provide some error handling",
-    "type": "wordpress-utility-class",
-    "require-dev": {
-        "10up/wp_mock": "*"
-    },
-    "license": "GPL-3.0-or-later",
-    "autoload": {
-        "psr-4": {
-            "Rdelbem\\WPMailerClass\\": "./src"
-        }
-    },
-    "authors": [
-        {
-            "name": "Rodrigo Del Bem",
-            "email": "rodrigodelbem@gmail.com"
-        }
-    ],
-    "minimum-stability": "stable",
-    "require": {}
+  "name": "rdelbem/wp-mailer-class",
+  "description": "Just a simple wrapper around the wp_mail function, now you can easily send an email from within WP without having to set a header by youself. We also provide some error handling",
+  "type": "wordpress-utility-class",
+  "version": "1.0.1",
+  "require-dev": {
+    "10up/wp_mock": "*"
+  },
+  "license": "GPL-3.0-or-later",
+  "autoload": {
+    "psr-4": {
+      "Rdelbem\\WPMailerClass\\": "src/"
+    }
+  },
+  "authors": [
+    {
+      "name": "Rodrigo Del Bem",
+      "email": "rodrigodelbem@gmail.com"
+    }
+  ],
+  "minimum-stability": "stable",
+  "require": {},
+  "scripts": {
+    "test": "./vendor/bin/phpunit --colors=always --bootstrap ./tests/bootstrap.php ./tests/TestWPMailerClass.php"
+  }
 }

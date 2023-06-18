@@ -1,4 +1,1 @@
-## In order to use the WP_mock, you need to have phpunit installed globally
-## For every new test, don't forget to require it in the bootstrap file
-## and for running the tests use `phpunit --bootstrap bootstrap.php <MyTestFile.php>`
-## You can create an alias, like in mac os, where `alias runphptests = phpunit --bootstrap bootstrap.php`, now you can `runphptests <MyTestFile.php>`
+# just run the command `composer test`
