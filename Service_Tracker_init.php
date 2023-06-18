@@ -16,40 +16,34 @@
  * Domain Path: languages
  */
 
-defined( 'WPINC' ) or die();
+defined('WPINC') or die();
 
-require_once plugin_dir_path( __FILE__ ) . '/vendor/autoload.php';
+require_once plugin_dir_path(__FILE__) . '/vendor/autoload.php';
 
-use ServiceTracker\includes\Service_Tracker_Activator;
-use ServiceTracker\Service_Tracker_Uninstall;
-use ServiceTracker\includes\Service_Tracker;
+use ServiceTracker\includes\STOServiceTrackerActivator;
+use ServiceTracker\STOServiceTrackerUninstall;
+use ServiceTracker\includes\STOServiceTracker;
 
-function activate_st_service_tracker() {
-	Service_Tracker_Activator::activate();
-	Service_Tracker_Activator::activation_notice();
+function STOactivateServiceTracker()
+{
+	STOServiceTrackerActivator::activate();
 }
 
-// Service Tracker should do nothing on deactivation
+/**
+ * Service Tracker should do nothing on deactivation,
+ * that's because we want to preserve the tables created
+ * during the plugin's usage
+ */
 
-function uninstall_st_service_tracker() {
-	Service_Tracker_Uninstall::uninstall();
+function STOuninstallServiceTracker()
+{
+	STOServiceTrackerUninstall::uninstall();
 }
 
-register_activation_hook( __FILE__, 'activate_st_service_tracker' );
+register_activation_hook(__FILE__, 'STOactivateServiceTracker');
 
-register_uninstall_hook( __FILE__, 'uninstall_st_service_tracker' );
+register_uninstall_hook(__FILE__, 'STOuninstallServiceTracker');
 
-$ST_serviceTracker = new Service_Tracker();
-
-$ST_serviceTracker->run();
-
-// UPDATE CHECKER
-if ( is_admin() ) {
-	require wp_normalize_path( plugin_dir_path( __FILE__ ) . 'plugin-update-checker/plugin-update-checker.php' );
-
-	$myUpdateChecker = Puc_v4_Factory::buildUpdateChecker(
-		'https://delbem.net/plugins/service-tracker/update_verification.json',
-		__FILE__, // Full path to the main plugin file or functions.php.
-		'service-tracker'
-	);
-}
+add_action('plugins_loaded', function () {
+	(new STOServiceTracker())->run();
+});

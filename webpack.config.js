@@ -1,20 +1,31 @@
 const path = require("path");
 const webpack = require("webpack");
-const UglifyJSPlugin = require("uglifyjs-webpack-plugin");
 const { CleanWebpackPlugin } = require("clean-webpack-plugin");
 const BrowserSyncPlugin = require("browser-sync-webpack-plugin");
+const BundleAnalyzerPlugin =
+  require("webpack-bundle-analyzer").BundleAnalyzerPlugin;
+const TerserPlugin = require("terser-webpack-plugin");
 
 module.exports = (env) => {
-  const pathToSave = env.production ? "./admin/js/prod" : "./admin/js/dev";
+  const pathToSave = "./admin/js/prod";
 
   return {
     entry: path.resolve(__dirname, "./react-app/index.js"),
     module: {
       rules: [
         {
-          test: /\.(js|jsx)$/,
+          test: /\.m?js$/,
           exclude: /node_modules/,
-          use: ["babel-loader"],
+          use: {
+            loader: "babel-loader",
+            options: {
+              presets: ["@babel/preset-env"],
+            },
+          },
+        },
+        {
+          test: /\.css$/,
+          use: ["style-loader", "css-loader"],
         },
       ],
     },
@@ -25,12 +36,16 @@ module.exports = (env) => {
       path: path.resolve(__dirname, pathToSave),
       filename: "App.js",
     },
+    optimization: {
+      minimize: true,
+      minimizer: [new TerserPlugin()],
+    },
     plugins: [
       new webpack.HotModuleReplacementPlugin(),
-      new UglifyJSPlugin(),
+      new BundleAnalyzerPlugin(),
       new CleanWebpackPlugin(),
       new BrowserSyncPlugin({
-        proxy: "http://aulasplugin.local/",
+        proxy: "localhost:8088",
         port: 3000,
         files: ["**/*.php"],
         ghostMode: {

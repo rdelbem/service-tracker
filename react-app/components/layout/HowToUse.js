@@ -78,40 +78,7 @@ export default function HowToUse() {
             </ul>
           </div>
         </CSSTransition>
-        <div className="accordion-title">
-          <h3
-            onClick={() => {
-              accordion !== 3 ? setAccordion(3) : setAccordion(0);
-            }}
-          >
-            3. {data.accordion_third_title}
-            <BsFillCaretDownFill
-              className="open-accordion"
-              onClick={() => {
-                accordion !== 3 ? setAccordion(3) : setAccordion(0);
-              }}
-            />
-          </h3>
-        </div>
-        <CSSTransition
-          in={accordion === 3}
-          timeout={400}
-          classNames="editing"
-          unmountOnExit
-        >
-          <div className="spec-container">
-            <ul>
-              <li>{data.third_accordion_first_li_item}</li>
-              <li>{data.third_accordion_second_li_item}</li>
-              <li>{data.third_accordion_third_li_item}</li>
-              <li>{data.third_accordion_forth_li_item}</li>
-              <li>{data.third_accordion_fifth_li_item}</li>
-            </ul>
-          </div>
-        </CSSTransition>
       </div>
-      <hr />
-      <p>{data.instructions_footer_info}</p>
     </Fragment>
   );
 }

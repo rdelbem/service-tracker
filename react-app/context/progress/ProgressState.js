@@ -64,9 +64,9 @@ export default function ProgressState(props) {
     }
 
     const dataToPost = {
-      id_user: id_user,
-      id_case: id_case,
-      text: text,
+      id_user,
+      id_case,
+      text,
     };
 
     try {
@@ -80,6 +80,8 @@ export default function ProgressState(props) {
           },
         }
       );
+
+      console.log(postStatus);
 
       const getAllStatus = await getStatus(id_case, true);
 
