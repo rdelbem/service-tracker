@@ -42,7 +42,6 @@ module.exports = (env) => {
     },
     plugins: [
       new webpack.HotModuleReplacementPlugin(),
-      new BundleAnalyzerPlugin(),
       new CleanWebpackPlugin(),
       new BrowserSyncPlugin({
         proxy: "localhost:8088",
