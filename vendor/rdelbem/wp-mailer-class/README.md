@@ -11,10 +11,23 @@ Here, only id is provided
 
 ```php
 $send_mail = new WPMailerClass( 1, 'Amazing subject!', 'Amazing message!' );
+$send_mail->sendEmail();
 ```
 
 Here, only e-mail is provided
 
 ```php
 $send_mail = new WPMailerClass( 'youruser@mail.com', 'Amazing subject!', 'Amazing message!' );
+$send_mail->sendEmail();
+```
+
+And if you want to defensive handle errors you can do the following
+
+```php
+$send_mail = new WPMailerClass( 'youruser@mail.com', 'Amazing subject!', 'Amazing message!' );
+$result = $send_mail->sendEmail();
+
+if($result instanceof WP_Error){
+    error_log($result->get_error_message()); // this will log 'WPMailerClass could not send email'
+}
 ```
