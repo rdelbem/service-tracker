@@ -14,6 +14,6 @@
   },
   "require": {
     "fightbulc/moment": "1.33",
-    "rdelbem/wp-mailer-class": "1.0.1"
+    "rdelbem/wp-mailer-class": "1.0.2"
   }
 }

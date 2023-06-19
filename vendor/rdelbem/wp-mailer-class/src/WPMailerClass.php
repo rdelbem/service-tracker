@@ -49,11 +49,11 @@ class WPMailerClass
 	 * Constructor method.
 	 * It will receive the parameters and equate then to the class properties.
 	 *
-	 * @param mixed  $to
+	 * @param string | int  $to
 	 * @param string $subject
 	 * @param string $message
 	 */
-	public function __construct(mixed $to, string $subject, string $message)
+	public function __construct(string|int $to, string $subject, string $message)
 	{
 		if (is_int($to) || ctype_digit($to)) {
 			$this->id = (int) $to;
