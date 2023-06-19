@@ -11,9 +11,11 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
+    target-branch: "dev"
 
   # Maintain dependencies for Composer
   - package-ecosystem: "composer"
     directory: "/"
     schedule:
       interval: "weekly"
+    target-branch: "dev"
