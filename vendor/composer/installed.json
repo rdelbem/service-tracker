@@ -62,23 +62,26 @@
         },
         {
             "name": "rdelbem/wp-mailer-class",
-            "version": "1.0.1",
-            "version_normalized": "1.0.1.0",
+            "version": "1.0.2",
+            "version_normalized": "1.0.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/rdelbem/WP-mailer-class.git",
-                "reference": "6a2b73a51134ddc21e0356ca6cc2c386815dfa15"
+                "reference": "0fcbfd1a6f2c5a6e5e39dff3ca79cf03cfe9b929"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/rdelbem/WP-mailer-class/zipball/6a2b73a51134ddc21e0356ca6cc2c386815dfa15",
-                "reference": "6a2b73a51134ddc21e0356ca6cc2c386815dfa15",
+                "url": "https://api.github.com/repos/rdelbem/WP-mailer-class/zipball/0fcbfd1a6f2c5a6e5e39dff3ca79cf03cfe9b929",
+                "reference": "0fcbfd1a6f2c5a6e5e39dff3ca79cf03cfe9b929",
                 "shasum": ""
+            },
+            "require": {
+                "php": ">=8.0"
             },
             "require-dev": {
                 "10up/wp_mock": "*"
             },
-            "time": "2023-06-03T21:58:00+00:00",
+            "time": "2023-06-19T01:21:18+00:00",
             "type": "wordpress-utility-class",
             "installation-source": "dist",
             "autoload": {
@@ -99,7 +102,7 @@
             "description": "Just a simple wrapper around the wp_mail function, now you can easily send an email from within WP without having to set a header by youself. We also provide some error handling",
             "support": {
                 "issues": "https://github.com/rdelbem/WP-mailer-class/issues",
-                "source": "https://github.com/rdelbem/WP-mailer-class/tree/1.0.1"
+                "source": "https://github.com/rdelbem/WP-mailer-class/tree/1.0.2"
             },
             "install-path": "../rdelbem/wp-mailer-class"
         }
