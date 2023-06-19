@@ -52,7 +52,8 @@ jobs:
 
             const dirsToRemove = [
               'react-app',
-              'node_modules'
+              'node_modules',
+              '.github'
             ];
 
             filesToRemove.forEach(file => {
