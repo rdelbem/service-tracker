@@ -12,7 +12,7 @@
  * Author: Rodrigo Del Bem <servicetracker@delbem.net>
  * Author URI: https://delbem.net
  * Plugin URI: https://delbem.net/services-tracker
- * Text Domain: service-tracker
+ * Text Domain: service-tracker-sto
  * Domain Path: languages
  */
 

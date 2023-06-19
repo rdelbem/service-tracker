@@ -1,0 +1,1 @@
+Service Tracker STO can be used to track the progress of a service being provided. It is easy to integrate it to WooCommerce. Since it uses the customer role to address the subjects of a service.
