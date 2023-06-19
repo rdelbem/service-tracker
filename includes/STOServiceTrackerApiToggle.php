@@ -1,7 +1,7 @@
 <?php
 namespace ServiceTracker\includes;
 
-use Rdelbem\WpMailerClass\WPMailerClass;
+use Rdelbem\WPMailerClass\WPMailerClass;
 use ServiceTracker\includes\STOServiceTrackerSql;
 use ServiceTracker\includes\STOServiceTrackerApi;
 use \WP_REST_Server;
