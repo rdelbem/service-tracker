@@ -1,11 +1,13 @@
 <?php
 namespace ServiceTracker\publics;
 
-use ServiceTracker\includes\STOServiceTrackerSql;
+if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
+
+use ServiceTracker\includes\STOLMCServiceTrackerSql;
 use \Moment\Moment;
 use \WP_User;
 
-class STOServiceTrackerPublicUserContent
+class STOLMCServiceTrackerPublicUserContent
 {
 	public $current_user_id;
 	public $user_cases_and_statuses;
@@ -41,14 +43,14 @@ class STOServiceTrackerPublicUserContent
 
 	public function getUserCases()
 	{
-		$sql = new STOServiceTrackerSql('servicetracker_cases');
+		$sql = new STOLMCServiceTrackerSql('servicetracker_cases');
 		$cases = $sql->getBy(array('id_user' => $this->current_user_id));
 		return $cases;
 	}
 
 	public function getCaseProgress($id_case)
 	{
-		$sql = new STOServiceTrackerSql('servicetracker_progress');
+		$sql = new STOLMCServiceTrackerSql('servicetracker_progress');
 		$status = $sql->getBy(array('id_case' => $id_case));
 		$progress_array = array();
 
@@ -106,7 +108,7 @@ class STOServiceTrackerPublicUserContent
 
 	public function addShortcode()
 	{
-		add_shortcode('service-tracker-cases-progress', array($this, 'usePartial'));
+		add_shortcode('stolmc-service-tracker-cases-progress', array($this, 'usePartial'));
 	}
 
 	public function usePartial()

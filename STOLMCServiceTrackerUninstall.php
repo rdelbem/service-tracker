@@ -1,7 +1,9 @@
 <?php
 namespace ServiceTracker;
 
-class STOServiceTrackerUninstall
+if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
+
+class STOLMCServiceTrackerUninstall
 {
 
 	/**

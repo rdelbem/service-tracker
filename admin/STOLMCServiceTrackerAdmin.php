@@ -1,10 +1,12 @@
 <?php
 namespace ServiceTracker\admin;
 
+if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
+
 /**
  * The admin-specific functionality of the plugin.
  *
- * @link       http://delbem.net/service-tracker
+ * @link       https://delbem.net/portfolio/service-tracker-sto/
  * @since      1.0.0
  *
  * @package    Service_Tracker
@@ -21,7 +23,7 @@ namespace ServiceTracker\admin;
  * @subpackage Service_Tracker/admin
  * @author     Rodrigo Del Bem <rodrigodelbem@gmail.com>
  */
-class STOServiceTrackerAdmin
+class STOLMCServiceTrackerAdmin
 {
 
 	/**

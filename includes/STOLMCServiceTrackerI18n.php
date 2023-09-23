@@ -1,6 +1,8 @@
 <?php
 namespace ServiceTracker\includes;
 
+if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
+
 /**
  * Define the internationalization functionality
  *
@@ -25,7 +27,7 @@ namespace ServiceTracker\includes;
  * @subpackage Plugin_Name/includes
  * @author     Your Name <email@example.com>
  */
-class STOServiceTrackerI18n
+class STOLMCServiceTrackerI18n
 {
 	/**
 	 * Load the plugin text domain for translation.

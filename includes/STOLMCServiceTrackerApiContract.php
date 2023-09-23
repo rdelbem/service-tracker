@@ -1,13 +1,15 @@
 <?php
 namespace ServiceTracker\includes;
 
+if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
+
 use \WP_REST_Request;
 
 /**
  * This is the required contract/interface used in order
  * to implement a full CRUD rest api end point.
  */
-interface STOServiceTrackerApiContract
+interface STOLMCServiceTrackerApiContract
 {
 	/**
 	 * The method run is used to start the application.

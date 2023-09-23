@@ -1,20 +1,20 @@
 <?php
 namespace ServiceTracker\includes;
 
-defined('WPINC') or die();
+if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 
-use ServiceTracker\includes\STOServiceTrackerLoader;
-use ServiceTracker\includes\STOServiceTrackerI18n;
-use ServiceTracker\includes\STOServiceTrackerApiCases;
-use ServiceTracker\includes\STOServiceTrackerApiProgress;
-use ServiceTracker\includes\STOServiceTrackerApiToggle;
-use ServiceTracker\admin\STOServiceTrackerAdmin;
-use ServiceTracker\publics\STOServiceTrackerPublic;
-use ServiceTracker\publics\STOServiceTrackerPublicUserContent;
-use ServiceTracker\includes\STOServiceTrackerPermalinkValidator;
+use ServiceTracker\includes\STOLMCServiceTrackerLoader;
+use ServiceTracker\includes\STOLMCServiceTrackerI18n;
+use ServiceTracker\includes\STOLMCServiceTrackerApiCases;
+use ServiceTracker\includes\STOLMCServiceTrackerApiProgress;
+use ServiceTracker\includes\STOLMCServiceTrackerApiToggle;
+use ServiceTracker\admin\STOLMCServiceTrackerAdmin;
+use ServiceTracker\publics\STOLMCServiceTrackerPublic;
+use ServiceTracker\publics\STOLMCServiceTrackerPublicUserContent;
+use ServiceTracker\includes\STOLMCServiceTrackerPermalinkValidator;
 
 // This must be here, since PSR4 determines that define should not be used in an output file
-define('SERVICE_TRACKER_VERSION', '1.0.0');
+define('STOLMC_SERVICE_TRACKER_VERSION', '1.0.0');
 
 /**
  * The file that defines the core plugin class
@@ -47,7 +47,7 @@ define('SERVICE_TRACKER_VERSION', '1.0.0');
  */
 
 
-class STOServiceTracker
+class STOLMCServiceTracker
 {
 	/**
 	 * The loader that's responsible for maintaining and registering all hooks that power
@@ -55,7 +55,7 @@ class STOServiceTracker
 	 *
 	 * @since    1.0.0
 	 * @access   protected
-	 * @var      STOServiceTrackerLoader	$loader    Maintains and registers all hooks for the plugin.
+	 * @var      STOLMCServiceTrackerLoader	$loader    Maintains and registers all hooks for the plugin.
 	 */
 	protected $loader;
 
@@ -90,14 +90,14 @@ class STOServiceTracker
 	 */
 	public function __construct()
 	{
-		if (defined('SERVICE_TRACKER_VERSION')) {
-			$this->version = SERVICE_TRACKER_VERSION;
+		if (defined('STOLMC_SERVICE_TRACKER_VERSION')) {
+			$this->version = STOLMC_SERVICE_TRACKER_VERSION;
 		} else {
 			$this->version = '1.0.0';
 		}
-		$this->pluginName = 'service-tracker';
+		$this->pluginName = 'service-tracker-stolmc';
 
-		$serviceTrackerPermalinkValidator = new STOServiceTrackerPermalinkValidator();
+		$serviceTrackerPermalinkValidator = new STOLMCServiceTrackerPermalinkValidator();
 		if (!$serviceTrackerPermalinkValidator->isPermalinkStructureValid()) {
 			$this->blockEnqueueBadConfig = true;
 		}
@@ -129,25 +129,25 @@ class STOServiceTracker
 	 */
 	private function loadDependencies()
 	{
-		$this->loader = new STOServiceTrackerLoader();
+		$this->loader = new STOLMCServiceTrackerLoader();
 	}
 
 	private function api()
 	{
-		$serviceTrackerApiCases = new STOServiceTrackerApiCases();
+		$serviceTrackerApiCases = new STOLMCServiceTrackerApiCases();
 		$this->loader->addAction('rest_api_init', $serviceTrackerApiCases, 'run');
 
-		$serviceTrackerApiProgress = new STOServiceTrackerApiProgress();
+		$serviceTrackerApiProgress = new STOLMCServiceTrackerApiProgress();
 		$this->loader->addAction('rest_api_init', $serviceTrackerApiProgress, 'run');
 
-		$serviceTrackerApiToggle = new STOServiceTrackerApiToggle();
+		$serviceTrackerApiToggle = new STOLMCServiceTrackerApiToggle();
 		$this->loader->addAction('rest_api_init', $serviceTrackerApiToggle, 'run');
 	}
 
 	/**
 	 * Define the locale for this plugin for internationalization.
 	 *
-	 * Uses the STOServiceTrackerI18n class in order to set the domain and to register the hook
+	 * Uses the STOLMCServiceTrackerI18n class in order to set the domain and to register the hook
 	 * with WordPress.
 	 *
 	 * @since    1.0.0
@@ -155,7 +155,7 @@ class STOServiceTracker
 	 */
 	private function setLocale()
 	{
-		$pluginI18n = new STOServiceTrackerI18n();
+		$pluginI18n = new STOLMCServiceTrackerI18n();
 		$this->loader->addAction('plugins_loaded', $pluginI18n, 'loadPluginTextdomain');
 	}
 
@@ -176,7 +176,7 @@ class STOServiceTracker
 	 */
 	private function defineAdminHooks()
 	{
-		$pluginAdmin = new STOServiceTrackerAdmin($this->getPluginName(), $this->getVersion(), $this->blockEnqueueBadConfig);
+		$pluginAdmin = new STOLMCServiceTrackerAdmin($this->getPluginName(), $this->getVersion(), $this->blockEnqueueBadConfig);
 		if (!$this->blockEnqueueBadConfig) {
 			$this->loader->addAction('admin_enqueue_scripts', $pluginAdmin, 'enqueueStyles');
 			$this->loader->addAction('admin_enqueue_scripts', $pluginAdmin, 'enqueueScripts');
@@ -198,7 +198,7 @@ class STOServiceTracker
 			return;
 		}
 
-		$pluginPublic = new STOServiceTrackerPublic($this->getPluginName(), $this->getVersion());
+		$pluginPublic = new STOLMCServiceTrackerPublic($this->getPluginName(), $this->getVersion());
 
 		$this->loader->addAction('wp_enqueue_scripts', $pluginPublic, 'enqueueStyles');
 		$this->loader->addAction('wp_enqueue_scripts', $pluginPublic, 'enqueueScripts');
@@ -211,7 +211,7 @@ class STOServiceTracker
 			return;
 		}
 
-		$publicUserContent = new STOServiceTrackerPublicUserContent();
+		$publicUserContent = new STOLMCServiceTrackerPublicUserContent();
 		$this->loader->addAction('init', $publicUserContent, 'getUserId');
 	}
 
@@ -241,7 +241,7 @@ class STOServiceTracker
 	 * The reference to the class that orchestrates the hooks with the plugin.
 	 *
 	 * @since     1.0.0
-	 * @return    STOServiceTrackerLoader    Orchestrates the hooks of the plugin.
+	 * @return    STOLMCServiceTrackerLoader    Orchestrates the hooks of the plugin.
 	 */
 	public function getLoader()
 	{

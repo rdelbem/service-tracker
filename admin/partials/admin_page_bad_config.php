@@ -1,3 +1,4 @@
+<?php if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly ?>
 <div id="wrap">
     <div class="notice notice-fail is-dismissible">
         <p>

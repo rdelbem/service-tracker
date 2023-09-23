@@ -2,7 +2,7 @@
 /**
  * Service Tracker bootstrap file
  *
- * @link http://delbem.net/service-tracker
+ * @link https://delbem.net/portfolio/service-tracker-sto/
  * @since 1.0.0
  * @package Service Tracker STO
  *
@@ -10,9 +10,9 @@
  * Version: 1.0.0
  * Description: This plugin offers the possibilitie to track the services you provide.
  * Author: Rodrigo Del Bem <servicetracker@delbem.net>
- * Author URI: https://delbem.net
- * Plugin URI: https://delbem.net/services-tracker
- * Text Domain: service-tracker-sto
+ * Author URI: https://delbem.net/portfolio/
+ * Plugin URI: https://delbem.net/portfolio/service-tracker-sto/
+ * Text Domain: service-tracker-stolmc
  * Domain Path: languages
  */
 
@@ -20,13 +20,13 @@ defined('WPINC') or die();
 
 require_once plugin_dir_path(__FILE__) . '/vendor/autoload.php';
 
-use ServiceTracker\includes\STOServiceTrackerActivator;
-use ServiceTracker\STOServiceTrackerUninstall;
-use ServiceTracker\includes\STOServiceTracker;
+use ServiceTracker\includes\STOLMCServiceTrackerActivator;
+use ServiceTracker\STOLMCServiceTrackerUninstall;
+use ServiceTracker\includes\STOLMCServiceTracker;
 
-function STOactivateServiceTracker()
+function STOLMCactivateServiceTracker()
 {
-	STOServiceTrackerActivator::activate();
+	STOLMCServiceTrackerActivator::activate();
 }
 
 /**
@@ -35,15 +35,15 @@ function STOactivateServiceTracker()
  * during the plugin's usage
  */
 
-function STOuninstallServiceTracker()
+function STOLMCuninstallServiceTracker()
 {
-	STOServiceTrackerUninstall::uninstall();
+	STOLMCServiceTrackerUninstall::uninstall();
 }
 
-register_activation_hook(__FILE__, 'STOactivateServiceTracker');
+register_activation_hook(__FILE__, 'STOLMCactivateServiceTracker');
 
-register_uninstall_hook(__FILE__, 'STOuninstallServiceTracker');
+register_uninstall_hook(__FILE__, 'STOLMCuninstallServiceTracker');
 
 add_action('plugins_loaded', function () {
-	(new STOServiceTracker())->run();
+	(new STOLMCServiceTracker())->run();
 });

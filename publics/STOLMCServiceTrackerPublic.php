@@ -1,7 +1,7 @@
 <?php
 namespace ServiceTracker\publics;
 
-use \WP_User;
+if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 
 /**
  * The public-facing functionality of the plugin.
@@ -23,7 +23,7 @@ use \WP_User;
  * @subpackage Plugin_Name/public
  * @author     Your Name <email@example.com>
  */
-class STOServiceTrackerPublic
+class STOLMCServiceTrackerPublic
 {
 
 	/**
@@ -66,7 +66,7 @@ class STOServiceTrackerPublic
 	 */
 	public function enqueueStyles()
 	{
-		if (!has_shortcode(get_the_content(), 'service-tracker-cases-progress')) {
+		if (!has_shortcode(get_the_content(), 'stolmc-service-tracker-cases-progress')) {
 			return;
 		}
 
@@ -80,7 +80,7 @@ class STOServiceTrackerPublic
 	 */
 	public function enqueueScripts()
 	{
-		if (!has_shortcode(get_the_content(), 'service-tracker-cases-progress')) {
+		if (!has_shortcode(get_the_content(), 'stolmc-service-tracker-cases-progress')) {
 			return;
 		}
 

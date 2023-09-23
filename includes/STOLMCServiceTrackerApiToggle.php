@@ -1,13 +1,15 @@
 <?php
 namespace ServiceTracker\includes;
 
+if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
+
 use Rdelbem\WPMailerClass\WPMailerClass;
-use ServiceTracker\includes\STOServiceTrackerSql;
-use ServiceTracker\includes\STOServiceTrackerApi;
+use ServiceTracker\includes\STOLMCServiceTrackerSql;
+use ServiceTracker\includes\STOLMCServiceTrackerApi;
 use \WP_REST_Server;
 use \WP_REST_Request;
 
-class STOServiceTrackerApiToggle extends STOServiceTrackerApi
+class STOLMCServiceTrackerApiToggle extends STOLMCServiceTrackerApi
 {
 
 	private $sql;
@@ -39,7 +41,7 @@ class STOServiceTrackerApiToggle extends STOServiceTrackerApi
 		global $wpdb;
 
 		$this->customApi();
-		$this->sql = new STOServiceTrackerSql($wpdb->prefix . self::DB);
+		$this->sql = new STOLMCServiceTrackerSql($wpdb->prefix . self::DB);
 	}
 
 	public function customApi()
