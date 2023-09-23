@@ -1,7 +1,9 @@
 <?php
 namespace ServiceTracker\includes;
 
-class STOServiceTrackerSql
+if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
+
+class STOLMCServiceTrackerSql
 {
 	/**
 	 * The current table name
@@ -59,7 +61,7 @@ class STOServiceTrackerSql
 			$sql .= ' ORDER BY ' . $orderBy;
 		}
 
-		return $wpdb->get_results($sql);
+		return $wpdb->get_results($wpdb->prepare($sql));
 	}
 
 	/**
@@ -124,12 +126,12 @@ class STOServiceTrackerSql
 	 *
 	 * @param  array $conditionValue - Key value pair for the where clause of the query
 	 *
-	 * @return Int - Num rows deleted
+	 * @return int - Num rows deleted, -1 as falsey int
 	 */
 	public function delete(array $conditionValue)
 	{
 		if (empty($conditionValue)) {
-			return;
+			return -1;
 		}
 
 		global $wpdb;

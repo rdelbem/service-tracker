@@ -1,11 +1,14 @@
 <?php
+
 namespace ServiceTracker\includes;
+
+if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 
 /**
  * This is called on activation, it will create the necessary tables.
  */
 
-class STOServiceTrackerActivator
+class STOLMCServiceTrackerActivator
 {
 
 	public static function activate()

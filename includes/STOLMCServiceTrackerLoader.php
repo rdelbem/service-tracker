@@ -1,6 +1,8 @@
 <?php
 namespace ServiceTracker\includes;
 
+if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
+
 /**
  * Register all actions and filters for the plugin
  *
@@ -22,7 +24,7 @@ namespace ServiceTracker\includes;
  * @subpackage Service_Tracker/includes
  * @author     Rodrigo Del Bem <rodrigodelbem@gmail.com>
  */
-class STOServiceTrackerLoader
+class STOLMCServiceTrackerLoader
 {
 
 	/**

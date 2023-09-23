@@ -1,9 +1,11 @@
 <?php
 namespace ServiceTracker\includes;
 
-use ServiceTracker\includes\STOServiceTrackerApiContract;
-use ServiceTracker\includes\STOServiceTrackerSql;
-use ServiceTracker\includes\STOServiceTrackerApi;
+if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
+
+use ServiceTracker\includes\STOLMCServiceTrackerApiContract;
+use ServiceTracker\includes\STOLMCServiceTrackerSql;
+use ServiceTracker\includes\STOLMCServiceTrackerApi;
 use \WP_REST_Server;
 use \WP_REST_Request;
 
@@ -15,7 +17,7 @@ use \WP_REST_Request;
  *
  * ENDPOINT => wp-json/service-tracker/v1/progress/[case_id]
  */
-class STOServiceTrackerApiCases extends STOServiceTrackerApi implements STOServiceTrackerApiContract
+class STOLMCServiceTrackerApiCases extends STOLMCServiceTrackerApi implements STOLMCServiceTrackerApiContract
 {
 
 	private $sql;
@@ -31,9 +33,9 @@ class STOServiceTrackerApiCases extends STOServiceTrackerApi implements STOServi
 		global $wpdb;
 
 		$this->customApi();
-		$this->sql = new STOServiceTrackerSql($wpdb->prefix . self::DB);
+		$this->sql = new STOLMCServiceTrackerSql($wpdb->prefix . self::DB);
 
-		$this->progressSql = new STOServiceTrackerSql($wpdb->prefix . self::DB_PROGRESS);
+		$this->progressSql = new STOLMCServiceTrackerSql($wpdb->prefix . self::DB_PROGRESS);
 	}
 
 	public function customApi()

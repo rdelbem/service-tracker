@@ -4,7 +4,7 @@ namespace ServiceTracker\includes;
 
 defined('WPINC') or die();
 
-class STOServiceTrackerPermalinkValidator
+class STOLMCServiceTrackerPermalinkValidator
 {
     public function isPermalinkStructureValid()
     {

@@ -1,9 +1,11 @@
 <?php
 namespace ServiceTracker\includes;
 
+if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
+
 use \WP_REST_Response;
 
-class STOServiceTrackerApi
+class STOLMCServiceTrackerApi
 {
 
 	public function userVerification()
@@ -28,7 +30,7 @@ class STOServiceTrackerApi
 	public function registerNewRoute($api_type, $api_argument, $method, $callback)
 	{
 		register_rest_route(
-			'service-tracker/v1',
+			'service-tracker-stolmc/v1',
 			'/' . $api_type . '/(?P<id' . $api_argument . '>\d+)',
 			array(
 				'methods' => $method,
