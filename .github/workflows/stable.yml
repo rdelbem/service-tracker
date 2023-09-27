@@ -43,6 +43,7 @@ jobs:
 
             const filesToRemove = [
               '.babelrc',
+              'prepare-stable.sh',
               '.gitignore',
               'package.json',
               'package-lock.json',
