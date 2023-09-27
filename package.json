@@ -30,6 +30,7 @@
     "clean-webpack-plugin": "4.0.0",
     "cross-env": "7.0.3",
     "css-loader": "6.8.1",
+    "ncp": "^2.0.0",
     "rimraf": "^5.0.5",
     "style-loader": "3.3.3",
     "terser-webpack-plugin": "5.3.9",
@@ -42,8 +43,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "webpack --mode=production --env production",
     "start": "webpack --watch --mode=production --env production",
-    "clean:dev": "rimraf .babelrc .gitignore package.json package-lock.json README.md webpack.config.js react-app node_modules .github",
-    "zip": "bestzip ../service-tracker-stolm-stable.zip .",
-    "generate:stable": "npm run build && npm run clean:dev && npm run zip"
+    "prepare:files": "./prepare-stable.sh",
+    "zip": "cd ../ && bestzip service-tracker-olmc.zip service-tracker-olmc && rimraf service-tracker-olmc",
+    "generate:stable": "npm run build && npm run prepare:files && npm run zip"
   }
 }
