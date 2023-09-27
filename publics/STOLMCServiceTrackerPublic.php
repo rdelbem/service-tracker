@@ -75,6 +75,8 @@ class STOLMCServiceTrackerPublic
 
 	/**
 	 * Register the JavaScript for the public-facing side of the site.
+	 * NOTE: this is yet not used, since we do not have any JS in the user
+	 * facing part of the plugin.
 	 *
 	 * @since    1.0.0
 	 */

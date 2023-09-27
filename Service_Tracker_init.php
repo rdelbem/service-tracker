@@ -24,7 +24,7 @@ use ServiceTracker\includes\STOLMCServiceTrackerActivator;
 use ServiceTracker\STOLMCServiceTrackerUninstall;
 use ServiceTracker\includes\STOLMCServiceTracker;
 
-function STOLMCactivateServiceTracker()
+function STOLMC_activateServiceTracker()
 {
 	STOLMCServiceTrackerActivator::activate();
 }
@@ -35,14 +35,14 @@ function STOLMCactivateServiceTracker()
  * during the plugin's usage
  */
 
-function STOLMCuninstallServiceTracker()
+function STOLMC_uninstallServiceTracker()
 {
 	STOLMCServiceTrackerUninstall::uninstall();
 }
 
-register_activation_hook(__FILE__, 'STOLMCactivateServiceTracker');
+register_activation_hook(__FILE__, 'STOLMC_activateServiceTracker');
 
-register_uninstall_hook(__FILE__, 'STOLMCuninstallServiceTracker');
+register_uninstall_hook(__FILE__, 'STOLMC_uninstallServiceTracker');
 
 add_action('plugins_loaded', function () {
 	(new STOLMCServiceTracker())->run();
