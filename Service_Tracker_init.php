@@ -20,9 +20,9 @@ defined('WPINC') or die();
 
 require_once plugin_dir_path(__FILE__) . '/vendor/autoload.php';
 
-use ServiceTracker\includes\STOLMCServiceTrackerActivator;
-use ServiceTracker\STOLMCServiceTrackerUninstall;
-use ServiceTracker\includes\STOLMCServiceTracker;
+use STOLMCServiceTracker\includes\STOLMCServiceTrackerActivator;
+use STOLMCServiceTracker\STOLMCServiceTrackerUninstall;
+use STOLMCServiceTracker\includes\STOLMCServiceTracker;
 
 function STOLMC_activateServiceTracker()
 {

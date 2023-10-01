@@ -1,5 +1,5 @@
 <?php
-namespace ServiceTracker\admin;
+namespace STOLMCServiceTracker\admin;
 
 if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 

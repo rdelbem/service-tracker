@@ -1,6 +1,6 @@
 <?php
 
-namespace ServiceTracker\includes;
+namespace STOLMCServiceTracker\includes;
 
 defined('WPINC') or die();
 

@@ -1,17 +1,17 @@
 <?php
-namespace ServiceTracker\includes;
+namespace STOLMCServiceTracker\includes;
 
 if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 
-use ServiceTracker\includes\STOLMCServiceTrackerLoader;
-use ServiceTracker\includes\STOLMCServiceTrackerI18n;
-use ServiceTracker\includes\STOLMCServiceTrackerApiCases;
-use ServiceTracker\includes\STOLMCServiceTrackerApiProgress;
-use ServiceTracker\includes\STOLMCServiceTrackerApiToggle;
-use ServiceTracker\admin\STOLMCServiceTrackerAdmin;
-use ServiceTracker\publics\STOLMCServiceTrackerPublic;
-use ServiceTracker\publics\STOLMCServiceTrackerPublicUserContent;
-use ServiceTracker\includes\STOLMCServiceTrackerPermalinkValidator;
+use STOLMCServiceTracker\includes\STOLMCServiceTrackerLoader;
+use STOLMCServiceTracker\includes\STOLMCServiceTrackerI18n;
+use STOLMCServiceTracker\includes\STOLMCServiceTrackerApiCases;
+use STOLMCServiceTracker\includes\STOLMCServiceTrackerApiProgress;
+use STOLMCServiceTracker\includes\STOLMCServiceTrackerApiToggle;
+use STOLMCServiceTracker\admin\STOLMCServiceTrackerAdmin;
+use STOLMCServiceTracker\publics\STOLMCServiceTrackerPublic;
+use STOLMCServiceTracker\publics\STOLMCServiceTrackerPublicUserContent;
+use STOLMCServiceTracker\includes\STOLMCServiceTrackerPermalinkValidator;
 
 // This must be here, since PSR4 determines that define should not be used in an output file
 define('STOLMC_SERVICE_TRACKER_VERSION', '1.0.0');
