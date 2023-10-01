@@ -6,7 +6,7 @@ $vendorDir = dirname(__DIR__);
 $baseDir = dirname($vendorDir);
 
 return array(
-    'ServiceTracker\\' => array($baseDir . '/'),
+    'STOLMCServiceTracker\\' => array($baseDir . '/'),
     'Rdelbem\\WPMailerClass\\' => array($vendorDir . '/rdelbem/wp-mailer-class/src'),
     'Moment\\' => array($vendorDir . '/fightbulc/moment/src'),
 );

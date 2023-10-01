@@ -1,11 +1,11 @@
 <?php
-namespace ServiceTracker\includes;
+namespace STOLMCServiceTracker\includes;
 
 if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 
-use ServiceTracker\includes\STOLMCServiceTrackerApiContract;
-use ServiceTracker\includes\STOLMCServiceTrackerSql;
-use ServiceTracker\includes\STOLMCServiceTrackerApi;
+use STOLMCServiceTracker\includes\STOLMCServiceTrackerApiContract;
+use STOLMCServiceTracker\includes\STOLMCServiceTrackerSql;
+use STOLMCServiceTracker\includes\STOLMCServiceTrackerApi;
 use \WP_REST_Server;
 use \WP_REST_Request;
 

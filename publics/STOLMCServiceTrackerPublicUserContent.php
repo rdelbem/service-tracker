@@ -1,9 +1,9 @@
 <?php
-namespace ServiceTracker\publics;
+namespace STOLMCServiceTracker\publics;
 
 if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 
-use ServiceTracker\includes\STOLMCServiceTrackerSql;
+use STOLMCServiceTracker\includes\STOLMCServiceTrackerSql;
 use \Moment\Moment;
 use \WP_User;
 

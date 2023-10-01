@@ -9,7 +9,7 @@ class ComposerStaticInita1c3f2669fea2498beb51d23e8edaf17
     public static $prefixLengthsPsr4 = array (
         'S' => 
         array (
-            'ServiceTracker\\' => 15,
+            'STOLMCServiceTracker\\' => 21,
         ),
         'R' => 
         array (
@@ -22,7 +22,7 @@ class ComposerStaticInita1c3f2669fea2498beb51d23e8edaf17
     );
 
     public static $prefixDirsPsr4 = array (
-        'ServiceTracker\\' => 
+        'STOLMCServiceTracker\\' => 
         array (
             0 => __DIR__ . '/../..' . '/',
         ),

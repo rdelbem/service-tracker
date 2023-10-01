@@ -1,14 +1,14 @@
 <?php
-namespace ServiceTracker\includes;
+namespace STOLMCServiceTracker\includes;
 
 if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 
 use \WP_REST_Server;
 use \WP_REST_Request;
 use Rdelbem\WPMailerClass\WPMailerClass;
-use ServiceTracker\includes\STOLMCServiceTrackerApi;
-use ServiceTracker\includes\STOLMCServiceTrackerSql;
-use ServiceTracker\includes\STOLMCServiceTrackerApiContract;
+use STOLMCServiceTracker\includes\STOLMCServiceTrackerApi;
+use STOLMCServiceTracker\includes\STOLMCServiceTrackerSql;
+use STOLMCServiceTracker\includes\STOLMCServiceTrackerApiContract;
 
 /**
  * This class will resolve api calls intended to manipulate the progress table.
