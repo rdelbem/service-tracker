@@ -135,6 +135,14 @@ class STOLMCServiceTrackerAdmin
 		}
 
 		wp_enqueue_script($this->pluginName, plugin_dir_url(__FILE__) . 'js/prod/App.js', array(), $this->version, true);
+
+		// Add type="module" to enable ES module syntax (dynamic imports for code splitting)
+		add_filter('script_loader_tag', function($tag, $handle) {
+			if ($handle === $this->pluginName) {
+				return str_replace('<script ', '<script type="module" ', $tag);
+			}
+			return $tag;
+		}, 10, 2);
 	}
 
 	public function localizeScripts($hook)

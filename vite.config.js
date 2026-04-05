@@ -36,17 +36,33 @@ export default defineConfig(({ mode }) => {
       emptyOutDir: true,
       sourcemap: !isProd,
       minify: isProd,
-      // Enable CSS code splitting so we get a separate CSS file
-      cssCodeSplit: true,
+      // Disable CSS code splitting — all CSS goes into one file for WordPress
+      // JS code splitting via React.lazy() still works
+      cssCodeSplit: false,
+      // Allow code splitting for React.lazy() dynamic imports
       rollupOptions: {
         input: path.resolve(__dirname, "react-app/index.tsx"),
         output: {
-          // Single JS file output
+          // Main entry file name
           entryFileNames: "App.js",
-          // Inline dynamic imports
-          inlineDynamicImports: true,
-          // Manual chunks disabled
-          manualChunks: undefined,
+          // Chunk file names for lazy-loaded components
+          chunkFileNames: "assets/[name]-[hash].js",
+          // Keep CSS in a predictable location
+          assetFileNames: (assetInfo) => {
+            if (assetInfo.name && assetInfo.name.endsWith('.css')) {
+              return 'style.css';
+            }
+            return 'assets/[name]-[hash][extname]';
+          },
+          // Separate vendor libraries into their own chunk
+          manualChunks: (id) => {
+            if (id.includes("node_modules")) {
+              if (id.includes("react-toastify")) return "toastify";
+              if (id.includes("react-icons")) return "icons";
+              if (id.includes("react-textarea-autosize")) return "textarea";
+              return "vendor";
+            }
+          },
         },
       },
     },
