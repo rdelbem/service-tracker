@@ -14,7 +14,7 @@ rimraf package.json
 rimraf package-lock.json
 rimraf README.md
 rimraf prepare-stable.sh
-rimraf webpack.config.js
+rimraf vite.config.js
 rimraf react-app
 rimraf node_modules
 rimraf .github
