@@ -1,14 +1,20 @@
-import React, { useContext } from "react";
+import { useContext } from "react";
 import InViewContext from "../../context/inView/inViewContext";
 import CasesContext from "../../context/cases/casesContext";
+import { User, InViewContextType, CasesContextType } from "../../types";
 
-export default function Client({ id, name, caseCount, activeSince }) {
-  const inViewContext = useContext(InViewContext);
+interface ClientProps extends User {
+  caseCount?: number;
+  activeSince?: string;
+}
+
+export default function Client({ id, name, caseCount, activeSince }: ClientProps) {
+  const inViewContext = useContext(InViewContext) as InViewContextType;
   const { state, updateIdView } = inViewContext;
-  const casesContext = useContext(CasesContext);
+  const casesContext = useContext(CasesContext) as CasesContextType;
   const { getCases } = casesContext;
 
-  const isActive = parseInt(state.userId) === parseInt(id);
+  const isActive = parseInt(String(state.userId)) === parseInt(String(id));
 
   return (
     <div

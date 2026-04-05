@@ -1,16 +1,17 @@
-import React, { useContext, useState, Fragment } from "react";
+import { useContext, useState, Fragment } from "react";
 import { CSSTransition } from "react-transition-group";
 import CasesContext from "../../context/cases/casesContext";
 import InViewContext from "../../context/inView/inViewContext";
 import ProgressContext from "../../context/progress/progressContext";
 import dateformat from "dateformat";
+import type { Case as CaseType, CasesContextType, InViewContextType, ProgressContextType } from "../../types";
 
-export default function Case({ id, id_user, status, created_at, title }) {
-  const casesContext = useContext(CasesContext);
+export default function Case({ id, id_user, status, created_at, title }: CaseType) {
+  const casesContext = useContext(CasesContext) as CasesContextType;
   const { deleteCase, toggleCase, editCase } = casesContext;
-  const inViewContext = useContext(InViewContext);
+  const inViewContext = useContext(InViewContext) as InViewContextType;
   const { updateIdView } = inViewContext;
-  const progressContext = useContext(ProgressContext);
+  const progressContext = useContext(ProgressContext) as ProgressContextType;
   const { getStatus } = progressContext;
   const [editing, setEditing] = useState(false);
   const [newTitle, setNewTitle] = useState("");

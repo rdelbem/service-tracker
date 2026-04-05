@@ -1,13 +1,14 @@
-import React, { Fragment, useContext } from "react";
+import { useContext } from "react";
 import InViewContext from "../../context/inView/inViewContext";
+import { InViewContextType } from "../../types";
 
 export default function Initial() {
-  const inViewContext = useContext(InViewContext);
+  const inViewContext = useContext(InViewContext) as InViewContextType;
   const { state } = inViewContext;
 
   // Required for navigation purposes
   if (state.view !== "init") {
-    return <Fragment></Fragment>;
+    return <></>;
   }
 
   return (

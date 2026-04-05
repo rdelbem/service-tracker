@@ -1,15 +1,17 @@
-import React, { Fragment, useContext, useState } from "react";
+import { useContext, useState } from "react";
 import { CSSTransition } from "react-transition-group";
 import InViewContext from "../../context/inView/inViewContext";
+import { InViewContextType } from "../../types";
 
 export default function HowToUse() {
-  const inViewContext = useContext(InViewContext);
+  const inViewContext = useContext(InViewContext) as InViewContextType;
   const { state } = inViewContext;
+
   const [accordion, setAccordion] = useState(1);
 
   // Required for navigation purposes
   if (state.view !== "howToUse") {
-    return <Fragment></Fragment>;
+    return <></>;
   }
 
   return (

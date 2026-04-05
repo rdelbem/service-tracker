@@ -1,12 +1,13 @@
-import React, { useContext, useState, Fragment } from "react";
+import { useContext, useState, Fragment } from "react";
 import Case from "./Case";
 import CasesContext from "../../context/cases/casesContext";
 import InViewContext from "../../context/inView/inViewContext";
 import Spinner from "../../components/layout/Spinner";
+import { CasesContextType, InViewContextType, Case as CaseType } from "../../types";
 
 export default function Cases() {
-  const inViewContext = useContext(InViewContext);
-  const casesContext = useContext(CasesContext);
+  const inViewContext = useContext(InViewContext) as InViewContextType;
+  const casesContext = useContext(CasesContext) as CasesContextType;
   const { state, postCase, currentUserInDisplay } = casesContext;
   const [caseTitle, setCaseTitle] = useState("");
 
@@ -118,7 +119,7 @@ export default function Cases() {
               onClick={(e) => {
                 e.preventDefault();
                 if (caseTitle.trim() !== "") {
-                  postCase(currentUserInDisplay, caseTitle);
+                  postCase(currentUserInDisplay ?? "", caseTitle);
                   setCaseTitle("");
                 }
               }}
@@ -131,7 +132,7 @@ export default function Cases() {
 
         {/* Cases Grid */}
         <div className="grid grid-cols-1 gap-4">
-          {state.cases.map((item) => (
+          {state.cases.map((item: CaseType) => (
             <Case key={item.id} {...item} />
           ))}
         </div>

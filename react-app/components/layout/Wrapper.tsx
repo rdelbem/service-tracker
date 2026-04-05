@@ -1,18 +1,16 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState, ReactNode } from "react";
 import Sidebar from "./Sidebar";
 
-export default function Wrapper(props) {
-  const [isWpMenuCollapsed, setIsWpMenuCollapsed] = useState(false);
-  const [adminBarHeight, setAdminBarHeight] = useState(32);
+interface WrapperProps {
+  children: ReactNode;
+}
 
-  // Detect WordPress admin menu collapse and admin bar height
+export default function Wrapper({ children }: WrapperProps) {
+  const [_adminBarHeight, setAdminBarHeight] = useState(32);
+
+  // Detect WordPress admin bar height
   useEffect(() => {
     const checkWpState = () => {
-      const body = document.body;
-      const isCollapsed = body.classList.contains('folded');
-      setIsWpMenuCollapsed(isCollapsed);
-
-      // Check if admin bar exists and get its height
       const adminBar = document.getElementById('wpadminbar');
       if (adminBar) {
         setAdminBarHeight(adminBar.offsetHeight || 32);
@@ -31,7 +29,7 @@ export default function Wrapper(props) {
     <div className="flex bg-background">
       <Sidebar />
       <main className="flex-1 flex h-[calc(100vh-32px)]">
-        {props.children}
+        {children}
       </main>
     </div>
   );

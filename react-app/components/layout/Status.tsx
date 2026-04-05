@@ -1,12 +1,13 @@
-import React, { useState, useContext, Fragment } from "react";
-import dateformat from "dateformat";
-import InViewContext from "../../context/inView/inViewContext";
+import { useState, useContext } from "react";
 import ProgressContext from "../../context/progress/progressContext";
 import TextareaAutosize from "react-textarea-autosize";
+import dateformat from "dateformat";
+import { ProgressContextType, Status as StatusType } from "../../types";
 
-export default function Status({ id, id_case, id_user, created_at, text }) {
-  const inViewContext = useContext(InViewContext);
-  const progressContext = useContext(ProgressContext);
+interface StatusProps extends StatusType {}
+
+export default function Status({ id, id_user, created_at, text }: Omit<StatusProps, '_id_case'>) {
+  const progressContext = useContext(ProgressContext) as ProgressContextType;
   const { deleteStatus, editStatus } = progressContext;
   const [editable, setEditable] = useState(false);
   const [editedText, setEditedText] = useState(text);

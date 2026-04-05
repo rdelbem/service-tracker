@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import { useContext } from "react";
 import InViewContext from "../../context/inView/inViewContext";
 
 export default function Sidebar() {

@@ -58,6 +58,48 @@ class STOLMCServiceTrackerAdmin
 		$this->pluginName = $pluginName;
 		$this->version = $version;
 		$this->blockEnqueueBadConfig = $blockEnqueueBadConfig;
+		
+		// Add hooks to remove WordPress admin elements on our page
+		add_action('admin_init', array($this, 'removeWpAdminElements'));
+	}
+
+	/**
+	 * Remove WordPress admin elements from our plugin page
+	 */
+	public function removeWpAdminElements()
+	{
+		if (isset($_GET['page']) && $_GET['page'] === 'service_tracker') {
+			// Remove footer text
+			add_filter('admin_footer_text', '__return_empty_string', 9999);
+			add_filter('update_footer', '__return_empty_string', 9999);
+			
+			// Remove help tabs
+			add_action('admin_head', array($this, 'removeHelpTabs'));
+			
+			// Add custom CSS to hide remaining elements
+			add_action('admin_head', array($this, 'hideWpElements'));
+		}
+	}
+
+	public function removeHelpTabs()
+	{
+		$screen = get_current_screen();
+		$screen->remove_help_tabs();
+	}
+
+	public function hideWpElements()
+	{
+		echo '<style>
+			#wpfooter,
+			#screen-meta-links,
+			#contextual-help-link-wrap,
+			#help-link-wrap {
+				display: none !important;
+			}
+			#wpbody-content {
+				padding-bottom: 0 !important;
+			}
+		</style>';
 	}
 
 	/**

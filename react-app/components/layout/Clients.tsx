@@ -1,11 +1,12 @@
-import React, { useContext } from "react";
+import { useContext } from "react";
 import Client from "./Client";
 import Search from "./Search";
 import ClientsContext from "../../context/clients/clientsContext";
 import Spinner from "./Spinner";
+import { ClientsContextType, User } from "../../types";
 
 export default function Clients() {
-  const clientsContext = useContext(ClientsContext);
+  const clientsContext = useContext(ClientsContext) as ClientsContextType;
   const { state } = clientsContext;
   const clientsArr = [...state.users];
 
@@ -22,8 +23,8 @@ export default function Clients() {
       {/* Client List */}
       <div className="flex-1 overflow-y-auto px-4 space-y-3 pb-8">
         {state.loadingUsers && <Spinner />}
-        {clientsArr.map((client) => (
-          <Client key={client.id} {...client} />
+        {clientsArr.map((client: User) => (
+          <Client key={client.id} {...client} caseCount={0} activeSince={`Active Since ${new Date().getFullYear()}`} />
         ))}
       </div>
     </section>

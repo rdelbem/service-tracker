@@ -1,14 +1,15 @@
-import React, { useState, useContext, Fragment } from "react";
+import { useState, useContext, Fragment } from "react";
 import { CSSTransition } from "react-transition-group";
 import InViewContext from "../../context/inView/inViewContext";
 import ProgressContext from "../../context/progress/progressContext";
 import TextareaAutosize from "react-textarea-autosize";
 import Spinner from "./Spinner";
 import Status from "./Status";
+import { InViewContextType, ProgressContextType } from "../../types";
 
 export default function Progress() {
-  const inViewContext = useContext(InViewContext);
-  const progressContext = useContext(ProgressContext);
+  const inViewContext = useContext(InViewContext) as InViewContextType;
+  const progressContext = useContext(ProgressContext) as ProgressContextType;
   const { state, postStatus } = progressContext;
   const [writingStatus, setWritingStatus] = useState(false);
   const [newText, setNewText] = useState("");

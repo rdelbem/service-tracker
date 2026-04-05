@@ -1,20 +1,25 @@
-import React, { useReducer, useEffect } from "react";
+import { useReducer, useEffect, ReactNode } from "react";
 import AppReducer from "../AppReducer";
-import axios from "axios";
+import { get } from "../../utils/fetch";
 import ClientsContext from "./clientsContext";
 import { GET_USERS } from "../types";
+import type { ClientsState as ClientsStateType, User } from "../types";
 
-export default function ClientsState(props) {
+interface ClientsStateProps {
+  children: ReactNode;
+}
+
+export default function ClientsState({ children }: ClientsStateProps) {
   const api_url_users = data.users_api_url;
 
-  const initialState = {
+  const initialState: ClientsStateType = {
     users: [],
     loadingUsers: true,
   };
 
   const [state, dispatch] = useReducer(AppReducer, initialState);
 
-  const searchUsers = (query) => {
+  const searchUsers = (query: string) => {
     //escape special characters
     const specialChar = /[-!$%^&*()_+|~=`{}\[\]:";'<>?,.\/]/;
     const specialCharRegEx = new RegExp(specialChar, "g");
@@ -24,11 +29,11 @@ export default function ClientsState(props) {
 
     const usersInState = state.users;
     const regex = new RegExp(query, "gi");
-    let foundUsers = [];
+    const foundUsers: User[] = [];
 
-    usersInState.forEach((user, index) => {
+    usersInState.forEach((user: User) => {
       if (regex.test(user.name) && query !== "") {
-        foundUsers.push(usersInState[index]);
+        foundUsers.push(user);
       }
     });
 
@@ -41,7 +46,7 @@ export default function ClientsState(props) {
   };
 
   const getUsers = async () => {
-    const res = await axios.get(api_url_users, {
+    const res = await get(api_url_users, {
       headers: {
         "X-WP-Nonce": data.nonce,
       },
@@ -64,7 +69,7 @@ export default function ClientsState(props) {
         searchUsers,
       }}
     >
-      {props.children}
+      {children}
     </ClientsContext.Provider>
   );
 }

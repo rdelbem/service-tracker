@@ -1,18 +1,19 @@
-import React, { useContext, useReducer } from "react";
-import InViewContext from "../../context/inView/inViewContext";
+import { useReducer, ReactNode } from "react";
 import AppReducer from "../AppReducer";
 import ProgressContext from "./progressContext";
 import { GET_STATUS } from "../types";
 import { toast } from "react-toastify";
-import axios from "axios";
+import { get, post, put, del } from "../../utils/fetch";
 import dateformat from "dateformat";
+import type { ProgressState as ProgressStateType, Status } from "../types";
 
-export default function ProgressState(props) {
-  const inViewContext = useContext(InViewContext);
-  const currentUserInDisplay = inViewContext.state.userId;
-  const currentCaseInDisplay = inViewContext.state.caseId;
+interface ProgressStateProps {
+  children: ReactNode;
+}
 
-  const initialState = {
+export default function ProgressState({ children }: ProgressStateProps) {
+
+  const initialState: ProgressStateType = {
     status: [],
     caseTitle: "",
     loadingStatus: false,
@@ -22,7 +23,7 @@ export default function ProgressState(props) {
   const apiUrlProgress = `${data.root_url}/wp-json/${data.api_url}/progress`;
 
   //onlyFetch means this function will retrieve plain data from api, without state update
-  const getStatus = async (id, onlyFetch, caseTitle) => {
+  const getStatus = async (id: string | number, onlyFetch: boolean, caseTitle?: string): Promise<Status[] | void> => {
     try {
       if (!onlyFetch) {
         dispatch({
@@ -35,7 +36,7 @@ export default function ProgressState(props) {
         });
       }
 
-      const res = await axios.get(`${apiUrlProgress}/${id}`, {
+      const res = await get(`${apiUrlProgress}/${id}`, {
         headers: {
           "X-WP-Nonce": data.nonce,
         },
@@ -51,18 +52,14 @@ export default function ProgressState(props) {
           },
         });
       }
+
       return res.data;
     } catch (error) {
-      alert(data.alert_error_base + error);
+      console.log(error);
     }
   };
 
-  const postStatus = async (id_user, id_case, text) => {
-    if (text === "") {
-      alert(data.alert_blank_status_title);
-      return;
-    }
-
+  const postStatus = async (id_user: string | number, id_case: string | number, text: string): Promise<void> => {
     const dataToPost = {
       id_user,
       id_case,
@@ -70,7 +67,7 @@ export default function ProgressState(props) {
     };
 
     try {
-      const postStatus = await axios.post(
+      await post(
         `${apiUrlProgress}/${id_case}`,
         dataToPost,
         {
@@ -81,11 +78,10 @@ export default function ProgressState(props) {
         }
       );
 
-      console.log(postStatus);
+      const getAllStatus = await getStatus(id_case, true, state.caseTitle);
+      const statusArray = Array.isArray(getAllStatus) ? getAllStatus : [];
 
-      const getAllStatus = await getStatus(id_case, true);
-
-      const { id, created_at } = getAllStatus[getAllStatus.length - 1];
+      const { id, created_at } = statusArray[statusArray.length - 1];
 
       const newStatus = {
         id: id,
@@ -94,15 +90,15 @@ export default function ProgressState(props) {
         created_at: created_at,
         text: text,
       };
-
-      const newStatuses = [...state.status, newStatus];
+      let currentStatus = state.status;
+      let newStatusArray = [...currentStatus, newStatus];
 
       dispatch({
         type: GET_STATUS,
         payload: {
-          status: newStatuses,
+          status: newStatusArray,
           caseTitle: state.caseTitle,
-          loadingCases: state.loadingCases,
+          loadingStatus: false,
         },
       });
 
@@ -120,19 +116,24 @@ export default function ProgressState(props) {
     }
   };
 
-  const deleteStatus = async (id, createdAt) => {
-    const confirm = window.confirm(
-      data.confirm_delete_status +
-        " " +
-        dateformat(createdAt, "dd/mm/yyyy, HH:MM") +
-        "?"
+  const deleteStatus = async (id: string | number, createdAt: string): Promise<void> => {
+    const status = [...state.status];
+
+    const sureToDelete = confirm(
+      `Are you sure you want to delete status from ${dateformat(createdAt, "dd/mm/yyyy, HH:MM")}?`
     );
-    if (!confirm) return;
+
+    if (!sureToDelete) return;
 
     try {
-      const status = state.status;
-      const filteredStatuses = status.filter((status) => {
-        return status.id !== id;
+      await del(`${apiUrlProgress}/${id}`, {
+        headers: {
+          "X-WP-Nonce": data.nonce,
+        },
+      });
+
+      const filteredStatuses = status.filter((status: Status) => {
+        return dateformat(status.created_at, "dd/mm/yyyy, HH:MM") !== dateformat(createdAt, "dd/mm/yyyy, HH:MM");
       });
 
       dispatch({
@@ -140,11 +141,11 @@ export default function ProgressState(props) {
         payload: {
           status: filteredStatuses,
           caseTitle: state.caseTitle,
-          loadingStatus: state.loadingStatus,
+          loadingStatus: false,
         },
       });
 
-      toast.warn(data.toast_status_deleted, {
+      toast.success(data.toast_status_deleted, {
         position: "bottom-right",
         autoClose: 5000,
         hideProgressBar: true,
@@ -153,39 +154,40 @@ export default function ProgressState(props) {
         draggable: true,
         progress: undefined,
       });
-
-      const deleteStatus = await axios.delete(`${apiUrlProgress}/${id}`, {
-        headers: {
-          "X-WP-Nonce": data.nonce,
-        },
-      });
     } catch (error) {
       alert(data.alert_error_base + error);
     }
   };
 
-  const editStatus = async (id, id_user, newText) => {
+  const editStatus = async (id: string | number, _id_user: string | number, newText: string): Promise<void> => {
     if (newText === "") {
       alert(data.alert_blank_status_title);
       return;
     }
 
-    const editedObj = JSON.stringify({ id: id, text: newText });
+    const editedObj = { text: newText };
 
     try {
-      const statuses = [...state.status];
-      statuses.forEach((item) => {
-        if (item.id === id) {
-          item.text = newText;
+      await put(`${apiUrlProgress}/${id}`, editedObj, {
+        headers: {
+          "X-WP-Nonce": data.nonce,
+          "Content-type": "application/json",
+        },
+      });
+
+      const newStatuses = state.status.map((status: Status) => {
+        if (status.id === id) {
+          return { ...status, text: newText };
         }
+        return status;
       });
 
       dispatch({
         type: GET_STATUS,
         payload: {
-          status: statuses,
+          status: newStatuses,
           caseTitle: state.caseTitle,
-          loadingStatus: state.loadingStatus,
+          loadingStatus: false,
         },
       });
 
@@ -197,13 +199,6 @@ export default function ProgressState(props) {
         pauseOnHover: true,
         draggable: true,
         progress: undefined,
-      });
-
-      const update = await axios.put(`${apiUrlProgress}/${id}`, editedObj, {
-        headers: {
-          "X-WP-Nonce": data.nonce,
-          "Content-type": "application/json",
-        },
       });
     } catch (error) {
       alert(data.alert_error_base + error);
@@ -220,7 +215,7 @@ export default function ProgressState(props) {
         editStatus,
       }}
     >
-      {props.children}
+      {children}
     </ProgressContext.Provider>
   );
 }

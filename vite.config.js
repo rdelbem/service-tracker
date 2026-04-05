@@ -1,5 +1,5 @@
 import { defineConfig } from "vite";
-import react from "@vitejs/plugin-react";
+import react from "@vitejs/plugin-react-swc";
 import path from "path";
 
 /**
@@ -21,7 +21,7 @@ export default defineConfig(({ mode }) => {
     plugins: [
       react({
         // Use classic JSX runtime (React.createElement)
-        jsxRuntime: "classic",
+        jsx: "classic",
       }),
     ],
     server: {
@@ -39,7 +39,7 @@ export default defineConfig(({ mode }) => {
       // Enable CSS code splitting so we get a separate CSS file
       cssCodeSplit: true,
       rollupOptions: {
-        input: path.resolve(__dirname, "react-app/index.jsx"),
+        input: path.resolve(__dirname, "react-app/index.tsx"),
         output: {
           // Single JS file output
           entryFileNames: "App.js",

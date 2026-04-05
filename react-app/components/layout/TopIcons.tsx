@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import { useContext } from "react";
 import { AiOutlineHome, AiOutlineTool } from "react-icons/ai";
 import InViewContext from "../../context/inView/inViewContext";
 
