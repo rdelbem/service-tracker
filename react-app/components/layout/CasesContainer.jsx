@@ -1,5 +1,9 @@
 import React from "react";
 
 export default function CasesContainer(props) {
-  return <div className="cases-container">{props.children}</div>;
+  return (
+    <section className="flex-1 relative h-full overflow-hidden">
+      {props.children}
+    </section>
+  );
 }

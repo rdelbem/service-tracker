@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Case Progress - Client Portal</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "primary": "#0c1427",
+                    "on-primary": "#ffffff",
+                    "primary-fixed-dim": "#bec6e0",
+                    "primary-container": "#21283c",
+                    "outline": "#75777d",
+                    "on-primary-fixed": "#131b2e",
+                    "secondary": "#006c49",
+                    "tertiary-fixed-dim": "#ffb95f",
+                    "surface-variant": "#d3e4fe",
+                    "surface-dim": "#cbdbf5",
+                    "on-tertiary-fixed-variant": "#653e00",
+                    "on-secondary-fixed-variant": "#005236",
+                    "on-primary-container": "#888fa7",
+                    "secondary-fixed": "#6ffbbe",
+                    "inverse-on-surface": "#eaf1ff",
+                    "on-error": "#ffffff",
+                    "surface-container-high": "#dce9ff",
+                    "on-secondary-container": "#00714d",
+                    "inverse-surface": "#213145",
+                    "tertiary-container": "#3c2300",
+                    "surface-tint": "#565e74",
+                    "error-container": "#ffdad6",
+                    "secondary-container": "#6cf8bb",
+                    "on-background": "#0b1c30",
+                    "secondary-fixed-dim": "#4edea3",
+                    "outline-variant": "#c5c6cd",
+                    "on-tertiary-container": "#c88000",
+                    "on-surface-variant": "#45474c",
+                    "surface-bright": "#f8f9ff",
+                    "on-error-container": "#93000a",
+                    "tertiary": "#201100",
+                    "tertiary-fixed": "#ffddb8",
+                    "surface-container-lowest": "#ffffff",
+                    "on-tertiary": "#ffffff",
+                    "primary-fixed": "#dae2fd",
+                    "on-primary-fixed-variant": "#3f465c",
+                    "on-surface": "#0b1c30",
+                    "inverse-primary": "#bec6e0",
+                    "on-secondary-fixed": "#002113",
+                    "surface-container": "#e5eeff",
+                    "on-secondary": "#ffffff",
+                    "on-tertiary-fixed": "#2a1700",
+                    "error": "#ba1a1a",
+                    "surface-container-highest": "#d3e4fe",
+                    "background": "#f8f9ff",
+                    "surface-container-low": "#eff4ff",
+                    "surface": "#f8f9ff"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "fontFamily": {
+                    "headline": ["Manrope"],
+                    "body": ["Inter"],
+                    "label": ["Inter"]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .tonal-shift-bottom {
+            background: linear-gradient(to bottom, #ffffff 0%, #f8f9ff 100%);
+        }
+    </style>
+</head>
+<body class="bg-background font-body text-on-surface antialiased">
+<!-- TopNavBar -->
+<header class="fixed top-0 w-full z-50 bg-white/80 backdrop-blur-md shadow-sm">
+<div class="flex justify-between items-center h-16 px-8 max-w-full mx-auto">
+<div class="flex items-center gap-8">
+<span class="text-lg font-bold text-slate-900 tracking-tight">Client Portal</span>
+<nav class="hidden md:flex items-center gap-6 text-sm font-['Manrope']">
+<a class="text-slate-500 hover:text-slate-900 transition-all" href="#">Overview</a>
+<a class="text-slate-900 font-bold border-b-2 border-slate-900 pb-1" href="#">My Cases</a>
+<a class="text-slate-500 hover:text-slate-900 transition-all" href="#">Documents</a>
+<a class="text-slate-500 hover:text-slate-900 transition-all" href="#">Messages</a>
+</nav>
+</div>
+<div class="flex items-center gap-6">
+<div class="hidden lg:flex items-center bg-surface-container-low px-4 py-2 rounded-full border-outline-variant/20 border">
+<span class="material-symbols-outlined text-outline text-sm">search</span>
+<input class="bg-transparent border-none focus:ring-0 text-sm ml-2 w-48" placeholder="Search activities..." type="text"/>
+</div>
+<button class="bg-primary hover:opacity-90 text-on-primary px-5 py-2 rounded-xl text-sm font-semibold transition-all active:scale-95">
+                    New Request
+                </button>
+<div class="w-8 h-8 rounded-full overflow-hidden bg-surface-container-high border border-outline-variant/30">
+<img alt="Customer Profile" data-alt="Close up portrait of a smiling professional man with neat hair and soft natural lighting in a corporate environment" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCC-UkuqBCo4oH22AP94cIgB4aBtMes3D5IHaKWJDIpUzqNvUTK6FHUqlm-T_7jKGes85bRHBiCdDTctC5TmeETD9KTysWEkzZa_mpRXDb-Dba74YJ9_Kj_78FEyR3YOmNGlRDlOCez-gAgBNzQE1v8F9PvfPtP6SRCEr3-uJEOvkoGUzofVvnozKAyuGyfY6UunCXkXKpCtPIZEaSKAb0wz9u2C0d0BTRSRzooFN1w_Qg2CDbSHi_XpOmSiSUToiE6AWCZZtM1laXg"/>
+</div>
+</div>
+</div>
+</header>
+<main class="pt-24 pb-16 px-8 max-w-[1440px] mx-auto">
+<!-- Case Header -->
+<div class="mb-12 flex flex-col md:flex-row md:items-end justify-between gap-6">
+<div>
+<nav class="flex items-center gap-2 text-on-surface-variant mb-4">
+<span class="label-sm font-bold tracking-widest text-[10px] uppercase">Case ID: #ARC-98221</span>
+<span class="w-1 h-1 rounded-full bg-outline-variant"></span>
+<span class="label-sm font-bold tracking-widest text-[10px] uppercase text-secondary">In Construction</span>
+</nav>
+<h1 class="text-4xl font-headline font-extrabold tracking-tighter text-primary">Urban Loft Renovation</h1>
+<p class="text-on-surface-variant mt-2 max-w-2xl">Structural modifications and interior reimagining for the 4th-floor residence at 882 Pearl St. All permits secured as of March 12.</p>
+</div>
+<div class="flex gap-3">
+<button class="flex items-center gap-2 px-4 py-2.5 bg-surface-container-lowest text-primary rounded-xl border border-outline-variant/20 font-semibold text-sm hover:bg-surface-container-low transition-colors">
+<span class="material-symbols-outlined text-lg">download</span>
+                    Full Project Specs
+                </button>
+<button class="flex items-center gap-2 px-4 py-2.5 bg-surface-container-lowest text-primary rounded-xl border border-outline-variant/20 font-semibold text-sm hover:bg-surface-container-low transition-colors">
+<span class="material-symbols-outlined text-lg">share</span>
+</button>
+</div>
+</div>
+<div class="grid grid-cols-12 gap-10">
+<!-- Left: Timeline -->
+<div class="col-span-12 lg:col-span-8">
+<div class="bg-surface-container-low rounded-xl p-10 relative overflow-hidden">
+<div class="relative">
+<!-- Vertical Line -->
+<div class="absolute left-[23px] top-4 bottom-4 w-px bg-outline-variant/30"></div>
+<div class="space-y-12 relative">
+<!-- Timeline Item: Active -->
+<div class="flex gap-8 group">
+<div class="relative z-10">
+<div class="w-12 h-12 rounded-full bg-secondary-container flex items-center justify-center text-on-secondary-container shadow-sm ring-4 ring-background">
+<span class="material-symbols-outlined font-bold">handyman</span>
+</div>
+</div>
+<div class="flex-1 pt-1">
+<div class="flex justify-between items-start mb-2">
+<h3 class="text-xl font-headline font-bold text-primary">Phase 3: Initial Demolition</h3>
+<span class="text-xs font-bold font-label text-secondary uppercase tracking-widest bg-secondary-container/40 px-3 py-1 rounded-full">In Progress</span>
+</div>
+<p class="text-on-surface-variant leading-relaxed">Internal non-load-bearing walls are being removed. Safety inspections for the HVAC rerouting scheduled for Thursday morning.</p>
+<div class="mt-4 flex gap-4">
+<div class="w-24 h-24 rounded-lg overflow-hidden border border-outline-variant/20">
+<img alt="Demo site" data-alt="Interior construction site with exposed concrete walls, scaffolding, and tools in a well-lit loft space" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAwakubIFS2Q6ilgku73ERLrGm1enBZP7Cb8WY9r_dbmfB8SWXKypF8BM2h74GW4D3-dbybNVCXOvl-AsGNNA-ATVuH-JHF0WTYjkPBawNln7FpH5dzOPIUJNnUA2_5qaQ7XZ7k-8XZMetABreeFNgngsEe4fJDnd4Jfz7nqRyNNJZNLY31jC2R7HP84Gy1Qtsmf5VF8tH_WHfNCGfF0DZI_a4y_SOPohbkp9xgH8mmOTpnSZnCEvXUEPAghQg00OMgd4veRPwBh1Ww"/>
+</div>
+<div class="w-24 h-24 rounded-lg overflow-hidden border border-outline-variant/20">
+<img alt="Demo site detail" data-alt="Close up of structural blueprint lying on a wooden surface with construction dust and natural lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC3FmFz6qAEyLQX_GjXE9wo3-ve6Dh9GwrUuP8jW7lmuqfve7xC4WonKCAocbqK5klp20i7pnOZpfxzmweBkEzmZZTjAD_8uDC__ZAZCpSMyuVl1GlcdbExb9YGP_IFj2rgCUDnAP-rcpsd_NWWJ_IF1rMD5NgMWs2sNCWZKS2ia4JfpFbXfNEDkrkVcfFUEjbDOK31pRreK5T3991HwIG5kbz0FhI1x1KzIbqKEvrZ0TKfS4mOj_hmcDsOYWQpH0ABQNsk2K_EaG8I"/>
+</div>
+</div>
+<div class="mt-4 text-[11px] font-bold text-outline uppercase tracking-wider">Today, 09:42 AM</div>
+</div>
+</div>
+<!-- Timeline Item: Completed -->
+<div class="flex gap-8">
+<div class="relative z-10">
+<div class="w-12 h-12 rounded-full bg-surface-container-lowest flex items-center justify-center text-secondary border border-outline-variant/30 ring-4 ring-background">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</div>
+</div>
+<div class="flex-1 pt-1 opacity-80 hover:opacity-100 transition-opacity">
+<div class="flex justify-between items-start mb-2">
+<h3 class="text-xl font-headline font-bold text-primary">Permit Approval Received</h3>
+<span class="text-xs font-bold font-label text-outline uppercase tracking-widest bg-surface-dim/40 px-3 py-1 rounded-full">Completed</span>
+</div>
+<p class="text-on-surface-variant leading-relaxed">City Planning Department has approved all structural modifications and seismic upgrades for the LOFT project. Documentation uploaded.</p>
+<div class="mt-4 text-[11px] font-bold text-outline uppercase tracking-wider">March 12, 2024, 02:15 PM</div>
+</div>
+</div>
+<!-- Timeline Item: Completed -->
+<div class="flex gap-8">
+<div class="relative z-10">
+<div class="w-12 h-12 rounded-full bg-surface-container-lowest flex items-center justify-center text-secondary border border-outline-variant/30 ring-4 ring-background">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</div>
+</div>
+<div class="flex-1 pt-1 opacity-80 hover:opacity-100 transition-opacity">
+<div class="flex justify-between items-start mb-2">
+<h3 class="text-xl font-headline font-bold text-primary">Final Design Sign-off</h3>
+<span class="text-xs font-bold font-label text-outline uppercase tracking-widest bg-surface-dim/40 px-3 py-1 rounded-full">Completed</span>
+</div>
+<p class="text-on-surface-variant leading-relaxed">Client approved the final material board and lighting layout. Cabinetry orders have been placed with lead times confirmed.</p>
+<div class="mt-4 text-[11px] font-bold text-outline uppercase tracking-wider">February 28, 2024, 11:30 AM</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Right: Summary Sidebar -->
+<div class="col-span-12 lg:col-span-4 space-y-8">
+<!-- Status Card -->
+<div class="bg-surface-container-lowest p-8 rounded-xl shadow-[0px_12px_32px_rgba(11,28,48,0.06)]">
+<h4 class="text-[10px] font-bold uppercase tracking-[0.2em] text-outline mb-6">Current Standing</h4>
+<div class="space-y-6">
+<div>
+<div class="flex justify-between items-end mb-2">
+<span class="text-sm font-semibold text-primary">Overall Progress</span>
+<span class="text-2xl font-headline font-black text-primary">38%</span>
+</div>
+<div class="w-full h-2 bg-surface-container rounded-full overflow-hidden">
+<div class="h-full bg-gradient-to-r from-primary to-primary-container w-[38%] rounded-full"></div>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-4 pt-4">
+<div class="p-4 bg-background rounded-lg border border-outline-variant/10">
+<div class="text-[10px] font-bold text-outline-variant uppercase mb-1">Days Active</div>
+<div class="text-xl font-headline font-bold text-primary">42</div>
+</div>
+<div class="p-4 bg-background rounded-lg border border-outline-variant/10">
+<div class="text-[10px] font-bold text-outline-variant uppercase mb-1">Updates</div>
+<div class="text-xl font-headline font-bold text-primary">12</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Provider Card -->
+<div class="bg-surface-container-lowest p-8 rounded-xl shadow-[0px_12px_32px_rgba(11,28,48,0.06)] border-l-4 border-secondary">
+<h4 class="text-[10px] font-bold uppercase tracking-[0.2em] text-outline mb-6">Lead Architect</h4>
+<div class="flex items-center gap-5 mb-8">
+<div class="w-16 h-16 rounded-full overflow-hidden bg-primary-fixed border-4 border-surface-container-low">
+<img alt="Architect Profile" data-alt="Close-up of an architect in a black sweater, glasses, with a sharp look and soft studio lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD6WsS8-lLsOfNSHxrXWPDW386kvXfwKZ6K-TSpcppkrx_zgZx-07xbsNfkmNCw-oTBlUsHrMaTbcmiIW4KArU43NgQky5uKwjitZwTbNBVNpKioOWxx9rVexd8d9EWk88PE45EnhuvsESzBzVd2yXZ1hcvlHlnW7qxGGngljucBUfOGnTwZeZQA7ZR6_CSiuNONVT8PmKfjuBxnBKAwa9_Eknsw7P1QFuIzqtMwe5UYeJYMqrK9frcuMohKd456dom022kbW0CMiK3"/>
+</div>
+<div>
+<div class="text-lg font-headline font-extrabold text-primary">David St. James</div>
+<div class="text-sm text-secondary font-semibold">Senior Project Lead</div>
+</div>
+</div>
+<div class="space-y-4">
+<button class="w-full flex items-center justify-center gap-3 bg-primary text-on-primary py-3 rounded-xl font-bold text-sm hover:opacity-90 active:scale-95 transition-all">
+<span class="material-symbols-outlined text-lg">chat_bubble</span>
+                            Send Direct Message
+                        </button>
+<button class="w-full flex items-center justify-center gap-3 bg-surface-container-low text-primary py-3 rounded-xl font-bold text-sm hover:bg-surface-container-high transition-all">
+<span class="material-symbols-outlined text-lg">event</span>
+                            Schedule Consultation
+                        </button>
+</div>
+<div class="mt-8 pt-6 border-t border-outline-variant/20">
+<div class="flex items-center gap-3 text-sm text-on-surface-variant">
+<span class="material-symbols-outlined text-base">verified</span>
+<span>Licence: #ARC-2993-NY</span>
+</div>
+<div class="flex items-center gap-3 text-sm text-on-surface-variant mt-2">
+<span class="material-symbols-outlined text-base">schedule</span>
+<span>Available: Mon - Fri, 9 - 5</span>
+</div>
+</div>
+</div>
+<!-- Quick Files -->
+<div class="bg-surface-container-low/50 p-8 rounded-xl border border-outline-variant/10">
+<h4 class="text-[10px] font-bold uppercase tracking-[0.2em] text-outline mb-6">Recent Documents</h4>
+<div class="space-y-3">
+<div class="flex items-center justify-between group cursor-pointer">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary-container">description</span>
+<span class="text-sm font-semibold text-primary group-hover:text-secondary transition-colors">Lighting_Layout_v2.pdf</span>
+</div>
+<span class="text-[10px] font-bold text-outline-variant">2.4 MB</span>
+</div>
+<div class="flex items-center justify-between group cursor-pointer">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary-container">picture_as_pdf</span>
+<span class="text-sm font-semibold text-primary group-hover:text-secondary transition-colors">Permit_A_102.pdf</span>
+</div>
+<span class="text-[10px] font-bold text-outline-variant">1.1 MB</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+</body></html>

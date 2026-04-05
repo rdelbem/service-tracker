@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Service Nexus | Admin Dashboard</title>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Google Fonts: Manrope & Inter -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Manrope:wght@700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                "primary": "#0c1427",
+                "on-primary": "#ffffff",
+                "primary-fixed-dim": "#bec6e0",
+                "primary-container": "#21283c",
+                "outline": "#75777d",
+                "on-primary-fixed": "#131b2e",
+                "secondary": "#006c49",
+                "tertiary-fixed-dim": "#ffb95f",
+                "surface-variant": "#d3e4fe",
+                "surface-dim": "#cbdbf5",
+                "on-tertiary-fixed-variant": "#653e00",
+                "on-secondary-fixed-variant": "#005236",
+                "on-primary-container": "#888fa7",
+                "secondary-fixed": "#6ffbbe",
+                "inverse-on-surface": "#eaf1ff",
+                "on-error": "#ffffff",
+                "surface-container-high": "#dce9ff",
+                "on-secondary-container": "#00714d",
+                "inverse-surface": "#213145",
+                "tertiary-container": "#3c2300",
+                "surface-tint": "#565e74",
+                "error-container": "#ffdad6",
+                "secondary-container": "#6cf8bb",
+                "on-background": "#0b1c30",
+                "secondary-fixed-dim": "#4edea3",
+                "outline-variant": "#c5c6cd",
+                "on-tertiary-container": "#c88000",
+                "on-surface-variant": "#45474c",
+                "surface-bright": "#f8f9ff",
+                "on-error-container": "#93000a",
+                "tertiary": "#201100",
+                "tertiary-fixed": "#ffddb8",
+                "surface-container-lowest": "#ffffff",
+                "on-tertiary": "#ffffff",
+                "primary-fixed": "#dae2fd",
+                "on-primary-fixed-variant": "#3f465c",
+                "on-surface": "#0b1c30",
+                "inverse-primary": "#bec6e0",
+                "on-secondary-fixed": "#002113",
+                "surface-container": "#e5eeff",
+                "on-secondary": "#ffffff",
+                "on-tertiary-fixed": "#2a1700",
+                "error": "#ba1a1a",
+                "surface-container-highest": "#d3e4fe",
+                "background": "#f8f9ff",
+                "surface-container-low": "#eff4ff",
+                "surface": "#f8f9ff"
+            },
+            "borderRadius": {
+                "DEFAULT": "0.125rem",
+                "lg": "0.25rem",
+                "xl": "0.5rem",
+                "full": "0.75rem"
+            },
+            "fontFamily": {
+                "headline": ["Manrope"],
+                "body": ["Inter"],
+                "label": ["Inter"]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .tonal-shift {
+            background-color: #eff4ff;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8f9ff;
+            color: #0b1c30;
+        }
+        h1, h2, h3, .brand-font {
+            font-family: 'Manrope', sans-serif;
+        }
+    </style>
+</head>
+<body class="flex min-h-screen">
+<!-- SideNavBar (Shared Component JSON) -->
+<aside class="fixed left-0 top-0 h-full flex flex-col py-8 px-4 h-screen w-64 border-r-0 bg-slate-50/80 dark:bg-slate-950/80 backdrop-blur-xl shadow-[12px_0_32px_rgba(11,28,48,0.06)] z-50">
+<div class="mb-10 px-4">
+<h1 class="text-xl font-black text-slate-900 dark:text-slate-50 tracking-tighter uppercase">Service Nexus</h1>
+<p class="font-['Manrope'] font-semibold tracking-tight text-xs text-slate-500 uppercase mt-1">Administrator</p>
+</div>
+<nav class="flex-1 space-y-1">
+<!-- Dashboard (Inactive) -->
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl transition-colors hover:bg-slate-200/50 dark:hover:bg-slate-800/50 text-slate-500 dark:text-slate-400 font-medium" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="font-['Manrope'] font-semibold tracking-tight">Dashboard</span>
+</a>
+<!-- Clients (Active - Closest match for Client List/Search) -->
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl transition-colors text-slate-900 dark:text-white font-bold border-r-2 border-slate-900 dark:border-slate-50 bg-slate-200/50 dark:bg-slate-800/50" href="#">
+<span class="material-symbols-outlined" data-icon="group" style="font-variation-settings: 'FILL' 1;">group</span>
+<span class="font-['Manrope'] font-semibold tracking-tight">Clients</span>
+</a>
+<!-- Cases (Inactive) -->
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl transition-colors hover:bg-slate-200/50 dark:hover:bg-slate-800/50 text-slate-500 dark:text-slate-400 font-medium" href="#">
+<span class="material-symbols-outlined" data-icon="folder_open">folder_open</span>
+<span class="font-['Manrope'] font-semibold tracking-tight">Cases</span>
+</a>
+<!-- Calendar (Inactive) -->
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl transition-colors hover:bg-slate-200/50 dark:hover:bg-slate-800/50 text-slate-500 dark:text-slate-400 font-medium" href="#">
+<span class="material-symbols-outlined" data-icon="event">event</span>
+<span class="font-['Manrope'] font-semibold tracking-tight">Calendar</span>
+</a>
+<!-- Analytics (Inactive) -->
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl transition-colors hover:bg-slate-200/50 dark:hover:bg-slate-800/50 text-slate-500 dark:text-slate-400 font-medium" href="#">
+<span class="material-symbols-outlined" data-icon="analytics">analytics</span>
+<span class="font-['Manrope'] font-semibold tracking-tight">Analytics</span>
+</a>
+</nav>
+<div class="mt-auto border-t border-slate-200/50 pt-6 space-y-1">
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl transition-colors hover:bg-slate-200/50 dark:hover:bg-slate-800/50 text-slate-500 dark:text-slate-400 font-medium" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span class="font-['Manrope'] font-semibold tracking-tight">Settings</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl transition-colors hover:bg-slate-200/50 dark:hover:bg-slate-800/50 text-slate-500 dark:text-slate-400 font-medium" href="#">
+<span class="material-symbols-outlined" data-icon="help_outline">help_outline</span>
+<span class="font-['Manrope'] font-semibold tracking-tight">Support</span>
+</a>
+<div class="flex items-center gap-3 px-4 py-4 mt-4">
+<img alt="Admin Avatar" class="w-10 h-10 rounded-full object-cover ring-2 ring-white" data-alt="professional portrait of a male administrator in a light blue studio setting with minimalist aesthetic" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBA0bj096FyW9WKG5pyUaMAE5ZM2dR42dPhZ_x0DR0va7y3bY-mr3PTUBHMCVww5p66-FuoxSVGBZdYRRrSzjtQZptAorxgJs-jcCFqrEgu7RueqDR5vQKhs42YTXZ_JQL_y6r_zMZ5-Y0oQbNT9NkRJsaiz3k7CetNmB9-U-RpcLoF-62SHzx2C7B0jECbGI8DCDPg6yqlNKk-F0tFz0CpfhjAW1nJ78Q_LR4s3_yitndFQLl-7Xxd-sur_TDDZZH-TNMa7zqYsZTN"/>
+<div class="overflow-hidden">
+<p class="text-sm font-bold text-slate-900 truncate">Alex Sterling</p>
+<p class="text-[10px] text-slate-500 uppercase tracking-widest">Master Admin</p>
+</div>
+</div>
+</div>
+</aside>
+<!-- Main Canvas -->
+<main class="ml-64 flex-1 flex h-screen overflow-hidden">
+<!-- Left Column: Searchable Client List -->
+<section class="w-[380px] bg-surface-container-low flex flex-col border-r border-outline-variant/10">
+<div class="p-8">
+<h2 class="text-2xl font-black text-on-surface tracking-tighter mb-6">Clients</h2>
+<div class="relative group">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline text-sm" data-icon="search">search</span>
+<input class="w-full bg-surface-container-lowest border-0 rounded-xl py-3 pl-10 pr-4 text-sm focus:ring-2 focus:ring-primary/10 transition-all placeholder:text-outline-variant" placeholder="Search accounts..." type="text"/>
+</div>
+</div>
+<div class="flex-1 overflow-y-auto px-4 space-y-3 pb-8">
+<!-- Client Card 1 -->
+<div class="group cursor-pointer p-4 rounded-xl bg-surface-container-lowest shadow-[0px_12px_32px_rgba(11,28,48,0.06)] transition-all hover:bg-surface-container-high border-l-4 border-primary">
+<div class="flex items-center gap-4">
+<img alt="Sarah Jenkins" class="w-12 h-12 rounded-xl object-cover shadow-sm" data-alt="portrait of a young professional woman smiling warmly in soft daylight with natural background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAJr5uE0wsaBKqXjhgv4eAoQAp2Dlpo6cKI9DFCLQHbeJNJ9Ot_HHjpQknXG8_Bb08yM-qvVko-pFRxPn31aNueA3div7L2rVmZEutvMrCcxZ42S5u293QZqxgpL4UNzU-SYGlLr1jWjR-FjMcxrXHJ7qfBvXiwrZpeEuUjGCq9hDXjMjKUGEEjsonifSWBK1_dqbhEuIAM3g2W3-2XZWzLZzQdBuPD_WHiasgEiBZFFkZShfpSSV7X0d_o58tsyGoctZ6mYnCVUtRi"/>
+<div class="flex-1">
+<h3 class="text-sm font-bold text-on-surface">Sarah Jenkins</h3>
+<p class="text-[10px] text-on-surface-variant/70 uppercase tracking-wider font-semibold">Active Since Oct 2023</p>
+</div>
+<div class="text-right">
+<span class="block text-xs font-black text-primary">12</span>
+<span class="block text-[8px] uppercase tracking-tighter text-outline">Cases</span>
+</div>
+</div>
+</div></div></section>
+<!-- Client Card 2 -->
+<div class="group cursor-pointer p-4 rounded-xl transition-all hover:bg-surface-container-high/50">
+<div class="flex items-center gap-4">
+<img alt="Marcus Vane" class="w-12 h-12 rounded-xl object-cover grayscale opacity-80" data-alt="headshot of a stylish man with beard in high-end studio lighting, soft charcoal background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBgtHK7NW-8Y0cHq3H0OpjuaW7C1N2QmbsCv-bgDPY5VyLqc8XqJTD0a0fcHQ9b_2OKtnDos9EtNry1rOH9_4MClq-pPEC76dVxtqcB7rxzVR_dL5P_lQtiQTa713B9yhh8e-BB632a4VTRPnLYiG-LZ1u3O5KisyYTFAB1I7sD_y7xb3Uavm0a0mALTTxvpzlZhdaw4ijBNfTnYBtKHJJeDz4NuvDkmOi3w6zdFb6WPLIEpHoegLr4JX25QS1eCxMnlCsdW_vTm4ix"/>
+<div class="flex-1">
+<h3 class="text-sm font-bold text-on-surface">Marcus Vane</h3>
+<p class="text-[10px] text-on-surface-variant/70 uppercase tracking-wider font-semibold">Last seen 2h ago</p>
+</div>
+<div class="text-right">
+<span class="block text-xs font-black text-on-surface-variant">4</span>
+<span class="block text-[8px] uppercase tracking-tighter text-outline">Cases</span>
+</div>
+</div>
+</div>
+<!-- Client Card 3 -->
+<div class="group cursor-pointer p-4 rounded-xl transition-all hover:bg-surface-container-high/50">
+<div class="flex items-center gap-4">
+<img alt="Elena Rodriguez" class="w-12 h-12 rounded-xl object-cover grayscale opacity-80" data-alt="professional woman in modern office setting with blurred architectural background, bright and airy lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBiHYWQqxH2whI2Uwl7RiQRpMlJX25tVFTWaFc5TDbcjThykEK5gn6Amiu0PVgFkB0NJPN78HAWZzqgha5Aa63HmF_ch7lcVma0FQLouKnwFSbRQR4yI9pI3z2D2AJa5Yvm7KtizLAVB6m7SGgEXudvn9O3KwQhPmFV_ygid6jSnfwatHvBAIREcaU8AK2KkDH3FOAiIWwo_4ve1ANW1BqWYHY7gUKwQgxvfCH7wi2AMPtml43T8-lLwEPOC1AeCVZ8Cpq63j-_WkGP"/>
+<div class="flex-1">
+<h3 class="text-sm font-bold text-on-surface">Elena Rodriguez</h3>
+<p class="text-[10px] text-on-surface-variant/70 uppercase tracking-wider font-semibold">Pending Review</p>
+</div>
+<div class="text-right">
+<span class="block text-xs font-black text-on-surface-variant">1</span>
+<span class="block text-[8px] uppercase tracking-tighter text-outline">Case</span>
+</div>
+</div>
+</div>
+<!-- Client Card 4 -->
+<div class="group cursor-pointer p-4 rounded-xl transition-all hover:bg-surface-container-high/50">
+<div class="flex items-center gap-4">
+<img alt="Julian Thorne" class="w-12 h-12 rounded-xl object-cover grayscale opacity-80" data-alt="minimalist close up of a man's face with dramatic lighting, soft shadows, and high contrast style" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD8JSM7IpdE6_UA8PhwP9U0jx8T7EazDqnPm8jWALDAhJixtrxN1tEzsYJUPqHlMpWns7UXAgOQbJlQS5DiAzqt-jq_5wNy7pZzJM5O85FZt8Xa-ou75NwsCavBHgXsrGGh_81jHmvPHig7Pj_GmCNWmAbwG9r9GPSeDjx-6obDa_AnfX4c0jyPyLuTn4FY5Otqw36fM8MHj3vdqKH9BCyb4b5bwnOBUxcjU-xVn6XRRprEFop3gCFrlGHwym03KxdICno4J49V20Jp"/>
+<div class="flex-1">
+<h3 class="text-sm font-bold text-on-surface">Julian Thorne</h3>
+<p class="text-[10px] text-on-surface-variant/70 uppercase tracking-wider font-semibold">New Client</p>
+</div>
+<div class="text-right">
+<span class="block text-xs font-black text-on-surface-variant">0</span>
+<span class="block text-[8px] uppercase tracking-tighter text-outline">Cases</span>
+</div>
+</div>
+</div>
+<!-- Right Column: Case Overview -->
+<section class="flex-1 flex flex-col bg-background relative">
+<!-- Top Action Header -->
+<header class="h-20 px-12 flex items-center justify-between border-b border-outline-variant/5">
+<div class="flex items-center gap-4">
+<div class="w-2 h-2 rounded-full bg-secondary shadow-[0_0_8px_rgba(0,108,73,0.4)]"></div>
+<span class="text-[10px] font-black uppercase tracking-widest text-on-surface-variant">Currently Viewing: Sarah Jenkins</span>
+</div>
+<div class="flex items-center gap-3">
+<button class="flex items-center gap-2 px-4 py-2 bg-surface-container-highest text-on-surface text-xs font-bold rounded-lg transition-all active:scale-95">
+<span class="material-symbols-outlined text-sm" data-icon="edit">edit</span>
+                        Rename Case
+                    </button>
+<button class="flex items-center gap-2 px-4 py-2 bg-error-container/30 text-error text-xs font-bold rounded-lg transition-all active:scale-95 hover:bg-error-container">
+<span class="material-symbols-outlined text-sm" data-icon="delete">delete</span>
+                        Delete
+                    </button>
+<div class="w-px h-6 bg-outline-variant/30 mx-2"></div>
+<button class="flex items-center gap-2 px-6 py-2 bg-gradient-to-br from-primary to-primary-container text-white text-xs font-bold rounded-lg shadow-lg active:scale-95 transition-all">
+<span class="material-symbols-outlined text-sm" data-icon="add_circle">add_circle</span>
+                        Create Case
+                    </button>
+</div>
+</header>
+<!-- Case Details Container -->
+<div class="flex-1 overflow-y-auto p-12">
+<!-- Main Header Title -->
+<div class="mb-12">
+<div class="flex items-baseline gap-6">
+<h1 class="text-5xl font-black text-on-surface tracking-tighter">Architecture Revamp 2024</h1>
+<span class="px-3 py-1 bg-secondary-container/40 text-on-secondary-container text-[10px] font-black uppercase tracking-wider rounded-md">Active Status</span>
+</div>
+<p class="text-on-surface-variant mt-4 max-w-2xl leading-relaxed font-body">
+                        Full structural redesign for the Jenkins residential estate. Priority focus on the glass-atrium integration and structural load-bearing updates for the north wing.
+                    </p>
+</div>
+<!-- Bento Grid Layout for Details -->
+<div class="grid grid-cols-12 gap-6">
+<!-- Status Toggle Card -->
+<div class="col-span-4 p-8 bg-surface-container-lowest rounded-2xl shadow-[0px_12px_32px_rgba(11,28,48,0.06)] border-t border-outline-variant/10">
+<div class="flex justify-between items-start mb-10">
+<div>
+<h4 class="text-[10px] font-black uppercase tracking-widest text-outline mb-1">Status Control</h4>
+<p class="text-sm font-bold text-on-surface">Lifecycle Phase</p>
+</div>
+<span class="material-symbols-outlined text-primary-fixed-dim" data-icon="sync">sync</span>
+</div>
+<div class="space-y-4">
+<label class="flex items-center justify-between p-3 rounded-xl bg-secondary-container/10 border border-secondary/20 cursor-pointer transition-all">
+<span class="text-xs font-bold text-secondary">Active Project</span>
+<input checked="" class="text-secondary focus:ring-secondary/20 h-4 w-4" name="status" type="radio"/>
+</label>
+<label class="flex items-center justify-between p-3 rounded-xl hover:bg-surface-container-low transition-all cursor-pointer">
+<span class="text-xs font-bold text-on-surface-variant">Closed / Archived</span>
+<input class="text-outline focus:ring-outline/20 h-4 w-4" name="status" type="radio"/>
+</label>
+</div>
+</div>
+<!-- Client Profile Snippet -->
+<div class="col-span-8 p-8 bg-primary text-white rounded-2xl shadow-xl relative overflow-hidden">
+<div class="relative z-10">
+<h4 class="text-[10px] font-black uppercase tracking-widest text-primary-fixed-dim mb-6">Case Assignee</h4>
+<div class="flex gap-8 items-center">
+<img alt="Sarah" class="w-24 h-24 rounded-2xl object-cover ring-4 ring-primary-container/50" data-alt="portrait of a confident female client, close up, warm atmospheric light, blurred architectural background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCzino_QGd9aDZmhn_TZyY0avqpEw8zvKHtdcLV-GIumcmqUJmg30NyuMDJj1k7CuaQ1IDF358G7xfYd2bjWN2lPhRxTCC5PgnJ9eQymPZC_maCd_Gun_u-XQYc2UHdqpwkEfuQjXpIoJPdNDdYqpCJWfP_qcbxJaVa8hoWtH57h14KHT4yR6qdpSMEKsHZO4xGo5P3Zm-e-4Bctwk0Xlgr8BScPNlY-UekLqIoBXdPoEsOnueAs9M8Oqjv5GuaAVwwobWCH1zGh27o"/>
+<div>
+<h3 class="text-3xl font-black tracking-tight mb-2">Sarah Jenkins</h3>
+<div class="flex gap-4 items-center">
+<div class="flex flex-col">
+<span class="text-[10px] uppercase font-bold text-primary-fixed-dim">Primary Email</span>
+<span class="text-sm">s.jenkins@nexus-design.com</span>
+</div>
+<div class="w-px h-8 bg-primary-container"></div>
+<div class="flex flex-col">
+<span class="text-[10px] uppercase font-bold text-primary-fixed-dim">Project Value</span>
+<span class="text-sm font-bold text-secondary-fixed">$42,500.00</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Abstract Background Decoration -->
+<div class="absolute -right-20 -bottom-20 w-64 h-64 bg-primary-container rounded-full blur-3xl opacity-50"></div>
+<div class="absolute -left-10 -top-10 w-40 h-40 bg-secondary/20 rounded-full blur-2xl opacity-30"></div>
+</div>
+<!-- Timeline/Recent Activity -->
+<div class="col-span-12 p-10 bg-surface-container-low/50 rounded-2xl border border-outline-variant/10">
+<div class="flex justify-between items-center mb-8">
+<h4 class="text-[10px] font-black uppercase tracking-widest text-on-surface-variant">Recent Interactions</h4>
+<button class="text-[10px] font-black uppercase tracking-widest text-primary hover:underline">View History</button>
+</div>
+<div class="space-y-6">
+<div class="flex gap-6 items-start">
+<div class="w-8 h-8 rounded-lg bg-surface-container-highest flex items-center justify-center flex-shrink-0">
+<span class="material-symbols-outlined text-sm text-primary" data-icon="description">description</span>
+</div>
+<div class="flex-1 pb-6 border-b border-outline-variant/10">
+<div class="flex justify-between mb-1">
+<p class="text-sm font-bold text-on-surface">Updated Blueprint V4.2 uploaded</p>
+<span class="text-[10px] text-outline font-medium">Today, 2:15 PM</span>
+</div>
+<p class="text-xs text-on-surface-variant">Final structural adjustments to the mezzanine floor based on city inspection.</p>
+</div>
+</div>
+<div class="flex gap-6 items-start">
+<div class="w-8 h-8 rounded-lg bg-surface-container-highest flex items-center justify-center flex-shrink-0">
+<span class="material-symbols-outlined text-sm text-secondary" data-icon="chat_bubble">chat_bubble</span>
+</div>
+<div class="flex-1 pb-6 border-b border-outline-variant/10">
+<div class="flex justify-between mb-1">
+<p class="text-sm font-bold text-on-surface">Internal Client Message</p>
+<span class="text-[10px] text-outline font-medium">Yesterday</span>
+</div>
+<p class="text-xs text-on-surface-variant">"The progress on the atrium looks incredible. Can we review the lighting specs?"</p>
+</div>
+</div>
+<div class="flex gap-6 items-start opacity-60">
+<div class="w-8 h-8 rounded-lg bg-surface-container-highest flex items-center justify-center flex-shrink-0">
+<span class="material-symbols-outlined text-sm text-on-tertiary-container" data-icon="notifications_active">notifications_active</span>
+</div>
+<div class="flex-1">
+<div class="flex justify-between mb-1">
+<p class="text-sm font-bold text-on-surface">Case Priority Escalated</p>
+<span class="text-[10px] text-outline font-medium">3 days ago</span>
+</div>
+<p class="text-xs text-on-surface-variant">Auto-escalated due to upcoming permit deadline on Feb 15th.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Floating Quick Action for Admin -->
+<div class="absolute bottom-10 right-10">
+<button class="w-16 h-16 rounded-full bg-primary text-white shadow-2xl flex items-center justify-center active:scale-90 transition-all hover:rotate-90">
+<span class="material-symbols-outlined text-3xl" data-icon="add">add</span>
+</button>
+</div>
+</section>
+</main>
+</body></html>

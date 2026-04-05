@@ -71,7 +71,14 @@ class STOLMCServiceTrackerAdmin
 			return;
 		}
 
-		wp_enqueue_style($this->pluginName, plugin_dir_url(__FILE__) . 'css/style.css', array(), $this->version, 'all');
+		// Load the new Tailwind CSS file from the build
+		$css_file = plugin_dir_path(__FILE__) . 'js/prod/style.css';
+		if (file_exists($css_file)) {
+			wp_enqueue_style($this->pluginName . '-tailwind', plugin_dir_url(__FILE__) . 'js/prod/style.css', array(), $this->version, 'all');
+		} else {
+			// Fallback to old CSS if new one doesn't exist
+			wp_enqueue_style($this->pluginName, plugin_dir_url(__FILE__) . 'css/style.css', array(), $this->version, 'all');
+		}
 	}
 
 	/**
@@ -85,7 +92,7 @@ class STOLMCServiceTrackerAdmin
 			return;
 		}
 
-		wp_enqueue_script($this->pluginName, plugin_dir_url(__FILE__) . 'js/prod/App.js', array('wp-element'), $this->version, false);
+		wp_enqueue_script($this->pluginName, plugin_dir_url(__FILE__) . 'js/prod/App.js', array(), $this->version, true);
 	}
 
 	public function localizeScripts($hook)

@@ -8,7 +8,7 @@ import path from "path";
  * Key decisions:
  * - Output goes to admin/js/prod/ matching the old Webpack output path.
  * - Single bundle file (no code splitting) for WordPress compatibility.
- * - No index.html in output - WordPress loads the JS directly.
+ * - CSS is extracted to a separate file for WordPress to load.
  * - The global `data` object (from wp_localize_script) is left as-is — it's
  *   available on `window` at runtime and Vite won't touch bare identifiers.
  */
@@ -36,13 +36,12 @@ export default defineConfig(({ mode }) => {
       emptyOutDir: true,
       sourcemap: !isProd,
       minify: isProd,
-      // Inline CSS into JS for single-file output
-      cssCodeSplit: false,
-      // Disable code splitting for WordPress compatibility
+      // Enable CSS code splitting so we get a separate CSS file
+      cssCodeSplit: true,
       rollupOptions: {
         input: path.resolve(__dirname, "react-app/index.jsx"),
         output: {
-          // Single file output
+          // Single JS file output
           entryFileNames: "App.js",
           // Inline dynamic imports
           inlineDynamicImports: true,
