@@ -4,6 +4,12 @@
 node_modules/
 /node_modules/
 
+# Local WordPress core files
+wordpress/
+
+# PHP dependencies
+vendor/
+
 # Packages #
 ############
 *.7z

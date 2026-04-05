@@ -1,0 +1,80 @@
+services:
+  db:
+    image: mysql:8.0
+    container_name: service-tracker-db
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: wordpress
+      MYSQL_USER: wp_user
+      MYSQL_PASSWORD: wp_password
+      MYSQL_ROOT_PASSWORD: root_password
+    ports:
+      - "3306:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+    networks:
+      - service-tracker-net
+
+  wordpress:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: service-tracker-wp
+    restart: unless-stopped
+    depends_on:
+      - db
+    ports:
+      - "8080:80"
+    environment:
+      WORDPRESS_DB_HOST: db:3306
+      WORDPRESS_DB_NAME: wordpress
+      WORDPRESS_DB_USER: wp_user
+      WORDPRESS_DB_PASSWORD: wp_password
+      WORDPRESS_DEBUG: "1"
+    volumes:
+      - ./wordpress:/var/www/html
+      - .:/var/www/html/wp-content/plugins/service-tracker
+      - ./docker/uploads.ini:/usr/local/etc/php/conf.d/uploads.ini
+    networks:
+      - service-tracker-net
+
+  wpcli:
+    image: wordpress:cli
+    container_name: service-tracker-wpcli
+    depends_on:
+      - wordpress
+      - db
+    environment:
+      WORDPRESS_DB_HOST: db:3306
+      WORDPRESS_DB_NAME: wordpress
+      WORDPRESS_DB_USER: wp_user
+      WORDPRESS_DB_PASSWORD: wp_password
+    volumes:
+      - ./wordpress:/var/www/html
+      - .:/var/www/html/wp-content/plugins/service-tracker
+    networks:
+      - service-tracker-net
+    user: "33:33"
+    entrypoint: ["wp"]
+
+  phpmyadmin:
+    image: phpmyadmin:latest
+    container_name: service-tracker-phpmyadmin
+    restart: unless-stopped
+    depends_on:
+      - db
+    ports:
+      - "8081:80"
+    environment:
+      PMA_HOST: db
+      PMA_USER: root
+      PMA_PASSWORD: root_password
+    networks:
+      - service-tracker-net
+
+volumes:
+  db_data:
+
+networks:
+  service-tracker-net:
+    driver: bridge
