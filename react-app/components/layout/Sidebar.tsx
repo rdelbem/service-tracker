@@ -7,15 +7,15 @@ export default function Sidebar() {
 
   const navItems = [
     { icon: "dashboard", label: "Dashboard", view: "init" },
-    { icon: "group", label: "Clients", view: "init" },
+    { icon: "group", label: "Clients", view: "cases" },
     { icon: "folder_open", label: "Cases", view: "cases" },
-    { icon: "event", label: "Calendar", view: "init" },
-    { icon: "analytics", label: "Analytics", view: "init" },
+    { icon: "event", label: "Calendar", view: "calendar" },
+    { icon: "analytics", label: "Analytics", view: "analytics" },
   ];
 
   const bottomNavItems = [
-    { icon: "settings", label: "Settings" },
-    { icon: "help_outline", label: "Support" },
+    { icon: "settings", label: "Settings", view: "settings" },
+    { icon: "help_outline", label: "Support", view: "support" },
   ];
 
   return (
@@ -37,7 +37,7 @@ export default function Sidebar() {
           return (
             <a
               key={item.label}
-              onClick={() => item.view !== "init" && updateIdView("", "", item.view, "")}
+              onClick={() => updateIdView("", "", item.view, "")}
               className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all cursor-pointer ${
                 isActive
                   ? "text-slate-900 font-bold bg-slate-200/50"
@@ -63,6 +63,7 @@ export default function Sidebar() {
         {bottomNavItems.map((item) => (
           <a
             key={item.label}
+            onClick={() => updateIdView("", "", item.view, "")}
             className="flex items-center gap-3 px-4 py-3 rounded-xl transition-colors text-slate-500 hover:bg-slate-200/50 font-medium cursor-pointer"
           >
             <span className="material-symbols-outlined">{item.icon}</span>

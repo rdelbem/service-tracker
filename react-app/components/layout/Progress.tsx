@@ -1,5 +1,4 @@
 import { useState, useContext, Fragment } from "react";
-import { CSSTransition } from "react-transition-group";
 import InViewContext from "../../context/inView/inViewContext";
 import ProgressContext from "../../context/progress/progressContext";
 import TextareaAutosize from "react-textarea-autosize";
@@ -50,7 +49,7 @@ export default function Progress() {
                 inViewContext.state.name
               );
             }}
-            className="flex items-center gap-2 px-4 py-2 bg-surface-container-highest text-on-surface text-xs font-bold rounded-lg transition-all active:scale-95"
+            className="flex items-center gap-2 px-4 py-2 bg-surface-container-highest text-on-surface text-xs font-bold rounded-lg shadow-lg hover:shadow-xl active:scale-95 transition-all"
           >
             <span className="material-symbols-outlined text-sm">arrow_back</span>
             Back to Cases
@@ -95,13 +94,8 @@ export default function Progress() {
             </div>
           </div>
 
-          <CSSTransition
-            in={writingStatus}
-            timeout={400}
-            classNames="editing"
-            unmountOnExit
-          >
-            <div className="status-add-new-container">
+          {writingStatus && (
+            <div className="status-add-new-container animate-fade-in">
               <div className="relative mb-6">
                 <TextareaAutosize
                   onChange={(e) => setNewText(e.target.value)}
@@ -144,7 +138,7 @@ export default function Progress() {
                 </button>
               </div>
             </div>
-          </CSSTransition>
+          )}
 
           <button
             onClick={(e) => {

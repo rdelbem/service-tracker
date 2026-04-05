@@ -1,5 +1,4 @@
 import { useContext, useState } from "react";
-import { CSSTransition } from "react-transition-group";
 import InViewContext from "../../context/inView/inViewContext";
 import { InViewContextType } from "../../types";
 
@@ -45,13 +44,8 @@ export default function HowToUse() {
                 expand_more
               </span>
             </button>
-            <CSSTransition
-              in={accordion === 1}
-              timeout={400}
-              classNames="editing"
-              unmountOnExit
-            >
-              <div className="px-8 pb-8">
+            {accordion === 1 && (
+              <div className="px-8 pb-8 animate-fade-in">
                 <ul className="space-y-3 text-on-surface-variant">
                   <li className="flex items-start gap-3">
                     <span className="material-symbols-outlined text-primary text-sm mt-0.5">
@@ -79,7 +73,7 @@ export default function HowToUse() {
                   </li>
                 </ul>
               </div>
-            </CSSTransition>
+            )}
           </div>
 
           {/* Second Accordion */}
@@ -100,13 +94,8 @@ export default function HowToUse() {
                 expand_more
               </span>
             </button>
-            <CSSTransition
-              in={accordion === 2}
-              timeout={400}
-              classNames="editing"
-              unmountOnExit
-            >
-              <div className="px-8 pb-8">
+            {accordion === 2 && (
+              <div className="px-8 pb-8 animate-fade-in">
                 <ul className="space-y-3 text-on-surface-variant">
                   <li className="flex items-start gap-3">
                     <span className="material-symbols-outlined text-primary text-sm mt-0.5">
@@ -122,7 +111,7 @@ export default function HowToUse() {
                   </li>
                 </ul>
               </div>
-            </CSSTransition>
+            )}
           </div>
         </div>
       </div>

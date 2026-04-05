@@ -1,5 +1,4 @@
 import { useContext, useState, Fragment } from "react";
-import { CSSTransition } from "react-transition-group";
 import CasesContext from "../../context/cases/casesContext";
 import InViewContext from "../../context/inView/inViewContext";
 import ProgressContext from "../../context/progress/progressContext";
@@ -99,13 +98,8 @@ export default function Case({ id, id_user, status, created_at, title }: CaseTyp
       </div>
 
       {/* Editing Mode */}
-      <CSSTransition
-        in={editing}
-        timeout={400}
-        classNames="editing"
-        unmountOnExit
-      >
-        <div className="bg-surface-container p-6 rounded-2xl shadow-lg mb-4">
+      {editing && (
+        <div className="bg-surface-container p-6 rounded-2xl shadow-lg mb-4 animate-fade-in">
           <form>
             <div className="flex gap-4 mb-4">
               <input
@@ -137,7 +131,7 @@ export default function Case({ id, id_user, status, created_at, title }: CaseTyp
             </div>
           </form>
         </div>
-      </CSSTransition>
+      )}
     </Fragment>
   );
 }

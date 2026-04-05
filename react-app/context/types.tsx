@@ -7,6 +7,14 @@ export const GET_STATUS = "GET_STATUS";
 // Global data object from WordPress wp_localize_script
 declare const data: Record<string, any>;
 
+// Route types for hash-based routing
+export interface RouteMatch {
+  view: string;
+  userId: string;
+  caseId: string;
+  name: string;
+}
+
 // Common types
 export interface User {
   id: string | number;
@@ -69,6 +77,7 @@ export interface InViewState {
 export interface InViewContextType {
   state: InViewState;
   updateIdView: (userId: string | number, caseId: string | number, view: string, name: string) => void;
+  navigate: (view: string, userId: string | number, caseId: string | number, name: string) => void;
 }
 
 export interface ProgressState {
