@@ -1,9 +1,21 @@
 import { useContext } from "react";
 import ClientsContext from "../../context/clients/clientsContext";
 
-export default function Search() {
+interface SearchProps {
+  onSearch?: (query: string) => void;
+}
+
+export default function Search({ onSearch }: SearchProps) {
   const clientsContext = useContext(ClientsContext);
   const { searchUsers } = clientsContext;
+
+  const handleSearch = (query: string) => {
+    if (onSearch) {
+      onSearch(query);
+    } else {
+      searchUsers(query);
+    }
+  };
 
   return (
     <div className="relative group">
@@ -12,7 +24,7 @@ export default function Search() {
       </span>
       <input
         onChange={(e) => {
-          searchUsers(e.target.value);
+          handleSearch(e.target.value);
         }}
         type="text"
         placeholder={data.search_bar || "Search accounts..."}

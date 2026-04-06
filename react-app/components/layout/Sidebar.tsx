@@ -7,7 +7,7 @@ export default function Sidebar() {
 
   const navItems = [
     { icon: "dashboard", label: "Dashboard", view: "init" },
-    { icon: "group", label: "Clients", view: "cases" },
+    { icon: "group", label: "Clients", view: "clients" },
     { icon: "folder_open", label: "Cases", view: "cases" },
     { icon: "event", label: "Calendar", view: "calendar" },
     { icon: "analytics", label: "Analytics", view: "analytics" },

@@ -21,6 +21,7 @@ const Initial = lazy(() => import("./components/layout/Initial"));
 const HowToUse = lazy(() => import("./components/layout/HowToUse"));
 const Cases = lazy(() => import("./components/layout/Cases"));
 const Progress = lazy(() => import("./components/layout/Progress"));
+const ClientsView = lazy(() => import("./components/layout/ClientsView"));
 
 //App bootstrap
 export default function App() {
@@ -35,6 +36,7 @@ export default function App() {
               <CasesContainer>
                 <LazyView><Initial /></LazyView>
                 <LazyView><HowToUse /></LazyView>
+                <LazyView><ClientsView /></LazyView>
                 <LazyView><Cases /></LazyView>
                 <LazyView><Progress /></LazyView>
               </CasesContainer>
