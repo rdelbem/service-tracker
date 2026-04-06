@@ -113,6 +113,14 @@ class STOLMCServiceTrackerAdmin
 			return;
 		}
 
+		// Load Google Fonts (Inter, Manrope, Material Symbols)
+		wp_enqueue_style(
+			$this->pluginName . '-google-fonts',
+			'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Manrope:wght@700;800;900&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap',
+			array(),
+			null
+		);
+
 		// Load the new Tailwind CSS file from the build
 		$css_file = plugin_dir_path(__FILE__) . 'js/prod/style.css';
 		if (file_exists($css_file)) {
