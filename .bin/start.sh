@@ -21,13 +21,9 @@ fi
 
 echo -e "${GREEN}✔ Dependencies check passed${NC}"
 
-# --- Download WordPress core locally ---
-if [ ! -d "wordpress/wp-includes" ]; then
-    echo -e "${YELLOW}→ Downloading WordPress core...${NC}"
-    bash docker/setup-wordpress.sh
-else
-    echo -e "${GREEN}✔ WordPress core already downloaded${NC}"
-fi
+# --- WordPress core will be auto-downloaded by the official WordPress image ---
+# The wordpress_data volume will persist the core files after first run
+echo -e "${GREEN}✔ WordPress core check skipped (auto-managed by container)${NC}"
 
 # --- Install PHP dependencies ---
 if [ ! -d "vendor" ]; then
@@ -46,11 +42,26 @@ fi
 echo -e "${YELLOW}→ Starting Docker services...${NC}"
 docker compose up -d db wordpress phpmyadmin
 
-# --- Wait for Apache to be ready ---
-echo -e "${YELLOW}→ Waiting for WordPress container to be ready...${NC}"
+# --- Wait for database to be ready ---
+echo -e "${YELLOW}→ Waiting for database to be ready...${NC}"
 MAX_WAIT=60
 WAITED=0
-until docker compose exec wordpress curl -s -o /dev/null -w "%{http_code}" http://localhost/ | grep -q "200\|302"; do
+until docker compose exec db mysqladmin ping -h localhost --silent 2>/dev/null; do
+    sleep 2
+    WAITED=$((WAITED + 2))
+    if [ "$WAITED" -ge "$MAX_WAIT" ]; then
+        echo -e "${RED}✖ Database failed to start after ${MAX_WAIT}s${NC}"
+        docker compose logs db
+        exit 1
+    fi
+done
+echo -e "${GREEN}✔ Database is ready${NC}"
+
+# --- Wait for WordPress container to be ready ---
+echo -e "${YELLOW}→ Waiting for WordPress container to initialize...${NC}"
+MAX_WAIT=60
+WAITED=0
+until docker compose exec wordpress curl -s -o /dev/null -w "%{http_code}" http://localhost/ 2>/dev/null | grep -q "200\|301\|302"; do
     sleep 2
     WAITED=$((WAITED + 2))
     if [ "$WAITED" -ge "$MAX_WAIT" ]; then
@@ -59,20 +70,36 @@ until docker compose exec wordpress curl -s -o /dev/null -w "%{http_code}" http:
         exit 1
     fi
 done
+echo -e "${GREEN}✔ WordPress container is ready${NC}"
 
-# --- Fix permissions (skip the plugin folder which is a separate bind mount) ---
-mkdir -p wordpress/wp-content/uploads
+# --- Fix permissions ---
+docker compose exec wordpress mkdir -p /var/www/html/wp-content/uploads
 
 # --- Generate wp-config.php if missing ---
-if [ ! -f "wordpress/wp-config.php" ]; then
-    echo -e "${YELLOW}→ Generating wp-config.php...${NC}"
-    cp wordpress/wp-config-sample.php wordpress/wp-config.php
-    sed -i 's/database_name_here/wordpress/' wordpress/wp-config.php
-    sed -i 's/username_here/wp_user/' wordpress/wp-config.php
-    sed -i 's/password_here/wp_password/' wordpress/wp-config.php
-    sed -i 's/localhost/db/' wordpress/wp-config.php
-    # Add custom port if needed
-    sed -i "s/'DB_HOST', 'db'/'DB_HOST', 'db:3306'/" wordpress/wp-config.php
+WP_CONFIG_EXISTS=$(docker compose exec wordpress test -f /var/www/html/wp-config.php 2>/dev/null && echo "yes" || echo "no")
+if [ "$WP_CONFIG_EXISTS" = "no" ]; then
+    echo -e "${YELLOW}→ Creating wp-config.php...${NC}"
+    docker compose exec wordpress bash -c "cat > /var/www/html/wp-config.php <<'EOF'
+<?php
+define( 'DB_NAME', 'wordpress' );
+define( 'DB_USER', 'wp_user' );
+define( 'DB_PASSWORD', 'wp_password' );
+define( 'DB_HOST', 'db:3306' );
+define( 'DB_CHARSET', 'utf8' );
+define( 'DB_COLLATE', '' );
+define( 'WP_HOME', 'http://localhost:8080' );
+define( 'WP_SITEURL', 'http://localhost:8080' );
+
+\$table_prefix = 'wp_';
+
+define( 'WP_DEBUG', true );
+
+if ( ! defined( 'ABSPATH' ) ) {
+    define( 'ABSPATH', __DIR__ . '/' );
+}
+
+require_once ABSPATH . 'wp-settings.php';
+EOF"
     echo -e "${GREEN}✔ wp-config.php created${NC}"
 fi
 
