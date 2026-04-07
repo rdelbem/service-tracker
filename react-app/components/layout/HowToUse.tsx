@@ -1,15 +1,15 @@
-import { useContext, useState } from "react";
-import InViewContext from "../../context/inView/inViewContext";
-import { InViewContextType } from "../../types";
+import { useState } from "react";
+import { useInViewStore } from "../../stores/inViewStore";
+
+declare const data: Record<string, any>;
 
 export default function HowToUse() {
-  const inViewContext = useContext(InViewContext) as InViewContextType;
-  const { state } = inViewContext;
+  const inViewState = useInViewStore((state) => state);
 
   const [accordion, setAccordion] = useState(1);
 
   // Required for navigation purposes
-  if (state.view !== "howToUse") {
+  if (inViewState.view !== "howToUse") {
     return <></>;
   }
 

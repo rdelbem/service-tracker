@@ -1,142 +1,157 @@
 <?php
 namespace STOLMCServiceTracker\includes;
 
-if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
+if ( ! defined( 'ABSPATH' ) ) {
+	exit; // Exit if accessed directly.
+}
 
-class STOLMCServiceTrackerSql
-{
-	/**
-	 * The current table name
-	 *
-	 * @var boolean
-	 */
-	private $tableName = false;
+/**
+ * SQL helper class for database operations.
+ *
+ * Provides generic CRUD operations for custom database tables.
+ * This class wraps $wpdb methods for simplified database interactions.
+ */
+class STOLMCServiceTrackerSql {
 
 	/**
-	 * Constructor for the database class to inject the table name
+	 * The current table name.
 	 *
-	 * @param string $tableName - The current table name
+	 * @var string|false
 	 */
-	public function __construct($tableName)
-	{
-		$this->tableName = $tableName;
+	private $table_name = false;
+
+	/**
+	 * Constructor for the database class to inject the table name.
+	 *
+	 * @param string $table_name The current table name.
+	 */
+	public function __construct( $table_name ) {
+		$this->table_name = $table_name;
 	}
 
 	/**
-	 * Insert data into the current data
+	 * Insert data into the current table.
 	 *
-	 * @param  array $data - Data to enter into the database table
+	 * @param array $data Data to enter into the database table.
 	 *
-	 * @return string Object
+	 * @return string|false Insert result message or false on failure.
 	 */
-	public function insert(array $data)
-	{
+	public function insert( array $data ) {
 		global $wpdb;
-		if (empty($data)) {
+
+		if ( empty( $data ) ) {
 			return false;
 		}
 
 		try {
-			$wpdb->insert($this->tableName, $data);
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Generic insert helper method.
+			$wpdb->insert( $this->table_name, $data );
 			return 'Success, data was inserted' . $wpdb->insert_id;
-		} catch (\Throwable $th) {
+		} catch ( \Throwable $th ) {
 			return 'Error: ' . $th;
 		}
 	}
 
 	/**
-	 * Get all from the selected table
+	 * Get all records from the selected table.
 	 *
-	 * @param  string $orderBy - Order by column name
+	 * @param string|null $order_by Order by column name.
 	 *
-	 * @return Table result
+	 * @return array|object|null Table results.
 	 */
-	public function getAll($orderBy = null)
-	{
+	public function get_all( $order_by = null ) {
 		global $wpdb;
 
-		$sql = 'SELECT * FROM `' . $this->tableName . '`';
+		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Generic select helper with optional ordering.
+		$sql = 'SELECT * FROM `' . $this->table_name . '`';
 
-		if (!empty($orderBy)) {
-			$sql .= ' ORDER BY ' . $orderBy;
+		if ( ! empty( $order_by ) ) {
+			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Column name for ORDER BY cannot be parameterized.
+			$sql .= ' ORDER BY ' . $order_by;
 		}
 
-		return $wpdb->get_results($wpdb->prepare($sql));
+		// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Dynamic query with optional ORDER BY.
+		return $wpdb->get_results( $sql );
 	}
 
 	/**
-	 * Get a value by a condition
+	 * Get records by condition.
 	 *
-	 * @param  array  $conditionValue - A key value pair of the conditions you want to search on
-	 * @param  string $condition - A string value for the condition of the query default to equals
+	 * @param array  $condition_value A key-value pair of the conditions to search on.
+	 * @param string $condition       A string value for the condition of the query. Defaults to equals.
 	 *
-	 * @return array result
+	 * @throws \Exception If values for IN query are not an array.
+	 *
+	 * @return array|object|null Query results.
 	 */
-	public function getBy(array $conditionValue, $condition = '=')
-	{
+	public function get_by( array $condition_value, $condition = '=' ) {
 		global $wpdb;
 
-		$sql = 'SELECT * FROM `' . $this->tableName . '` WHERE ';
+		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Generic select helper building WHERE clause.
+		$sql = 'SELECT * FROM `' . $this->table_name . '` WHERE ';
 
-		foreach ($conditionValue as $field => $value) {
-			switch (strtolower($condition)) {
+		foreach ( $condition_value as $field => $value ) {
+			switch ( strtolower( $condition ) ) {
 				case 'in':
-					if (!is_array($value)) {
-						throw new Exception('Values for IN query must be an array.', 1);
+					if ( ! is_array( $value ) ) {
+						throw new \Exception( 'Values for IN query must be an array.', 1 );
 					}
 
-					$sql .= $wpdb->prepare('`%s` IN (%s)', $field, implode(',', $value));
+					// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare -- Dynamic IN clause handling.
+					$sql .= $wpdb->prepare( '`%s` IN (%s)', $field, implode( ',', $value ) );
 					break;
 
 				default:
-					$sql .= $wpdb->prepare('`' . $field . '` ' . $condition . ' %s', $value);
+					// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare -- Dynamic WHERE clause handling.
+					$sql .= $wpdb->prepare( '`' . $field . '` ' . $condition . ' %s', $value );
 					break;
 			}
 		}
 
-		return $wpdb->get_results($sql);
+		// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Dynamic query built above.
+		return $wpdb->get_results( $sql );
 	}
 
 	/**
-	 * Update a table record in the database
+	 * Update table records in the database.
 	 *
-	 * @param  array $data           - Array of data to be updated
-	 * @param  array $conditionValue - Key value pair for the where clause of the query
+	 * @param array $data            Array of data to be updated.
+	 * @param array $condition_value Key-value pair for the WHERE clause of the query.
 	 *
-	 * @return Updated object
+	 * @return int|false Number of rows updated, or false on failure.
 	 */
-	public function update(array $data, array $conditionValue)
-	{
+	public function update( array $data, array $condition_value ) {
 		global $wpdb;
 
-		if (empty($data)) {
+		if ( empty( $data ) ) {
 			return false;
 		}
 
 		try {
-			$updated = $wpdb->update($this->tableName, $data, $conditionValue);
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Generic update helper method.
+			$updated = $wpdb->update( $this->table_name, $data, $condition_value );
 			return $updated;
-		} catch (\Throwable $th) {
+		} catch ( \Throwable $th ) {
 			return $th;
 		}
 	}
 
 	/**
-	 * Delete row on the database table
+	 * Delete rows from the database table.
 	 *
-	 * @param  array $conditionValue - Key value pair for the where clause of the query
+	 * @param array $condition_value Key-value pair for the WHERE clause of the query.
 	 *
-	 * @return int - Num rows deleted, -1 as falsey int
+	 * @return int|false Number of rows deleted, or false on failure.
 	 */
-	public function delete(array $conditionValue)
-	{
-		if (empty($conditionValue)) {
+	public function delete( array $condition_value ) {
+		if ( empty( $condition_value ) ) {
 			return -1;
 		}
 
 		global $wpdb;
 
-		$deleted = $wpdb->delete($this->tableName, $conditionValue);
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Generic delete helper method.
+		$deleted = $wpdb->delete( $this->table_name, $condition_value );
 
 		return $deleted;
 	}

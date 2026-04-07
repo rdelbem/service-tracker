@@ -1,1 +1,2 @@
-<?php // silence is golden teste
+<?php
+// Silence is golden.

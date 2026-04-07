@@ -1,9 +1,8 @@
-import { useContext } from "react";
-import InViewContext from "../../context/inView/inViewContext";
+import { useInViewStore } from "../../stores/inViewStore";
 
 export default function Sidebar() {
-  const inViewContext = useContext(InViewContext);
-  const { state, updateIdView } = inViewContext;
+  const inViewState = useInViewStore((state) => state);
+  const { navigate } = useInViewStore();
 
   const navItems = [
     { icon: "dashboard", label: "Dashboard", view: "init" },
@@ -33,11 +32,11 @@ export default function Sidebar() {
       {/* Main Navigation */}
       <nav className="flex-1 space-y-1">
         {navItems.map((item) => {
-          const isActive = state.view === item.view;
+          const isActive = inViewState.view === item.view;
           return (
             <a
               key={item.label}
-              onClick={() => updateIdView("", "", item.view, "")}
+              onClick={() => navigate(item.view, "", "", "")}
               className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all cursor-pointer ${
                 isActive
                   ? "text-slate-900 font-bold bg-slate-200/50"
@@ -63,7 +62,7 @@ export default function Sidebar() {
         {bottomNavItems.map((item) => (
           <a
             key={item.label}
-            onClick={() => updateIdView("", "", item.view, "")}
+            onClick={() => navigate(item.view, "", "", "")}
             className="flex items-center gap-3 px-4 py-3 rounded-xl transition-colors text-slate-500 hover:bg-slate-200/50 font-medium cursor-pointer"
           >
             <span className="material-symbols-outlined">{item.icon}</span>
@@ -76,11 +75,11 @@ export default function Sidebar() {
         {/* User Profile */}
         <div className="flex items-center gap-3 px-4 py-4 mt-4">
           <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-white font-bold">
-            {state.name ? state.name.charAt(0).toUpperCase() : "A"}
+            {inViewState.name ? inViewState.name.charAt(0).toUpperCase() : "A"}
           </div>
           <div className="overflow-hidden">
             <p className="text-sm font-bold text-slate-900 truncate">
-              {state.name || "Admin User"}
+              {inViewState.name || "Admin User"}
             </p>
             <p className="text-[10px] text-slate-500 uppercase tracking-widest">
               Master Admin

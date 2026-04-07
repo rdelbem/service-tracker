@@ -1,20 +1,25 @@
 <?php
 namespace STOLMCServiceTracker\includes;
 
-if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
+if ( ! defined( 'ABSPATH' ) ) {
+	exit; // Exit if accessed directly.
+}
 
-use \WP_REST_Request;
+use WP_REST_Request;
 
 /**
  * This is the required contract/interface used in order
- * to implement a full CRUD rest api end point.
+ * to implement a full CRUD REST API end point.
  */
-interface STOLMCServiceTrackerApiContract
-{
+interface STOLMCServiceTrackerApiContract {
+
 	/**
 	 * The method run is used to start the application.
-	 * It is necessary because it is add to the app with
-	 * the WordPress hook add_action
+	 *
+	 * It is necessary because it is added to the app with
+	 * the WordPress hook add_action().
+	 *
+	 * @since    1.0.0
 	 *
 	 * @return void
 	 */
@@ -22,41 +27,55 @@ interface STOLMCServiceTrackerApiContract
 
 	/**
 	 * This method registers the end point, it is done
-	 * by calling the extended class method registerNewRoute.
+	 * by calling the extended class method register_new_route().
+	 *
+	 * @since    1.0.0
 	 *
 	 * @return void
 	 */
-	public function customApi();
+	public function custom_api();
 
 	/**
-	 * It verifys the request, then reads a table.
+	 * It verifies the request, then reads a table.
 	 *
-	 * @param WP_REST_Request $data
+	 * @since    1.0.0
+	 *
+	 * @param WP_REST_Request $data The REST request object.
+	 *
 	 * @return void
 	 */
-	public function read(WP_REST_Request $data);
+	public function read( WP_REST_Request $data );
 
 	/**
-	 * It verifys the request, then creates an new entry on a table.
+	 * It verifies the request, then creates a new entry on a table.
 	 *
-	 * @param WP_REST_Request $data
+	 * @since    1.0.0
+	 *
+	 * @param WP_REST_Request $data The REST request object.
+	 *
 	 * @return void
 	 */
-	public function create(WP_REST_Request $data);
+	public function create( WP_REST_Request $data );
 
 	/**
-	 * It verifys the request, then updates a certain entry on a table.
+	 * It verifies the request, then updates a certain entry on a table.
 	 *
-	 * @param WP_REST_Request $data
+	 * @since    1.0.0
+	 *
+	 * @param WP_REST_Request $data The REST request object.
+	 *
 	 * @return void
 	 */
-	public function update(WP_REST_Request $data);
+	public function update( WP_REST_Request $data );
 
 	/**
-	 * It verifys the request, then it deletes a certain entry on a table.
+	 * It verifies the request, then it deletes a certain entry on a table.
 	 *
-	 * @param WP_REST_Request $data
+	 * @since    1.0.0
+	 *
+	 * @param WP_REST_Request $data The REST request object.
+	 *
 	 * @return void
 	 */
-	public function delete(WP_REST_Request $data);
+	public function delete( WP_REST_Request $data );
 }

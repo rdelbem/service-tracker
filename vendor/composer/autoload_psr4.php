@@ -6,7 +6,9 @@ $vendorDir = dirname(__DIR__);
 $baseDir = dirname($vendorDir);
 
 return array(
+    'SzepeViktor\\PHPStan\\WordPress\\' => array($vendorDir . '/szepeviktor/phpstan-wordpress/src'),
     'STOLMCServiceTracker\\' => array($baseDir . '/'),
     'Rdelbem\\WPMailerClass\\' => array($vendorDir . '/rdelbem/wp-mailer-class/src'),
+    'PHPCSStandards\\Composer\\Plugin\\Installers\\PHPCodeSniffer\\' => array($vendorDir . '/dealerdirect/phpcodesniffer-composer-installer/src'),
     'Moment\\' => array($vendorDir . '/fightbulc/moment/src'),
 );

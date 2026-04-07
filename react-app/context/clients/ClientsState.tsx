@@ -1,6 +1,6 @@
 import { useReducer, useEffect, ReactNode } from "react";
 import AppReducer from "../AppReducer";
-import { get } from "../../utils/fetch";
+import { get, post } from "../../utils/fetch";
 import ClientsContext from "./clientsContext";
 import { GET_USERS } from "../types";
 import type { ClientsState as ClientsStateType, User } from "../types";
@@ -11,6 +11,7 @@ interface ClientsStateProps {
 
 export default function ClientsState({ children }: ClientsStateProps) {
   const api_url_users = data.users_api_url;
+  const create_user_api_url = data.create_user_api_url;
 
   const initialState: ClientsStateType = {
     users: [],
@@ -58,6 +59,33 @@ export default function ClientsState({ children }: ClientsStateProps) {
     });
   };
 
+  const createUser = async (userData: { name: string; email: string; phone?: string; cellphone?: string }) => {
+    try {
+      const res = await post(
+        create_user_api_url,
+        userData,
+        {
+          headers: {
+            "X-WP-Nonce": data.nonce,
+          },
+        }
+      );
+
+      // If successful, refresh the users list
+      if (res.data.success) {
+        await getUsers();
+      }
+
+      return res.data;
+    } catch (error) {
+      console.error("Error creating user:", error);
+      return {
+        success: false,
+        message: "Failed to create user. Please try again.",
+      };
+    }
+  };
+
   useEffect(() => {
     getUsers();
   }, []);
@@ -67,6 +95,7 @@ export default function ClientsState({ children }: ClientsStateProps) {
       value={{
         state,
         searchUsers,
+        createUser,
       }}
     >
       {children}

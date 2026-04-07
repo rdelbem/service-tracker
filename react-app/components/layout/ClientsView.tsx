@@ -1,38 +1,60 @@
-import { useContext, useState, Fragment } from "react";
-import ClientsContext from "../../context/clients/clientsContext";
-import InViewContext from "../../context/inView/inViewContext";
+import { useState } from "react";
+import { toast } from "react-toastify";
+import { useInViewStore } from "../../stores/inViewStore";
+import { useClientsStore } from "../../stores/clientsStore";
 import Spinner from "./Spinner";
 import Search from "./Search";
-import { ClientsContextType, InViewContextType, User } from "../../types";
+import type { User } from "../../types";
 
 export default function ClientsView() {
-  const clientsContext = useContext(ClientsContext) as ClientsContextType;
-  const inViewContext = useContext(InViewContext) as InViewContextType;
-  const { state, searchUsers } = clientsContext;
-  const { state: inViewState, updateIdView } = inViewContext;
+  const inViewState = useInViewStore((state) => state);
+  const { navigate } = useInViewStore();
+  const { users, loadingUsers, searchUsers, createUser } = useClientsStore();
   const [newClientName, setNewClientName] = useState("");
   const [newClientEmail, setNewClientEmail] = useState("");
+  const [newClientPhone, setNewClientPhone] = useState("");
+  const [newClientCellphone, setNewClientCellphone] = useState("");
   const [showAddForm, setShowAddForm] = useState(false);
-  const [selectedClient, setSelectedClient] = useState<User | null>(null);
+  const [isCreating, setIsCreating] = useState(false);
 
   // Only show this view when view === 'clients'
   if (inViewState.view !== "clients") {
-    return <Fragment></Fragment>;
+    return null;
   }
 
   const handleSelectClient = (client: User) => {
-    setSelectedClient(client);
-    updateIdView(client.id, "", "clients", client.name);
+    navigate("clients", client.id, "", client.name);
   };
 
-  const handleAddClient = (e: React.FormEvent) => {
+  const handleAddClient = async (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: Implement actual client creation
-    // For now, just log and reset form
-    console.log("Adding client:", { name: newClientName, email: newClientEmail });
-    setNewClientName("");
-    setNewClientEmail("");
-    setShowAddForm(false);
+    
+    if (!newClientName.trim() || !newClientEmail.trim()) {
+      toast.error("Name and email are required");
+      return;
+    }
+
+    setIsCreating(true);
+
+    const result = await createUser({
+      name: newClientName.trim(),
+      email: newClientEmail.trim(),
+      phone: newClientPhone.trim() || undefined,
+      cellphone: newClientCellphone.trim() || undefined,
+    });
+
+    setIsCreating(false);
+
+    if (result.success) {
+      toast.success(result.message);
+      setNewClientName("");
+      setNewClientEmail("");
+      setNewClientPhone("");
+      setNewClientCellphone("");
+      setShowAddForm(false);
+    } else {
+      toast.error(result.message);
+    }
   };
 
   return (
@@ -68,6 +90,7 @@ export default function ClientsView() {
                 placeholder="Client name..."
                 className="w-full bg-surface-container-low border border-outline-variant/20 rounded-lg py-2 px-3 text-sm focus:ring-2 focus:ring-primary/10 transition-all placeholder:text-outline-variant"
                 required
+                disabled={isCreating}
               />
             </div>
             <div>
@@ -81,14 +104,44 @@ export default function ClientsView() {
                 placeholder="client@example.com"
                 className="w-full bg-surface-container-low border border-outline-variant/20 rounded-lg py-2 px-3 text-sm focus:ring-2 focus:ring-primary/10 transition-all placeholder:text-outline-variant"
                 required
+                disabled={isCreating}
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-bold text-on-surface-variant mb-1 uppercase tracking-wider">
+                Phone
+              </label>
+              <input
+                type="tel"
+                value={newClientPhone}
+                onChange={(e) => setNewClientPhone(e.target.value)}
+                placeholder="(123) 456-7890"
+                className="w-full bg-surface-container-low border border-outline-variant/20 rounded-lg py-2 px-3 text-sm focus:ring-2 focus:ring-primary/10 transition-all placeholder:text-outline-variant"
+                disabled={isCreating}
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-bold text-on-surface-variant mb-1 uppercase tracking-wider">
+                Cellphone
+              </label>
+              <input
+                type="tel"
+                value={newClientCellphone}
+                onChange={(e) => setNewClientCellphone(e.target.value)}
+                placeholder="(123) 456-7890"
+                className="w-full bg-surface-container-low border border-outline-variant/20 rounded-lg py-2 px-3 text-sm focus:ring-2 focus:ring-primary/10 transition-all placeholder:text-outline-variant"
+                disabled={isCreating}
               />
             </div>
             <button
               type="submit"
-              className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-gradient-to-br from-primary to-primary-container text-white text-xs font-bold rounded-lg shadow-lg active:scale-95 transition-all"
+              disabled={isCreating}
+              className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-gradient-to-br from-primary to-primary-container text-white text-xs font-bold rounded-lg shadow-lg active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              <span className="material-symbols-outlined text-sm">person_add</span>
-              Create Client
+              <span className="material-symbols-outlined text-sm">
+                {isCreating ? "progress_activity" : "person_add"}
+              </span>
+              {isCreating ? "Creating..." : "Create Client"}
             </button>
           </form>
         )}
@@ -98,8 +151,8 @@ export default function ClientsView() {
 
       {/* Client List */}
       <div className="flex-1 overflow-y-auto px-4 space-y-2 pb-8">
-        {state.loadingUsers && <Spinner />}
-        {!state.loadingUsers && state.users.length === 0 && (
+        {loadingUsers && <Spinner />}
+        {!loadingUsers && users.length === 0 && (
           <div className="text-center py-12">
             <span className="material-symbols-outlined text-6xl text-outline-variant mb-4">
               group
@@ -112,8 +165,8 @@ export default function ClientsView() {
             </p>
           </div>
         )}
-        {state.users.map((client: User) => {
-          const isSelected = selectedClient?.id === client.id;
+        {users.map((client: User) => {
+          const isSelected = String(inViewState.userId) === String(client.id);
           return (
             <div
               key={client.id}
@@ -154,67 +207,6 @@ export default function ClientsView() {
           );
         })}
       </div>
-
-      {/* Selected Client Details */}
-      {selectedClient && (
-        <div className="border-t border-outline-variant/10 p-6 bg-surface-container-low">
-          <h3 className="text-lg font-black text-on-surface tracking-tight mb-4">
-            Client Details
-          </h3>
-          <div className="space-y-3">
-            <div>
-              <label className="block text-[10px] font-bold text-on-surface-variant uppercase tracking-wider mb-1">
-                Name
-              </label>
-              <p className="text-sm font-semibold text-on-surface">
-                {selectedClient.name || "N/A"}
-              </p>
-            </div>
-            {selectedClient.email && (
-              <div>
-                <label className="block text-[10px] font-bold text-on-surface-variant uppercase tracking-wider mb-1">
-                  Email
-                </label>
-                <p className="text-sm text-on-surface">{selectedClient.email}</p>
-              </div>
-            )}
-            {selectedClient.phone && (
-              <div>
-                <label className="block text-[10px] font-bold text-on-surface-variant uppercase tracking-wider mb-1">
-                  Phone
-                </label>
-                <p className="text-sm text-on-surface">{selectedClient.phone}</p>
-              </div>
-            )}
-            {selectedClient.cellphone && (
-              <div>
-                <label className="block text-[10px] font-bold text-on-surface-variant uppercase tracking-wider mb-1">
-                  Cellphone
-                </label>
-                <p className="text-sm text-on-surface">{selectedClient.cellphone}</p>
-              </div>
-            )}
-            <div>
-              <label className="block text-[10px] font-bold text-on-surface-variant uppercase tracking-wider mb-1">
-                Role
-              </label>
-              <p className="text-sm text-on-surface">
-                {selectedClient.role || "Customer"}
-              </p>
-            </div>
-            {selectedClient.created_at && (
-              <div>
-                <label className="block text-[10px] font-bold text-on-surface-variant uppercase tracking-wider mb-1">
-                  Client Since
-                </label>
-                <p className="text-sm text-on-surface-variant">
-                  {new Date(selectedClient.created_at).toLocaleDateString()}
-                </p>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
     </section>
   );
 }

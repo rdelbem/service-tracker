@@ -1,14 +1,15 @@
-import { useState, useContext } from "react";
-import ProgressContext from "../../context/progress/progressContext";
+import { useState } from "react";
+import { useProgressStore } from "../../stores/progressStore";
 import TextareaAutosize from "react-textarea-autosize";
 import dateformat from "dateformat";
-import { ProgressContextType, Status as StatusType } from "../../types";
+import type { Status as StatusType } from "../../types";
+
+declare const data: Record<string, any>;
 
 interface StatusProps extends StatusType {}
 
 export default function Status({ id, id_user, created_at, text }: Omit<StatusProps, '_id_case'>) {
-  const progressContext = useContext(ProgressContext) as ProgressContextType;
-  const { deleteStatus, editStatus } = progressContext;
+  const { deleteStatus, editStatus } = useProgressStore();
   const [editable, setEditable] = useState(false);
   const [editedText, setEditedText] = useState(text);
 

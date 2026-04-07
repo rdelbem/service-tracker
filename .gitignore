@@ -10,6 +10,9 @@ wordpress/
 # PHP dependencies
 vendor/
 
+# PHPStan baseline (auto-generated file, can be committed to track baseline)
+# Uncomment to ignore: phpstan-baseline.neon
+
 # Packages #
 ############
 *.7z

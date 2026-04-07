@@ -1,13 +1,13 @@
-import { useContext } from "react";
-import ClientsContext from "../../context/clients/clientsContext";
+import { useClientsStore } from "../../stores/clientsStore";
+
+declare const data: Record<string, any>;
 
 interface SearchProps {
   onSearch?: (query: string) => void;
 }
 
 export default function Search({ onSearch }: SearchProps) {
-  const clientsContext = useContext(ClientsContext);
-  const { searchUsers } = clientsContext;
+  const { searchUsers } = useClientsStore();
 
   const handleSearch = (query: string) => {
     if (onSearch) {

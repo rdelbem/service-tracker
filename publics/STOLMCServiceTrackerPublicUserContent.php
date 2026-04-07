@@ -1,75 +1,137 @@
 <?php
 namespace STOLMCServiceTracker\publics;
 
-if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
+if ( ! defined( 'ABSPATH' ) ) {
+	exit; // Exit if accessed directly.
+}
 
+use Moment\Moment;
 use STOLMCServiceTracker\includes\STOLMCServiceTrackerSql;
-use \Moment\Moment;
-use \WP_User;
+use WP_User;
 
-class STOLMCServiceTrackerPublicUserContent
-{
+/**
+ * Handles public-facing user content display.
+ *
+ * Manages shortcode registration and displays case progress
+ * information to customers on the public-facing side of the site.
+ */
+class STOLMCServiceTrackerPublicUserContent {
+
+	/**
+	 * The current logged-in user ID.
+	 *
+	 * @since    1.0.0
+	 * @access   public
+	 * @var      int
+	 */
 	public $current_user_id;
+
+	/**
+	 * Array of user cases and their statuses.
+	 *
+	 * @since    1.0.0
+	 * @access   public
+	 * @var      array
+	 */
 	public $user_cases_and_statuses;
 
-	public function getUserId()
-	{
+	/**
+	 * Get the current user ID and check their role.
+	 *
+	 * @since    1.0.0
+	 * @access   public
+	 *
+	 * @return void
+	 */
+	public function get_user_id() {
 
-		if (!is_user_logged_in()) {
+		if ( ! is_user_logged_in() ) {
 			return;
 		}
 
 		$this->current_user_id = get_current_user_id();
-		$this->checkUserRole();
+		$this->check_user_role();
 	}
 
-	public function checkUserRole()
-	{
-		$user = new WP_User($this->current_user_id);
+	/**
+	 * Check if the current user has the customer role.
+	 *
+	 * @since    1.0.0
+	 * @access   public
+	 *
+	 * @return void
+	 */
+	public function check_user_role() {
+		$user = new WP_User( $this->current_user_id );
 
-		if (empty($user->roles)) {
+		if ( empty( $user->roles ) ) {
 			return;
 		}
 
-		if (is_array($user->roles) && !in_array('customer', $user->roles)) {
+		if ( is_array( $user->roles ) && ! in_array( 'customer', $user->roles, true ) ) {
 			return;
 		}
 
-		if (is_array($user->roles) && in_array('customer', $user->roles)) {
-			$this->getStatusesByCases();
-			$this->addShortcode();
+		if ( is_array( $user->roles ) && in_array( 'customer', $user->roles, true ) ) {
+			$this->get_statuses_by_cases();
+			$this->add_shortcode();
 		}
 	}
 
-	public function getUserCases()
-	{
-		$sql = new STOLMCServiceTrackerSql('servicetracker_cases');
-		$cases = $sql->getBy(array('id_user' => $this->current_user_id));
+	/**
+	 * Get all cases for the current user.
+	 *
+	 * @since    1.0.0
+	 * @access   public
+	 *
+	 * @return array|object|null Array of cases or null on failure.
+	 */
+	public function get_user_cases() {
+		$sql = new STOLMCServiceTrackerSql( 'servicetracker_cases' );
+		$cases = $sql->get_by( [ 'id_user' => $this->current_user_id ] );
 		return $cases;
 	}
 
-	public function getCaseProgress($id_case)
-	{
-		$sql = new STOLMCServiceTrackerSql('servicetracker_progress');
-		$status = $sql->getBy(array('id_case' => $id_case));
-		$progress_array = array();
+	/**
+	 * Get progress entries for a specific case.
+	 *
+	 * @since    1.0.0
+	 * @access   public
+	 *
+	 * @param int $id_case The case ID.
+	 *
+	 * @return array Array of progress entries with formatted dates.
+	 */
+	public function get_case_progress( $id_case ) {
+		$sql = new STOLMCServiceTrackerSql( 'servicetracker_progress' );
+		$status = $sql->get_by( [ 'id_case' => $id_case ] );
+		$progress_array = [];
 
-		foreach ($status as $stat) {
-			$status_obj = array();
-			$status_obj['created_at'] = $this->localeTranslationTime($stat->{'created_at'});
+		foreach ( $status as $stat ) {
+			$status_obj = [];
+			$status_obj['created_at'] = $this->locale_translation_time( $stat->{'created_at'} );
 			$status_obj['text'] = $stat->{'text'};
 
-			array_push($progress_array, $status_obj);
+			array_push( $progress_array, $status_obj );
 		}
 
 		return $progress_array;
 	}
 
-	public function localeTranslationTime($date)
-	{
+	/**
+	 * Format date according to site locale.
+	 *
+	 * @since    1.0.0
+	 * @access   public
+	 *
+	 * @param string $date The date to format.
+	 *
+	 * @return string Formatted date string.
+	 */
+	public function locale_translation_time( $date ) {
 		$locale = get_locale();
 
-		switch ($locale) {
+		switch ( $locale ) {
 			case 'pt_BR':
 				$time_format = 'd/m/y - H:i:s';
 				break;
@@ -81,40 +143,60 @@ class STOLMCServiceTrackerPublicUserContent
 				break;
 		}
 
-		$format_date = new Moment($date);
+		$format_date = new Moment( $date );
 
-		return $format_date->format($time_format);
+		return $format_date->format( $time_format );
 	}
 
-	public function getStatusesByCases()
-	{
-		$cases = $this->getUserCases();
+	/**
+	 * Get all cases and their statuses for the current user.
+	 *
+	 * @since    1.0.0
+	 * @access   public
+	 *
+	 * @return void
+	 */
+	public function get_statuses_by_cases() {
+		$cases = $this->get_user_cases();
 
-		$case_and_statuses = array();
+		$case_and_statuses = [];
 
-		foreach ($cases as $case) {
-			$case_obj = array();
+		foreach ( $cases as $case ) {
+			$case_obj = [];
 			$case_obj['case_title'] = $case->title;
 			$case_obj['case_id'] = $case->id;
-			$case_obj['created_at'] = $this->localeTranslationTime($case->created_at);
+			$case_obj['created_at'] = $this->locale_translation_time( $case->created_at );
 			$case_obj['case_status'] = $case->status;
-			$case_obj['progress'] = $this->getCaseProgress($case->id);
+			$case_obj['progress'] = $this->get_case_progress( $case->id );
 
-			array_push($case_and_statuses, $case_obj);
+			array_push( $case_and_statuses, $case_obj );
 		}
 
 		$this->user_cases_and_statuses = $case_and_statuses;
 	}
 
-	public function addShortcode()
-	{
-		add_shortcode('stolmc-service-tracker-cases-progress', array($this, 'usePartial'));
+	/**
+	 * Register the shortcode for displaying case progress.
+	 *
+	 * @since    1.0.0
+	 * @access   public
+	 *
+	 * @return void
+	 */
+	public function add_shortcode() {
+		add_shortcode( 'stolmc-service-tracker-cases-progress', [ $this, 'use_partial' ] );
 	}
 
-	public function usePartial()
-	{
+	/**
+	 * Render the shortcode partial view.
+	 *
+	 * @since    1.0.0
+	 * @access   public
+	 *
+	 * @return void
+	 */
+	public function use_partial() {
 		$user_cases_and_statuses = $this->user_cases_and_statuses;
-		include wp_normalize_path(plugin_dir_path(__FILE__) . 'partials/cases_progress.php');
+		include wp_normalize_path( plugin_dir_path( __FILE__ ) . 'partials/cases_progress.php' );
 	}
-
 }

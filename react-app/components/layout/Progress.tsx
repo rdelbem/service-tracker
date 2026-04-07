@@ -1,33 +1,30 @@
-import { useState, useContext, Fragment } from "react";
-import InViewContext from "../../context/inView/inViewContext";
-import ProgressContext from "../../context/progress/progressContext";
+import { useState } from "react";
+import { useInViewStore } from "../../stores/inViewStore";
+import { useProgressStore } from "../../stores/progressStore";
 import TextareaAutosize from "react-textarea-autosize";
 import Spinner from "./Spinner";
 import Status from "./Status";
-import { InViewContextType, ProgressContextType } from "../../types";
+
+declare const data: Record<string, any>;
 
 export default function Progress() {
-  const inViewContext = useContext(InViewContext) as InViewContextType;
-  const progressContext = useContext(ProgressContext) as ProgressContextType;
-  const { state, postStatus } = progressContext;
+  const inViewState = useInViewStore((state) => state);
+  const { navigate } = useInViewStore();
+  const progressState = useProgressStore((state) => state);
+  const { postStatus } = useProgressStore();
   const [writingStatus, setWritingStatus] = useState(false);
   const [newText, setNewText] = useState("");
 
-  // Required for navigation purposes
-  if (inViewContext.state.view !== "progress") {
-    return <Fragment></Fragment>;
-  }
-
-  if (state.loadingStatus) {
+  if (progressState.loadingStatus) {
     return <Spinner />;
   }
 
   // Case ID
-  const idCase = inViewContext.state.caseId;
+  const idCase = inViewState.caseId;
   // User ID
-  const idUser = inViewContext.state.userId;
+  const idUser = inViewState.userId;
 
-  const allStatuses = [...state.status];
+  const allStatuses = [...progressState.status];
 
   return (
     <section className="flex-1 flex flex-col bg-background relative h-full">
@@ -36,18 +33,13 @@ export default function Progress() {
         <div className="flex items-center gap-4">
           <div className="w-2 h-2 rounded-full bg-secondary shadow-[0_0_8px_rgba(0,108,73,0.4)]"></div>
           <span className="text-[10px] font-black uppercase tracking-widest text-on-surface-variant">
-            Progress: {state.caseTitle}
+            Progress: {progressState.caseTitle}
           </span>
         </div>
         <div className="flex items-center gap-3">
           <button
             onClick={() => {
-              inViewContext.updateIdView(
-                idUser,
-                idCase,
-                "cases",
-                inViewContext.state.name
-              );
+              navigate("cases", idUser, idCase, inViewState.name);
             }}
             className="flex items-center gap-2 px-4 py-2 bg-surface-container-highest text-on-surface text-xs font-bold rounded-lg shadow-lg hover:shadow-xl active:scale-95 transition-all"
           >
@@ -63,7 +55,7 @@ export default function Progress() {
         <div className="mb-12">
           <div className="flex items-baseline gap-6">
             <h1 className="text-4xl font-black text-on-surface tracking-tighter">
-              {state.caseTitle}
+              {progressState.caseTitle}
             </h1>
             <span className="px-3 py-1 bg-secondary-container/40 text-on-secondary-container text-[10px] font-black uppercase tracking-wider rounded-md">
               Active Status

@@ -41,6 +41,7 @@ export interface ClientsState {
 export interface ClientsContextType {
   state: ClientsState;
   searchUsers: (query: string) => void;
+  createUser: (userData: { name: string; email: string; phone?: string; cellphone?: string }) => Promise<{ success: boolean; message: string; user?: User }>;
 }
 
 export interface CasesState {
@@ -57,6 +58,7 @@ export interface CasesContextType {
   deleteCase: (id: string | number, title: string) => Promise<void>;
   editCase: (id: string | number, id_user: string | number, newTitle: string) => Promise<void>;
   currentUserInDisplay: string | number | undefined;
+  navigate: (view: string, userId: string | number, caseId: string | number, name: string) => void;
 }
 
 export interface InViewState {

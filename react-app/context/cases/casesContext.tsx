@@ -9,6 +9,7 @@ const CasesContext = createContext<CasesContextType>({
   deleteCase: async () => {},
   editCase: async () => {},
   currentUserInDisplay: undefined,
+  navigate: () => {},
 });
 
 export default CasesContext;

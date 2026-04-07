@@ -1,7 +1,9 @@
 <?php
 namespace STOLMCServiceTracker\publics;
 
-if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
+if ( ! defined( 'ABSPATH' ) ) {
+	exit; // Exit if accessed directly.
+}
 
 /**
  * The public-facing functionality of the plugin.
@@ -9,8 +11,8 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
  * @link       http://example.com
  * @since      1.0.0
  *
- * @package    Plugin_Name
- * @subpackage Plugin_Name/public
+ * @package    Service_Tracker
+ * @subpackage Service_Tracker/public
  */
 
 /**
@@ -19,12 +21,12 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
  * Defines the plugin name, version, and two examples hooks for how to
  * enqueue the public-facing stylesheet and JavaScript.
  *
- * @package    Plugin_Name
- * @subpackage Plugin_Name/public
- * @author     Your Name <email@example.com>
+ * @package    Service_Tracker
+ * @subpackage Service_Tracker/public
+ * @author     Rodrigo Del Bem <rodrigodelbem@gmail.com>
  */
-class STOLMCServiceTrackerPublic
-{
+class STOLMCServiceTrackerPublic {
+
 
 	/**
 	 * The ID of this plugin.
@@ -51,42 +53,43 @@ class STOLMCServiceTrackerPublic
 	 * @param      string $plugin_name       The name of the plugin.
 	 * @param      string $version    The version of this plugin.
 	 */
-	public function __construct($plugin_name, $version)
-	{
+	public function __construct( $plugin_name, $version ) {
 
 		$this->plugin_name = $plugin_name;
 		$this->version = $version;
-
 	}
 
 	/**
 	 * Register the stylesheets for the public-facing side of the site.
 	 *
 	 * @since    1.0.0
+	 *
+	 * @return void
 	 */
-	public function enqueueStyles()
-	{
-		if (!has_shortcode(get_the_content(), 'stolmc-service-tracker-cases-progress')) {
+	public function enqueue_styles() {
+		if ( ! has_shortcode( get_the_content(), 'stolmc-service-tracker-cases-progress' ) ) {
 			return;
 		}
 
-		wp_enqueue_style($this->plugin_name, plugin_dir_url(__FILE__) . 'css/service-tracker-public.css', array(), $this->version, 'all');
+		wp_enqueue_style( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'css/service-tracker-public.css', [], $this->version, 'all' );
 	}
 
 	/**
 	 * Register the JavaScript for the public-facing side of the site.
-	 * NOTE: this is yet not used, since we do not have any JS in the user
+	 *
+	 * NOTE: This is yet not used, since we do not have any JS in the user
 	 * facing part of the plugin.
 	 *
 	 * @since    1.0.0
+	 *
+	 * @return void
 	 */
-	public function enqueueScripts()
-	{
-		if (!has_shortcode(get_the_content(), 'stolmc-service-tracker-cases-progress')) {
+	public function enqueue_scripts() {
+		if ( ! has_shortcode( get_the_content(), 'stolmc-service-tracker-cases-progress' ) ) {
 			return;
 		}
 
-		// wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/plugin-name-public.js', array( 'jquery' ), $this->version, false );
+		// JavaScript is not currently used on the public-facing side.
+		// wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/plugin-name-public.js', array( 'jquery' ), $this->version, false );.
 	}
-
 }

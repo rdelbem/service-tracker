@@ -40,7 +40,7 @@ if docker compose ps --services 2>/dev/null | grep -q "wordpress"; then
 fi
 
 echo -e "${YELLOW}→ Starting Docker services...${NC}"
-docker compose up -d db wordpress phpmyadmin
+docker compose up db wordpress phpmyadmin
 
 # --- Wait for database to be ready ---
 echo -e "${YELLOW}→ Waiting for database to be ready...${NC}"

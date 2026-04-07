@@ -1,10 +1,12 @@
 <?php
 namespace STOLMCServiceTracker\includes;
 
-if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
+if ( ! defined( 'ABSPATH' ) ) {
+	exit; // Exit if accessed directly.
+}
 
 /**
- * Define the internationalization functionality
+ * Define the internationalization functionality.
  *
  * Loads and defines the internationalization files for this plugin
  * so that it is ready for translation.
@@ -12,8 +14,8 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
  * @link       http://example.com
  * @since      1.0.0
  *
- * @package    Plugin_Name
- * @subpackage Plugin_Name/includes
+ * @package    Service_Tracker
+ * @subpackage Service_Tracker/includes
  */
 
 /**
@@ -23,28 +25,25 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
  * so that it is ready for translation.
  *
  * @since      1.0.0
- * @package    Plugin_Name
- * @subpackage Plugin_Name/includes
- * @author     Your Name <email@example.com>
+ * @package    Service_Tracker
+ * @subpackage Service_Tracker/includes
+ * @author     Rodrigo Del Bem <rodrigodelbem@gmail.com>
  */
-class STOLMCServiceTrackerI18n
-{
+class STOLMCServiceTrackerI18n {
+
 	/**
 	 * Load the plugin text domain for translation.
 	 *
 	 * @since    1.0.0
+	 *
+	 * @return void
 	 */
-	public function loadPluginTextdomain()
-	{
+	public function load_plugin_textdomain() {
 
 		load_plugin_textdomain(
-			'service-tracker',
+			'service-tracker-stolmc',
 			false,
-			dirname(dirname(plugin_basename(__FILE__))) . '/languages/'
+			dirname( dirname( plugin_basename( __FILE__ ) ) ) . '/languages/'
 		);
-
 	}
-
-
-
 }

@@ -1,7 +1,6 @@
-import { useContext } from "react";
-import InViewContext from "../../context/inView/inViewContext";
-import CasesContext from "../../context/cases/casesContext";
-import { User, InViewContextType, CasesContextType } from "../../types";
+import { useInViewStore } from "../../stores/inViewStore";
+import { useCasesStore } from "../../stores/casesStore";
+import type { User } from "../../types";
 
 interface ClientProps extends User {
   caseCount?: number;
@@ -9,17 +8,16 @@ interface ClientProps extends User {
 }
 
 export default function Client({ id, name, caseCount, activeSince }: ClientProps) {
-  const inViewContext = useContext(InViewContext) as InViewContextType;
-  const { state, updateIdView } = inViewContext;
-  const casesContext = useContext(CasesContext) as CasesContextType;
-  const { getCases } = casesContext;
+  const inViewState = useInViewStore((state) => state);
+  const { navigate } = useInViewStore();
+  const { getCases } = useCasesStore();
 
-  const isActive = parseInt(String(state.userId)) === parseInt(String(id));
+  const isActive = parseInt(String(inViewState.userId)) === parseInt(String(id));
 
   return (
     <div
       onClick={() => {
-        updateIdView(id, "", "cases", name);
+        navigate("cases", id, "", name);
         getCases(id, false);
       }}
       className={`group cursor-pointer p-4 rounded-xl transition-all ${

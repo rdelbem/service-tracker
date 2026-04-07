@@ -1,152 +1,153 @@
-import { useContext, useState, Fragment } from "react";
+import { useState, useEffect } from "react";
+import { useInViewStore } from "../../stores/inViewStore";
+import { useCasesStore } from "../../stores/casesStore";
+import Spinner from "./Spinner";
 import Case from "./Case";
-import CasesContext from "../../context/cases/casesContext";
-import InViewContext from "../../context/inView/inViewContext";
-import Spinner from "../../components/layout/Spinner";
-import { CasesContextType, InViewContextType, Case as CaseType } from "../../types";
+import type { Case as CaseType } from "../../types";
+import { get as fetchGet } from "../../utils/fetch";
+
+declare const data: Record<string, any>;
 
 export default function Cases() {
-  const inViewContext = useContext(InViewContext) as InViewContextType;
-  const casesContext = useContext(CasesContext) as CasesContextType;
-  const { state, postCase, currentUserInDisplay } = casesContext;
-  const [caseTitle, setCaseTitle] = useState("");
+  const inViewState = useInViewStore((state) => state);
+  const { navigate } = useInViewStore();
+  const { loadingCases } = useCasesStore();
+  const [allCases, setAllCases] = useState<CaseType[]>([]);
+  const [filteredCases, setFilteredCases] = useState<CaseType[]>([]);
+  const [searchQuery, setSearchQuery] = useState("");
 
-  // Required for navigation purposes
-  if (inViewContext.state.view !== "cases") {
-    return <Fragment></Fragment>;
+  // Load all cases on mount
+  useEffect(() => {
+    // Only load if we're in the cases view
+    if (inViewState.view !== "cases") return;
+
+    const loadAllCases = async () => {
+      const apiUrlCases = `${data.root_url}/wp-json/${data.api_url}/cases`;
+      try {
+        // Get all customer users first
+        const usersRes = await fetchGet(`${data.root_url}/wp-json/service-tracker-stolmc/v1/users`, {
+          headers: { "X-WP-Nonce": data.nonce },
+        });
+
+        const users = usersRes.data;
+        let casesList: CaseType[] = [];
+
+        // Fetch cases for each user
+        for (const user of users) {
+          const casesRes = await fetchGet(`${apiUrlCases}/${user.id}`, {
+            headers: { "X-WP-Nonce": data.nonce },
+          });
+          if (casesRes.data && casesRes.data.length > 0) {
+            casesList = [...casesList, ...casesRes.data.map((c: CaseType) => ({
+              ...c,
+              clientName: user.name,
+              clientId: user.id,
+            }))];
+          }
+        }
+
+        setAllCases(casesList);
+        setFilteredCases(casesList);
+      } catch (error) {
+        console.error("Error loading cases:", error);
+      }
+    };
+
+    loadAllCases();
+  }, [inViewState.view]);
+
+  // Filter cases based on search query
+  useEffect(() => {
+    if (searchQuery.trim() === "") {
+      setFilteredCases(allCases);
+    } else {
+      const filtered = allCases.filter(
+        (c) =>
+          c.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          c.clientName?.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+      setFilteredCases(filtered);
+    }
+  }, [searchQuery, allCases]);
+
+  // Required for navigation purposes - MUST be after all hooks
+  if (inViewState.view !== "cases") {
+    return null;
   }
 
-  if (state.loadingCases) {
+  const handleAddCase = () => {
+    navigate("casesAddNew", "", "", "");
+  };
+
+  if (loadingCases) {
     return <Spinner />;
   }
 
-  // Empty state - no cases yet
-  if (state.cases.length === 0 && !state.loadingCases && currentUserInDisplay) {
-    return (
-      <Fragment>
-        {/* Top Action Header */}
-        <header className="h-20 px-12 flex items-center justify-between border-b border-outline-variant/5">
-          <div className="flex items-center gap-4">
-            <div className="w-2 h-2 rounded-full bg-secondary shadow-[0_0_8px_rgba(0,108,73,0.4)]"></div>
-            <span className="text-[10px] font-black uppercase tracking-widest text-on-surface-variant">
-              Currently Viewing: {inViewContext.state.name}
-            </span>
-          </div>
-          <div className="flex items-center gap-3">
-            <button className="flex items-center gap-2 px-6 py-2 bg-gradient-to-br from-primary to-primary-container text-white text-xs font-bold rounded-lg shadow-lg active:scale-95 transition-all">
-              <span className="material-symbols-outlined text-sm">add_circle</span>
-              Create Case
-            </button>
-          </div>
-        </header>
-
-        {/* Empty State */}
-        <div className="flex items-center justify-center p-12">
-          <form className="w-full max-w-md">
-            <input
-              className="w-full bg-surface-container-lowest border-2 border-outline-variant/20 rounded-xl py-4 px-6 text-sm focus:ring-2 focus:ring-primary/10 transition-all placeholder:text-outline-variant mb-4"
-              placeholder={data.case_name || "Enter case name..."}
-              onChange={(e) => setCaseTitle(e.target.value)}
-              type="text"
-              value={caseTitle}
-            />
-            <button
-              onClick={(e) => {
-                e.preventDefault();
-                if (caseTitle.trim() !== "") {
-                  postCase(currentUserInDisplay, caseTitle);
-                  setCaseTitle("");
-                }
-              }}
-              className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-br from-primary to-primary-container text-white text-sm font-bold rounded-xl shadow-lg active:scale-95 transition-all"
-            >
-              <span className="material-symbols-outlined text-sm">add_circle</span>
-              {data.btn_add_case || "Add Case"}
-            </button>
-          </form>
-        </div>
-      </Fragment>
-    );
-  }
-
   return (
-    <Fragment>
-      {/* Top Action Header */}
-      <header className="h-20 px-12 flex items-center justify-between border-b border-outline-variant/5 flex-shrink-0">
-        <div className="flex items-center gap-4">
-          <div className="w-2 h-2 rounded-full bg-secondary shadow-[0_0_8px_rgba(0,108,73,0.4)]"></div>
-          <span className="text-[10px] font-black uppercase tracking-widest text-on-surface-variant">
-            Currently Viewing: {inViewContext.state.name}
-          </span>
-        </div>
-        <div className="flex items-center gap-3">
-          <button
-            onClick={() => {
-              setCaseTitle("");
-              document.getElementById("new-case-input")?.focus();
-            }}
-            className="flex items-center gap-2 px-6 py-2 bg-gradient-to-br from-primary to-primary-container text-white text-xs font-bold rounded-lg shadow-lg active:scale-95 transition-all"
-          >
-            <span className="material-symbols-outlined text-sm">add_circle</span>
-            Create Case
-          </button>
-        </div>
-      </header>
-
-      {/* Cases List */}
-      <div className="flex-1 overflow-y-auto p-12">
-        <div className="mb-8">
-          <h1 className="text-4xl font-black text-on-surface tracking-tighter mb-2">
-            Cases
-          </h1>
-          <p className="text-on-surface-variant text-sm">
-            Manage and track all active cases
-          </p>
-        </div>
-
-        {/* New Case Input */}
-        <form className="mb-8 bg-surface-container-lowest p-6 rounded-2xl shadow-[0px_12px_32px_rgba(11,28,48,0.06)]">
-          <div className="flex gap-4">
-            <input
-              id="new-case-input"
-              className="flex-1 bg-surface-container-low border-0 rounded-xl py-3 px-4 text-sm focus:ring-2 focus:ring-primary/10 transition-all placeholder:text-outline-variant"
-              placeholder={data.case_name || "Enter new case name..."}
-              onChange={(e) => setCaseTitle(e.target.value)}
-              type="text"
-              value={caseTitle}
-            />
-            <button
-              onClick={(e) => {
-                e.preventDefault();
-                if (caseTitle.trim() !== "") {
-                  postCase(currentUserInDisplay ?? "", caseTitle);
-                  setCaseTitle("");
-                }
-              }}
-              className="px-6 py-3 bg-gradient-to-br from-primary to-primary-container text-white text-sm font-bold rounded-xl shadow-lg active:scale-95 transition-all"
-            >
-              {data.btn_add_case || "Add"}
-            </button>
+    <section className="flex-1 h-full overflow-y-auto">
+      <div className="p-8">
+        {/* Header */}
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <h1 className="text-3xl font-black text-on-surface tracking-tight">
+              Cases
+            </h1>
+            <p className="text-on-surface-variant text-sm mt-1">
+              Search and manage all service cases
+            </p>
           </div>
-        </form>
-
-        {/* Cases Grid */}
-        <div className="grid grid-cols-1 gap-4">
-          {state.cases.map((item: CaseType) => (
-            <Case key={item.id} {...item} />
-          ))}
         </div>
+
+        {/* Search Bar */}
+        <div className="relative mb-8">
+          <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline text-xl">
+            search
+          </span>
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Search cases by title or client name..."
+            className="w-full bg-surface-container-low border-0 rounded-xl py-4 pl-12 pr-4 text-sm focus:ring-2 focus:ring-primary/10 transition-all placeholder:text-outline-variant"
+          />
+        </div>
+
+        {/* Cases List */}
+        {filteredCases.length === 0 ? (
+          <div className="text-center py-16">
+            <span className="material-symbols-outlined text-6xl text-outline-variant mb-4">
+              folder_open
+            </span>
+            <p className="text-on-surface-variant text-sm font-medium">
+              {searchQuery ? "No cases match your search" : "No cases found"}
+            </p>
+            {!searchQuery && (
+              <button
+                onClick={handleAddCase}
+                className="mt-4 flex items-center gap-2 px-6 py-3 bg-gradient-to-br from-primary to-primary-container text-white text-sm font-bold rounded-xl shadow-lg active:scale-95 transition-all mx-auto"
+              >
+                <span className="material-symbols-outlined text-sm">add_circle</span>
+                Create your first case
+              </button>
+            )}
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 gap-4">
+            {filteredCases.map((item: CaseType) => (
+              <Case key={item.id} {...item} />
+            ))}
+          </div>
+        )}
       </div>
 
-      {/* Floating Quick Action */}
-      <div className="absolute bottom-10 right-10">
-        <button
-          onClick={() => document.getElementById("new-case-input")?.focus()}
-          className="w-16 h-16 rounded-full bg-primary text-white shadow-2xl flex items-center justify-center active:scale-90 transition-all hover:rotate-90"
-        >
-          <span className="material-symbols-outlined text-3xl">add</span>
-        </button>
-      </div>
-    </Fragment>
+      {/* Floating Add Button */}
+      <button
+        onClick={handleAddCase}
+        className="absolute bottom-10 right-10 w-16 h-16 rounded-full bg-primary text-white shadow-2xl flex items-center justify-center active:scale-90 transition-all hover:bg-primary-container z-30"
+        title="Add new case"
+      >
+        <span className="material-symbols-outlined text-3xl">add</span>
+      </button>
+    </section>
   );
 }

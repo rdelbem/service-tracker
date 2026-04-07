@@ -16,34 +16,50 @@
  * Domain Path: languages
  */
 
-defined('WPINC') or die();
+if ( ! defined( 'WPINC' ) ) {
+	die;
+}
 
-require_once plugin_dir_path(__FILE__) . '/vendor/autoload.php';
+require_once plugin_dir_path( __FILE__ ) . '/vendor/autoload.php';
 
 use STOLMCServiceTracker\includes\STOLMCServiceTrackerActivator;
 use STOLMCServiceTracker\STOLMCServiceTrackerUninstall;
 use STOLMCServiceTracker\includes\STOLMCServiceTracker;
 
-function STOLMC_activateServiceTracker()
-{
+/**
+ * Activate the Service Tracker plugin.
+ *
+ * Called on plugin activation to create database tables.
+ *
+ * @since    1.0.0
+ *
+ * @return void
+ */
+function stolmc_activate_service_tracker() {
 	STOLMCServiceTrackerActivator::activate();
 }
 
 /**
+ * Uninstall the Service Tracker plugin.
+ *
  * Service Tracker should do nothing on deactivation,
  * that's because we want to preserve the tables created
- * during the plugin's usage
+ * during the plugin's usage.
+ *
+ * @since    1.0.0
+ *
+ * @return void
  */
-
-function STOLMC_uninstallServiceTracker()
-{
+function stolmc_uninstall_service_tracker() {
 	STOLMCServiceTrackerUninstall::uninstall();
 }
 
-register_activation_hook(__FILE__, 'STOLMC_activateServiceTracker');
+register_activation_hook( __FILE__, 'stolmc_activate_service_tracker' );
+register_uninstall_hook( __FILE__, 'stolmc_uninstall_service_tracker' );
 
-register_uninstall_hook(__FILE__, 'STOLMC_uninstallServiceTracker');
-
-add_action('plugins_loaded', function () {
-	(new STOLMCServiceTracker())->run();
-});
+add_action(
+	'plugins_loaded',
+	function () {
+		( new STOLMCServiceTracker() )->run();
+	}
+);

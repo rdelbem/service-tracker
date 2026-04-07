@@ -1,13 +1,12 @@
-import { useContext } from "react";
-import InViewContext from "../../context/inView/inViewContext";
-import { InViewContextType } from "../../types";
+import { useInViewStore } from "../../stores/inViewStore";
+
+declare const data: Record<string, any>;
 
 export default function Initial() {
-  const inViewContext = useContext(InViewContext) as InViewContextType;
-  const { state } = inViewContext;
+  const inViewState = useInViewStore((state) => state);
 
   // Required for navigation purposes
-  if (state.view !== "init") {
+  if (inViewState.view !== "init") {
     return <></>;
   }
 

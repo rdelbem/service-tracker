@@ -35,7 +35,18 @@ export async function request(
     throw new Error(`HTTP error! status: ${response.status}`);
   }
 
-  const data = await response.json();
+  // Handle empty or non-JSON responses
+  const contentType = response.headers.get('content-type');
+  let data: any = null;
+  
+  if (contentType && contentType.includes('application/json')) {
+    data = await response.json();
+  } else {
+    // For non-JSON responses (like empty 200/204 responses)
+    const text = await response.text();
+    data = text ? text : null;
+  }
+  
   return { data };
 }
 

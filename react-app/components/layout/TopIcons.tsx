@@ -1,19 +1,17 @@
-import { useContext } from "react";
+import { useInViewStore } from "../../stores/inViewStore";
 import { AiOutlineHome, AiOutlineTool } from "react-icons/ai";
-import InViewContext from "../../context/inView/inViewContext";
 
 export default function TopIcons() {
-  const inViewContext = useContext(InViewContext);
-  const { updateIdView } = inViewContext;
+  const { navigate } = useInViewStore();
 
   return (
     <div className="top-icons-container">
       <AiOutlineHome
-        onClick={() => updateIdView("", "", "init", "")}
+        onClick={() => navigate("init", "", "", "")}
         className="top-icon"
       />
       <AiOutlineTool
-        onClick={() => updateIdView("", "", "howToUse", "")}
+        onClick={() => navigate("howToUse", "", "", "")}
         className="top-icon"
       />
     </div>

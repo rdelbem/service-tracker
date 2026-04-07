@@ -1,17 +1,17 @@
-import { useContext, useState, Fragment } from "react";
-import CasesContext from "../../context/cases/casesContext";
-import InViewContext from "../../context/inView/inViewContext";
-import ProgressContext from "../../context/progress/progressContext";
+import { useState, Fragment } from "react";
+import { useCasesStore } from "../../stores/casesStore";
+import { useInViewStore } from "../../stores/inViewStore";
+import { useProgressStore } from "../../stores/progressStore";
 import dateformat from "dateformat";
-import type { Case as CaseType, CasesContextType, InViewContextType, ProgressContextType } from "../../types";
+import type { Case as CaseType } from "../../types";
+
+declare const data: Record<string, any>;
 
 export default function Case({ id, id_user, status, created_at, title }: CaseType) {
-  const casesContext = useContext(CasesContext) as CasesContextType;
-  const { deleteCase, toggleCase, editCase } = casesContext;
-  const inViewContext = useContext(InViewContext) as InViewContextType;
-  const { updateIdView } = inViewContext;
-  const progressContext = useContext(ProgressContext) as ProgressContextType;
-  const { getStatus } = progressContext;
+  const { deleteCase, toggleCase, editCase } = useCasesStore();
+  const inViewState = useInViewStore((state) => state);
+  const { navigate } = useInViewStore();
+  const { getStatus } = useProgressStore();
   const [editing, setEditing] = useState(false);
   const [newTitle, setNewTitle] = useState("");
 
@@ -35,7 +35,7 @@ export default function Case({ id, id_user, status, created_at, title }: CaseTyp
             <div className="flex items-center gap-3 mb-2">
               <span
                 onClick={() => {
-                  updateIdView(id_user, id, "progress", inViewContext.state.name);
+                  navigate("progress", id_user, id, inViewState.name);
                   getStatus(id, false, title);
                 }}
                 className="text-xl font-bold text-on-surface cursor-pointer hover:text-primary transition-colors"
@@ -55,7 +55,7 @@ export default function Case({ id, id_user, status, created_at, title }: CaseTyp
           <div className="flex items-center gap-2">
             <button
               onClick={() => {
-                updateIdView(id_user, id, "progress", inViewContext.state.name);
+                navigate("progress", id_user, id, inViewState.name);
                 getStatus(id, false, title);
               }}
               className="p-2 rounded-lg hover:bg-surface-container-highest transition-colors text-on-surface-variant hover:text-primary"

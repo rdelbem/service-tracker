@@ -38,17 +38,17 @@ export function parseHash(hash: string): RouteMatch {
     };
   }
 
-  // Match /cases/:userId
-  if (segments[0] === "cases" && segments.length >= 2) {
-    return {
-      view: "cases",
-      userId: segments[1],
-      caseId: "",
-      name: "",
-    };
+  // Match /cases/add-new
+  if (segments[0] === "cases" && segments[1] === "add-new") {
+    return { view: "casesAddNew", userId: "", caseId: "", name: "" };
   }
 
-  // Match /cases
+  // Match /cases/:caseId (viewing a specific case)
+  if (segments[0] === "cases" && segments.length >= 2 && segments[1] !== "add-new") {
+    return { view: "cases", userId: "", caseId: segments[1], name: "" };
+  }
+
+  // Match /cases (list view)
   if (segments[0] === "cases") {
     return { view: "cases", userId: "", caseId: "", name: "" };
   }
@@ -56,6 +56,36 @@ export function parseHash(hash: string): RouteMatch {
   // Match /how-to-use
   if (segments[0] === "how-to-use") {
     return { view: "howToUse", userId: "", caseId: "", name: "" };
+  }
+
+  // Match /clients/:userId
+  if (segments[0] === "clients" && segments.length >= 2) {
+    return { view: "clients", userId: segments[1], caseId: "", name: "" };
+  }
+
+  // Match /clients
+  if (segments[0] === "clients") {
+    return { view: "clients", userId: "", caseId: "", name: "" };
+  }
+
+  // Match /calendar
+  if (segments[0] === "calendar") {
+    return { view: "calendar", userId: "", caseId: "", name: "" };
+  }
+
+  // Match /analytics
+  if (segments[0] === "analytics") {
+    return { view: "analytics", userId: "", caseId: "", name: "" };
+  }
+
+  // Match /settings
+  if (segments[0] === "settings") {
+    return { view: "settings", userId: "", caseId: "", name: "" };
+  }
+
+  // Match /support
+  if (segments[0] === "support") {
+    return { view: "support", userId: "", caseId: "", name: "" };
   }
 
   // Default to initial view
@@ -67,13 +97,25 @@ export function buildHash(view: string, userId: string | number = "", caseId: st
   switch (view) {
     case "init":
       return "#/";
+    case "clients":
+      return userId ? `#/clients/${userId}` : "#/clients";
     case "cases":
-      return userId ? `#/cases/${userId}` : "#/cases";
+      return caseId ? `#/cases/${caseId}` : "#/cases";
+    case "casesAddNew":
+      return "#/cases/add-new";
     case "progress":
       return `#/progress/${userId}/${caseId}`;
     case "howToUse":
       return "#/how-to-use";
+    case "calendar":
+      return "#/calendar";
+    case "analytics":
+      return "#/analytics";
+    case "settings":
+      return "#/settings";
+    case "support":
+      return "#/support";
     default:
-      return "#/";
+      return `#/${view}`;
   }
 }

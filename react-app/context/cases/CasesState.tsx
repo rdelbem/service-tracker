@@ -245,6 +245,7 @@ export default function CasesState({ children }: CasesStateProps) {
         deleteCase,
         editCase,
         currentUserInDisplay,
+        navigate: inViewContext.navigate,
       }}
     >
       {children}
