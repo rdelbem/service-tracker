@@ -1,9 +1,5 @@
 <?php
-namespace STOLMCServiceTracker\includes;
-
-if ( ! defined( 'ABSPATH' ) ) {
-	exit; // Exit if accessed directly.
-}
+namespace STOLMC_Service_Tracker\includes\I18n;
 
 /**
  * Define the internationalization functionality.
@@ -29,7 +25,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @subpackage Service_Tracker/includes
  * @author     Rodrigo Del Bem <rodrigodelbem@gmail.com>
  */
-class STOLMCServiceTrackerI18n {
+class STOLMC_Service_Tracker_I18n {
 
 	/**
 	 * Load the plugin text domain for translation.
@@ -38,7 +34,7 @@ class STOLMCServiceTrackerI18n {
 	 *
 	 * @return void
 	 */
-	public function load_plugin_textdomain() {
+	public function load_plugin_textdomain(): void {
 
 		load_plugin_textdomain(
 			'service-tracker-stolmc',

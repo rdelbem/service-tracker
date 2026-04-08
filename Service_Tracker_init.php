@@ -16,15 +16,11 @@
  * Domain Path: languages
  */
 
-if ( ! defined( 'WPINC' ) ) {
-	die;
-}
-
 require_once plugin_dir_path( __FILE__ ) . '/vendor/autoload.php';
 
-use STOLMCServiceTracker\includes\STOLMCServiceTrackerActivator;
-use STOLMCServiceTracker\STOLMCServiceTrackerUninstall;
-use STOLMCServiceTracker\includes\STOLMCServiceTracker;
+use STOLMC_Service_Tracker\includes\Life_Cycle\STOLMC_Service_Tracker_Activator;
+use STOLMC_Service_Tracker\STOLMC_Service_Tracker_Uninstall;
+use STOLMC_Service_Tracker\includes\STOLMC_Service_Tracker;
 
 /**
  * Activate the Service Tracker plugin.
@@ -35,8 +31,15 @@ use STOLMCServiceTracker\includes\STOLMCServiceTracker;
  *
  * @return void
  */
-function stolmc_activate_service_tracker() {
-	STOLMCServiceTrackerActivator::activate();
+function stolmc_activate_service_tracker(): void {
+	STOLMC_Service_Tracker_Activator::activate();
+	
+	/**
+	 * Fires after the plugin has been activated.
+	 *
+	 * @since 1.0.0
+	 */
+	do_action( 'stolmc_service_tracker_activated' );
 }
 
 /**
@@ -50,8 +53,22 @@ function stolmc_activate_service_tracker() {
  *
  * @return void
  */
-function stolmc_uninstall_service_tracker() {
-	STOLMCServiceTrackerUninstall::uninstall();
+function stolmc_uninstall_service_tracker(): void {
+	/**
+	 * Fires before the plugin is uninstalled.
+	 *
+	 * @since 1.0.0
+	 */
+	do_action( 'stolmc_service_tracker_before_uninstall' );
+	
+	STOLMC_Service_Tracker_Uninstall::uninstall();
+	
+	/**
+	 * Fires after the plugin has been uninstalled.
+	 *
+	 * @since 1.0.0
+	 */
+	do_action( 'stolmc_service_tracker_uninstalled' );
 }
 
 register_activation_hook( __FILE__, 'stolmc_activate_service_tracker' );
@@ -60,6 +77,17 @@ register_uninstall_hook( __FILE__, 'stolmc_uninstall_service_tracker' );
 add_action(
 	'plugins_loaded',
 	function () {
-		( new STOLMCServiceTracker() )->run();
+		$plugin_instance = new STOLMC_Service_Tracker();
+		
+		/**
+		 * Filters the plugin instance before it runs.
+		 *
+		 * @since 1.0.0
+		 *
+		 * @param STOLMC_Service_Tracker $plugin_instance The plugin instance.
+		 */
+		apply_filters( 'stolmc_service_tracker_before_run', $plugin_instance );
+		
+		$plugin_instance->run();
 	}
 );

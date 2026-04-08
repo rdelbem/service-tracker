@@ -1,39 +1,14 @@
 parameters:
-    # Start with level 4 and gradually increase to 6, 7, 8
-    level: 4
-    
+    level: 8
+
     # Paths to analyze
     paths:
         - admin
         - includes
-        - publics
-    
+
     # WordPress integration
     bootstrapFiles:
         - vendor/php-stubs/wordpress-stubs/wordpress-stubs.php
-    
-    # Ignore specific errors initially (remove as you fix them)
-    ignoreErrors:
-        # Ignore missing WordPress functions/classes (normal for WP plugins)
-        - '#Function (apply_filters|add_action|add_filter|do_action|current_user_can|wp_verify_nonce) not found#'
-        - '#Class (WP_REST_Request|WP_REST_Response|WP_Error) not found#'
-        - '#Function (plugin_dir_path|plugin_dir_url|__|_e|esc_html__|esc_attr__) not found#'
-        
-        # Ignore undefined variables from WordPress globals
-        - '#Undefined variable: \$wpdb#'
-        
-        # Ignore method calls on potentially null objects during gradual refactoring
-        - '#Call to an undefined method#'
-    
-    # Report possibly undefined values
-    reportPossiblyUndefinedValues: true
-    
-    # Check missing return statements
-    checkMissingReturnTypes: true
-    
-    # Check union types
-    featureToggles:
-        phpstanParser: true
 
 # Use WordPress extension for better WP integration
 includes:

@@ -1,6 +1,10 @@
-<?php if ( ! defined( 'ABSPATH' ) ) {
+<?php
+if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
+
+// Variable passed from STOLMC_Service_Tracker_Public_User_Content::use_partial().
+$user_cases_and_statuses = $user_cases_and_statuses ?? [];
 ?>
 
 <div class="st-container">

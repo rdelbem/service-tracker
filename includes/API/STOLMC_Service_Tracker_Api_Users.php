@@ -1,11 +1,6 @@
 <?php
-namespace STOLMCServiceTracker\includes;
+namespace STOLMC_Service_Tracker\includes\API;
 
-if ( ! defined( 'ABSPATH' ) ) {
-	exit; // Exit if accessed directly.
-}
-
-use STOLMCServiceTracker\includes\STOLMCServiceTrackerApi;
 use WP_Error;
 use WP_REST_Request;
 use WP_REST_Response;
@@ -18,14 +13,14 @@ use WP_REST_Server;
  *
  * ENDPOINT => wp-json/service-tracker-stolmc/v1/users
  */
-class STOLMCServiceTrackerApiUsers extends STOLMCServiceTrackerApi {
+class STOLMC_Service_Tracker_Api_Users extends STOLMC_Service_Tracker_Api {
 
 	/**
 	 * Initialize the API and register routes.
 	 *
 	 * @return void
 	 */
-	public function run() {
+	public function run(): void {
 		$this->custom_api();
 	}
 
@@ -34,7 +29,7 @@ class STOLMCServiceTrackerApiUsers extends STOLMCServiceTrackerApi {
 	 *
 	 * @return void
 	 */
-	public function custom_api() {
+	public function custom_api(): void {
 
 		// GET /service-tracker-stolmc/v1/users - Get all customer users.
 		register_rest_route(
@@ -66,7 +61,7 @@ class STOLMCServiceTrackerApiUsers extends STOLMCServiceTrackerApi {
 	 *
 	 * @return WP_REST_Response Response with user data.
 	 */
-	public function get_users( WP_REST_Request $data ) {
+	public function get_users( WP_REST_Request $data ): WP_REST_Response {
 
 		// Security check.
 		$security_result = $this->security_check( $data );
@@ -80,6 +75,15 @@ class STOLMCServiceTrackerApiUsers extends STOLMCServiceTrackerApi {
 			'orderby' => 'display_name',
 			'order'   => 'ASC',
 		];
+
+		/**
+		 * Filters the query arguments for fetching customer users.
+		 *
+		 * @since 1.0.0
+		 *
+		 * @param array $args The user query arguments.
+		 */
+		$args = apply_filters( 'stolmc_service_tracker_get_users_args', $args );
 
 		$users      = get_users( $args );
 		$user_data  = [];
@@ -96,6 +100,16 @@ class STOLMCServiceTrackerApiUsers extends STOLMCServiceTrackerApi {
 			];
 		}
 
+		/**
+		 * Filters the users response data.
+		 *
+		 * @since 1.0.0
+		 *
+		 * @param array    $user_data The user data array.
+		 * @param WP_User[] $users    The WP_User objects.
+		 */
+		$user_data = apply_filters( 'stolmc_service_tracker_users_response', $user_data, $users );
+
 		return new WP_REST_Response( $user_data, 200 );
 	}
 
@@ -106,7 +120,7 @@ class STOLMCServiceTrackerApiUsers extends STOLMCServiceTrackerApi {
 	 *
 	 * @return WP_REST_Response Response indicating success or failure.
 	 */
-	public function create( WP_REST_Request $data ) {
+	public function create( WP_REST_Request $data ): WP_REST_Response {
 
 		// Security check.
 		$security_result = $this->security_check( $data );
@@ -143,6 +157,15 @@ class STOLMCServiceTrackerApiUsers extends STOLMCServiceTrackerApi {
 		// Generate a random password.
 		$password = wp_generate_password( 12, true, true );
 
+		/**
+		 * Filters the generated password before user creation.
+		 *
+		 * @since 1.0.0
+		 *
+		 * @param string $password The generated password.
+		 */
+		$password = apply_filters( 'stolmc_service_tracker_user_password', $password );
+
 		// Prepare user data.
 		$user_data = [
 			'user_login'   => sanitize_user( $body->name ),
@@ -153,10 +176,16 @@ class STOLMCServiceTrackerApiUsers extends STOLMCServiceTrackerApi {
 			'first_name'   => sanitize_text_field( $body->name ),
 		];
 
-		// Optionally add phone if provided.
-		if ( ! empty( $body->phone ) ) {
-			$user_data['phone'] = sanitize_text_field( $body->phone );
-		}
+		/**
+		 * Filters the user data before creation.
+		 *
+		 * @since 1.0.0
+		 *
+		 * @param array  $user_data The user data to insert.
+		 * @param object $body      The raw request body.
+		 * @param string $password  The user password.
+		 */
+		$user_data = apply_filters( 'stolmc_service_tracker_user_create_data', $user_data, $body, $password );
 
 		// Create the user.
 		$user_id = wp_insert_user( $user_data );
@@ -172,17 +201,54 @@ class STOLMCServiceTrackerApiUsers extends STOLMCServiceTrackerApi {
 		}
 
 		// Store phone as user meta if provided.
+		$meta_data = [];
 		if ( ! empty( $body->phone ) ) {
 			update_user_meta( $user_id, 'phone', sanitize_text_field( $body->phone ) );
+			$meta_data['phone'] = sanitize_text_field( $body->phone );
 		}
 
 		// Store cellphone as user meta if provided.
 		if ( ! empty( $body->cellphone ) ) {
 			update_user_meta( $user_id, 'cellphone', sanitize_text_field( $body->cellphone ) );
+			$meta_data['cellphone'] = sanitize_text_field( $body->cellphone );
+		}
+
+		/**
+		 * Fires after a user has been created.
+		 *
+		 * @since 1.0.0
+		 *
+		 * @param int    $user_id   The ID of the created user.
+		 * @param array  $user_data The user data that was inserted.
+		 * @param object $body      The raw request body.
+		 * @param string $password  The user password.
+		 */
+		do_action( 'stolmc_service_tracker_user_created', $user_id, $user_data, $body, $password );
+
+		if ( ! empty( $meta_data ) ) {
+			/**
+			 * Fires after user meta data has been updated.
+			 *
+			 * @since 1.0.0
+			 *
+			 * @param int   $user_id   The ID of the created user.
+			 * @param array $meta_data The meta data that was saved.
+			 */
+			do_action( 'stolmc_service_tracker_user_created_with_meta', $user_id, $meta_data );
 		}
 
 		// Return the created user data.
 		$user = get_user_by( 'id', $user_id );
+
+		if ( false === $user ) {
+			return new WP_REST_Response(
+				[
+					'success' => false,
+					'message' => 'User created but could not retrieve data',
+				],
+				500
+			);
+		}
 
 		return new WP_REST_Response(
 			[

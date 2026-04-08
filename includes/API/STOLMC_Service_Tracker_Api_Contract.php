@@ -1,9 +1,5 @@
 <?php
-namespace STOLMCServiceTracker\includes;
-
-if ( ! defined( 'ABSPATH' ) ) {
-	exit; // Exit if accessed directly.
-}
+namespace STOLMC_Service_Tracker\includes\API;
 
 use WP_REST_Request;
 
@@ -11,7 +7,7 @@ use WP_REST_Request;
  * This is the required contract/interface used in order
  * to implement a full CRUD REST API end point.
  */
-interface STOLMCServiceTrackerApiContract {
+interface STOLMC_Service_Tracker_Api_Contract {
 
 	/**
 	 * The method run is used to start the application.
@@ -23,7 +19,7 @@ interface STOLMCServiceTrackerApiContract {
 	 *
 	 * @return void
 	 */
-	public function run();
+	public function run(): void;
 
 	/**
 	 * This method registers the end point, it is done
@@ -33,7 +29,7 @@ interface STOLMCServiceTrackerApiContract {
 	 *
 	 * @return void
 	 */
-	public function custom_api();
+	public function custom_api(): void;
 
 	/**
 	 * It verifies the request, then reads a table.
@@ -42,9 +38,9 @@ interface STOLMCServiceTrackerApiContract {
 	 *
 	 * @param WP_REST_Request $data The REST request object.
 	 *
-	 * @return void
+	 * @return mixed
 	 */
-	public function read( WP_REST_Request $data );
+	public function read( WP_REST_Request $data ): mixed;
 
 	/**
 	 * It verifies the request, then creates a new entry on a table.
@@ -53,9 +49,9 @@ interface STOLMCServiceTrackerApiContract {
 	 *
 	 * @param WP_REST_Request $data The REST request object.
 	 *
-	 * @return void
+	 * @return mixed
 	 */
-	public function create( WP_REST_Request $data );
+	public function create( WP_REST_Request $data ): mixed;
 
 	/**
 	 * It verifies the request, then updates a certain entry on a table.
@@ -64,9 +60,9 @@ interface STOLMCServiceTrackerApiContract {
 	 *
 	 * @param WP_REST_Request $data The REST request object.
 	 *
-	 * @return void
+	 * @return mixed
 	 */
-	public function update( WP_REST_Request $data );
+	public function update( WP_REST_Request $data ): mixed;
 
 	/**
 	 * It verifies the request, then it deletes a certain entry on a table.
@@ -75,7 +71,7 @@ interface STOLMCServiceTrackerApiContract {
 	 *
 	 * @param WP_REST_Request $data The REST request object.
 	 *
-	 * @return void
+	 * @return mixed
 	 */
-	public function delete( WP_REST_Request $data );
+	public function delete( WP_REST_Request $data ): mixed;
 }

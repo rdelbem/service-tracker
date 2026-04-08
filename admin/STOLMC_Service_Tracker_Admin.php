@@ -1,9 +1,5 @@
 <?php
-namespace STOLMCServiceTracker\admin;
-
-if ( ! defined( 'ABSPATH' ) ) {
-	exit; // Exit if accessed directly.
-}
+namespace STOLMC_Service_Tracker\admin;
 
 /**
  * The admin-specific functionality of the plugin.
@@ -25,7 +21,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @subpackage Service_Tracker/admin
  * @author     Rodrigo Del Bem <rodrigodelbem@gmail.com>
  */
-class STOLMCServiceTrackerAdmin {
+class STOLMC_Service_Tracker_Admin {
 
 	/**
 	 * The ID of this plugin.
@@ -63,7 +59,7 @@ class STOLMCServiceTrackerAdmin {
 	 * @param string $version                The version of this plugin.
 	 * @param bool   $block_enqueue_bad_config Whether to block script enqueue.
 	 */
-	public function __construct( $plugin_name, $version, $block_enqueue_bad_config ) {
+	public function __construct( string $plugin_name, string $version, bool $block_enqueue_bad_config ) {
 		$this->plugin_name = $plugin_name;
 		$this->version = $version;
 		$this->block_enqueue_bad_config = $block_enqueue_bad_config;
@@ -79,10 +75,17 @@ class STOLMCServiceTrackerAdmin {
 	 *
 	 * @return void
 	 */
-	public function remove_wp_admin_elements() {
+	public function remove_wp_admin_elements(): void {
 
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Non-admin data check for page identification.
 		if ( isset( $_GET['page'] ) && 'service_tracker' === $_GET['page'] ) {
+
+			/**
+			 * Fires when the admin page is initialized.
+			 *
+			 * @since 1.0.0
+			 */
+			do_action( 'stolmc_service_tracker_admin_page_init' );
 
 			// Remove footer text.
 			add_filter( 'admin_footer_text', '__return_empty_string', 9999 );
@@ -103,9 +106,11 @@ class STOLMCServiceTrackerAdmin {
 	 *
 	 * @return void
 	 */
-	public function remove_help_tabs() {
+	public function remove_help_tabs(): void {
 		$screen = get_current_screen();
-		$screen->remove_help_tabs();
+		if ( null !== $screen ) {
+			$screen->remove_help_tabs();
+		}
 	}
 
 	/**
@@ -115,7 +120,7 @@ class STOLMCServiceTrackerAdmin {
 	 *
 	 * @return void
 	 */
-	public function hide_wp_elements() {
+	public function hide_wp_elements(): void {
 		echo '<style>
 			#wpfooter,
 			#screen-meta-links,
@@ -138,8 +143,20 @@ class STOLMCServiceTrackerAdmin {
 	 *
 	 * @return void
 	 */
-	public function enqueue_styles( $hook ) {
+	public function enqueue_styles( string $hook ): void {
 		if ( 'toplevel_page_service_tracker' !== $hook ) {
+			return;
+		}
+
+		/**
+		 * Filters whether to enqueue admin styles.
+		 *
+		 * @since 1.0.0
+		 *
+		 * @param bool   $enqueue Whether to enqueue styles.
+		 * @param string $hook    The current admin page.
+		 */
+		if ( ! apply_filters( 'stolmc_service_tracker_admin_enqueue_styles', true, $hook ) ) {
 			return;
 		}
 
@@ -170,8 +187,20 @@ class STOLMCServiceTrackerAdmin {
 	 *
 	 * @return void
 	 */
-	public function enqueue_scripts( $hook ) {
+	public function enqueue_scripts( string $hook ): void {
 		if ( 'toplevel_page_service_tracker' !== $hook ) {
+			return;
+		}
+
+		/**
+		 * Filters whether to enqueue admin scripts.
+		 *
+		 * @since 1.0.0
+		 *
+		 * @param bool   $enqueue Whether to enqueue scripts.
+		 * @param string $hook    The current admin page.
+		 */
+		if ( ! apply_filters( 'stolmc_service_tracker_admin_enqueue_scripts', true, $hook ) ) {
 			return;
 		}
 
@@ -200,13 +229,24 @@ class STOLMCServiceTrackerAdmin {
 	 *
 	 * @return void
 	 */
-	public function localize_scripts( $hook ) {
+	public function localize_scripts( string $hook ): void {
 		if ( 'toplevel_page_service_tracker' !== $hook ) {
 			return;
 		}
 
 		// This file has all the texts inside a variable $texts_array.
+		$texts_array = [];
 		include wp_normalize_path( plugin_dir_path( __FILE__ ) . 'translation/texts_array.php' );
+
+		/**
+		 * Filters the data passed to the admin JavaScript.
+		 *
+		 * @since 1.0.0
+		 *
+		 * @param array  $texts_array The texts data array.
+		 * @param string $hook        The current admin page.
+		 */
+		$texts_array = apply_filters( 'stolmc_service_tracker_admin_localize_script_data', $texts_array, $hook );
 
 		wp_localize_script(
 			$this->plugin_name,
@@ -222,7 +262,7 @@ class STOLMCServiceTrackerAdmin {
 	 *
 	 * @return void
 	 */
-	public function admin_page() {
+	public function admin_page(): void {
 		add_menu_page( 'Service Tracker', 'Service Tracker', 'manage_options', 'service_tracker', [ $this, 'admin_index' ], 'dashicons-money', 10 );
 	}
 
@@ -233,11 +273,40 @@ class STOLMCServiceTrackerAdmin {
 	 *
 	 * @return void
 	 */
-	public function admin_index() {
+	public function admin_index(): void {
 		if ( $this->block_enqueue_bad_config ) {
+			/**
+			 * Fires before the admin page renders (error state).
+			 *
+			 * @since 1.0.0
+			 */
+			do_action( 'stolmc_service_tracker_admin_page_before_render' );
+
 			include wp_normalize_path( plugin_dir_path( __FILE__ ) . 'partials/admin_page_bad_config.php' );
+
+			/**
+			 * Fires after the admin page renders.
+			 *
+			 * @since 1.0.0
+			 */
+			do_action( 'stolmc_service_tracker_admin_page_after_render' );
 			return;
 		}
+
+		/**
+		 * Fires before the admin page renders.
+		 *
+		 * @since 1.0.0
+		 */
+		do_action( 'stolmc_service_tracker_admin_page_before_render' );
+
 		include wp_normalize_path( plugin_dir_path( __FILE__ ) . 'partials/admin_page.php' );
+
+		/**
+		 * Fires after the admin page renders.
+		 *
+		 * @since 1.0.0
+		 */
+		do_action( 'stolmc_service_tracker_admin_page_after_render' );
 	}
 }

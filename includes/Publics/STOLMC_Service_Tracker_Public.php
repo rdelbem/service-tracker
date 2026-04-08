@@ -1,5 +1,5 @@
 <?php
-namespace STOLMCServiceTracker\publics;
+namespace STOLMC_Service_Tracker\includes\Publics;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
@@ -25,7 +25,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @subpackage Service_Tracker/public
  * @author     Rodrigo Del Bem <rodrigodelbem@gmail.com>
  */
-class STOLMCServiceTrackerPublic {
+class STOLMC_Service_Tracker_Public {
 
 
 	/**
@@ -53,7 +53,7 @@ class STOLMCServiceTrackerPublic {
 	 * @param      string $plugin_name       The name of the plugin.
 	 * @param      string $version    The version of this plugin.
 	 */
-	public function __construct( $plugin_name, $version ) {
+	public function __construct( string $plugin_name, string $version ) {
 
 		$this->plugin_name = $plugin_name;
 		$this->version = $version;
@@ -66,12 +66,22 @@ class STOLMCServiceTrackerPublic {
 	 *
 	 * @return void
 	 */
-	public function enqueue_styles() {
+	public function enqueue_styles(): void {
 		if ( ! has_shortcode( get_the_content(), 'stolmc-service-tracker-cases-progress' ) ) {
 			return;
 		}
 
-		wp_enqueue_style( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'css/service-tracker-public.css', [], $this->version, 'all' );
+		/**
+		 * Filters whether to enqueue public-facing styles.
+		 *
+		 * @since 1.0.0
+		 *
+		 * @param bool   $enqueue     Whether to enqueue styles.
+		 * @param string $plugin_name The plugin name.
+		 */
+		if ( apply_filters( 'stolmc_service_tracker_public_enqueue_styles', true, $this->plugin_name ) ) {
+			wp_enqueue_style( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'css/service-tracker-public.css', [], $this->version, 'all' );
+		}
 	}
 
 	/**
@@ -84,12 +94,22 @@ class STOLMCServiceTrackerPublic {
 	 *
 	 * @return void
 	 */
-	public function enqueue_scripts() {
+	public function enqueue_scripts(): void {
 		if ( ! has_shortcode( get_the_content(), 'stolmc-service-tracker-cases-progress' ) ) {
 			return;
 		}
 
-		// JavaScript is not currently used on the public-facing side.
-		// wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/plugin-name-public.js', array( 'jquery' ), $this->version, false );.
+		/**
+		 * Filters whether to enqueue public-facing scripts.
+		 *
+		 * @since 1.0.0
+		 *
+		 * @param bool   $enqueue     Whether to enqueue scripts.
+		 * @param string $plugin_name The plugin name.
+		 */
+		if ( apply_filters( 'stolmc_service_tracker_public_enqueue_scripts', false, $this->plugin_name ) ) {
+			// JavaScript is not currently used on the public-facing side.
+			// wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/plugin-name-public.js', array( 'jquery' ), $this->version, false );
+		}
 	}
 }

@@ -14,7 +14,7 @@ class ComposerStaticInitfeff79196ce3d2152f5a0b227ae5c585
         'S' => 
         array (
             'SzepeViktor\\PHPStan\\WordPress\\' => 30,
-            'STOLMCServiceTracker\\' => 21,
+            'STOLMC_Service_Tracker\\' => 23,
         ),
         'R' => 
         array (
@@ -35,7 +35,7 @@ class ComposerStaticInitfeff79196ce3d2152f5a0b227ae5c585
         array (
             0 => __DIR__ . '/..' . '/szepeviktor/phpstan-wordpress/src',
         ),
-        'STOLMCServiceTracker\\' => 
+        'STOLMC_Service_Tracker\\' => 
         array (
             0 => __DIR__ . '/../..' . '/',
         ),

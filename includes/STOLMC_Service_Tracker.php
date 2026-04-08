@@ -1,20 +1,16 @@
 <?php
-namespace STOLMCServiceTracker\includes;
+namespace STOLMC_Service_Tracker\includes;
 
-if ( ! defined( 'ABSPATH' ) ) {
-	exit; // Exit if accessed directly.
-}
-
-use STOLMCServiceTracker\admin\STOLMCServiceTrackerAdmin;
-use STOLMCServiceTracker\includes\STOLMCServiceTrackerApiCases;
-use STOLMCServiceTracker\includes\STOLMCServiceTrackerApiProgress;
-use STOLMCServiceTracker\includes\STOLMCServiceTrackerApiToggle;
-use STOLMCServiceTracker\includes\STOLMCServiceTrackerApiUsers;
-use STOLMCServiceTracker\includes\STOLMCServiceTrackerI18n;
-use STOLMCServiceTracker\includes\STOLMCServiceTrackerLoader;
-use STOLMCServiceTracker\includes\STOLMCServiceTrackerPermalinkValidator;
-use STOLMCServiceTracker\publics\STOLMCServiceTrackerPublic;
-use STOLMCServiceTracker\publics\STOLMCServiceTrackerPublicUserContent;
+use STOLMC_Service_Tracker\admin\STOLMC_Service_Tracker_Admin;
+use STOLMC_Service_Tracker\includes\API\STOLMC_Service_Tracker_Api_Cases;
+use STOLMC_Service_Tracker\includes\API\STOLMC_Service_Tracker_Api_Progress;
+use STOLMC_Service_Tracker\includes\API\STOLMC_Service_Tracker_Api_Toggle;
+use STOLMC_Service_Tracker\includes\API\STOLMC_Service_Tracker_Api_Users;
+use STOLMC_Service_Tracker\includes\I18n\STOLMC_Service_Tracker_I18n;
+use STOLMC_Service_Tracker\includes\Utils\STOLMC_Service_Tracker_Loader;
+use STOLMC_Service_Tracker\includes\Utils\STOLMC_Service_Tracker_Permalink_Validator;
+use STOLMC_Service_Tracker\includes\Publics\STOLMC_Service_Tracker_Public;
+use STOLMC_Service_Tracker\includes\Publics\STOLMC_Service_Tracker_Public_User_Content;
 
 // This must be here, since PSR4 determines that define should not be used in an output file.
 define( 'STOLMC_SERVICE_TRACKER_VERSION', '1.0.0' );
@@ -48,7 +44,7 @@ define( 'STOLMC_SERVICE_TRACKER_VERSION', '1.0.0' );
  * @subpackage Service_Tracker/includes
  * @author     Rodrigo Del Bem <rodrigodelbem@gmail.com>
  */
-class STOLMCServiceTracker {
+class STOLMC_Service_Tracker {
 
 	/**
 	 * The loader that's responsible for maintaining and registering all hooks that power
@@ -56,7 +52,7 @@ class STOLMCServiceTracker {
 	 *
 	 * @since    1.0.0
 	 * @access   protected
-	 * @var      STOLMCServiceTrackerLoader $loader Maintains and registers all hooks for the plugin.
+	 * @var      STOLMC_Service_Tracker_Loader $loader Maintains and registers all hooks for the plugin.
 	 */
 	protected $loader;
 
@@ -104,12 +100,22 @@ class STOLMCServiceTracker {
 		}
 		$this->plugin_name = 'service-tracker-stolmc';
 
-		$service_tracker_permalink_validator = new STOLMCServiceTrackerPermalinkValidator();
+		$service_tracker_permalink_validator = new STOLMC_Service_Tracker_Permalink_Validator();
 		if ( ! $service_tracker_permalink_validator->is_permalink_structure_valid() ) {
 			$this->block_enqueue_bad_config = true;
 		}
 
 		$this->add_customer_role();
+
+		/**
+		 * Fires before the plugin initializes its dependencies and hooks.
+		 *
+		 * @since 1.0.0
+		 *
+		 * @param STOLMC_Service_Tracker $instance The plugin instance.
+		 */
+		do_action( 'stolmc_service_tracker_before_init', $this );
+
 		$this->load_dependencies();
 		$this->set_locale();
 		$this->define_admin_hooks();
@@ -136,8 +142,17 @@ class STOLMCServiceTracker {
 	 *
 	 * @return void
 	 */
-	private function load_dependencies() {
-		$this->loader = new STOLMCServiceTrackerLoader();
+	private function load_dependencies(): void {
+		$this->loader = new STOLMC_Service_Tracker_Loader();
+
+		/**
+		 * Fires after the plugin dependencies have been loaded.
+		 *
+		 * @since 1.0.0
+		 *
+		 * @param STOLMC_Service_Tracker_Loader $loader The plugin loader instance.
+		 */
+		do_action( 'stolmc_service_tracker_dependencies_loaded', $this->loader );
 	}
 
 	/**
@@ -148,24 +163,24 @@ class STOLMCServiceTracker {
 	 *
 	 * @return void
 	 */
-	private function api() {
-		$service_tracker_api_cases = new STOLMCServiceTrackerApiCases();
+	private function api(): void {
+		$service_tracker_api_cases = new STOLMC_Service_Tracker_Api_Cases();
 		$this->loader->add_action( 'rest_api_init', $service_tracker_api_cases, 'run' );
 
-		$service_tracker_api_progress = new STOLMCServiceTrackerApiProgress();
+		$service_tracker_api_progress = new STOLMC_Service_Tracker_Api_Progress();
 		$this->loader->add_action( 'rest_api_init', $service_tracker_api_progress, 'run' );
 
-		$service_tracker_api_toggle = new STOLMCServiceTrackerApiToggle();
+		$service_tracker_api_toggle = new STOLMC_Service_Tracker_Api_Toggle();
 		$this->loader->add_action( 'rest_api_init', $service_tracker_api_toggle, 'run' );
 
-		$service_tracker_api_users = new STOLMCServiceTrackerApiUsers();
+		$service_tracker_api_users = new STOLMC_Service_Tracker_Api_Users();
 		$this->loader->add_action( 'rest_api_init', $service_tracker_api_users, 'run' );
 	}
 
 	/**
 	 * Define the locale for this plugin for internationalization.
 	 *
-	 * Uses the STOLMCServiceTrackerI18n class in order to set the domain and to register the hook
+	 * Uses the STOLMC_Service_Tracker_I18n class in order to set the domain and to register the hook
 	 * with WordPress.
 	 *
 	 * @since    1.0.0
@@ -173,8 +188,8 @@ class STOLMCServiceTracker {
 	 *
 	 * @return void
 	 */
-	private function set_locale() {
-		$plugin_i18n = new STOLMCServiceTrackerI18n();
+	private function set_locale(): void {
+		$plugin_i18n = new STOLMC_Service_Tracker_I18n();
 		$this->loader->add_action( 'init', $plugin_i18n, 'load_plugin_textdomain' );
 	}
 
@@ -186,7 +201,7 @@ class STOLMCServiceTracker {
 	 *
 	 * @return void
 	 */
-	private function add_customer_role() {
+	private function add_customer_role(): void {
 		add_action( 'init', [ $this, 'register_customer_role' ] );
 	}
 
@@ -198,11 +213,29 @@ class STOLMCServiceTracker {
 	 *
 	 * @return void
 	 */
-	public function register_customer_role() {
+	public function register_customer_role(): void {
 		if ( in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', get_option( 'active_plugins' ) ), true ) ) {
 			return;
 		}
-		add_role( 'customer', __( 'Customer', 'service-tracker-stolmc' ), get_role( 'subscriber' )->capabilities );
+		$subscriber_role = get_role( 'subscriber' );
+		if ( null !== $subscriber_role ) {
+			/**
+			 * Filters the capabilities assigned to the customer role.
+			 *
+			 * @since 1.0.0
+			 *
+			 * @param array $capabilities The capabilities from the subscriber role.
+			 */
+			$capabilities = apply_filters( 'stolmc_service_tracker_customer_role_capabilities', $subscriber_role->capabilities );
+			add_role( 'customer', __( 'Customer', 'service-tracker-stolmc' ), $capabilities );
+		}
+
+		/**
+		 * Fires after the customer role has been registered.
+		 *
+		 * @since 1.0.0
+		 */
+		do_action( 'stolmc_service_tracker_role_registered' );
 	}
 
 	/**
@@ -214,14 +247,23 @@ class STOLMCServiceTracker {
 	 *
 	 * @return void
 	 */
-	private function define_admin_hooks() {
-		$plugin_admin = new STOLMCServiceTrackerAdmin( $this->get_plugin_name(), $this->get_version(), $this->block_enqueue_bad_config );
+	private function define_admin_hooks(): void {
+		$plugin_admin = new STOLMC_Service_Tracker_Admin( $this->get_plugin_name(), $this->get_version(), $this->block_enqueue_bad_config );
 		if ( ! $this->block_enqueue_bad_config ) {
 			$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_styles' );
 			$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_scripts' );
 			$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'localize_scripts' );
 		}
 		$this->loader->add_action( 'admin_menu', $plugin_admin, 'admin_page' );
+
+		/**
+		 * Fires after admin hooks have been defined.
+		 *
+		 * @since 1.0.0
+		 *
+		 * @param STOLMC_Service_Tracker_Admin $plugin_admin The admin instance.
+		 */
+		do_action( 'stolmc_service_tracker_admin_hooks_defined', $plugin_admin );
 	}
 
 	/**
@@ -233,15 +275,24 @@ class STOLMCServiceTracker {
 	 *
 	 * @return void
 	 */
-	private function define_public_hooks() {
+	private function define_public_hooks(): void {
 		if ( is_admin() ) {
 			return;
 		}
 
-		$plugin_public = new STOLMCServiceTrackerPublic( $this->get_plugin_name(), $this->get_version() );
+		$plugin_public = new STOLMC_Service_Tracker_Public( $this->get_plugin_name(), $this->get_version() );
 
 		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_styles' );
 		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_scripts' );
+
+		/**
+		 * Fires after public-facing hooks have been defined.
+		 *
+		 * @since 1.0.0
+		 *
+		 * @param STOLMC_Service_Tracker_Public $plugin_public The public instance.
+		 */
+		do_action( 'stolmc_service_tracker_public_hooks_defined', $plugin_public );
 	}
 
 	/**
@@ -252,12 +303,12 @@ class STOLMCServiceTracker {
 	 *
 	 * @return void
 	 */
-	private function public_user_content() {
+	private function public_user_content(): void {
 		if ( is_admin() ) {
 			return;
 		}
 
-		$public_user_content = new STOLMCServiceTrackerPublicUserContent();
+		$public_user_content = new STOLMC_Service_Tracker_Public_User_Content();
 		$this->loader->add_action( 'init', $public_user_content, 'get_user_id' );
 	}
 
@@ -268,8 +319,26 @@ class STOLMCServiceTracker {
 	 *
 	 * @return void
 	 */
-	public function run() {
+	public function run(): void {
+		/**
+		 * Fires before the plugin loader runs.
+		 *
+		 * @since 1.0.0
+		 *
+		 * @param STOLMC_Service_Tracker $instance The plugin instance.
+		 */
+		do_action( 'stolmc_service_tracker_running', $this );
+
 		$this->loader->run();
+
+		/**
+		 * Fires after the plugin has been fully initialized.
+		 *
+		 * @since 1.0.0
+		 *
+		 * @param STOLMC_Service_Tracker $instance The plugin instance.
+		 */
+		do_action( 'stolmc_service_tracker_initialized', $this );
 	}
 
 	/**
@@ -279,7 +348,7 @@ class STOLMCServiceTracker {
 	 * @since     1.0.0
 	 * @return    string    The name of the plugin.
 	 */
-	public function get_plugin_name() {
+	public function get_plugin_name(): string {
 		return $this->plugin_name;
 	}
 
@@ -287,9 +356,9 @@ class STOLMCServiceTracker {
 	 * The reference to the class that orchestrates the hooks with the plugin.
 	 *
 	 * @since     1.0.0
-	 * @return    STOLMCServiceTrackerLoader    Orchestrates the hooks of the plugin.
+	 * @return    STOLMC_Service_Tracker_Loader    Orchestrates the hooks of the plugin.
 	 */
-	public function get_loader() {
+	public function get_loader(): STOLMC_Service_Tracker_Loader {
 		return $this->loader;
 	}
 
@@ -299,7 +368,7 @@ class STOLMCServiceTracker {
 	 * @since     1.0.0
 	 * @return    string    The version number of the plugin.
 	 */
-	public function get_version() {
+	public function get_version(): string {
 		return $this->version;
 	}
 }

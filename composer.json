@@ -23,7 +23,7 @@
   },
   "autoload": {
     "psr-4": {
-      "STOLMCServiceTracker\\": "./"
+      "STOLMC_Service_Tracker\\": "./"
     }
   },
   "config": {

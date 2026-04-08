@@ -1,9 +1,5 @@
 <?php
-namespace STOLMCServiceTracker\includes;
-
-if ( ! defined( 'ABSPATH' ) ) {
-	exit; // Exit if accessed directly.
-}
+namespace STOLMC_Service_Tracker\includes\Utils;
 
 /**
  * Register all actions and filters for the plugin
@@ -26,7 +22,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @subpackage Service_Tracker/includes
  * @author     Rodrigo Del Bem <rodrigodelbem@gmail.com>
  */
-class STOLMCServiceTrackerLoader {
+class STOLMC_Service_Tracker_Loader {
 
 
 	/**
@@ -34,7 +30,7 @@ class STOLMCServiceTrackerLoader {
 	 *
 	 * @since    1.0.0
 	 * @access   protected
-	 * @var      array    $actions    The actions registered with WordPress to fire when the plugin loads.
+	 * @var      array<int, array{hook: string, component: object, callback: string, priority: int, accepted_args: int}>    $actions    The actions registered with WordPress to fire when the plugin loads.
 	 */
 	protected $actions;
 
@@ -43,7 +39,7 @@ class STOLMCServiceTrackerLoader {
 	 *
 	 * @since    1.0.0
 	 * @access   protected
-	 * @var      array    $filters    The filters registered with WordPress to fire when the plugin loads.
+	 * @var      array<int, array{hook: string, component: object, callback: string, priority: int, accepted_args: int}>    $filters    The filters registered with WordPress to fire when the plugin loads.
 	 */
 	protected $filters;
 
@@ -67,8 +63,10 @@ class STOLMCServiceTrackerLoader {
 	 * @param    string $callback         The name of the function definition on the $component.
 	 * @param    int    $priority         Optional. The priority at which the function should be fired. Default is 10.
 	 * @param    int    $accepted_args    Optional. The number of arguments that should be passed to the $callback. Default is 1.
+	 *
+	 * @return void
 	 */
-	public function add_action( $hook, $component, $callback, $priority = 10, $accepted_args = 1 ) {
+	public function add_action( string $hook, object $component, string $callback, int $priority = 10, int $accepted_args = 1 ): void {
 		$this->actions = $this->add( $this->actions, $hook, $component, $callback, $priority, $accepted_args );
 	}
 
@@ -81,8 +79,10 @@ class STOLMCServiceTrackerLoader {
 	 * @param    string $callback         The name of the function definition on the $component.
 	 * @param    int    $priority         Optional. The priority at which the function should be fired. Default is 10.
 	 * @param    int    $accepted_args    Optional. The number of arguments that should be passed to the $callback. Default is 1.
+	 *
+	 * @return void
 	 */
-	public function add_filter( $hook, $component, $callback, $priority = 10, $accepted_args = 1 ) {
+	public function add_filter( string $hook, object $component, string $callback, int $priority = 10, int $accepted_args = 1 ): void {
 		$this->filters = $this->add( $this->filters, $hook, $component, $callback, $priority, $accepted_args );
 	}
 
@@ -92,15 +92,15 @@ class STOLMCServiceTrackerLoader {
 	 *
 	 * @since    1.0.0
 	 * @access   private
-	 * @param    array  $hooks            The collection of hooks that is being registered (that is, actions or filters).
+	 * @param    array<int, array{hook: string, component: object, callback: string, priority: int, accepted_args: int}> $hooks            The collection of hooks that is being registered (that is, actions or filters).
 	 * @param    string $hook             The name of the WordPress filter that is being registered.
 	 * @param    object $component        A reference to the instance of the object on which the filter is defined.
 	 * @param    string $callback         The name of the function definition on the $component.
 	 * @param    int    $priority         The priority at which the function should be fired.
 	 * @param    int    $accepted_args    The number of arguments that should be passed to the $callback.
-	 * @return   array                                  The collection of actions and filters registered with WordPress.
+	 * @return   array<int, array{hook: string, component: object, callback: string, priority: int, accepted_args: int}>                                  The collection of actions and filters registered with WordPress.
 	 */
-	private function add( $hooks, $hook, $component, $callback, $priority, $accepted_args ) {
+	private function add( array $hooks, string $hook, object $component, string $callback, int $priority, int $accepted_args ): array {
 
 		$hooks[] = [
 			'hook'          => $hook,
@@ -117,15 +117,19 @@ class STOLMCServiceTrackerLoader {
 	 * Register the filters and actions with WordPress.
 	 *
 	 * @since    1.0.0
+	 *
+	 * @return void
 	 */
-	public function run() {
+	public function run(): void {
 
 		foreach ( $this->filters as $hook ) {
-			add_filter( $hook['hook'], [ $hook['component'], $hook['callback'] ], $hook['priority'], $hook['accepted_args'] );
+			// phpcs:ignore ArgumentType.Explicit -- WordPress accepts array{object, string} as callback.
+			add_filter( $hook['hook'], [ $hook['component'], $hook['callback'] ], $hook['priority'], $hook['accepted_args'] ); // @phpstan-ignore argument.type
 		}
 
 		foreach ( $this->actions as $hook ) {
-			add_action( $hook['hook'], [ $hook['component'], $hook['callback'] ], $hook['priority'], $hook['accepted_args'] );
+			// phpcs:ignore ArgumentType.Explicit -- WordPress accepts array{object, string} as callback.
+			add_action( $hook['hook'], [ $hook['component'], $hook['callback'] ], $hook['priority'], $hook['accepted_args'] ); // @phpstan-ignore argument.type
 		}
 	}
 }
