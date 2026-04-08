@@ -10,8 +10,7 @@
   ],
   "require": {
     "php": ">=8.1",
-    "fightbulc/moment": "1.33",
-    "rdelbem/wp-mailer-class": "1.0.2"
+    "fightbulc/moment": "1.33"
   },
   "require-dev": {
     "phpstan/phpstan": "^2.1",

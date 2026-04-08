@@ -3,7 +3,7 @@
         'name' => 'delbem/service-tracker',
         'pretty_version' => 'dev-main',
         'version' => 'dev-main',
-        'reference' => '84016a5c1fb784a9db81dda46bf44b56a967d785',
+        'reference' => 'da16ed8a7756f2f936498109f6320c889de494f5',
         'type' => 'wordpress-plugin',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -22,7 +22,7 @@
         'delbem/service-tracker' => array(
             'pretty_version' => 'dev-main',
             'version' => 'dev-main',
-            'reference' => '84016a5c1fb784a9db81dda46bf44b56a967d785',
+            'reference' => 'da16ed8a7756f2f936498109f6320c889de494f5',
             'type' => 'wordpress-plugin',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
@@ -99,15 +99,6 @@
             'install_path' => __DIR__ . '/../phpstan/phpstan',
             'aliases' => array(),
             'dev_requirement' => true,
-        ),
-        'rdelbem/wp-mailer-class' => array(
-            'pretty_version' => '1.0.2',
-            'version' => '1.0.2.0',
-            'reference' => '0fcbfd1a6f2c5a6e5e39dff3ca79cf03cfe9b929',
-            'type' => 'wordpress-utility-class',
-            'install_path' => __DIR__ . '/../rdelbem/wp-mailer-class',
-            'aliases' => array(),
-            'dev_requirement' => false,
         ),
         'squizlabs/php_codesniffer' => array(
             'pretty_version' => '3.13.5',

@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "986a7349fc6cb1645b8dcb95d73966a6",
+    "content-hash": "a9be4dbf5b94264705a122ed904b44cc",
     "packages": [
         {
             "name": "fightbulc/moment",
@@ -62,49 +62,6 @@
                 "source": "https://github.com/fightbulc/moment.php/tree/1.33.0"
             },
             "time": "2021-03-27T13:10:08+00:00"
-        },
-        {
-            "name": "rdelbem/wp-mailer-class",
-            "version": "1.0.2",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/rdelbem/WP-mailer-class.git",
-                "reference": "0fcbfd1a6f2c5a6e5e39dff3ca79cf03cfe9b929"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/rdelbem/WP-mailer-class/zipball/0fcbfd1a6f2c5a6e5e39dff3ca79cf03cfe9b929",
-                "reference": "0fcbfd1a6f2c5a6e5e39dff3ca79cf03cfe9b929",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=8.0"
-            },
-            "require-dev": {
-                "10up/wp_mock": "*"
-            },
-            "type": "wordpress-utility-class",
-            "autoload": {
-                "psr-4": {
-                    "Rdelbem\\WPMailerClass\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "GPL-3.0-or-later"
-            ],
-            "authors": [
-                {
-                    "name": "Rodrigo Del Bem",
-                    "email": "rodrigodelbem@gmail.com"
-                }
-            ],
-            "description": "Just a simple wrapper around the wp_mail function, now you can easily send an email from within WP without having to set a header by youself. We also provide some error handling",
-            "support": {
-                "issues": "https://github.com/rdelbem/WP-mailer-class/issues",
-                "source": "https://github.com/rdelbem/WP-mailer-class/tree/1.0.2"
-            },
-            "time": "2023-06-19T01:21:18+00:00"
         }
     ],
     "packages-dev": [

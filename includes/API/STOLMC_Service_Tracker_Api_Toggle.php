@@ -1,7 +1,6 @@
 <?php
 namespace STOLMC_Service_Tracker\includes\API;
 
-use Rdelbem\WPMailerClass\WPMailerClass;
 use STOLMC_Service_Tracker\includes\Utils\STOLMC_Service_Tracker_Sql;
 use WP_REST_Request;
 use WP_REST_Server;
@@ -124,12 +123,11 @@ class STOLMC_Service_Tracker_Api_Toggle extends STOLMC_Service_Tracker_Api {
 			]
 		);
 
-		$send_mail = new WPMailerClass(
-			$email_data['id_user'],
-			$email_data['subject'],
-			$email_data['message']
-		);
-		$send_mail->sendEmail();
+		// Get user email from WordPress user.
+		$user = get_user_by( 'id', $email_data['id_user'] );
+		if ( false !== $user ) {
+			wp_mail( $user->user_email, $email_data['subject'], $email_data['message'] );
+		}
 	}
 
 	/**

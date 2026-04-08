@@ -16,10 +16,6 @@ class ComposerStaticInitfeff79196ce3d2152f5a0b227ae5c585
             'SzepeViktor\\PHPStan\\WordPress\\' => 30,
             'STOLMC_Service_Tracker\\' => 23,
         ),
-        'R' => 
-        array (
-            'Rdelbem\\WPMailerClass\\' => 22,
-        ),
         'P' => 
         array (
             'PHPCSStandards\\Composer\\Plugin\\Installers\\PHPCodeSniffer\\' => 57,
@@ -38,10 +34,6 @@ class ComposerStaticInitfeff79196ce3d2152f5a0b227ae5c585
         'STOLMC_Service_Tracker\\' => 
         array (
             0 => __DIR__ . '/../..' . '/',
-        ),
-        'Rdelbem\\WPMailerClass\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/rdelbem/wp-mailer-class/src',
         ),
         'PHPCSStandards\\Composer\\Plugin\\Installers\\PHPCodeSniffer\\' => 
         array (

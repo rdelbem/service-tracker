@@ -4,7 +4,6 @@ namespace STOLMC_Service_Tracker\includes\API;
 use WP_REST_Request;
 use WP_REST_Response;
 use WP_REST_Server;
-use Rdelbem\WPMailerClass\WPMailerClass;
 use STOLMC_Service_Tracker\includes\Utils\STOLMC_Service_Tracker_Sql;
 
 /**
@@ -151,25 +150,23 @@ class STOLMC_Service_Tracker_Api_Progress extends STOLMC_Service_Tracker_Api imp
 			$progress_data
 		);
 
-		$send_mail = new WPMailerClass(
-			$email_data['id_user'],
-			$email_data['subject'],
-			$email_data['message']
-		);
+		// Get user email from WordPress user.
+		$user = get_user_by( 'id', $email_data['id_user'] );
+		if ( false !== $user ) {
+			/**
+			 * Fires before the progress email is sent.
+			 *
+			 * @since 1.0.0
+			 *
+			 * @param string $to      The email recipient.
+			 * @param string $subject The email subject.
+			 * @param string $message The email message.
+			 * @param int    $id_user The user ID.
+			 */
+			do_action( 'stolmc_service_tracker_progress_before_email_sent', $user->user_email, $email_data['subject'], $email_data['message'], $id_user );
 
-		/**
-		 * Fires before the progress email is sent.
-		 *
-		 * @since 1.0.0
-		 *
-		 * @param WPMailerClass $send_mail The mailer instance.
-		 * @param int           $id_user   The user ID.
-		 * @param string        $subject   The email subject.
-		 * @param string        $message   The email message.
-		 */
-		do_action( 'stolmc_service_tracker_progress_before_email_sent', $send_mail, $id_user, $subject, $message );
-
-		$send_mail->sendEmail();
+			wp_mail( $user->user_email, $email_data['subject'], $email_data['message'] );
+		}
 
 		$result = $this->sql->insert( $progress_data );
 
