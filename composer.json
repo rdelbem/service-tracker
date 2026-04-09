@@ -18,7 +18,15 @@
     "wp-coding-standards/wpcs": "^3.1",
     "phpcompatibility/phpcompatibility-wp": "^2.1",
     "php-stubs/wordpress-stubs": "^6.8",
-    "szepeviktor/phpstan-wordpress": "^2.0"
+    "szepeviktor/phpstan-wordpress": "^2.0",
+    "phpunit/phpunit": "^10.5",
+    "brain/monkey": "^2.6",
+    "yoast/phpunit-polyfills": "^2.0"
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "STOLMC_Service_Tracker\\Tests\\": "tests/"
+    }
   },
   "autoload": {
     "psr-4": {
@@ -38,10 +46,15 @@
     "phpcbf": "phpcbf --standard=phpcs.xml.dist",
     "phpstan": "phpstan analyse --memory-limit=2G",
     "phpstan:baseline": "phpstan analyse --memory-limit=2G --generate-baseline=phpstan-baseline.neon",
+    "phpunit": "phpunit",
+    "phpunit:coverage": "phpunit --coverage-html .coverage",
     "test": [
       "@phpcs",
-      "@phpstan"
+      "@phpstan",
+      "@phpunit"
     ],
+    "test:unit": "@phpunit --testsuite Unit",
+    "test:integration": "@phpunit --testsuite Integration",
     "fix": "@phpcbf"
   }
 }

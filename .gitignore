@@ -10,6 +10,10 @@ wordpress/
 # PHP dependencies
 vendor/
 
+# PHPUnit cache
+.phpunit.cache/
+.coverage/
+
 # PHPStan baseline (auto-generated file, can be committed to track baseline)
 # Uncomment to ignore: phpstan-baseline.neon
 
