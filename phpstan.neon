@@ -6,6 +6,10 @@ parameters:
         - admin
         - includes
 
+    # Exclude CLI classes that depend on WP-CLI (not available as stubs)
+    excludePaths:
+        - includes/CLI/*
+
     # WordPress integration
     bootstrapFiles:
         - vendor/php-stubs/wordpress-stubs/wordpress-stubs.php

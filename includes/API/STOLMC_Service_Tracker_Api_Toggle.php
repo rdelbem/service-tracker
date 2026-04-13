@@ -93,10 +93,11 @@ class STOLMC_Service_Tracker_Api_Toggle extends STOLMC_Service_Tracker_Api {
 	 * @param int              $id_user      User ID to send email to.
 	 * @param string           $title        Case title.
 	 * @param array<int, string> $case_state_msg Translation messages for the state change.
+	 * @param int              $id_case      The case ID.
 	 *
 	 * @return void
 	 */
-	public function sendEmail( int $id_user, string $title, array $case_state_msg ): void {
+	public function sendEmail( int $id_user, string $title, array $case_state_msg, int $id_case ): void {
 		/**
 		 * Filters the toggle email data before sending.
 		 *
@@ -115,10 +116,10 @@ class STOLMC_Service_Tracker_Api_Toggle extends STOLMC_Service_Tracker_Api {
 		$email_data = apply_filters(
 			'stolmc_service_tracker_toggle_email_data',
 			[
-				'id_user'      => $id_user,
-				'subject'      => $case_state_msg[0],
-				'message'      => $title . ' - ' . $case_state_msg[1],
-				'title'        => $title,
+				'id_user'        => $id_user,
+				'subject'        => $case_state_msg[0],
+				'message'        => $title . ' - ' . $case_state_msg[1],
+				'title'          => $title,
 				'case_state_msg' => $case_state_msg,
 			]
 		);
@@ -126,7 +127,32 @@ class STOLMC_Service_Tracker_Api_Toggle extends STOLMC_Service_Tracker_Api {
 		// Get user email from WordPress user.
 		$user = get_user_by( 'id', $email_data['id_user'] );
 		if ( false !== $user ) {
-			wp_mail( $user->user_email, $email_data['subject'], $email_data['message'] );
+			/**
+			 * Fires before the toggle email is sent.
+			 *
+			 * @since 1.0.0
+			 *
+			 * @param string $to      The email recipient.
+			 * @param string $subject The email subject.
+			 * @param string $message The email message.
+			 * @param int    $id_user The user ID.
+			 */
+			do_action( 'stolmc_service_tracker_toggle_before_email_sent', $user->user_email, $email_data['subject'], $email_data['message'], $id_user );
+
+			$sent = wp_mail( $user->user_email, $email_data['subject'], $email_data['message'] );
+
+			/**
+			 * Fires after the toggle email attempt to log notification status.
+			 *
+			 * @since 1.2.0
+			 *
+			 * @param bool   $sent    Whether wp_mail() returned success.
+			 * @param string $to      The email recipient.
+			 * @param string $subject The email subject.
+			 * @param int    $id_user The user ID.
+			 * @param int    $id_case The case ID.
+			 */
+			do_action( 'stolmc_service_tracker_toggle_email_result', $sent, $user->user_email, $email_data['subject'], $id_user, $id_case );
 		}
 	}
 
@@ -141,9 +167,6 @@ class STOLMC_Service_Tracker_Api_Toggle extends STOLMC_Service_Tracker_Api {
 	 * @return int|false|null Update result.
 	 */
 	public function toggle_status( WP_REST_Request $data ): int|false|null {
-
-		$this->security_check( $data );
-
 		$response = $this->sql->get_by( [ 'id' => $data['id'] ] );
 
 		if ( ! is_array( $response ) || ! isset( $response[0] ) ) {
@@ -181,7 +204,7 @@ class STOLMC_Service_Tracker_Api_Toggle extends STOLMC_Service_Tracker_Api {
 				[ 'id' => $data['id'] ]
 			);
 
-			$this->sendEmail( $id_user, $title, $this->get_closed_messages() );
+			$this->sendEmail( $id_user, $title, $this->get_closed_messages(), (int) $data['id'] );
 
 			/**
 			 * Fires after a case has been closed.
@@ -215,7 +238,7 @@ class STOLMC_Service_Tracker_Api_Toggle extends STOLMC_Service_Tracker_Api {
 				[ 'id' => $data['id'] ]
 			);
 
-			$this->sendEmail( $id_user, $title, $this->get_opened_messages() );
+			$this->sendEmail( $id_user, $title, $this->get_opened_messages(), (int) $data['id'] );
 
 			/**
 			 * Fires after a case has been reopened.

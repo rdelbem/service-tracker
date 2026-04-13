@@ -28,19 +28,32 @@ if ( ! class_exists( 'WP_Error' ) ) {
 		public $code;
 		public $message;
 		public $data = [];
-		
+
 		public function __construct( $code = '', $message = '', $data = [] ) {
 			$this->code = $code;
 			$this->message = $message;
 			$this->data = $data;
 		}
-		
+
 		public function get_error_message() {
 			return $this->message;
 		}
-		
+
 		public function get_error_code() {
 			return $this->code;
+		}
+	}
+}
+
+if ( ! class_exists( 'WP_User' ) ) {
+	class WP_User {
+		public $ID;
+		public $roles = [];
+		public $caps = [];
+
+		public function __construct( $id = 0 ) {
+			$this->ID = $id;
+			$this->roles = [];
 		}
 	}
 }

@@ -5,6 +5,7 @@ export const ROUTES = {
   CASES_FOR_CLIENT: "/cases/:userId",
   PROGRESS: "/progress/:userId/:caseId",
   HOW_TO_USE: "/how-to-use",
+  CALENDAR: "/calendar",
 } as const;
 
 export type RoutePath = typeof ROUTES[keyof typeof ROUTES];

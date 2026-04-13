@@ -19,6 +19,7 @@
 require_once plugin_dir_path( __FILE__ ) . '/vendor/autoload.php';
 
 use STOLMC_Service_Tracker\includes\Life_Cycle\STOLMC_Service_Tracker_Activator;
+use STOLMC_Service_Tracker\includes\Life_Cycle\STOLMC_Service_Tracker_Deactivator;
 use STOLMC_Service_Tracker\STOLMC_Service_Tracker_Uninstall;
 use STOLMC_Service_Tracker\includes\STOLMC_Service_Tracker;
 
@@ -33,7 +34,7 @@ use STOLMC_Service_Tracker\includes\STOLMC_Service_Tracker;
  */
 function stolmc_activate_service_tracker(): void {
 	STOLMC_Service_Tracker_Activator::activate();
-	
+
 	/**
 	 * Fires after the plugin has been activated.
 	 *
@@ -43,11 +44,32 @@ function stolmc_activate_service_tracker(): void {
 }
 
 /**
+ * Deactivate the Service Tracker plugin.
+ *
+ * Called on plugin deactivation. Drops all plugin-managed database
+ * tables and clears the schema version.  Re-activating the plugin
+ * will recreate tables from the current schema definition.
+ *
+ * @since    1.1.0
+ *
+ * @return void
+ */
+function stolmc_deactivate_service_tracker(): void {
+	STOLMC_Service_Tracker_Deactivator::deactivate();
+
+	/**
+	 * Fires after the plugin has been deactivated.
+	 *
+	 * @since 1.1.0
+	 */
+	do_action( 'stolmc_service_tracker_deactivated' );
+}
+
+/**
  * Uninstall the Service Tracker plugin.
  *
- * Service Tracker should do nothing on deactivation,
- * that's because we want to preserve the tables created
- * during the plugin's usage.
+ * Called when the plugin is permanently deleted from WordPress.
+ * Drops all plugin data from the database.
  *
  * @since    1.0.0
  *
@@ -60,9 +82,9 @@ function stolmc_uninstall_service_tracker(): void {
 	 * @since 1.0.0
 	 */
 	do_action( 'stolmc_service_tracker_before_uninstall' );
-	
+
 	STOLMC_Service_Tracker_Uninstall::uninstall();
-	
+
 	/**
 	 * Fires after the plugin has been uninstalled.
 	 *
@@ -72,13 +94,14 @@ function stolmc_uninstall_service_tracker(): void {
 }
 
 register_activation_hook( __FILE__, 'stolmc_activate_service_tracker' );
+register_deactivation_hook( __FILE__, 'stolmc_deactivate_service_tracker' );
 register_uninstall_hook( __FILE__, 'stolmc_uninstall_service_tracker' );
 
 add_action(
 	'plugins_loaded',
 	function () {
 		$plugin_instance = new STOLMC_Service_Tracker();
-		
+
 		/**
 		 * Filters the plugin instance before it runs.
 		 *
@@ -87,7 +110,7 @@ add_action(
 		 * @param STOLMC_Service_Tracker $plugin_instance The plugin instance.
 		 */
 		apply_filters( 'stolmc_service_tracker_before_run', $plugin_instance );
-		
+
 		$plugin_instance->run();
 	}
 );

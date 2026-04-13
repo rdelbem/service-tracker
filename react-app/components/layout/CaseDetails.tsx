@@ -1,6 +1,7 @@
 import { useState, Fragment, useEffect } from "react";
 import { useInViewStore } from "../../stores/inViewStore";
 import { useClientsStore } from "../../stores/clientsStore";
+import { useCasesStore } from "../../stores/casesStore";
 import { get as fetchGet, post, put, del } from "../../utils/fetch";
 import { toast } from "react-toastify";
 import Spinner from "./Spinner";
@@ -15,17 +16,22 @@ interface CaseData {
   status: "open" | "close" | string;
   description?: string;
   created_at: string;
+  start_at?: string | null;
+  due_at?: string | null;
   [key: string]: any;
 }
 
 export default function CaseDetails() {
   const inViewState = useInViewStore((state) => state);
   const { navigate } = useInViewStore();
+  const editCase = useCasesStore((state) => state.editCase);
   const [caseData, setCaseData] = useState<CaseData | null>(null);
   const [client, setClient] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
   const [editTitle, setEditTitle] = useState("");
+  const [editStartAt, setEditStartAt] = useState("");
+  const [editDueAt, setEditDueAt] = useState("");
 
   useEffect(() => {
     // Only load if we're in the right view
@@ -53,6 +59,8 @@ export default function CaseDetails() {
               setCaseData(foundCase);
               setClient(user);
               setEditTitle(foundCase.title);
+              setEditStartAt(foundCase.start_at ? foundCase.start_at.slice(0, 16) : "");
+              setEditDueAt(foundCase.due_at ? foundCase.due_at.slice(0, 16) : "");
               break;
             }
           }
@@ -74,23 +82,20 @@ export default function CaseDetails() {
       return;
     }
 
-    const apiUrlCases = `${data.root_url}/wp-json/${data.api_url}/cases`;
+    // Validate dates if both provided
+    if (editStartAt && editDueAt && new Date(editStartAt) > new Date(editDueAt)) {
+      toast.error("Start date must be before due date");
+      return;
+    }
 
     try {
-      await put(
-        `${apiUrlCases}/${caseData.id}`,
-        { id_user: caseData.id_user, title: editTitle.trim() },
-        {
-          headers: {
-            "X-WP-Nonce": data.nonce,
-            "Content-type": "application/json",
-          },
-        }
-      );
+      const startAt = editStartAt || null;
+      const dueAt = editDueAt || null;
 
-      setCaseData({ ...caseData, title: editTitle.trim() });
+      await editCase(caseData.id, caseData.id_user, editTitle.trim(), startAt, dueAt);
+
+      setCaseData({ ...caseData, title: editTitle.trim(), start_at: startAt, due_at: dueAt });
       setIsEditing(false);
-      toast.success("Case updated successfully");
     } catch (error) {
       console.error("Error updating case:", error);
       toast.error("Failed to update case");
@@ -195,7 +200,12 @@ export default function CaseDetails() {
                   Save
                 </button>
                 <button
-                  onClick={() => { setIsEditing(false); setEditTitle(caseData.title); }}
+                  onClick={() => {
+                    setIsEditing(false);
+                    setEditTitle(caseData.title);
+                    setEditStartAt(caseData.start_at ? caseData.start_at.slice(0, 16) : "");
+                    setEditDueAt(caseData.due_at ? caseData.due_at.slice(0, 16) : "");
+                  }}
                   className="flex items-center gap-1 px-4 py-2 bg-surface-container-high text-on-surface-variant text-xs font-bold rounded-lg"
                 >
                   <span className="material-symbols-outlined text-sm">close</span>
@@ -237,7 +247,7 @@ export default function CaseDetails() {
         </div>
 
         {/* Details Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           {/* Status */}
           <div className="bg-surface-container-low p-6 rounded-xl">
             <div className="flex items-center gap-3 mb-3">
@@ -272,6 +282,66 @@ export default function CaseDetails() {
                   })
                 : "N/A"}
             </p>
+          </div>
+
+          {/* Start Date */}
+          <div className="bg-surface-container-low p-6 rounded-xl">
+            <div className="flex items-center gap-3 mb-3">
+              <span className="material-symbols-outlined text-primary text-xl">
+                event_note
+              </span>
+              <label className="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">
+                Start Date
+              </label>
+            </div>
+            {isEditing ? (
+              <input
+                type="datetime-local"
+                value={editStartAt}
+                onChange={(e) => setEditStartAt(e.target.value)}
+                className="w-full text-sm text-on-surface bg-surface-container-lowest border border-outline-variant/20 rounded-lg py-1 px-2 focus:ring-2 focus:ring-primary/10"
+              />
+            ) : (
+              <p className="text-sm text-on-surface">
+                {caseData.start_at
+                  ? new Date(caseData.start_at).toLocaleDateString("en-US", {
+                      year: "numeric",
+                      month: "long",
+                      day: "numeric",
+                    })
+                  : "Not set"}
+              </p>
+            )}
+          </div>
+
+          {/* Due Date */}
+          <div className="bg-surface-container-low p-6 rounded-xl">
+            <div className="flex items-center gap-3 mb-3">
+              <span className="material-symbols-outlined text-primary text-xl">
+                event_busy
+              </span>
+              <label className="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">
+                Due Date
+              </label>
+            </div>
+            {isEditing ? (
+              <input
+                type="datetime-local"
+                value={editDueAt}
+                onChange={(e) => setEditDueAt(e.target.value)}
+                className="w-full text-sm text-on-surface bg-surface-container-lowest border border-outline-variant/20 rounded-lg py-1 px-2 focus:ring-2 focus:ring-primary/10"
+              />
+            ) : (
+              <p className="text-sm text-on-surface">
+                {caseData.due_at
+                  ? new Date(caseData.due_at).toLocaleDateString("en-US", {
+                      year: "numeric",
+                      month: "long",
+                      day: "numeric",
+                    })
+                  : "Not set"}
+              </p>
+            )}
           </div>
         </div>
 

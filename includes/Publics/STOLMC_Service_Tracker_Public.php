@@ -107,9 +107,11 @@ class STOLMC_Service_Tracker_Public {
 		 * @param bool   $enqueue     Whether to enqueue scripts.
 		 * @param string $plugin_name The plugin name.
 		 */
-		if ( apply_filters( 'stolmc_service_tracker_public_enqueue_scripts', false, $this->plugin_name ) ) {
-			// JavaScript is not currently used on the public-facing side.
-			// wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/plugin-name-public.js', array( 'jquery' ), $this->version, false );
+		$enqueue = apply_filters( 'stolmc_service_tracker_public_enqueue_scripts', false, $this->plugin_name );
+		if ( ! $enqueue ) {
+			return;
 		}
+
+		// Intentionally empty: JavaScript is not currently used on the public-facing side.
 	}
 }

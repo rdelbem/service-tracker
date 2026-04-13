@@ -1,7 +1,9 @@
 <?php
 namespace STOLMC_Service_Tracker\includes\API;
 
+use WP_Error;
 use WP_REST_Response;
+use WP_REST_Request;
 
 /**
  * Base API class for Service Tracker REST endpoints.
@@ -12,62 +14,47 @@ use WP_REST_Response;
 class STOLMC_Service_Tracker_Api {
 
 	/**
-	 * Verify the current user has permission to access the API.
+	 * Central permission check for all routes.
 	 *
-	 * @since    1.0.0
-	 * @access   public
+	 * @param WP_REST_Request $request REST request.
 	 *
-	 * @return bool True if user can publish posts, false otherwise.
+	 * @return bool|WP_Error
 	 */
-	public function user_verification(): bool {
+	public function permission_check( WP_REST_Request $request ): bool|WP_Error {
 		$current_user_id = get_current_user_id();
 
-		/**
-		 * Filters whether the current user has permission to access the API.
-		 *
-		 * @since 1.0.0
-		 *
-		 * @param bool $result          Whether the user can publish posts.
-		 * @param int  $current_user_id The current user ID.
-		 */
-		return apply_filters( 'stolmc_service_tracker_api_user_can', current_user_can( 'publish_posts' ), $current_user_id );
-	}
+		$user_can = apply_filters(
+			'stolmc_service_tracker_api_user_can',
+			current_user_can( 'publish_posts' ),
+			$current_user_id
+		);
 
-	/**
-	 * Perform security check on the REST request.
-	 *
-	 * Verifies the nonce in the request headers.
-	 *
-	 * @since    1.0.0
-	 * @access   public
-	 *
-	 * @param mixed $data The REST request object or data to check.
-	 *
-	 * @return WP_REST_Response|null Returns error response if nonce is invalid.
-	 */
-	public function security_check( mixed $data ): ?WP_REST_Response {
-		if ( empty( $data ) ) {
-			return null;
+		if ( ! $user_can ) {
+			return new WP_Error(
+				'stolmc_service_tracker_forbidden',
+				__( 'Sorry, you are not allowed to access this endpoint.', 'service-tracker-stolmc' ),
+				[ 'status' => 403 ]
+			);
 		}
 
-		$headers = $data->get_headers();
-		$nonce   = $headers['x_wp_nonce'][0];
+		$headers = $request->get_headers();
+		$nonce   = $headers['x_wp_nonce'][0] ?? '';
 
 		if ( ! wp_verify_nonce( $nonce, 'wp_rest' ) ) {
-			$error_response = new WP_REST_Response( __( 'Sorry, invalid credentials', 'service-tracker-stolmc' ) );
+			$error = new WP_Error(
+				'stolmc_service_tracker_invalid_nonce',
+				__( 'Sorry, invalid credentials.', 'service-tracker-stolmc' ),
+				[ 'status' => 401 ]
+			);
 
-			/**
-			 * Filters the security check error response.
-			 *
-			 * @since 1.0.0
-			 *
-			 * @param WP_REST_Response|null $error_response The error response.
-			 * @param mixed                 $data           The REST request object.
-			 */
-			return apply_filters( 'stolmc_service_tracker_api_security_check', $error_response, $data );
+			return apply_filters(
+				'stolmc_service_tracker_api_permission_check',
+				$error,
+				$request
+			);
 		}
 
-		return null;
+		return true;
 	}
 
 	/**
@@ -87,7 +74,7 @@ class STOLMC_Service_Tracker_Api {
 		$route_args = [
 			'methods'             => $method,
 			'callback'            => $callback,
-			'permission_callback' => [ $this, 'user_verification' ],
+			'permission_callback' => [ $this, 'permission_check' ],
 		];
 
 		/**
@@ -118,5 +105,17 @@ class STOLMC_Service_Tracker_Api {
 		 * @param array  $callback     The callback function.
 		 */
 		do_action( 'stolmc_service_tracker_api_route_registered', $api_type, $api_argument, $method, $callback );
+	}
+
+	/**
+	 * Create a REST response.
+	 *
+	 * @param array<string, mixed> $data The response data.
+	 * @param int                  $status The HTTP status code.
+	 *
+	 * @return WP_REST_Response
+	 */
+	public function rest_response( array $data, int $status ): WP_REST_Response {
+		return new WP_REST_Response( $data, $status );
 	}
 }

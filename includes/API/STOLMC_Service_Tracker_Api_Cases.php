@@ -75,8 +75,6 @@ class STOLMC_Service_Tracker_Api_Cases extends STOLMC_Service_Tracker_Api implem
 	 * @return array<object>|object|null Array of cases or null on failure.
 	 */
 	public function read( WP_REST_Request $data ): array|object|null {
-		$this->security_check( $data );
-
 		/**
 		 * Filters the query parameters for reading cases.
 		 *
@@ -108,20 +106,35 @@ class STOLMC_Service_Tracker_Api_Cases extends STOLMC_Service_Tracker_Api implem
 	 * @return WP_REST_Response Response indicating success or failure.
 	 */
 	public function create( WP_REST_Request $data ): WP_REST_Response {
-		$this->security_check( $data );
-
 		$body = $data->get_body();
 		$body = json_decode( $body );
 		$id_user     = $body->id_user;
 		$title       = $body->title;
 		$status      = isset( $body->status ) ? $body->status : 'open';
 		$description = isset( $body->description ) ? $body->description : '';
+		$start_at    = isset( $body->start_at ) ? $body->start_at : null;
+		$due_at      = isset( $body->due_at ) ? $body->due_at : null;
+		$owner_id    = isset( $body->owner_id ) ? $body->owner_id : null;
+
+		// Validate date range if both are provided.
+		if ( ! empty( $start_at ) && ! empty( $due_at ) && $start_at > $due_at ) {
+			return $this->rest_response(
+				[
+					'success' => false,
+					'message' => 'start_at must be before or equal to due_at',
+				],
+				400
+			);
+		}
 
 		$case_data = [
 			'id_user'     => $id_user,
 			'title'       => $title,
 			'status'      => $status,
 			'description' => $description,
+			'start_at'    => $start_at,
+			'due_at'      => $due_at,
+			'owner_id'    => $owner_id,
 		];
 
 		/**
@@ -149,7 +162,7 @@ class STOLMC_Service_Tracker_Api_Cases extends STOLMC_Service_Tracker_Api implem
 			 */
 			do_action( 'stolmc_service_tracker_case_created', $wpdb->insert_id, $case_data, $data );
 
-			return new WP_REST_Response(
+			return $this->rest_response(
 				[
 					'success' => true,
 					'id'      => $wpdb->insert_id,
@@ -169,7 +182,7 @@ class STOLMC_Service_Tracker_Api_Cases extends STOLMC_Service_Tracker_Api implem
 		 */
 		do_action( 'stolmc_service_tracker_case_create_failed', $inserted, $case_data );
 
-		return new WP_REST_Response(
+		return $this->rest_response(
 			[
 				'success' => false,
 				'message' => 'Failed to create case',
@@ -187,14 +200,42 @@ class STOLMC_Service_Tracker_Api_Cases extends STOLMC_Service_Tracker_Api implem
 	 * @return int|false|null Update result message.
 	 */
 	public function update( WP_REST_Request $data ): int|false|null {
-		$this->security_check( $data );
-
 		$body = $data->get_body();
 		$body = json_decode( $body );
 
-		$title    = $body->title;
-		$update_data = [ 'title' => $title ];
-		$condition   = [ 'id' => $data['id'] ];
+		$update_data = [];
+
+		if ( isset( $body->title ) ) {
+			$update_data['title'] = $body->title;
+		}
+
+		if ( isset( $body->status ) ) {
+			$update_data['status'] = $body->status;
+		}
+
+		if ( isset( $body->description ) ) {
+			$update_data['description'] = $body->description;
+		}
+
+		if ( isset( $body->start_at ) ) {
+			$update_data['start_at'] = $body->start_at;
+		}
+
+		if ( isset( $body->due_at ) ) {
+			$update_data['due_at'] = $body->due_at;
+		}
+
+		if ( property_exists( $body, 'owner_id' ) ) {
+			$update_data['owner_id'] = $body->owner_id;
+		}
+
+		// Validate date range if both are provided.
+		if ( isset( $update_data['start_at'] ) && isset( $update_data['due_at'] )
+			&& $update_data['start_at'] > $update_data['due_at'] ) {
+			return null;
+		}
+
+		$condition = [ 'id' => $data['id'] ];
 
 		/**
 		 * Filters the update data before the SQL operation.
@@ -232,8 +273,6 @@ class STOLMC_Service_Tracker_Api_Cases extends STOLMC_Service_Tracker_Api implem
 	 * @return mixed
 	 */
 	public function delete( WP_REST_Request $data ): mixed {
-		$this->security_check( $data );
-
 		$case_id = $data['id'];
 
 		/**

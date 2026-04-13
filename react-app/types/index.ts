@@ -19,7 +19,10 @@ export interface Case {
   id_user: string | number;
   title: string;
   status: "open" | "close" | string;
+  description?: string;
   created_at: string;
+  start_at?: string | null;
+  due_at?: string | null;
   [key: string]: any;
 }
 

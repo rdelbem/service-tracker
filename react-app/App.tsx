@@ -22,6 +22,8 @@ const ClientsView = lazy(() => import("./components/layout/ClientsView"));
 const ClientDetails = lazy(() => import("./components/layout/ClientDetails"));
 const AddCase = lazy(() => import("./components/layout/AddCase"));
 const CaseDetails = lazy(() => import("./components/layout/CaseDetails"));
+const Calendar = lazy(() => import("./components/layout/Calendar"));
+const Analytics = lazy(() => import("./components/layout/Analytics"));
 
 // Initialize stores on app mount
 function StoreInitializer() {
@@ -54,6 +56,10 @@ function MainContent() {
       return <LazyView><AddCase /></LazyView>;
     case "progress":
       return <LazyView><Progress /></LazyView>;
+    case "analytics":
+      return <LazyView><Analytics /></LazyView>;
+    case "calendar":
+      return <LazyView><Calendar /></LazyView>;
     case "clients":
       // When in clients view with a selected client, show client details
       // Otherwise show the welcome/initial screen

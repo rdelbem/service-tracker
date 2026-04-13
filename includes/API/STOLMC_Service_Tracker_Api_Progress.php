@@ -49,11 +49,8 @@ class STOLMC_Service_Tracker_Api_Progress extends STOLMC_Service_Tracker_Api imp
 		// RegisterNewRoute -> Method from superclass / extended class.
 
 		$this->register_new_route( 'progress', '_case', WP_REST_Server::READABLE, [ $this, 'read' ] );
-
 		$this->register_new_route( 'progress', '', WP_REST_Server::EDITABLE, [ $this, 'update' ] );
-
 		$this->register_new_route( 'progress', '', WP_REST_Server::DELETABLE, [ $this, 'delete' ] );
-
 		$this->register_new_route( 'progress', '_case', WP_REST_Server::CREATABLE, [ $this, 'create' ] );
 	}
 
@@ -65,8 +62,6 @@ class STOLMC_Service_Tracker_Api_Progress extends STOLMC_Service_Tracker_Api imp
 	 * @return array<object>|object|null Array of progress entries or null on failure.
 	 */
 	public function read( WP_REST_Request $data ): array|object|null {
-		$this->security_check( $data );
-
 		/**
 		 * Filters the query parameters for reading progress entries.
 		 *
@@ -98,8 +93,6 @@ class STOLMC_Service_Tracker_Api_Progress extends STOLMC_Service_Tracker_Api imp
 	 * @return string|false Insert result message.
 	 */
 	public function create( WP_REST_Request $data ): string|false {
-		$this->security_check( $data );
-
 		$body = $data->get_json_params();
 
 		$id_user = $body['id_user'];
@@ -150,7 +143,21 @@ class STOLMC_Service_Tracker_Api_Progress extends STOLMC_Service_Tracker_Api imp
 			$progress_data
 		);
 
-		// Get user email from WordPress user.
+		$result = $this->sql->insert( $progress_data );
+
+		/**
+		 * Fires after a progress entry has been created.
+		 *
+		 * @since 1.0.0
+		 *
+		 * @param string|false    $result        The insert result.
+		 * @param array           $progress_data The progress data.
+		 * @param WP_REST_Request $data          The REST request object.
+		 */
+		do_action( 'stolmc_service_tracker_progress_created', $result, $progress_data, $data );
+
+		// Send email notification after progress is created.
+		$progress_id = $wpdb->insert_id ? (int) $wpdb->insert_id : null;
 		$user = get_user_by( 'id', $email_data['id_user'] );
 		if ( false !== $user ) {
 			/**
@@ -165,21 +172,22 @@ class STOLMC_Service_Tracker_Api_Progress extends STOLMC_Service_Tracker_Api imp
 			 */
 			do_action( 'stolmc_service_tracker_progress_before_email_sent', $user->user_email, $email_data['subject'], $email_data['message'], $id_user );
 
-			wp_mail( $user->user_email, $email_data['subject'], $email_data['message'] );
+			$sent = wp_mail( $user->user_email, $email_data['subject'], $email_data['message'] );
+
+			/**
+			 * Fires after the progress email attempt to log notification status.
+			 *
+			 * @since 1.2.0
+			 *
+			 * @param bool   $sent        Whether wp_mail() returned success.
+			 * @param string $to          The email recipient.
+			 * @param string $subject     The email subject.
+			 * @param int    $id_user     The user ID.
+			 * @param int    $id_case     The case ID.
+			 * @param int    $progress_id The progress ID (if available).
+			 */
+			do_action( 'stolmc_service_tracker_progress_email_result', $sent, $user->user_email, $email_data['subject'], $id_user, $id_case, $progress_id );
 		}
-
-		$result = $this->sql->insert( $progress_data );
-
-		/**
-		 * Fires after a progress entry has been created.
-		 *
-		 * @since 1.0.0
-		 *
-		 * @param string|false    $result        The insert result.
-		 * @param array           $progress_data The progress data.
-		 * @param WP_REST_Request $data          The REST request object.
-		 */
-		do_action( 'stolmc_service_tracker_progress_created', $result, $progress_data, $data );
 
 		return $result;
 	}
@@ -193,12 +201,10 @@ class STOLMC_Service_Tracker_Api_Progress extends STOLMC_Service_Tracker_Api imp
 	 */
 	public function update( WP_REST_Request $data ): WP_REST_Response {
 		try {
-			$this->security_check( $data );
-
 			$body = $data->get_json_params();
 
 			if ( ! isset( $body['text'] ) ) {
-				return new WP_REST_Response(
+				return $this->rest_response(
 					[
 						'success' => false,
 						'message' => 'Missing text parameter',
@@ -211,7 +217,7 @@ class STOLMC_Service_Tracker_Api_Progress extends STOLMC_Service_Tracker_Api imp
 			$id   = $data->get_param( 'id' );
 
 			if ( ! $id ) {
-				return new WP_REST_Response(
+				return $this->rest_response(
 					[
 						'success' => false,
 						'message' => 'Missing ID parameter',
@@ -223,7 +229,7 @@ class STOLMC_Service_Tracker_Api_Progress extends STOLMC_Service_Tracker_Api imp
 			if ( ! $this->sql ) { // @phpstan-ignore booleanNot.alwaysFalse
 				// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log -- Fallback logging for critical errors.
 				error_log( 'Service Tracker: SQL instance is null in update method' );
-				return new WP_REST_Response(
+				return $this->rest_response(
 					[
 						'success' => false,
 						'message' => 'SQL instance not initialized',
@@ -260,7 +266,7 @@ class STOLMC_Service_Tracker_Api_Progress extends STOLMC_Service_Tracker_Api imp
 			 */
 			do_action( 'stolmc_service_tracker_progress_updated', $response, $update_data, $condition, $data );
 
-			return new WP_REST_Response(
+			return $this->rest_response(
 				[
 					'success' => true,
 					'data'    => $response,
@@ -272,7 +278,7 @@ class STOLMC_Service_Tracker_Api_Progress extends STOLMC_Service_Tracker_Api imp
 			error_log( 'Service Tracker Update Error: ' . $e->getMessage() );
 			// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log -- Fallback logging for critical errors.
 			error_log( 'Service Tracker Update Stack: ' . $e->getTraceAsString() );
-			return new WP_REST_Response(
+			return $this->rest_response(
 				[
 					'success' => false,
 					'message' => $e->getMessage(),
@@ -290,8 +296,7 @@ class STOLMC_Service_Tracker_Api_Progress extends STOLMC_Service_Tracker_Api imp
 	 * @return WP_REST_Response Response indicating success.
 	 */
 	public function delete( WP_REST_Request $data ): WP_REST_Response {
-		$this->security_check( $data );
-		$id     = $data->get_param( 'id' );
+		$id = $data->get_param( 'id' );
 
 		/**
 		 * Fires before a progress entry is deleted.
@@ -316,6 +321,6 @@ class STOLMC_Service_Tracker_Api_Progress extends STOLMC_Service_Tracker_Api imp
 		 */
 		do_action( 'stolmc_service_tracker_progress_deleted', $delete, $id, $data );
 
-		return new WP_REST_Response( [ 'success' => true ] );
+		return $this->rest_response( [ 'success' => true ], 200 );
 	}
 }

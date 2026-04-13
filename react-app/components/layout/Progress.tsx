@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useInViewStore } from "../../stores/inViewStore";
 import { useProgressStore } from "../../stores/progressStore";
 import TextareaAutosize from "react-textarea-autosize";
 import Spinner from "./Spinner";
 import Status from "./Status";
+import { get as fetchGet, put } from "../../utils/fetch";
 
 declare const data: Record<string, any>;
 
@@ -11,18 +12,147 @@ export default function Progress() {
   const inViewState = useInViewStore((state) => state);
   const { navigate } = useInViewStore();
   const progressState = useProgressStore((state) => state);
-  const { postStatus } = useProgressStore();
+  const { postStatus, getStatus } = useProgressStore();
   const [writingStatus, setWritingStatus] = useState(false);
   const [newText, setNewText] = useState("");
-
-  if (progressState.loadingStatus) {
-    return <Spinner />;
-  }
+  const [caseData, setCaseData] = useState<any>(null);
+  const [loadingCase, setLoadingCase] = useState(false);
+  const [editingDate, setEditingDate] = useState<"start" | "due" | null>(null);
+  const [tempDate, setTempDate] = useState("");
+  const [selectedOwner, setSelectedOwner] = useState<string | number>("");
+  const [savingOwner, setSavingOwner] = useState(false);
+  const [staffUsers, setStaffUsers] = useState<any[]>([]);
 
   // Case ID
   const idCase = inViewState.caseId;
   // User ID
   const idUser = inViewState.userId;
+
+  // Load progress data when caseId changes
+  useEffect(() => {
+    if (!idCase) return;
+    const title = inViewState.name || progressState.caseTitle;
+    getStatus(idCase, false, title);
+  }, [idCase]);
+
+  // Fetch case data for dates
+  useEffect(() => {
+    if (!idUser || !idCase) return;
+
+    const fetchCaseData = async () => {
+      setLoadingCase(true);
+      const apiUrlCases = `${data.root_url}/wp-json/${data.api_url}/cases`;
+      try {
+        const res = await fetchGet(`${apiUrlCases}/${idUser}`, {
+          headers: { "X-WP-Nonce": data.nonce },
+        });
+        const cases = res.data || [];
+        const found = cases.find((c: any) => String(c.id) === String(idCase));
+        setCaseData(found || null);
+        setSelectedOwner(found?.owner_id || "");
+      } catch (error) {
+        console.error("Error fetching case data:", error);
+      } finally {
+        setLoadingCase(false);
+      }
+    };
+
+    fetchCaseData();
+  }, [idUser, idCase]);
+
+  // Fetch staff users for owner dropdown
+  useEffect(() => {
+    const fetchStaffUsers = async () => {
+      const apiUrlStaff = `${data.root_url}/wp-json/service-tracker-stolmc/v1/users/staff`;
+      try {
+        const res = await fetchGet(apiUrlStaff, {
+          headers: { "X-WP-Nonce": data.nonce },
+        });
+        setStaffUsers(res.data || []);
+      } catch (error) {
+        console.error("Error fetching staff users:", error);
+      }
+    };
+
+    fetchStaffUsers();
+  }, []);
+
+  const formatDateForInput = (dateStr: string | null) => {
+    if (!dateStr) return "";
+    return dateStr.substring(0, 16);
+  };
+
+  const handleDateEdit = (type: "start" | "due") => {
+    const value = type === "start" ? caseData?.start_at : caseData?.due_at;
+    setTempDate(formatDateForInput(value));
+    setEditingDate(type);
+  };
+
+  const handleDateSave = async () => {
+    if (!editingDate || !caseData) return;
+
+    const field = editingDate === "start" ? "start_at" : "due_at";
+    const apiUrlCases = `${data.root_url}/wp-json/${data.api_url}/cases`;
+
+    try {
+      await put(`${apiUrlCases}/${idCase}`, {
+        id_user: idUser,
+        [field]: tempDate || null,
+      }, {
+        headers: {
+          "X-WP-Nonce": data.nonce,
+          "Content-type": "application/json",
+        },
+      });
+
+      setCaseData((prev: any) => ({ ...prev, [field]: tempDate || null }));
+      setEditingDate(null);
+    } catch (error) {
+      console.error("Error updating date:", error);
+      alert("Failed to update date");
+    }
+  };
+
+  const handleDateCancel = () => {
+    setEditingDate(null);
+    setTempDate("");
+  };
+
+  const handleOwnerChange = async (newOwnerId: string | number) => {
+    setSelectedOwner(newOwnerId);
+    setSavingOwner(true);
+    const apiUrlCases = `${data.root_url}/wp-json/${data.api_url}/cases`;
+
+    try {
+      await put(`${apiUrlCases}/${idCase}`, {
+        id_user: idUser,
+        owner_id: newOwnerId || null,
+      }, {
+        headers: {
+          "X-WP-Nonce": data.nonce,
+          "Content-type": "application/json",
+        },
+      });
+
+      setCaseData((prev: any) => ({ ...prev, owner_id: newOwnerId || null }));
+    } catch (error) {
+      console.error("Error updating owner:", error);
+      alert("Failed to update owner");
+      setSelectedOwner(caseData?.owner_id || "");
+    } finally {
+      setSavingOwner(false);
+    }
+  };
+
+  const getOwnerName = () => {
+    if (!caseData?.owner_id) return "Unassigned";
+    const owner = staffUsers.find((u: any) => String(u.id) === String(caseData.owner_id));
+    return owner ? owner.name : "Unknown";
+  };
+
+  if (progressState.loadingStatus || loadingCase) {
+    return <Spinner />;
+  }
 
   const allStatuses = [...progressState.status];
 
@@ -64,6 +194,145 @@ export default function Progress() {
           <p className="text-on-surface-variant mt-4 max-w-2xl leading-relaxed font-body">
             Track all updates and progress for this case
           </p>
+
+          {/* Owner Assignment */}
+          <div className="mt-6 max-w-2xl">
+            <div className="bg-surface-container-low p-4 rounded-xl">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <span className="material-symbols-outlined text-primary text-xl">
+                    person
+                  </span>
+                  <div>
+                    <label className="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">
+                      Case Owner
+                    </label>
+                    <p className="text-sm text-on-surface font-medium">
+                      {getOwnerName()}
+                    </p>
+                  </div>
+                </div>
+                <select
+                  value={selectedOwner}
+                  onChange={(e) => handleOwnerChange(e.target.value)}
+                  disabled={savingOwner}
+                  className="bg-surface-container-lowest border border-outline-variant/20 rounded-lg py-2 px-3 text-sm focus:ring-2 focus:ring-primary/10 disabled:opacity-50"
+                >
+                  <option value="">Unassigned</option>
+                  {staffUsers.map((user: any) => (
+                    <option key={user.id} value={user.id}>
+                      {user.name} {user.role === "administrator" ? "(Admin)" : ""}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+          </div>
+
+          {/* Editable Dates */}
+          <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6 max-w-2xl">
+            {/* Start Date */}
+            <div className="bg-surface-container-low p-4 rounded-xl">
+              <div className="flex items-center justify-between mb-2">
+                <label className="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">
+                  Start Date
+                </label>
+                {editingDate !== "start" && (
+                  <button
+                    onClick={() => handleDateEdit("start")}
+                    className="p-1 rounded hover:bg-surface-container-high text-on-surface-variant hover:text-primary transition-all"
+                  >
+                    <span className="material-symbols-outlined text-sm">edit</span>
+                  </button>
+                )}
+              </div>
+              {editingDate === "start" ? (
+                <div className="flex items-center gap-2">
+                  <input
+                    type="datetime-local"
+                    value={tempDate}
+                    onChange={(e) => setTempDate(e.target.value)}
+                    className="flex-1 bg-surface-container-lowest border border-outline-variant/20 rounded-lg py-2 px-3 text-sm text-on-surface focus:ring-2 focus:ring-primary/10"
+                  />
+                  <button
+                    onClick={handleDateSave}
+                    className="p-2 rounded-lg bg-primary text-white hover:bg-primary-container transition-all"
+                  >
+                    <span className="material-symbols-outlined text-sm">check</span>
+                  </button>
+                  <button
+                    onClick={handleDateCancel}
+                    className="p-2 rounded-lg bg-surface-container-highest text-on-surface-variant hover:bg-surface-container transition-all"
+                  >
+                    <span className="material-symbols-outlined text-sm">close</span>
+                  </button>
+                </div>
+              ) : (
+                <p className="text-sm text-on-surface font-medium">
+                  {caseData?.start_at
+                    ? new Date(caseData.start_at).toLocaleString("en-US", {
+                        year: "numeric",
+                        month: "short",
+                        day: "numeric",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })
+                    : "Not set"}
+                </p>
+              )}
+            </div>
+
+            {/* Due Date */}
+            <div className="bg-surface-container-low p-4 rounded-xl">
+              <div className="flex items-center justify-between mb-2">
+                <label className="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">
+                  Due Date
+                </label>
+                {editingDate !== "due" && (
+                  <button
+                    onClick={() => handleDateEdit("due")}
+                    className="p-1 rounded hover:bg-surface-container-high text-on-surface-variant hover:text-primary transition-all"
+                  >
+                    <span className="material-symbols-outlined text-sm">edit</span>
+                  </button>
+                )}
+              </div>
+              {editingDate === "due" ? (
+                <div className="flex items-center gap-2">
+                  <input
+                    type="datetime-local"
+                    value={tempDate}
+                    onChange={(e) => setTempDate(e.target.value)}
+                    className="flex-1 bg-surface-container-lowest border border-outline-variant/20 rounded-lg py-2 px-3 text-sm text-on-surface focus:ring-2 focus:ring-primary/10"
+                  />
+                  <button
+                    onClick={handleDateSave}
+                    className="p-2 rounded-lg bg-primary text-white hover:bg-primary-container transition-all"
+                  >
+                    <span className="material-symbols-outlined text-sm">check</span>
+                  </button>
+                  <button
+                    onClick={handleDateCancel}
+                    className="p-2 rounded-lg bg-surface-container-highest text-on-surface-variant hover:bg-surface-container transition-all"
+                  >
+                    <span className="material-symbols-outlined text-sm">close</span>
+                  </button>
+                </div>
+              ) : (
+                <p className="text-sm text-on-surface font-medium">
+                  {caseData?.due_at
+                    ? new Date(caseData.due_at).toLocaleString("en-US", {
+                        year: "numeric",
+                        month: "short",
+                        day: "numeric",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })
+                    : "Not set"}
+                </p>
+              )}
+            </div>
+          </div>
         </div>
 
         {/* Status Update Input */}

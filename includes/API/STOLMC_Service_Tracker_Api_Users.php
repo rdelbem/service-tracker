@@ -1,10 +1,10 @@
 <?php
 namespace STOLMC_Service_Tracker\includes\API;
 
-use WP_Error;
 use WP_REST_Request;
 use WP_REST_Response;
 use WP_REST_Server;
+use WP_User;
 
 /**
  * This class handles user-related REST API operations.
@@ -38,7 +38,7 @@ class STOLMC_Service_Tracker_Api_Users extends STOLMC_Service_Tracker_Api {
 			[
 				'methods'             => WP_REST_Server::READABLE,
 				'callback'            => [ $this, 'get_users' ],
-				'permission_callback' => [ $this, 'user_verification' ],
+				'permission_callback' => [ $this, 'permission_check' ],
 			]
 		);
 
@@ -49,7 +49,18 @@ class STOLMC_Service_Tracker_Api_Users extends STOLMC_Service_Tracker_Api {
 			[
 				'methods'             => WP_REST_Server::CREATABLE,
 				'callback'            => [ $this, 'create' ],
-				'permission_callback' => [ $this, 'user_verification' ],
+				'permission_callback' => [ $this, 'permission_check' ],
+			]
+		);
+
+		// GET /service-tracker-stolmc/v1/users/staff - Get all staff/admin users.
+		register_rest_route(
+			'service-tracker-stolmc/v1',
+			'/users/staff',
+			[
+				'methods'             => WP_REST_Server::READABLE,
+				'callback'            => [ $this, 'get_staff_users' ],
+				'permission_callback' => [ $this, 'permission_check' ],
 			]
 		);
 	}
@@ -62,13 +73,6 @@ class STOLMC_Service_Tracker_Api_Users extends STOLMC_Service_Tracker_Api {
 	 * @return WP_REST_Response Response with user data.
 	 */
 	public function get_users( WP_REST_Request $data ): WP_REST_Response {
-
-		// Security check.
-		$security_result = $this->security_check( $data );
-		if ( $security_result instanceof WP_REST_Response ) {
-			return $security_result;
-		}
-
 		// Get all users with customer role.
 		$args = [
 			'role'    => 'customer',
@@ -105,12 +109,12 @@ class STOLMC_Service_Tracker_Api_Users extends STOLMC_Service_Tracker_Api {
 		 *
 		 * @since 1.0.0
 		 *
-		 * @param array    $user_data The user data array.
+		 * @param array     $user_data The user data array.
 		 * @param WP_User[] $users    The WP_User objects.
 		 */
 		$user_data = apply_filters( 'stolmc_service_tracker_users_response', $user_data, $users );
 
-		return new WP_REST_Response( $user_data, 200 );
+		return $this->rest_response( $user_data, 200 );
 	}
 
 	/**
@@ -121,13 +125,6 @@ class STOLMC_Service_Tracker_Api_Users extends STOLMC_Service_Tracker_Api {
 	 * @return WP_REST_Response Response indicating success or failure.
 	 */
 	public function create( WP_REST_Request $data ): WP_REST_Response {
-
-		// Security check.
-		$security_result = $this->security_check( $data );
-		if ( $security_result instanceof WP_REST_Response ) {
-			return $security_result;
-		}
-
 		$body = $data->get_body();
 		$body = json_decode( $body );
 
@@ -145,7 +142,7 @@ class STOLMC_Service_Tracker_Api_Users extends STOLMC_Service_Tracker_Api {
 		// Check if user with this email already exists.
 		$existing_user = get_user_by( 'email', $body->email );
 		if ( $existing_user ) {
-			return new WP_REST_Response(
+			return $this->rest_response(
 				[
 					'success' => false,
 					'message' => 'A user with this email already exists',
@@ -191,7 +188,7 @@ class STOLMC_Service_Tracker_Api_Users extends STOLMC_Service_Tracker_Api {
 		$user_id = wp_insert_user( $user_data );
 
 		if ( is_wp_error( $user_id ) ) {
-			return new WP_REST_Response(
+			return $this->rest_response(
 				[
 					'success' => false,
 					'message' => $user_id->get_error_message(),
@@ -241,7 +238,7 @@ class STOLMC_Service_Tracker_Api_Users extends STOLMC_Service_Tracker_Api {
 		$user = get_user_by( 'id', $user_id );
 
 		if ( false === $user ) {
-			return new WP_REST_Response(
+			return $this->rest_response(
 				[
 					'success' => false,
 					'message' => 'User created but could not retrieve data',
@@ -250,7 +247,7 @@ class STOLMC_Service_Tracker_Api_Users extends STOLMC_Service_Tracker_Api {
 			);
 		}
 
-		return new WP_REST_Response(
+		return $this->rest_response(
 			[
 				'success' => true,
 				'message' => 'User created successfully',
@@ -266,5 +263,54 @@ class STOLMC_Service_Tracker_Api_Users extends STOLMC_Service_Tracker_Api {
 			],
 			201
 		);
+	}
+
+	/**
+	 * Get all staff and admin users.
+	 *
+	 * @param WP_REST_Request $data The REST request object.
+	 *
+	 * @return WP_REST_Response Response with user data.
+	 */
+	public function get_staff_users( WP_REST_Request $data ): WP_REST_Response {
+		// Get users with staff or administrator role.
+		$args = [
+			'role__in' => [ 'staff', 'administrator' ],
+			'orderby'  => 'display_name',
+			'order'    => 'ASC',
+		];
+
+		/**
+		 * Filters the query arguments for fetching staff users.
+		 *
+		 * @since 1.2.0
+		 *
+		 * @param array $args The user query arguments.
+		 */
+		$args = apply_filters( 'stolmc_service_tracker_get_staff_users_args', $args );
+
+		$users     = get_users( $args );
+		$user_data = [];
+
+		foreach ( $users as $user ) {
+			$user_data[] = [
+				'id'         => $user->ID,
+				'name'       => $user->display_name,
+				'email'      => $user->user_email,
+				'role'       => $user->roles[0] ?? 'staff',
+				'created_at' => $user->user_registered,
+			];
+		}
+
+		/**
+		 * Filters the staff users response data.
+		 *
+		 * @since 1.2.0
+		 *
+		 * @param array $user_data The users data.
+		 */
+		$user_data = apply_filters( 'stolmc_service_tracker_get_staff_users_response', $user_data );
+
+		return $this->rest_response( $user_data, 200 );
 	}
 }

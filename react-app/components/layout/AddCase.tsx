@@ -15,6 +15,8 @@ export default function AddCase() {
   const [caseTitle, setCaseTitle] = useState("");
   const [caseStatus, setCaseStatus] = useState("open");
   const [caseDescription, setCaseDescription] = useState("");
+  const [caseStartAt, setCaseStartAt] = useState("");
+  const [caseDueAt, setCaseDueAt] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
   const [showUserDropdown, setShowUserDropdown] = useState(false);
@@ -67,10 +69,26 @@ export default function AddCase() {
     try {
       const { useCasesStore } = await import("../../stores/casesStore");
       const { postCase, getCases } = useCasesStore.getState();
-      
+
+      // Prepare case data with optional date fields
+      const caseData: any = {
+        id_user: selectedUser.id,
+        title: caseTitle.trim(),
+        status: caseStatus,
+        description: caseDescription.trim(),
+      };
+
+      if (caseStartAt) {
+        caseData.start_at = caseStartAt;
+      }
+
+      if (caseDueAt) {
+        caseData.due_at = caseDueAt;
+      }
+
       // Post the case directly using the store's postCase function
-      await postCase(selectedUser.id, caseTitle.trim());
-      
+      await postCase(selectedUser.id, caseTitle.trim(), caseData);
+
       // Refresh cases and navigate
       await getCases(selectedUser.id, false);
       navigate("cases", "", "", "");
@@ -194,6 +212,43 @@ export default function AddCase() {
               rows={4}
               className="w-full bg-surface-container-lowest border border-outline-variant/20 rounded-lg py-3 px-4 text-sm focus:ring-2 focus:ring-primary/10 transition-all placeholder:text-outline-variant resize-none"
             />
+          </div>
+
+          {/* Date Range */}
+          <div className="bg-surface-container-low p-6 rounded-xl">
+            <label className="block text-xs font-bold text-on-surface-variant uppercase tracking-wider mb-4">
+              Date Range (Optional)
+            </label>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Start Date */}
+              <div>
+                <label className="block text-xs text-on-surface-variant mb-2">
+                  Start Date
+                </label>
+                <input
+                  type="datetime-local"
+                  value={caseStartAt}
+                  onChange={(e) => setCaseStartAt(e.target.value)}
+                  className="w-full bg-surface-container-lowest border border-outline-variant/20 rounded-lg py-3 px-4 text-sm focus:ring-2 focus:ring-primary/10 transition-all"
+                />
+              </div>
+
+              {/* Due Date */}
+              <div>
+                <label className="block text-xs text-on-surface-variant mb-2">
+                  Due Date
+                </label>
+                <input
+                  type="datetime-local"
+                  value={caseDueAt}
+                  onChange={(e) => setCaseDueAt(e.target.value)}
+                  className="w-full bg-surface-container-lowest border border-outline-variant/20 rounded-lg py-3 px-4 text-sm focus:ring-2 focus:ring-primary/10 transition-all"
+                />
+              </div>
+            </div>
+            <p className="text-xs text-on-surface-variant mt-3">
+              Leave blank if no specific dates are needed. If both dates are provided, start date must be before due date.
+            </p>
           </div>
 
           {/* Actions */}

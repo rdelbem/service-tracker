@@ -2,10 +2,18 @@
 namespace STOLMC_Service_Tracker\includes;
 
 use STOLMC_Service_Tracker\admin\STOLMC_Service_Tracker_Admin;
+use STOLMC_Service_Tracker\includes\Analytics\AnalyticsLogger;
+use STOLMC_Service_Tracker\includes\Analytics\Analytics_Hooks;
+use STOLMC_Service_Tracker\includes\API\STOLMC_Service_Tracker_Api;
+use STOLMC_Service_Tracker\includes\API\STOLMC_Service_Tracker_Api_Analytics;
 use STOLMC_Service_Tracker\includes\API\STOLMC_Service_Tracker_Api_Cases;
+use STOLMC_Service_Tracker\includes\API\STOLMC_Service_Tracker_Api_Calendar;
 use STOLMC_Service_Tracker\includes\API\STOLMC_Service_Tracker_Api_Progress;
 use STOLMC_Service_Tracker\includes\API\STOLMC_Service_Tracker_Api_Toggle;
 use STOLMC_Service_Tracker\includes\API\STOLMC_Service_Tracker_Api_Users;
+use STOLMC_Service_Tracker\includes\CLI\Service_Tracker_Commands;
+use STOLMC_Service_Tracker\includes\DB\CalendarIndex;
+use STOLMC_Service_Tracker\includes\DB\SchemaManager;
 use STOLMC_Service_Tracker\includes\I18n\STOLMC_Service_Tracker_I18n;
 use STOLMC_Service_Tracker\includes\Utils\STOLMC_Service_Tracker_Loader;
 use STOLMC_Service_Tracker\includes\Utils\STOLMC_Service_Tracker_Permalink_Validator;
@@ -122,6 +130,10 @@ class STOLMC_Service_Tracker {
 		$this->api();
 		$this->define_public_hooks();
 		$this->public_user_content();
+		$this->define_schema_hooks();
+		$this->define_analytics_hooks();
+		$this->define_cli_commands();
+		$this->define_calendar_index_hooks();
 	}
 
 	/**
@@ -175,6 +187,12 @@ class STOLMC_Service_Tracker {
 
 		$service_tracker_api_users = new STOLMC_Service_Tracker_Api_Users();
 		$this->loader->add_action( 'rest_api_init', $service_tracker_api_users, 'run' );
+
+		$service_tracker_api_calendar = new STOLMC_Service_Tracker_Api_Calendar();
+		$this->loader->add_action( 'rest_api_init', $service_tracker_api_calendar, 'run' );
+
+		$service_tracker_api_analytics = new STOLMC_Service_Tracker_Api_Analytics();
+		$this->loader->add_action( 'rest_api_init', $service_tracker_api_analytics, 'run' );
 	}
 
 	/**
@@ -203,6 +221,7 @@ class STOLMC_Service_Tracker {
 	 */
 	private function add_customer_role(): void {
 		add_action( 'init', [ $this, 'register_customer_role' ] );
+		add_action( 'init', [ $this, 'register_staff_role' ] );
 	}
 
 	/**
@@ -236,6 +255,43 @@ class STOLMC_Service_Tracker {
 		 * @since 1.0.0
 		 */
 		do_action( 'stolmc_service_tracker_role_registered' );
+	}
+
+	/**
+	 * Register the staff role on init hook.
+	 *
+	 * Staff users can manage cases and progress. Administrators
+	 * are implicitly treated as staff for ownership and assignment purposes.
+	 *
+	 * @since    1.2.0
+	 * @access   public
+	 *
+	 * @return void
+	 */
+	public function register_staff_role(): void {
+		// Only create the role if it doesn't already exist.
+		if ( null === get_role( 'staff' ) ) {
+			$editor_role = get_role( 'editor' );
+			$capabilities = $editor_role ? $editor_role->capabilities : [];
+
+			/**
+			 * Filters the capabilities assigned to the staff role.
+			 *
+			 * @since 1.2.0
+			 *
+			 * @param array $capabilities The capabilities (defaults to editor).
+			 */
+			$capabilities = apply_filters( 'stolmc_service_tracker_staff_role_capabilities', $capabilities );
+
+			add_role( 'staff', __( 'Staff', 'service-tracker-stolmc' ), $capabilities );
+		}
+
+		/**
+		 * Fires after the staff role has been registered.
+		 *
+		 * @since 1.2.0
+		 */
+		do_action( 'stolmc_service_tracker_staff_role_registered' );
 	}
 
 	/**
@@ -293,6 +349,99 @@ class STOLMC_Service_Tracker {
 		 * @param STOLMC_Service_Tracker_Public $plugin_public The public instance.
 		 */
 		do_action( 'stolmc_service_tracker_public_hooks_defined', $plugin_public );
+	}
+
+	/**
+	 * Register database schema synchronization hooks.
+	 *
+	 * The SchemaManager runs on every `init` to compare the actual
+	 * database schema against the declarative definition and apply
+	 * any pending ALTER TABLE migrations.  The fast-path version
+	 * check costs a single option read and returns immediately when
+	 * the schema is current.
+	 *
+	 * @since    1.1.0
+	 * @access   private
+	 *
+	 * @return void
+	 */
+	private function define_schema_hooks(): void {
+		$schema_manager = new SchemaManager();
+		$this->loader->add_action( 'init', $schema_manager, 'sync' );
+	}
+
+	/**
+	 * Register analytics hooks for activity and notification logging.
+	 *
+	 * Sets up the AnalyticsLogger and Analytics_Hooks classes to
+	 * listen to domain events and persist activity/notification records.
+	 *
+	 * @since    1.2.0
+	 * @access   private
+	 *
+	 * @return void
+	 */
+	private function define_analytics_hooks(): void {
+		global $wpdb;
+
+		$notifications_table = $wpdb->prefix . 'servicetracker_notifications';
+		$activity_log_table  = $wpdb->prefix . 'servicetracker_activity_log';
+
+		$logger        = new AnalyticsLogger( $notifications_table, $activity_log_table );
+		$analytics     = new Analytics_Hooks( $logger );
+		$analytics->register_hooks();
+	}
+
+	/**
+	 * Register WP-CLI commands.
+	 *
+	 * @since    1.1.0
+	 * @access   private
+	 *
+	 * @return void
+	 */
+	private function define_cli_commands(): void {
+		// WP_CLI is only defined when running via WP-CLI.
+		// phpcs:ignore Generic.PHP.NoSilencedErrors -- Intentional for WP-CLI check.
+		$wp_cli = defined( 'WP_CLI' ) && constant( 'WP_CLI' );
+		if ( ! $wp_cli ) {
+			return;
+		}
+
+		// phpcs:ignore Generic.PHP.NoSilencedErrors -- WP-CLI class only exists when running WP-CLI.
+		if ( class_exists( '\WP_CLI' ) ) {
+			\WP_CLI::add_command( 'service-tracker', Service_Tracker_Commands::class );
+		}
+	}
+
+	/**
+	 * Register hooks to keep the calendar date index in sync.
+	 *
+	 * The index is rebuilt on every case create, update, or delete
+	 * event so the frontend calendar can render accurate start/end
+	 * indicators without scanning every case.
+	 *
+	 * @since    1.1.0
+	 * @access   private
+	 *
+	 * @return void
+	 */
+	private function define_calendar_index_hooks(): void {
+		$this->loader->add_action( 'stolmc_service_tracker_case_created', $this, 'rebuild_calendar_index' );
+		$this->loader->add_action( 'stolmc_service_tracker_case_updated', $this, 'rebuild_calendar_index' );
+		$this->loader->add_action( 'stolmc_service_tracker_case_before_delete', $this, 'rebuild_calendar_index' );
+	}
+
+	/**
+	 * Rebuild the calendar date index (proxy method for hook registration).
+	 *
+	 * @since    1.1.0
+	 * @access   public
+	 *
+	 * @return void
+	 */
+	public function rebuild_calendar_index(): void {
+		CalendarIndex::rebuild();
 	}
 
 	/**
