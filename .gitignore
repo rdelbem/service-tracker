@@ -77,3 +77,4 @@ assets/bower_components/*
 .idea/
 assets/img/.DS_Store
 
+admin/js/prod
