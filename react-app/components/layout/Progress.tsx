@@ -64,14 +64,18 @@ export default function Progress() {
         setCaseData(found || null);
         setSelectedOwner(found?.owner_id || "");
 
-        // Fetch client name
+        // Fetch client name — unpack paginated envelope.
         if (found?.id_user) {
           const apiUrlUsers = `${data.root_url}/wp-json/service-tracker-stolmc/v1/users`;
           try {
-            const usersRes = await fetchGet(apiUrlUsers, {
-              headers: { "X-WP-Nonce": data.nonce },
-            });
-            const client = (usersRes.data || []).find((u: any) => String(u.id) === String(found.id_user));
+            const usersRes = await fetchGet(
+              `${apiUrlUsers}?page=1&per_page=100`,
+              { headers: { "X-WP-Nonce": data.nonce } }
+            );
+            const userList = usersRes.data?.data ?? [];
+            const client = userList.find(
+              (u: any) => String(u.id) === String(found.id_user)
+            );
             setClientName(client?.name || `Client #${found.id_user}`);
           } catch {
             setClientName(`Client #${found.id_user}`);

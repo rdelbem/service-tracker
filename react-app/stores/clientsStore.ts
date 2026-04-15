@@ -7,11 +7,16 @@ declare const data: Record<string, any>;
 export interface ClientsState {
   users: User[];
   loadingUsers: boolean;
+  page: number;
+  perPage: number;
+  total: number;
+  totalPages: number;
 }
 
 export interface ClientsActions {
-  getUsers: () => Promise<void>;
+  getUsers: (page?: number) => Promise<void>;
   searchUsers: (query: string) => void;
+  setPage: (page: number) => Promise<void>;
   createUser: (userData: { name: string; email: string; phone?: string; cellphone?: string }) => Promise<{ success: boolean; message: string; user?: User }>;
 }
 
@@ -24,24 +29,54 @@ export const useClientsStore = create<ClientsStore>((set, get) => {
   return {
     users: [],
     loadingUsers: true,
-    getUsers: async () => {
+    page: 1,
+    perPage: 6,
+    total: 0,
+    totalPages: 1,
+
+    getUsers: async (page?: number) => {
+      const currentPage = page ?? get().page;
+      const perPage = get().perPage;
+
       try {
-        const res = await fetchGet(api_url_users, {
+        set({ loadingUsers: true });
+
+        const url = `${api_url_users}?page=${currentPage}&per_page=${perPage}`;
+        const res = await fetchGet(url, {
           headers: { "X-WP-Nonce": data.nonce },
         });
-        set({ users: res.data, loadingUsers: false });
+
+        // API returns a paginated envelope: { data, total, page, per_page, total_pages }
+        const envelope = res.data;
+
+        set({
+          users: envelope.data ?? [],
+          total: envelope.total ?? 0,
+          page: envelope.page ?? currentPage,
+          perPage: envelope.per_page ?? perPage,
+          totalPages: envelope.total_pages ?? 1,
+          loadingUsers: false,
+        });
       } catch (error) {
         console.error("Error fetching users:", error);
         set({ loadingUsers: false });
       }
     },
+
+    setPage: async (page: number) => {
+      const { totalPages } = get();
+      const clamped = Math.max(1, Math.min(page, totalPages));
+      set({ page: clamped });
+      await get().getUsers(clamped);
+    },
+
     searchUsers: (query: string) => {
       const specialChar = /[-!$%^&*()_+|~=`{}\[\]:";'<>?,.\/]/;
       const specialCharRegEx = new RegExp(specialChar, "g");
       if (specialCharRegEx.test(query)) return;
 
       if (query === "") {
-        get().getUsers();
+        get().getUsers(1);
         return;
       }
 
@@ -59,6 +94,7 @@ export const useClientsStore = create<ClientsStore>((set, get) => {
         set({ users: foundUsers, loadingUsers: false });
       }
     },
+
     createUser: async (userData) => {
       try {
         const res = await post(create_user_api_url, userData, {
@@ -66,7 +102,8 @@ export const useClientsStore = create<ClientsStore>((set, get) => {
         });
 
         if (res.data.success) {
-          await get().getUsers();
+          // Refresh current page so the new user appears.
+          await get().getUsers(get().page);
         }
 
         return res.data;
@@ -78,5 +115,5 @@ export const useClientsStore = create<ClientsStore>((set, get) => {
   };
 });
 
-// Auto-fetch users on store creation
-useClientsStore.getState().getUsers();
+// Auto-fetch users on store creation (page 1).
+useClientsStore.getState().getUsers(1);

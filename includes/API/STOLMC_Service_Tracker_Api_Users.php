@@ -16,6 +16,13 @@ use WP_User;
 class STOLMC_Service_Tracker_Api_Users extends STOLMC_Service_Tracker_Api {
 
 	/**
+	 * Number of users returned per page by default.
+	 *
+	 * @since 1.3.0
+	 */
+	private const PER_PAGE_DEFAULT = 6;
+
+	/**
 	 * Initialize the API and register routes.
 	 *
 	 * @return void
@@ -31,7 +38,7 @@ class STOLMC_Service_Tracker_Api_Users extends STOLMC_Service_Tracker_Api {
 	 */
 	public function custom_api(): void {
 
-		// GET /service-tracker-stolmc/v1/users - Get all customer users.
+		// GET /service-tracker-stolmc/v1/users - Get all customer users (paginated).
 		register_rest_route(
 			'service-tracker-stolmc/v1',
 			'/users',
@@ -39,6 +46,16 @@ class STOLMC_Service_Tracker_Api_Users extends STOLMC_Service_Tracker_Api {
 				'methods'             => WP_REST_Server::READABLE,
 				'callback'            => [ $this, 'get_users' ],
 				'permission_callback' => [ $this, 'permission_check' ],
+				'args'                => [
+					'page'     => [
+						'default'           => 1,
+						'sanitize_callback' => 'absint',
+					],
+					'per_page' => [
+						'default'           => self::PER_PAGE_DEFAULT,
+						'sanitize_callback' => 'absint',
+					],
+				],
 			]
 		);
 
@@ -66,18 +83,53 @@ class STOLMC_Service_Tracker_Api_Users extends STOLMC_Service_Tracker_Api {
 	}
 
 	/**
-	 * Get all customer users.
+	 * Get paginated customer users.
+	 *
+	 * Accepts `page` (1-based) and `per_page` query parameters.
+	 * Returns a paginated envelope so the frontend can render page controls.
 	 *
 	 * @param WP_REST_Request $data The REST request object.
 	 *
-	 * @return WP_REST_Response Response with user data.
+	 * @return WP_REST_Response Response with paginated user data.
 	 */
 	public function get_users( WP_REST_Request $data ): WP_REST_Response {
-		// Get all users with customer role.
+		$page     = max( 1, (int) $data->get_param( 'page' ) );
+		$per_page = max( 1, (int) $data->get_param( 'per_page' ) );
+
+		if ( $per_page === 0 ) {
+			$per_page = self::PER_PAGE_DEFAULT;
+		}
+
+		// Count query — fetch only IDs to get the total efficiently.
+		$count_args = [
+			'role'    => 'customer',
+			'fields'  => 'ids',
+			'orderby' => 'display_name',
+			'order'   => 'ASC',
+		];
+
+		/**
+		 * Filters the query arguments used for counting customer users.
+		 *
+		 * @since 1.3.0
+		 *
+		 * @param array $count_args The user query arguments for counting.
+		 */
+		$count_args = apply_filters( 'stolmc_service_tracker_get_users_count_args', $count_args );
+
+		$all_ids     = get_users( $count_args );
+		$total       = count( $all_ids );
+		$total_pages = (int) ceil( $total / $per_page );
+
+		// Clamp page to valid range.
+		$page = min( $page, max( 1, $total_pages ) );
+
 		$args = [
 			'role'    => 'customer',
 			'orderby' => 'display_name',
 			'order'   => 'ASC',
+			'number'  => $per_page,
+			'offset'  => ( $page - 1 ) * $per_page,
 		];
 
 		/**
@@ -89,8 +141,8 @@ class STOLMC_Service_Tracker_Api_Users extends STOLMC_Service_Tracker_Api {
 		 */
 		$args = apply_filters( 'stolmc_service_tracker_get_users_args', $args );
 
-		$users      = get_users( $args );
-		$user_data  = [];
+		$users     = get_users( $args );
+		$user_data = [];
 
 		foreach ( $users as $user ) {
 			$user_data[] = [
@@ -110,11 +162,20 @@ class STOLMC_Service_Tracker_Api_Users extends STOLMC_Service_Tracker_Api {
 		 * @since 1.0.0
 		 *
 		 * @param array     $user_data The user data array.
-		 * @param WP_User[] $users    The WP_User objects.
+		 * @param WP_User[] $users     The WP_User objects.
 		 */
 		$user_data = apply_filters( 'stolmc_service_tracker_users_response', $user_data, $users );
 
-		return $this->rest_response( $user_data, 200 );
+		return $this->rest_response(
+			[
+				'data'        => $user_data,
+				'total'       => $total,
+				'page'        => $page,
+				'per_page'    => $per_page,
+				'total_pages' => $total_pages,
+			],
+			200
+		);
 	}
 
 	/**

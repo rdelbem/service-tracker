@@ -25,25 +25,38 @@ export default function Cases() {
     const loadAllCases = async () => {
       const apiUrlCases = `${data.root_url}/wp-json/${data.api_url}/cases`;
       try {
-        // Get all customer users first
-        const usersRes = await fetchGet(`${data.root_url}/wp-json/service-tracker-stolmc/v1/users`, {
-          headers: { "X-WP-Nonce": data.nonce },
-        });
+        // Fetch all users across all pages to build the full cases list.
+        let allUsers: any[] = [];
+        let page = 1;
+        let totalPages = 1;
 
-        const users = usersRes.data;
+        do {
+          const usersRes = await fetchGet(
+            `${data.root_url}/wp-json/service-tracker-stolmc/v1/users?page=${page}&per_page=6`,
+            { headers: { "X-WP-Nonce": data.nonce } }
+          );
+          const envelope = usersRes.data;
+          allUsers = [...allUsers, ...(envelope.data ?? [])];
+          totalPages = envelope.total_pages ?? 1;
+          page++;
+        } while (page <= totalPages);
+
         let casesList: CaseType[] = [];
 
         // Fetch cases for each user
-        for (const user of users) {
+        for (const user of allUsers) {
           const casesRes = await fetchGet(`${apiUrlCases}/${user.id}`, {
             headers: { "X-WP-Nonce": data.nonce },
           });
           if (casesRes.data && casesRes.data.length > 0) {
-            casesList = [...casesList, ...casesRes.data.map((c: CaseType) => ({
-              ...c,
-              clientName: user.name,
-              clientId: user.id,
-            }))];
+            casesList = [
+              ...casesList,
+              ...casesRes.data.map((c: CaseType) => ({
+                ...c,
+                clientName: user.name,
+                clientId: user.id,
+              })),
+            ];
           }
         }
 
