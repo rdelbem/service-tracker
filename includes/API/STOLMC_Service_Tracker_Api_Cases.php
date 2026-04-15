@@ -68,16 +68,7 @@ class STOLMC_Service_Tracker_Api_Cases extends STOLMC_Service_Tracker_Api implem
 	public function custom_api(): void {
 
 		// RegisterNewRoute -> Method from superclass / extended class.
-		$this->register_new_route( 'cases', '_user', WP_REST_Server::READABLE, [ $this, 'read' ], [
-			'page'     => [
-				'default'           => 1,
-				'sanitize_callback' => 'absint',
-			],
-			'per_page' => [
-				'default'           => self::PER_PAGE_DEFAULT,
-				'sanitize_callback' => 'absint',
-			],
-		] );
+		$this->register_new_route( 'cases', '_user', WP_REST_Server::READABLE, [ $this, 'read' ] );
 		$this->register_new_route( 'cases', '', WP_REST_Server::EDITABLE, [ $this, 'update' ] );
 		$this->register_new_route( 'cases', '', WP_REST_Server::DELETABLE, [ $this, 'delete' ] );
 		$this->register_new_route( 'cases', '_user', WP_REST_Server::CREATABLE, [ $this, 'create' ] );
@@ -96,13 +87,12 @@ class STOLMC_Service_Tracker_Api_Cases extends STOLMC_Service_Tracker_Api implem
 	public function read( WP_REST_Request $data ): WP_REST_Response {
 		global $wpdb;
 
-		$id_user  = (int) $data['id_user'];
-		$page     = max( 1, (int) $data->get_param( 'page' ) );
-		$per_page = max( 1, (int) $data->get_param( 'per_page' ) );
+		$id_user = (int) $data['id_user'];
 
-		if ( $per_page === 0 ) {
-			$per_page = self::PER_PAGE_DEFAULT;
-		}
+		// Read pagination params defensively — fall back to defaults when the
+		// value is absent (null) or zero so route-arg registration is not required.
+		$page     = max( 1, (int) ( $data->get_param( 'page' ) ?: 1 ) );
+		$per_page = max( 1, (int) ( $data->get_param( 'per_page' ) ?: self::PER_PAGE_DEFAULT ) );
 
 		$table = $wpdb->prefix . self::DB;
 
@@ -129,10 +119,10 @@ class STOLMC_Service_Tracker_Api_Cases extends STOLMC_Service_Tracker_Api implem
 			)
 		);
 
-		$total_pages = (int) ceil( $total / $per_page );
+		$total_pages = $total > 0 ? (int) ceil( $total / $per_page ) : 1;
 
 		// Clamp page to valid range.
-		$page   = min( $page, max( 1, $total_pages ) );
+		$page   = min( $page, $total_pages );
 		$offset = ( $page - 1 ) * $per_page;
 
 		// Fetch paginated cases.
