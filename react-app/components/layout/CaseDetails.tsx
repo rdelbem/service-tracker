@@ -4,6 +4,7 @@ import { useClientsStore } from "../../stores/clientsStore";
 import { useCasesStore } from "../../stores/casesStore";
 import { get as fetchGet, post, put, del } from "../../utils/fetch";
 import { toast } from "react-toastify";
+import { showConfirm } from "../ui/Modal";
 import Spinner from "./Spinner";
 import type { User } from "../../types";
 
@@ -125,7 +126,14 @@ export default function CaseDetails() {
 
   const handleDeleteCase = async () => {
     if (!caseData) return;
-    if (!confirm(`Are you sure you want to delete "${caseData.title}"?`)) return;
+
+    const confirmed = await showConfirm({
+      title: "Delete Case",
+      message: `Are you sure you want to delete "${caseData.title}"? This will also delete all associated progress updates.`,
+      confirmText: "Delete Case",
+    });
+
+    if (!confirmed) return;
 
     const apiUrlCases = `${data.root_url}/wp-json/${data.api_url}/cases`;
 

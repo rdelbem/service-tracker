@@ -309,12 +309,12 @@ class Analytics_Hooks {
 	 *
 	 * @param int              $user_id   The user ID.
 	 * @param array<string,mixed> $user_data The user data.
-	 * @param array<string,mixed> $body      The request body.
+	 * @param object|array<string,mixed> $body The request body.
 	 * @param string           $password  The generated password.
 	 *
 	 * @return void
 	 */
-	public function on_user_created( int $user_id, array $user_data, array $body, string $password ): void {
+	public function on_user_created( int $user_id, array $user_data, $body, string $password ): void {
 		$actor = AnalyticsLogger::capture_current_actor();
 
 		$this->logger->log_activity(

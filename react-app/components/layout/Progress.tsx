@@ -4,7 +4,11 @@ import { useProgressStore } from "../../stores/progressStore";
 import TextareaAutosize from "react-textarea-autosize";
 import Spinner from "./Spinner";
 import Status from "./Status";
-import { get as fetchGet, put } from "../../utils/fetch";
+import { get as fetchGet, put, post, del } from "../../utils/fetch";
+import { toast } from "react-toastify";
+import { showConfirm, showAlert } from "../ui/Modal";
+import { useRef } from "react";
+import type { Attachment } from "../../types";
 
 declare const data: Record<string, any>;
 
@@ -12,7 +16,7 @@ export default function Progress() {
   const inViewState = useInViewStore((state) => state);
   const { navigate } = useInViewStore();
   const progressState = useProgressStore((state) => state);
-  const { postStatus, getStatus } = useProgressStore();
+  const { postStatus, getStatus, uploadFiles } = useProgressStore();
   const [writingStatus, setWritingStatus] = useState(false);
   const [newText, setNewText] = useState("");
   const [caseData, setCaseData] = useState<any>(null);
@@ -22,6 +26,13 @@ export default function Progress() {
   const [selectedOwner, setSelectedOwner] = useState<string | number>("");
   const [savingOwner, setSavingOwner] = useState(false);
   const [staffUsers, setStaffUsers] = useState<any[]>([]);
+  const [editingTitle, setEditingTitle] = useState(false);
+  const [newTitle, setNewTitle] = useState("");
+  const [clientName, setClientName] = useState<string>("");
+  const [pendingFiles, setPendingFiles] = useState<File[]>([]);
+  const [uploadingFiles, setUploadingFiles] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const imageInputRef = useRef<HTMLInputElement>(null);
 
   // Case ID
   const idCase = inViewState.caseId;
@@ -50,6 +61,20 @@ export default function Progress() {
         const found = cases.find((c: any) => String(c.id) === String(idCase));
         setCaseData(found || null);
         setSelectedOwner(found?.owner_id || "");
+
+        // Fetch client name
+        if (found?.id_user) {
+          const apiUrlUsers = `${data.root_url}/wp-json/service-tracker-stolmc/v1/users`;
+          try {
+            const usersRes = await fetchGet(apiUrlUsers, {
+              headers: { "X-WP-Nonce": data.nonce },
+            });
+            const client = (usersRes.data || []).find((u: any) => String(u.id) === String(found.id_user));
+            setClientName(client?.name || `Client #${found.id_user}`);
+          } catch {
+            setClientName(`Client #${found.id_user}`);
+          }
+        }
       } catch (error) {
         console.error("Error fetching case data:", error);
       } finally {
@@ -109,7 +134,7 @@ export default function Progress() {
       setEditingDate(null);
     } catch (error) {
       console.error("Error updating date:", error);
-      alert("Failed to update date");
+      showAlert({ title: "Error", message: "Failed to update date" });
     }
   };
 
@@ -135,19 +160,167 @@ export default function Progress() {
       });
 
       setCaseData((prev: any) => ({ ...prev, owner_id: newOwnerId || null }));
+      const ownerName = newOwnerId
+        ? staffUsers.find((u: any) => String(u.id) === String(newOwnerId))?.name || "Unknown"
+        : "Unassigned";
+      toast.success(`Case owner changed to ${ownerName}`);
     } catch (error) {
       console.error("Error updating owner:", error);
-      alert("Failed to update owner");
+      toast.error("Failed to update case owner");
       setSelectedOwner(caseData?.owner_id || "");
     } finally {
       setSavingOwner(false);
     }
   };
 
+  const handleToggleStatus = async () => {
+    const currentStatus = caseData?.status || "open";
+    const newStatus = currentStatus === "open" ? "close" : "open";
+    const actionLabel = newStatus === "close" ? "closing" : "reopening";
+
+    const confirmed = await showConfirm({
+      title: `${newStatus === "close" ? "Close" : "Reopen"} Case`,
+      message: `Are you sure you want to ${actionLabel} this case?`,
+      confirmText: newStatus === "close" ? "Close Case" : "Reopen Case",
+    });
+
+    if (!confirmed) return;
+
+    const apiUrlToggle = `${data.root_url}/wp-json/${data.api_url}/cases-status`;
+
+    try {
+      await post(`${apiUrlToggle}/${idCase}`, null, {
+        headers: { "X-WP-Nonce": data.nonce },
+      });
+
+      setCaseData((prev: any) => ({ ...prev, status: newStatus }));
+      toast.success(`Case is now ${newStatus === "close" ? "closed" : "open"}`);
+    } catch (error) {
+      console.error("Error toggling status:", error);
+      toast.error("Failed to update case status");
+    }
+  };
+
+  const handleDeleteCase = async () => {
+    const confirmed = await showConfirm({
+      title: "Delete Case",
+      message: `Are you sure you want to delete "${progressState.caseTitle || caseData?.title || "this case"}"? This will also delete all associated progress updates.`,
+      confirmText: "Delete Case",
+    });
+
+    if (!confirmed) return;
+
+    const apiUrlCases = `${data.root_url}/wp-json/${data.api_url}/cases`;
+
+    try {
+      await del(`${apiUrlCases}/${idCase}`, {
+        headers: { "X-WP-Nonce": data.nonce },
+      });
+
+      toast.success("Case deleted successfully");
+      navigate("cases", "", "", "");
+    } catch (error) {
+      console.error("Error deleting case:", error);
+      toast.error("Failed to delete case");
+    }
+  };
+
+  const handleSaveTitle = async () => {
+    if (newTitle.trim() === "") {
+      showAlert({ title: "Error", message: "Case title cannot be blank" });
+      return;
+    }
+
+    const apiUrlCases = `${data.root_url}/wp-json/${data.api_url}/cases`;
+
+    try {
+      await put(`${apiUrlCases}/${idCase}`, {
+        id_user: idUser,
+        title: newTitle.trim(),
+      }, {
+        headers: {
+          "X-WP-Nonce": data.nonce,
+          "Content-type": "application/json",
+        },
+      });
+
+      setCaseData((prev: any) => ({ ...prev, title: newTitle.trim() }));
+      setEditingTitle(false);
+      toast.success("Case title updated successfully");
+    } catch (error) {
+      console.error("Error updating title:", error);
+      toast.error("Failed to update case title");
+    }
+  };
+
+  const handleCancelEditTitle = () => {
+    setEditingTitle(false);
+    setNewTitle("");
+  };
+
   const getOwnerName = () => {
     if (!caseData?.owner_id) return "Unassigned";
     const owner = staffUsers.find((u: any) => String(u.id) === String(caseData.owner_id));
     return owner ? owner.name : "Unknown";
+  };
+
+  const handleAttachFiles = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleAddImage = () => {
+    imageInputRef.current?.click();
+  };
+
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+
+    // Add files to pending list (don't upload yet)
+    const newFiles = Array.from(files);
+    setPendingFiles([...pendingFiles, ...newFiles]);
+
+    // Reset the input
+    if (e.target) e.target.value = "";
+  };
+
+  const handlePostStatus = async () => {
+    if (newText.trim() === "") {
+      showAlert({ title: "Error", message: data.alert_blank_status_title || "Status title cannot be blank" });
+      return;
+    }
+    
+    setUploadingFiles(true);
+    try {
+      let attachmentsToSend: Attachment[] | undefined;
+
+      // Upload files first if there are any
+      if (pendingFiles.length > 0) {
+        const uploaded = await uploadFiles(idUser, idCase, pendingFiles);
+        if (uploaded.length > 0) {
+          attachmentsToSend = uploaded;
+        }
+      }
+
+      // Create status with attachments
+      await postStatus(idUser, idCase, newText.trim(), attachmentsToSend);
+      
+      // Clean up
+      setNewText("");
+      setPendingFiles([]);
+      setWritingStatus(false);
+    } catch (error) {
+      console.error("Error posting status:", error);
+      toast.error("Failed to post status update");
+    } finally {
+      setUploadingFiles(false);
+    }
+  };
+
+  const removePendingFile = (index: number) => {
+    const newFiles = [...pendingFiles];
+    newFiles.splice(index, 1);
+    setPendingFiles(newFiles);
   };
 
   if (progressState.loadingStatus || loadingCase) {
@@ -162,11 +335,18 @@ export default function Progress() {
       <header className="h-20 px-12 flex items-center justify-between border-b border-outline-variant/5 flex-shrink-0">
         <div className="flex items-center gap-4">
           <div className="w-2 h-2 rounded-full bg-secondary shadow-[0_0_8px_rgba(0,108,73,0.4)]"></div>
-          <span className="text-[10px] font-black uppercase tracking-widest text-on-surface-variant">
-            Progress: {progressState.caseTitle}
+          <span className="text-lg font-bold text-on-surface-variant">
+            Client: <span className="text-on-surface">{clientName || "Loading..."}</span>
           </span>
         </div>
         <div className="flex items-center gap-3">
+          <button
+            onClick={handleDeleteCase}
+            className="flex items-center gap-2 px-4 py-2 bg-error-container/30 text-error text-xs font-bold rounded-lg shadow-lg hover:bg-error-container/50 active:scale-95 transition-all"
+            title="Delete Case"
+          >
+            <span className="material-symbols-outlined text-sm">delete</span>
+          </button>
           <button
             onClick={() => {
               navigate("cases", idUser, idCase, inViewState.name);
@@ -184,12 +364,63 @@ export default function Progress() {
         {/* Case Title Header */}
         <div className="mb-12">
           <div className="flex items-baseline gap-6">
-            <h1 className="text-4xl font-black text-on-surface tracking-tighter">
-              {progressState.caseTitle}
-            </h1>
-            <span className="px-3 py-1 bg-secondary-container/40 text-on-secondary-container text-[10px] font-black uppercase tracking-wider rounded-md">
-              Active Status
-            </span>
+            {!editingTitle ? (
+              <>
+                <h1 className="text-4xl font-black text-on-surface tracking-tighter">
+                  {progressState.caseTitle || caseData?.title || "Case"}
+                </h1>
+                <button
+                  onClick={() => {
+                    setNewTitle(progressState.caseTitle || caseData?.title || "");
+                    setEditingTitle(true);
+                  }}
+                  className="p-2 rounded-lg hover:bg-surface-container-high text-on-surface-variant hover:text-primary transition-all"
+                  title="Edit title"
+                >
+                  <span className="material-symbols-outlined text-sm">edit</span>
+                </button>
+              </>
+            ) : (
+              <div className="flex-1">
+                <div className="flex items-center gap-3">
+                  <input
+                    type="text"
+                    value={newTitle}
+                    onChange={(e) => setNewTitle(e.target.value)}
+                    className="flex-1 bg-surface-container-low border border-outline-variant/20 rounded-xl py-2 px-4 text-2xl font-black text-on-surface focus:ring-2 focus:ring-primary/10"
+                    placeholder="Enter case title..."
+                    autoFocus
+                  />
+                  <button
+                    onClick={handleSaveTitle}
+                    className="p-2 rounded-lg bg-primary text-white hover:bg-primary-container active:scale-95 transition-all"
+                    title="Save title"
+                  >
+                    <span className="material-symbols-outlined text-sm">check</span>
+                  </button>
+                  <button
+                    onClick={handleCancelEditTitle}
+                    className="p-2 rounded-lg bg-surface-container-highest text-on-surface-variant hover:bg-surface-container active:scale-95 transition-all"
+                    title="Cancel"
+                  >
+                    <span className="material-symbols-outlined text-sm">close</span>
+                  </button>
+                </div>
+              </div>
+            )}
+            {!editingTitle && (
+              <button
+                onClick={handleToggleStatus}
+                className={`px-3 py-1 text-[10px] font-black uppercase tracking-wider rounded-md cursor-pointer hover:opacity-80 transition-all ${
+                  caseData?.status === "open"
+                    ? "bg-secondary-container/40 text-on-secondary-container hover:bg-secondary-container/60"
+                    : "bg-surface-dim/40 text-outline hover:bg-surface-dim/60"
+                }`}
+                title={caseData?.status === "open" ? "Click to close case" : "Click to reopen case"}
+              >
+                {caseData?.status === "open" ? "Active" : "Closed"}
+              </button>
+            )}
           </div>
           <p className="text-on-surface-variant mt-4 max-w-2xl leading-relaxed font-body">
             Track all updates and progress for this case
@@ -366,61 +597,114 @@ export default function Progress() {
                   value={newText}
                 />
               </div>
+
+              {/* Pending files display */}
+              {pendingFiles.length > 0 && (
+                <div className="mb-4 p-3 bg-surface-container-low rounded-xl">
+                  <p className="text-xs font-bold text-on-surface-variant mb-2">Files to Attach:</p>
+                  <div className="flex flex-wrap gap-2">
+                    {pendingFiles.map((file, index) => (
+                      <div key={index} className="flex items-center gap-2 px-3 py-2 bg-surface-container-high rounded-lg">
+                        <span className="material-symbols-outlined text-sm text-primary">
+                          {file.type.startsWith("image/") ? "image" : "attach_file"}
+                        </span>
+                        <span className="text-xs text-on-surface-variant max-w-[120px] truncate">{file.name}</span>
+                        <button
+                          onClick={() => removePendingFile(index)}
+                          className="text-on-surface-variant hover:text-error transition-colors"
+                        >
+                          <span className="material-symbols-outlined text-sm">close</span>
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               <div className="flex justify-between items-center">
                 <div className="flex gap-2">
                   <button
                     type="button"
-                    className="p-2 text-on-surface-variant hover:bg-surface-container-high rounded-lg transition-all"
+                    onClick={handleAttachFiles}
+                    disabled={uploadingFiles}
+                    className="p-2 text-on-surface-variant hover:bg-surface-container-high rounded-lg transition-all disabled:opacity-50"
                     title="Attach Files"
                   >
                     <span className="material-symbols-outlined">attach_file</span>
                   </button>
                   <button
                     type="button"
-                    className="p-2 text-on-surface-variant hover:bg-surface-container-high rounded-lg transition-all"
+                    onClick={handleAddImage}
+                    disabled={uploadingFiles}
+                    className="p-2 text-on-surface-variant hover:bg-surface-container-high rounded-lg transition-all disabled:opacity-50"
                     title="Add Image"
                   >
                     <span className="material-symbols-outlined">image</span>
                   </button>
+                  {uploadingFiles && (
+                    <div className="flex items-center gap-2 px-3 py-2">
+                      <span className="material-symbols-outlined text-sm animate-spin">progress_activity</span>
+                      <span className="text-xs text-on-surface-variant">Uploading...</span>
+                    </div>
+                  )}
                 </div>
-                <button
-                  onClick={(e) => {
-                    e.preventDefault();
-                    if (newText.trim() === "") {
-                      alert(data.alert_blank_status_title || "Status title cannot be blank");
-                      return;
-                    }
-                    postStatus(idUser, idCase, newText.trim());
-                    setNewText("");
-                  }}
-                  className="px-8 py-3 bg-primary text-on-primary font-bold rounded-xl shadow-lg active:scale-95 transition-transform"
-                >
-                  {data.add_status_btn || "Post Update"}
-                </button>
+                <div className="flex gap-3">
+                  <button
+                    onClick={(e) => {
+                      e.preventDefault();
+                      handlePostStatus();
+                    }}
+                    className="px-8 py-3 bg-primary text-on-primary font-bold rounded-xl shadow-lg active:scale-95 transition-transform"
+                  >
+                    {data.add_status_btn || "Post Update"}
+                  </button>
+                  <button
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setWritingStatus(false);
+                      setPendingFiles([]);
+                    }}
+                    className="px-6 py-3 bg-surface-container-highest text-on-surface font-bold rounded-xl shadow-lg active:scale-95 transition-all hover:bg-surface-container-high"
+                  >
+                    {data.close_box_btn || "Close"}
+                  </button>
+                </div>
               </div>
+
+              {/* Hidden file inputs */}
+              <input
+                ref={fileInputRef}
+                type="file"
+                multiple
+                accept="*/*"
+                onChange={handleFileSelect}
+                className="hidden"
+              />
+              <input
+                ref={imageInputRef}
+                type="file"
+                multiple
+                accept="image/*"
+                onChange={handleFileSelect}
+                className="hidden"
+              />
             </div>
           )}
 
-          <button
-            onClick={(e) => {
-              e.preventDefault();
-              setWritingStatus(!writingStatus);
-            }}
-            className={`w-full py-3 rounded-xl font-bold text-sm transition-all ${
-              writingStatus
-                ? "bg-surface-container-highest text-on-surface"
-                : "bg-gradient-to-br from-primary to-primary-container text-white shadow-lg"
-            }`}
-          >
-            {!writingStatus ? (
+          {!writingStatus && (
+            <button
+              onClick={(e) => {
+                e.preventDefault();
+                setWritingStatus(true);
+              }}
+              className="w-full py-3 bg-gradient-to-br from-primary to-primary-container text-white font-bold rounded-xl shadow-lg active:scale-95 transition-all text-sm"
+            >
               <span className="flex items-center justify-center gap-2">
                 <span className="material-symbols-outlined text-sm">add_circle</span>
                 {data.new_status_btn || "Add Status Update"}
               </span>
-            ) : (
-              data.close_box_btn || "Cancel"
-            )}
-          </button>
+            </button>
+          )}
         </div>
 
         {/* Timeline / Activity Log */}

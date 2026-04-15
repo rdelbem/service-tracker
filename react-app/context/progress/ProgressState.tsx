@@ -102,15 +102,7 @@ export default function ProgressState({ children }: ProgressStateProps) {
         },
       });
 
-      toast.success(data.toast_status_added, {
-        position: "bottom-right",
-        autoClose: 5000,
-        hideProgressBar: true,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-      });
+      toast.success(data.toast_status_added);
     } catch (error) {
       alert(data.alert_error_base + error);
     }
@@ -145,15 +137,7 @@ export default function ProgressState({ children }: ProgressStateProps) {
         },
       });
 
-      toast.success(data.toast_status_deleted, {
-        position: "bottom-right",
-        autoClose: 5000,
-        hideProgressBar: true,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-      });
+      toast.success(data.toast_status_deleted);
     } catch (error) {
       alert(data.alert_error_base + error);
     }
@@ -191,15 +175,7 @@ export default function ProgressState({ children }: ProgressStateProps) {
         },
       });
 
-      toast.success(data.toast_status_edited, {
-        position: "bottom-right",
-        autoClose: 5000,
-        hideProgressBar: true,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-      });
+      toast.success(data.toast_status_edited);
     } catch (error) {
       alert(data.alert_error_base + error);
     }

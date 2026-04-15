@@ -97,15 +97,7 @@ export default function CasesState({ children }: CasesStateProps) {
         },
       });
 
-      toast.success(data.toast_case_added, {
-        position: "bottom-right",
-        autoClose: 5000,
-        hideProgressBar: true,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-      });
+      toast.success(data.toast_case_added);
     } catch (error) {
       alert(data.alert_error_base + error);
     }
@@ -136,15 +128,7 @@ export default function CasesState({ children }: CasesStateProps) {
         },
       });
 
-      toast.success(data.toast_case_toggled, {
-        position: "bottom-right",
-        autoClose: 5000,
-        hideProgressBar: true,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-      });
+      toast.success(data.toast_case_toggled);
     } catch (error) {
       alert(data.alert_error_base + error);
     }
@@ -174,15 +158,7 @@ export default function CasesState({ children }: CasesStateProps) {
         },
       });
 
-      toast.success(data.toast_case_deleted, {
-        position: "bottom-right",
-        autoClose: 5000,
-        hideProgressBar: true,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-      });
+      toast.success(data.toast_case_deleted);
     } catch (error) {
       alert(data.alert_error_base + error);
     }
@@ -221,15 +197,7 @@ export default function CasesState({ children }: CasesStateProps) {
         },
       });
 
-      toast.success(data.toast_case_edited, {
-        position: "bottom-right",
-        autoClose: 5000,
-        hideProgressBar: true,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-      });
+      toast.success(data.toast_case_edited);
     } catch (error) {
       alert(data.alert_error_base + error);
     }

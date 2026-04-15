@@ -78,3 +78,4 @@ assets/bower_components/*
 assets/img/.DS_Store
 
 admin/js/prod
+.aider*

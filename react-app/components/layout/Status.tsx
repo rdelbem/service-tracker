@@ -2,16 +2,29 @@ import { useState } from "react";
 import { useProgressStore } from "../../stores/progressStore";
 import TextareaAutosize from "react-textarea-autosize";
 import dateformat from "dateformat";
+import { showConfirm } from "../ui/Modal";
 import type { Status as StatusType } from "../../types";
 
 declare const data: Record<string, any>;
 
 interface StatusProps extends StatusType {}
 
-export default function Status({ id, id_user, created_at, text }: Omit<StatusProps, '_id_case'>) {
+export default function Status({ id, id_user, created_at, text, attachments }: Omit<StatusProps, '_id_case'>) {
   const { deleteStatus, editStatus } = useProgressStore();
   const [editable, setEditable] = useState(false);
   const [editedText, setEditedText] = useState(text);
+
+  const handleDelete = async () => {
+    const confirmed = await showConfirm({
+      title: "Delete Progress Update",
+      message: `Are you sure you want to delete the progress update from ${dateformat(created_at, "mmm dd, yyyy, hh:MM TT")}?`,
+      confirmText: "Delete",
+    });
+
+    if (confirmed) {
+      deleteStatus(id, created_at);
+    }
+  };
 
   return (
     <div className="relative pl-10 border-l-2 border-primary-fixed ml-4 space-y-2 pb-8">
@@ -45,7 +58,7 @@ export default function Status({ id, id_user, created_at, text }: Omit<StatusPro
             <span className="material-symbols-outlined text-sm">edit</span>
           </button>
           <button
-            onClick={() => deleteStatus(id, created_at)}
+            onClick={handleDelete}
             className="p-2 rounded-lg hover:bg-error-container/30 transition-colors text-on-surface-variant hover:text-error"
             data-tooltip-id="service-tracker"
             data-tooltip-content={data.tip_delete_status || "Delete Status"}
@@ -89,6 +102,34 @@ export default function Status({ id, id_user, created_at, text }: Omit<StatusPro
           </form>
         )}
       </div>
+
+      {/* Attachments */}
+      {attachments && attachments.length > 0 && (
+        <div className="flex flex-wrap gap-2">
+          {attachments.map((att: { url: string; type: string; name: string; size: number }, index: number) => (
+            <a
+              key={index}
+              href={att.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 px-3 py-2 bg-surface-container-low rounded-lg hover:bg-surface-container-high transition-all group"
+              title={att.name}
+            >
+              <span className="material-symbols-outlined text-sm text-primary">
+                {att.type.startsWith("image/") ? "image" : "attach_file"}
+              </span>
+              <span className="text-xs text-on-surface-variant max-w-[120px] truncate group-hover:text-primary">
+                {att.name}
+              </span>
+              {att.type.startsWith("image/") && (
+                <span className="material-symbols-outlined text-sm text-outline-variant group-hover:text-primary">
+                  open_in_new
+                </span>
+              )}
+            </a>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

@@ -26,12 +26,20 @@ export interface Case {
   [key: string]: any;
 }
 
+export interface Attachment {
+  url: string;
+  type: string;
+  name: string;
+  size: number;
+}
+
 export interface Status {
   id: string | number;
   id_case: string | number;
   id_user: string | number;
   text: string;
   created_at: string;
+  attachments?: Attachment[] | null;
   [key: string]: any;
 }
 

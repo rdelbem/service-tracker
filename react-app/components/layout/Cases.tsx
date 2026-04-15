@@ -1,10 +1,11 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useInViewStore } from "../../stores/inViewStore";
 import { useCasesStore } from "../../stores/casesStore";
 import Spinner from "./Spinner";
 import Case from "./Case";
 import type { Case as CaseType } from "../../types";
-import { get as fetchGet } from "../../utils/fetch";
+import { get as fetchGet, post } from "../../utils/fetch";
+import { toast } from "react-toastify";
 
 declare const data: Record<string, any>;
 
@@ -70,14 +71,40 @@ export default function Cases() {
     }
   }, [searchQuery, allCases]);
 
-  // Required for navigation purposes - MUST be after all hooks
-  if (inViewState.view !== "cases") {
-    return null;
-  }
-
   const handleAddCase = () => {
     navigate("casesAddNew", "", "", "");
   };
+
+  const handleToggleCase = useCallback(async (caseId: string | number) => {
+    const theCase = allCases.find((c) => String(c.id) === String(caseId));
+    const targetStatus = theCase?.status === "open" ? "close" : "open";
+
+    try {
+      await post(`${data.root_url}/wp-json/${data.api_url}/cases-status/${caseId}`, null, {
+        headers: { "X-WP-Nonce": data.nonce },
+      });
+
+      setAllCases((prev) =>
+        prev.map((c) =>
+          String(c.id) === String(caseId) ? { ...c, status: targetStatus } : c
+        )
+      );
+      setFilteredCases((prev) =>
+        prev.map((c) =>
+          String(c.id) === String(caseId) ? { ...c, status: targetStatus } : c
+        )
+      );
+      toast.success(`Case is now ${targetStatus === "open" ? "open" : "closed"}`);
+    } catch (error) {
+      console.error("Error toggling case:", error);
+      toast.error("Failed to update case status");
+    }
+  }, [allCases]);
+
+  // Keep hook order stable across route transitions.
+  if (inViewState.view !== "cases") {
+    return null;
+  }
 
   if (loadingCases) {
     return <Spinner />;
@@ -134,7 +161,7 @@ export default function Cases() {
         ) : (
           <div className="grid grid-cols-1 gap-4">
             {filteredCases.map((item: CaseType) => (
-              <Case key={item.id} {...item} />
+              <Case key={item.id} {...item} onToggle={handleToggleCase} />
             ))}
           </div>
         )}

@@ -3,6 +3,7 @@
 import { lazy, useEffect } from "react";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { Bounce } from "react-toastify";
 
 //stores
 import { useInViewStore } from "./stores/inViewStore";
@@ -78,7 +79,7 @@ export default function App() {
   return (
     <>
       <StoreInitializer />
-      <ToastContainer />
+      <ToastContainer position="bottom-right" transition={Bounce} hideProgressBar closeOnClick pauseOnHover draggable theme="colored" />
       <Wrapper>
         <ClientsView />
         <CasesContainer>

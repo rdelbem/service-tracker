@@ -96,51 +96,36 @@ export const useCasesStore = create<CasesStore>((set, get) => {
 
         set({ user: id, cases: newCases, loadingCases: false });
 
-        toast.success(data.toast_case_added, {
-          position: "bottom-right",
-          autoClose: 5000,
-          hideProgressBar: true,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-        });
+        toast.success(data.toast_case_added);
       } catch (error) {
         alert(data.alert_error_base + error);
       }
     },
     toggleCase: async (id: string | number): Promise<void> => {
+      const currentCases = get().cases;
+      const theCase = currentCases.find((c: Case) => String(c.id) === String(id));
+      const targetStatus = theCase?.status === "open" ? "close" : "open";
+
       try {
         await post(`${apiUrlCases}-status/${id}`, null, {
           headers: { "X-WP-Nonce": data.nonce },
         });
 
-        const currentCases = get().cases;
-        const newCases = currentCases.map((theCase: Case) => {
-          if (theCase.id.toString() === id.toString()) {
-            return { ...theCase, status: theCase.status === "open" ? "close" : "open" };
+        const updatedCases = currentCases.map((c: Case) => {
+          if (String(c.id) === String(id)) {
+            return { ...c, status: targetStatus };
           }
-          return theCase;
+          return c;
         });
 
-        set({ cases: newCases });
-
-        toast.success(data.toast_case_toggled, {
-          position: "bottom-right",
-          autoClose: 5000,
-          hideProgressBar: true,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-        });
+        set({ cases: updatedCases });
+        toast.success(`Case is now ${targetStatus === "open" ? "open" : "closed"}`);
       } catch (error) {
-        alert(data.alert_error_base + error);
+        console.error("Error toggling case:", error);
+        toast.error("Failed to update case status");
       }
     },
-    deleteCase: async (id: string | number, title: string): Promise<void> => {
-      if (!confirm(`Are you sure you want to delete the case: ${title}?`)) return;
-
+    deleteCase: async (id: string | number): Promise<void> => {
       try {
         await del(`${apiUrlCases}/${id}`, {
           headers: { "X-WP-Nonce": data.nonce },
@@ -153,15 +138,7 @@ export const useCasesStore = create<CasesStore>((set, get) => {
 
         set({ cases: newCases });
 
-        toast.success(data.toast_case_deleted, {
-          position: "bottom-right",
-          autoClose: 5000,
-          hideProgressBar: true,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-        });
+        toast.success(data.toast_case_deleted);
       } catch (error) {
         alert(data.alert_error_base + error);
       }
@@ -203,15 +180,7 @@ export const useCasesStore = create<CasesStore>((set, get) => {
 
         set({ user: id_user, cases: newCases });
 
-        toast.success(data.toast_case_edited, {
-          position: "bottom-right",
-          autoClose: 5000,
-          hideProgressBar: true,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-        });
+        toast.success(data.toast_case_edited);
       } catch (error) {
         alert(data.alert_error_base + error);
       }

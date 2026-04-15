@@ -33,7 +33,7 @@ class Schema {
 	 * @since 1.1.0
 	 * @var   int
 	 */
-	public const VERSION = 4;
+	public const VERSION = 5;
 
 	/**
 	 * Option key used in wp_options to store the current DB version.
@@ -153,6 +153,10 @@ class Schema {
 					[
 						'name'       => 'text',
 						'definition' => 'TEXT',
+					],
+					[
+						'name'       => 'attachments',
+						'definition' => 'JSON NULL',
 					],
 				],
 				'indexes'    => [

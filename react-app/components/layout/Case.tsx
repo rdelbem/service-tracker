@@ -1,29 +1,71 @@
-import { useState, Fragment } from "react";
+import { useState, useEffect, Fragment } from "react";
 import { useCasesStore } from "../../stores/casesStore";
 import { useInViewStore } from "../../stores/inViewStore";
 import { useProgressStore } from "../../stores/progressStore";
 import dateformat from "dateformat";
+import { showConfirm } from "../ui/Modal";
 import type { Case as CaseType } from "../../types";
 
 declare const data: Record<string, any>;
 
-export default function Case({ id, id_user, status, created_at, title }: CaseType) {
+export default function Case({ id, id_user, status, created_at, title, onToggle }: CaseType & { onToggle?: (id: string | number) => void }) {
   const { deleteCase, toggleCase, editCase } = useCasesStore();
   const inViewState = useInViewStore((state) => state);
   const { navigate } = useInViewStore();
   const { getStatus } = useProgressStore();
   const [editing, setEditing] = useState(false);
   const [newTitle, setNewTitle] = useState("");
+  const [toggling, setToggling] = useState(false);
+  const [localStatus, setLocalStatus] = useState(status);
+
+  // Sync localStatus when the parent re-renders with updated status from store
+  useEffect(() => {
+    setLocalStatus(status);
+  }, [status]);
+
+  const handleToggle = async () => {
+    setToggling(true);
+    const newStatus = localStatus === "open" ? "close" : "open";
+    setLocalStatus(newStatus); // Optimistic update
+
+    if (onToggle) {
+      try {
+        await onToggle(id);
+      } catch {
+        setLocalStatus(localStatus); // Rollback on error
+      }
+    } else {
+      // Fallback to store method
+      try {
+        await toggleCase(id);
+      } catch {
+        setLocalStatus(localStatus); // Rollback on error
+      }
+    }
+    setToggling(false);
+  };
+
+  const handleDelete = async () => {
+    const confirmed = await showConfirm({
+      title: "Delete Case",
+      message: `Are you sure you want to delete "${title}"? This action cannot be undone.`,
+      confirmText: "Delete",
+    });
+
+    if (confirmed) {
+      deleteCase(id);
+    }
+  };
 
   const getStatusColor = () => {
-    if (status === "open") return "bg-secondary-container/40 text-on-secondary-container";
-    if (status === "close") return "bg-surface-dim/40 text-outline";
+    if (localStatus === "open") return "bg-secondary-container/40 text-on-secondary-container";
+    if (localStatus === "close") return "bg-surface-dim/40 text-outline";
     return "bg-outline-variant/20 text-on-surface-variant";
   };
 
   const getStatusLabel = () => {
-    if (status === "open") return "Active";
-    if (status === "close") return "Closed";
+    if (localStatus === "open") return "Active";
+    if (localStatus === "close") return "Closed";
     return "Unknown";
   };
 
@@ -75,18 +117,24 @@ export default function Case({ id, id_user, status, created_at, title }: CaseTyp
             </button>
 
             <button
-              onClick={() => toggleCase(id)}
-              className="p-2 rounded-lg hover:bg-surface-container-highest transition-colors text-on-surface-variant hover:text-secondary"
+              onClick={handleToggle}
+              disabled={toggling}
+              className={`p-2 rounded-lg transition-colors ${
+                localStatus === "open"
+                  ? "hover:bg-secondary-container/30 text-on-surface-variant hover:text-secondary"
+                  : "hover:bg-primary-container/30 text-on-surface-variant hover:text-primary"
+              } disabled:opacity-50`}
               data-tooltip-id="service-tracker"
-              data-tooltip-content={status === "open" ? data.tip_toggle_case_open || "Close Case" : data.tip_toggle_case_close || "Open Case"}
+              data-tooltip-content={localStatus === "open" ? data.tip_toggle_case_open || "Close Case" : data.tip_toggle_case_close || "Open Case"}
+              title={localStatus === "open" ? "Close Case" : "Open Case"}
             >
               <span className="material-symbols-outlined text-sm">
-                {status === "open" ? "toggle_on" : "toggle_off"}
+                {toggling ? "hourglass_empty" : localStatus === "open" ? "toggle_on" : "toggle_off"}
               </span>
             </button>
 
             <button
-              onClick={() => deleteCase(id, title)}
+              onClick={handleDelete}
               className="p-2 rounded-lg hover:bg-error-container/30 transition-colors text-on-surface-variant hover:text-error"
               data-tooltip-id="service-tracker"
               data-tooltip-content={data.tip_delete_case || "Delete Case"}

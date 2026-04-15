@@ -3,8 +3,9 @@
 
 interface FetchOptions {
   method?: "GET" | "POST" | "PUT" | "DELETE";
-  body?: Record<string, any> | null;
+  body?: Record<string, any> | FormData | null;
   headers?: Record<string, string>;
+  multipart?: boolean;
 }
 
 interface FetchResponse {
@@ -15,18 +16,20 @@ export async function request(
   url: string,
   options: FetchOptions = {}
 ): Promise<FetchResponse> {
-  const { method = "GET", body, headers = {} } = options;
+  const { method = "GET", body, headers = {}, multipart = false } = options;
 
   const config: RequestInit = {
     method,
-    headers: {
-      "Content-Type": "application/json",
-      ...headers,
-    },
+    headers: multipart
+      ? { ...headers } // Don't set Content-Type, let browser set it with boundary
+      : {
+          "Content-Type": "application/json",
+          ...headers,
+        },
   };
 
   if (body && (method === "POST" || method === "PUT" || method === "DELETE")) {
-    config.body = JSON.stringify(body);
+    config.body = (multipart ? body : JSON.stringify(body)) as BodyInit | undefined;
   }
 
   const response = await fetch(url, config);
@@ -62,3 +65,6 @@ export const put = (url: string, body?: any, config?: { headers?: Record<string,
 
 export const del = (url: string, config?: { headers?: Record<string, string> }) =>
   request(url, { method: "DELETE", headers: config?.headers });
+
+export const postMultipart = (url: string, body: FormData, config?: { headers?: Record<string, string> }) =>
+  request(url, { method: "POST", body, headers: config?.headers, multipart: true });
