@@ -4,6 +4,7 @@ import { useProgressStore } from "../../stores/progressStore";
 import TextareaAutosize from "react-textarea-autosize";
 import Spinner from "./Spinner";
 import Status from "./Status";
+import UserAttachments from "./UserAttachments";
 import { get as fetchGet, put, post, del } from "../../utils/fetch";
 import { toast } from "react-toastify";
 import { showConfirm, showAlert } from "../ui/Modal";
@@ -31,6 +32,7 @@ export default function Progress() {
   const [clientName, setClientName] = useState<string>("");
   const [pendingFiles, setPendingFiles] = useState<File[]>([]);
   const [uploadingFiles, setUploadingFiles] = useState(false);
+  const [activeTab, setActiveTab] = useState<"progress" | "attachments">("progress");
   const fileInputRef = useRef<HTMLInputElement>(null);
   const imageInputRef = useRef<HTMLInputElement>(null);
 
@@ -289,7 +291,7 @@ export default function Progress() {
       showAlert({ title: "Error", message: data.alert_blank_status_title || "Status title cannot be blank" });
       return;
     }
-    
+
     setUploadingFiles(true);
     try {
       let attachmentsToSend: Attachment[] | undefined;
@@ -304,7 +306,7 @@ export default function Progress() {
 
       // Create status with attachments
       await postStatus(idUser, idCase, newText.trim(), attachmentsToSend);
-      
+
       // Clean up
       setNewText("");
       setPendingFiles([]);
@@ -566,174 +568,222 @@ export default function Progress() {
           </div>
         </div>
 
-        {/* Status Update Input */}
-        <div className="bg-surface-container-lowest rounded-2xl p-8 shadow-[0px_12px_32px_rgba(11,28,48,0.06)] relative overflow-hidden mb-8">
-          <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-secondary to-secondary-container"></div>
-          <div className="flex items-center justify-between mb-6">
-            <h3 className="text-xl font-headline font-bold text-primary">
-              Progress Update
-            </h3>
-            <div className="flex items-center gap-2 bg-secondary-container/20 px-3 py-1.5 rounded-full border border-secondary-container/30">
-              <span
-                className="material-symbols-outlined text-[18px] text-on-secondary-container"
-                style={{ fontVariationSettings: "'FILL' 1" }}
-              >
-                mail
-              </span>
-              <span className="text-[10px] font-bold text-on-secondary-container uppercase tracking-wider">
-                Client will be notified
-              </span>
-            </div>
-          </div>
+        {/* Tabs: Progress / Attachments */}
+        <div className="flex gap-1 mb-8 border-b border-outline-variant/10">
+          <button
+            onClick={() => setActiveTab("progress")}
+            className={`px-5 py-2.5 text-sm font-bold rounded-t-lg transition-all ${
+              activeTab === "progress"
+                ? "bg-surface-container-lowest text-primary border-b-2 border-primary"
+                : "text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low"
+            }`}
+          >
+            <span className="flex items-center gap-2">
+              <span className="material-symbols-outlined text-sm">timeline</span>
+              Progress
+            </span>
+          </button>
+          <button
+            onClick={() => setActiveTab("attachments")}
+            className={`px-5 py-2.5 text-sm font-bold rounded-t-lg transition-all ${
+              activeTab === "attachments"
+                ? "bg-surface-container-lowest text-primary border-b-2 border-primary"
+                : "text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low"
+            }`}
+          >
+            <span className="flex items-center gap-2">
+              <span className="material-symbols-outlined text-sm">attach_file</span>
+              All Attachments
+            </span>
+          </button>
+        </div>
 
-          {writingStatus && (
-            <div className="status-add-new-container animate-fade-in">
-              <div className="relative mb-6">
-                <TextareaAutosize
-                  onChange={(e) => setNewText(e.target.value)}
-                  className="w-full p-4 bg-surface-container-low rounded-xl border-none focus:ring-2 focus:ring-primary/10 text-on-surface font-medium resize-none placeholder:text-on-primary-container"
-                  placeholder="Type progress details here... (e.g., 'Initial site visit completed')"
-                  rows={4}
-                  value={newText}
-                />
+        {/* Tab: Progress */}
+        {activeTab === "progress" && (
+          <>
+            {/* Status Update Input */}
+            <div className="bg-surface-container-lowest rounded-2xl p-8 shadow-[0px_12px_32px_rgba(11,28,48,0.06)] relative overflow-hidden mb-8">
+              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-secondary to-secondary-container"></div>
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="text-xl font-headline font-bold text-primary">
+                  Progress Update
+                </h3>
+                <div className="flex items-center gap-2 bg-secondary-container/20 px-3 py-1.5 rounded-full border border-secondary-container/30">
+                  <span
+                    className="material-symbols-outlined text-[18px] text-on-secondary-container"
+                    style={{ fontVariationSettings: "'FILL' 1" }}
+                  >
+                    mail
+                  </span>
+                  <span className="text-[10px] font-bold text-on-secondary-container uppercase tracking-wider">
+                    Client will be notified
+                  </span>
+                </div>
               </div>
 
-              {/* Pending files display */}
-              {pendingFiles.length > 0 && (
-                <div className="mb-4 p-3 bg-surface-container-low rounded-xl">
-                  <p className="text-xs font-bold text-on-surface-variant mb-2">Files to Attach:</p>
-                  <div className="flex flex-wrap gap-2">
-                    {pendingFiles.map((file, index) => (
-                      <div key={index} className="flex items-center gap-2 px-3 py-2 bg-surface-container-high rounded-lg">
-                        <span className="material-symbols-outlined text-sm text-primary">
-                          {file.type.startsWith("image/") ? "image" : "attach_file"}
-                        </span>
-                        <span className="text-xs text-on-surface-variant max-w-[120px] truncate">{file.name}</span>
-                        <button
-                          onClick={() => removePendingFile(index)}
-                          className="text-on-surface-variant hover:text-error transition-colors"
-                        >
-                          <span className="material-symbols-outlined text-sm">close</span>
-                        </button>
-                      </div>
-                    ))}
+              {writingStatus && (
+                <div className="status-add-new-container animate-fade-in">
+                  <div className="relative mb-6">
+                    <TextareaAutosize
+                      onChange={(e) => setNewText(e.target.value)}
+                      className="w-full p-4 bg-surface-container-low rounded-xl border-none focus:ring-2 focus:ring-primary/10 text-on-surface font-medium resize-none placeholder:text-on-primary-container"
+                      placeholder="Type progress details here... (e.g., 'Initial site visit completed')"
+                      rows={4}
+                      value={newText}
+                    />
                   </div>
+
+                  {/* Pending files display */}
+                  {pendingFiles.length > 0 && (
+                    <div className="mb-4 p-3 bg-surface-container-low rounded-xl">
+                      <p className="text-xs font-bold text-on-surface-variant mb-2">Files to Attach:</p>
+                      <div className="flex flex-wrap gap-2">
+                        {pendingFiles.map((file, index) => (
+                          <div key={index} className="flex items-center gap-2 px-3 py-2 bg-surface-container-high rounded-lg">
+                            <span className="material-symbols-outlined text-sm text-primary">
+                              {file.type.startsWith("image/") ? "image" : "attach_file"}
+                            </span>
+                            <span className="text-xs text-on-surface-variant max-w-[120px] truncate">{file.name}</span>
+                            <button
+                              onClick={() => removePendingFile(index)}
+                              className="text-on-surface-variant hover:text-error transition-colors"
+                            >
+                              <span className="material-symbols-outlined text-sm">close</span>
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="flex justify-between items-center">
+                    <div className="flex gap-2">
+                      <button
+                        type="button"
+                        onClick={handleAttachFiles}
+                        disabled={uploadingFiles}
+                        className="p-2 text-on-surface-variant hover:bg-surface-container-high rounded-lg transition-all disabled:opacity-50"
+                        title="Attach Files"
+                      >
+                        <span className="material-symbols-outlined">attach_file</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={handleAddImage}
+                        disabled={uploadingFiles}
+                        className="p-2 text-on-surface-variant hover:bg-surface-container-high rounded-lg transition-all disabled:opacity-50"
+                        title="Add Image"
+                      >
+                        <span className="material-symbols-outlined">image</span>
+                      </button>
+                      {uploadingFiles && (
+                        <div className="flex items-center gap-2 px-3 py-2">
+                          <span className="material-symbols-outlined text-sm animate-spin">progress_activity</span>
+                          <span className="text-xs text-on-surface-variant">Uploading...</span>
+                        </div>
+                      )}
+                    </div>
+                    <div className="flex gap-3">
+                      <button
+                        onClick={(e) => {
+                          e.preventDefault();
+                          handlePostStatus();
+                        }}
+                        className="px-8 py-3 bg-primary text-on-primary font-bold rounded-xl shadow-lg active:scale-95 transition-transform"
+                      >
+                        {data.add_status_btn || "Post Update"}
+                      </button>
+                      <button
+                        onClick={(e) => {
+                          e.preventDefault();
+                          setWritingStatus(false);
+                          setPendingFiles([]);
+                        }}
+                        className="px-6 py-3 bg-surface-container-highest text-on-surface font-bold rounded-xl shadow-lg active:scale-95 transition-all hover:bg-surface-container-high"
+                      >
+                        {data.close_box_btn || "Close"}
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Hidden file inputs */}
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    multiple
+                    accept="*/*"
+                    onChange={handleFileSelect}
+                    className="hidden"
+                  />
+                  <input
+                    ref={imageInputRef}
+                    type="file"
+                    multiple
+                    accept="image/*"
+                    onChange={handleFileSelect}
+                    className="hidden"
+                  />
                 </div>
               )}
 
-              <div className="flex justify-between items-center">
-                <div className="flex gap-2">
-                  <button
-                    type="button"
-                    onClick={handleAttachFiles}
-                    disabled={uploadingFiles}
-                    className="p-2 text-on-surface-variant hover:bg-surface-container-high rounded-lg transition-all disabled:opacity-50"
-                    title="Attach Files"
-                  >
-                    <span className="material-symbols-outlined">attach_file</span>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={handleAddImage}
-                    disabled={uploadingFiles}
-                    className="p-2 text-on-surface-variant hover:bg-surface-container-high rounded-lg transition-all disabled:opacity-50"
-                    title="Add Image"
-                  >
-                    <span className="material-symbols-outlined">image</span>
-                  </button>
-                  {uploadingFiles && (
-                    <div className="flex items-center gap-2 px-3 py-2">
-                      <span className="material-symbols-outlined text-sm animate-spin">progress_activity</span>
-                      <span className="text-xs text-on-surface-variant">Uploading...</span>
-                    </div>
-                  )}
-                </div>
-                <div className="flex gap-3">
-                  <button
-                    onClick={(e) => {
-                      e.preventDefault();
-                      handlePostStatus();
-                    }}
-                    className="px-8 py-3 bg-primary text-on-primary font-bold rounded-xl shadow-lg active:scale-95 transition-transform"
-                  >
-                    {data.add_status_btn || "Post Update"}
-                  </button>
-                  <button
-                    onClick={(e) => {
-                      e.preventDefault();
-                      setWritingStatus(false);
-                      setPendingFiles([]);
-                    }}
-                    className="px-6 py-3 bg-surface-container-highest text-on-surface font-bold rounded-xl shadow-lg active:scale-95 transition-all hover:bg-surface-container-high"
-                  >
-                    {data.close_box_btn || "Close"}
-                  </button>
-                </div>
+              {!writingStatus && (
+                <button
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setWritingStatus(true);
+                  }}
+                  className="w-full py-3 bg-gradient-to-br from-primary to-primary-container text-white font-bold rounded-xl shadow-lg active:scale-95 transition-all text-sm"
+                >
+                  <span className="flex items-center justify-center gap-2">
+                    <span className="material-symbols-outlined text-sm">add_circle</span>
+                    {data.new_status_btn || "Add Status Update"}
+                  </span>
+                </button>
+              )}
+            </div>
+
+            {/* Timeline / Activity Log */}
+            <div className="space-y-6">
+              <div className="flex items-center gap-4 mb-8">
+                <div className="h-[1px] flex-1 bg-outline-variant/20"></div>
+                <span className="text-[10px] font-bold text-on-primary-container uppercase tracking-widest px-4">
+                  Activity Log
+                </span>
+                <div className="h-[1px] flex-1 bg-outline-variant/20"></div>
               </div>
 
-              {/* Hidden file inputs */}
-              <input
-                ref={fileInputRef}
-                type="file"
-                multiple
-                accept="*/*"
-                onChange={handleFileSelect}
-                className="hidden"
-              />
-              <input
-                ref={imageInputRef}
-                type="file"
-                multiple
-                accept="image/*"
-                onChange={handleFileSelect}
-                className="hidden"
-              />
+              {allStatuses.length <= 0 && (
+                <div className="text-center py-12">
+                  <span className="material-symbols-outlined text-6xl text-outline-variant mb-4">
+                    timeline
+                  </span>
+                  <h3 className="text-xl font-bold text-on-surface-variant">
+                    {data.no_progress_yet || "No progress updates yet"}
+                  </h3>
+                  <p className="text-sm text-outline mt-2">
+                    Add your first status update to get started
+                  </p>
+                </div>
+              )}
+
+              {allStatuses.length > 0 &&
+                allStatuses.map((item, index) => <Status key={item.id || index} {...item} />)}
             </div>
-          )}
+          </>
+        )}
 
-          {!writingStatus && (
-            <button
-              onClick={(e) => {
-                e.preventDefault();
-                setWritingStatus(true);
-              }}
-              className="w-full py-3 bg-gradient-to-br from-primary to-primary-container text-white font-bold rounded-xl shadow-lg active:scale-95 transition-all text-sm"
-            >
-              <span className="flex items-center justify-center gap-2">
-                <span className="material-symbols-outlined text-sm">add_circle</span>
-                {data.new_status_btn || "Add Status Update"}
-              </span>
-            </button>
-          )}
-        </div>
-
-        {/* Timeline / Activity Log */}
-        <div className="space-y-6">
-          <div className="flex items-center gap-4 mb-8">
-            <div className="h-[1px] flex-1 bg-outline-variant/20"></div>
-            <span className="text-[10px] font-bold text-on-primary-container uppercase tracking-widest px-4">
-              Activity Log
-            </span>
-            <div className="h-[1px] flex-1 bg-outline-variant/20"></div>
-          </div>
-
-          {allStatuses.length <= 0 && (
-            <div className="text-center py-12">
-              <span className="material-symbols-outlined text-6xl text-outline-variant mb-4">
-                timeline
-              </span>
-              <h3 className="text-xl font-bold text-on-surface-variant">
-                {data.no_progress_yet || "No progress updates yet"}
+        {/* Tab: All Attachments */}
+        {activeTab === "attachments" && (
+          <div className="bg-surface-container-lowest rounded-2xl p-8 shadow-[0px_12px_32px_rgba(11,28,48,0.06)]">
+            <div className="flex items-center gap-3 mb-6">
+              <span className="material-symbols-outlined text-primary">attach_file</span>
+              <h3 className="text-xl font-headline font-bold text-primary">
+                Client Attachments
               </h3>
-              <p className="text-sm text-outline mt-2">
-                Add your first status update to get started
-              </p>
             </div>
-          )}
-
-          {allStatuses.length > 0 &&
-            allStatuses.map((item, index) => <Status key={item.id || index} {...item} />)}
-        </div>
+            <UserAttachments idUser={idUser} />
+          </div>
+        )}
       </div>
     </section>
   );

@@ -65,6 +65,17 @@ class STOLMC_Service_Tracker_Api_Progress extends STOLMC_Service_Tracker_Api imp
 			'/progress/upload',
 			$route_args
 		);
+
+		// Register user attachments route.
+		register_rest_route(
+			'service-tracker-stolmc/v1',
+			'/progress/user-attachments/(?P<id_user>\d+)',
+			[
+				'methods'             => WP_REST_Server::READABLE,
+				'callback'            => [ $this, 'read_user_attachments' ],
+				'permission_callback' => [ $this, 'permission_check' ],
+			]
+		);
 	}
 
 	/**
@@ -108,6 +119,78 @@ class STOLMC_Service_Tracker_Api_Progress extends STOLMC_Service_Tracker_Api imp
 		 * @param WP_REST_Request   $data     The REST request object.
 		 */
 		return apply_filters( 'stolmc_service_tracker_progress_read_response', $response, $data );
+	}
+
+	/**
+	 * Read all attachments across all progress entries belonging to a user's cases.
+	 *
+	 * @param WP_REST_Request $data The REST request object.
+	 *
+	 * @return WP_REST_Response Response with flat list of attachments.
+	 */
+	public function read_user_attachments( WP_REST_Request $data ): WP_REST_Response {
+		global $wpdb;
+
+		$id_user = (int) $data->get_param( 'id_user' );
+
+		if ( ! $id_user ) {
+			return $this->rest_response(
+				[
+					'success' => false,
+					'message' => 'Missing id_user parameter',
+				],
+				400
+			);
+		}
+
+		$cases_table    = $wpdb->prefix . 'servicetracker_cases';
+		$progress_table = $wpdb->prefix . self::DB;
+
+		// Fetch all progress rows for cases that belong to this user.
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$rows = $wpdb->get_results(
+			$wpdb->prepare(
+				"SELECT p.id AS progress_id, p.id_case, p.text, p.created_at, p.attachments, c.title AS case_title
+				FROM {$progress_table} p
+				INNER JOIN {$cases_table} c ON c.id = p.id_case
+				WHERE c.id_user = %d
+				AND p.attachments IS NOT NULL
+				AND p.attachments != ''
+				AND p.attachments != 'null'
+				ORDER BY p.created_at DESC",
+				$id_user
+			)
+		);
+
+		$attachments = [];
+
+		foreach ( $rows as $row ) {
+			$decoded = json_decode( $row->attachments, true );
+			if ( ! is_array( $decoded ) || empty( $decoded ) ) {
+				continue;
+			}
+			foreach ( $decoded as $att ) {
+				$attachments[] = [
+					'url'         => $att['url'] ?? '',
+					'type'        => $att['type'] ?? '',
+					'name'        => $att['name'] ?? '',
+					'size'        => $att['size'] ?? 0,
+					'progress_id' => (int) $row->progress_id,
+					'id_case'     => (int) $row->id_case,
+					'case_title'  => $row->case_title,
+					'created_at'  => $row->created_at,
+					'status_text' => $row->text,
+				];
+			}
+		}
+
+		return $this->rest_response(
+			[
+				'success' => true,
+				'data'    => $attachments,
+			],
+			200
+		);
 	}
 
 	/**
@@ -336,7 +419,7 @@ class STOLMC_Service_Tracker_Api_Progress extends STOLMC_Service_Tracker_Api imp
 		 *
 		 * @since 1.0.0
 		 *
-		 * @param int             $id   The ID of the progress entry.
+		 * @param int             $id   The ID of the progress entry to delete.
 		 * @param WP_REST_Request $data The REST request object.
 		 */
 		do_action( 'stolmc_service_tracker_progress_before_delete', $id, $data );
@@ -396,13 +479,13 @@ class STOLMC_Service_Tracker_Api_Progress extends STOLMC_Service_Tracker_Api imp
 			require_once ABSPATH . 'wp-admin/includes/media.php';
 
 			$upload_overrides = [
-				'test_form' => false,
-				'test_size' => true,
+				'test_form'        => false,
+				'test_size'        => true,
 				'test_upload_size' => true,
 			];
 
 			$uploaded_files = [];
-			$upload_errors = [];
+			$upload_errors  = [];
 
 			// Handle multiple files.
 			foreach ( $_FILES as $file_key => $file_array ) {
@@ -433,7 +516,7 @@ class STOLMC_Service_Tracker_Api_Progress extends STOLMC_Service_Tracker_Api imp
 								'size' => $file_array['size'][ $i ],
 							];
 						} else {
-							$error_msg = isset( $movefile['error'] ) ? $movefile['error'] : 'Unknown error';
+							$error_msg       = isset( $movefile['error'] ) ? $movefile['error'] : 'Unknown error';
 							$upload_errors[] = "File {$file_name}: {$error_msg}";
 							// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
 							error_log( 'Service Tracker Upload Error: ' . $error_msg );
@@ -448,7 +531,7 @@ class STOLMC_Service_Tracker_Api_Progress extends STOLMC_Service_Tracker_Api imp
 					}
 
 					$file_array['name'] = sanitize_file_name( $file_array['name'] );
-					$movefile = wp_handle_upload( $file_array, $upload_overrides );
+					$movefile           = wp_handle_upload( $file_array, $upload_overrides );
 
 					if ( $movefile && ! isset( $movefile['error'] ) ) {
 						$uploaded_files[] = [
@@ -458,7 +541,7 @@ class STOLMC_Service_Tracker_Api_Progress extends STOLMC_Service_Tracker_Api imp
 							'size' => $file_array['size'],
 						];
 					} else {
-						$error_msg = isset( $movefile['error'] ) ? $movefile['error'] : 'Unknown error';
+						$error_msg       = isset( $movefile['error'] ) ? $movefile['error'] : 'Unknown error';
 						$upload_errors[] = $error_msg;
 						// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
 						error_log( 'Service Tracker Upload Error: ' . $error_msg );
