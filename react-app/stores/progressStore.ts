@@ -1,8 +1,8 @@
 import { create } from "zustand";
-import { get as fetchGet, post, put, del } from "../utils/fetch";
+import { get as fetchGet, post, put, del, postMultipart } from "../utils/fetch";
 import { toast } from "react-toastify";
 import dateformat from "dateformat";
-import type { Status } from "../types";
+import type { Status, Attachment } from "../types";
 
 declare const data: Record<string, any>;
 
@@ -14,9 +14,10 @@ export interface ProgressState {
 
 export interface ProgressActions {
   getStatus: (id: string | number, onlyFetch: boolean, caseTitle?: string) => Promise<Status[] | void>;
-  postStatus: (id_user: string | number, id_case: string | number, text: string) => Promise<void>;
+  postStatus: (id_user: string | number, id_case: string | number, text: string, attachments?: Attachment[]) => Promise<void>;
   deleteStatus: (id: string | number, createdAt: string) => Promise<void>;
   editStatus: (id: string | number, _id_user: string | number, newText: string) => Promise<void>;
+  uploadFiles: (id_user: string | number, id_case: string | number, files: FileList | File[]) => Promise<Attachment[]>;
 }
 
 export interface ProgressStore extends ProgressState, ProgressActions {}
@@ -50,8 +51,8 @@ export const useProgressStore = create<ProgressStore>((set, get) => {
         }
       }
     },
-    postStatus: async (id_user: string | number, id_case: string | number, text: string): Promise<void> => {
-      const dataToPost = { id_user, id_case, text };
+    postStatus: async (id_user: string | number, id_case: string | number, text: string, attachments?: Attachment[]): Promise<void> => {
+      const dataToPost = { id_user, id_case, text, attachments };
 
       try {
         await post(`${apiUrlProgress}/${id_case}`, dataToPost, {
@@ -72,33 +73,20 @@ export const useProgressStore = create<ProgressStore>((set, get) => {
           id_user,
           created_at,
           text,
+          attachments: attachments || [],
         };
         const currentStatus = get().status;
         const newStatusArray = [...currentStatus, newStatus];
 
         set({ status: newStatusArray, loadingStatus: false });
 
-        toast.success(data.toast_status_added, {
-          position: "bottom-right",
-          autoClose: 5000,
-          hideProgressBar: true,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-        });
+        toast.success(data.toast_status_added);
       } catch (error) {
         alert(data.alert_error_base + error);
       }
     },
-    deleteStatus: async (id: string | number, createdAt: string): Promise<void> => {
+    deleteStatus: async (id: string | number): Promise<void> => {
       const status = [...get().status];
-
-      const sureToDelete = confirm(
-        `Are you sure you want to delete status from ${dateformat(createdAt, "dd/mm/yyyy, HH:MM")}?`
-      );
-
-      if (!sureToDelete) return;
 
       try {
         await del(`${apiUrlProgress}/${id}`, {
@@ -106,20 +94,12 @@ export const useProgressStore = create<ProgressStore>((set, get) => {
         });
 
         const filteredStatuses = status.filter((status: Status) => {
-          return dateformat(status.created_at, "dd/mm/yyyy, HH:MM") !== dateformat(createdAt, "dd/mm/yyyy, HH:MM");
+          return String(status.id) !== String(id);
         });
 
         set({ status: filteredStatuses, loadingStatus: false });
 
-        toast.success(data.toast_status_deleted, {
-          position: "bottom-right",
-          autoClose: 5000,
-          hideProgressBar: true,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-        });
+        toast.success(data.toast_status_deleted);
       } catch (error) {
         alert(data.alert_error_base + error);
       }
@@ -147,17 +127,34 @@ export const useProgressStore = create<ProgressStore>((set, get) => {
 
         set({ status: newStatuses, loadingStatus: false });
 
-        toast.success(data.toast_status_edited, {
-          position: "bottom-right",
-          autoClose: 5000,
-          hideProgressBar: true,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-        });
+        toast.success(data.toast_status_edited);
       } catch (error) {
         alert(data.alert_error_base + error);
+      }
+    },
+    uploadFiles: async (id_user: string | number, id_case: string | number, files: FileList | File[]): Promise<Attachment[]> => {
+      const formData = new FormData();
+      formData.append("id_user", String(id_user));
+      formData.append("id_case", String(id_case));
+
+      for (let i = 0; i < files.length; i++) {
+        formData.append("files", files[i]);
+      }
+
+      try {
+        const apiUrlUpload = `${data.root_url}/wp-json/${data.api_url}/progress/upload`;
+        const res = await postMultipart(apiUrlUpload, formData, {
+          headers: { "X-WP-Nonce": data.nonce },
+        });
+
+        if (res.data.success) {
+          return res.data.files as Attachment[];
+        } else {
+          throw new Error(res.data.message || "Upload failed");
+        }
+      } catch (error) {
+        alert(data.alert_error_base + error);
+        return [];
       }
     },
   };
