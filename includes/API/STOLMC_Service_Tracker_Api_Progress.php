@@ -52,6 +52,19 @@ class STOLMC_Service_Tracker_Api_Progress extends STOLMC_Service_Tracker_Api imp
 		$this->register_new_route( 'progress', '', WP_REST_Server::EDITABLE, [ $this, 'update' ] );
 		$this->register_new_route( 'progress', '', WP_REST_Server::DELETABLE, [ $this, 'delete' ] );
 		$this->register_new_route( 'progress', '_case', WP_REST_Server::CREATABLE, [ $this, 'create' ] );
+
+		// Register upload route with custom pattern.
+		$route_args = [
+			'methods'             => WP_REST_Server::CREATABLE,
+			'callback'            => [ $this, 'upload_file' ],
+			'permission_callback' => [ $this, 'permission_check' ],
+		];
+
+		register_rest_route(
+			'service-tracker-stolmc/v1',
+			'/progress/upload',
+			$route_args
+		);
 	}
 
 	/**
@@ -73,6 +86,18 @@ class STOLMC_Service_Tracker_Api_Progress extends STOLMC_Service_Tracker_Api imp
 		$query_args = apply_filters( 'stolmc_service_tracker_progress_read_query_args', [ 'id_case' => $data['id_case'] ], $data );
 
 		$response = $this->sql->get_by( $query_args );
+
+		// Decode attachments JSON for each progress entry.
+		if ( is_array( $response ) ) {
+			foreach ( $response as &$entry ) {
+				if ( isset( $entry->attachments ) && is_string( $entry->attachments ) ) {
+					$entry->attachments = json_decode( $entry->attachments, true );
+				} elseif ( ! isset( $entry->attachments ) ) {
+					$entry->attachments = null;
+				}
+			}
+			unset( $entry );
+		}
 
 		/**
 		 * Filters the progress read response.
@@ -98,11 +123,19 @@ class STOLMC_Service_Tracker_Api_Progress extends STOLMC_Service_Tracker_Api imp
 		$id_user = $body['id_user'];
 		$id_case = $body['id_case'];
 		$text    = $body['text'];
+		$attachments = isset( $body['attachments'] ) ? $body['attachments'] : null;
+
+		// Encode attachments as JSON string for database storage.
+		$attachments_json = null;
+		if ( $attachments && is_array( $attachments ) ) {
+			$attachments_json = wp_json_encode( $attachments );
+		}
 
 		$progress_data = [
-			'id_user' => $id_user,
-			'id_case' => $id_case,
-			'text'    => $text,
+			'id_user'     => $id_user,
+			'id_case'     => $id_case,
+			'text'        => $text,
+			'attachments' => $attachments_json,
 		];
 
 		/**
@@ -322,5 +355,157 @@ class STOLMC_Service_Tracker_Api_Progress extends STOLMC_Service_Tracker_Api imp
 		do_action( 'stolmc_service_tracker_progress_deleted', $delete, $id, $data );
 
 		return $this->rest_response( [ 'success' => true ], 200 );
+	}
+
+	/**
+	 * Upload a file and associate it with a progress entry.
+	 *
+	 * @param WP_REST_Request $data The REST request object.
+	 *
+	 * @return WP_REST_Response Response with file data.
+	 */
+	public function upload_file( WP_REST_Request $data ): WP_REST_Response {
+		try {
+			// Check if files were uploaded.
+			if ( empty( $_FILES ) ) {
+				return $this->rest_response(
+					[
+						'success' => false,
+						'message' => 'No files uploaded',
+					],
+					400
+				);
+			}
+
+			$id_case = $data->get_param( 'id_case' );
+			$id_user = $data->get_param( 'id_user' );
+
+			if ( ! $id_case || ! $id_user ) {
+				return $this->rest_response(
+					[
+						'success' => false,
+						'message' => 'Missing id_case or id_user parameter',
+					],
+					400
+				);
+			}
+
+			// Handle file upload using WordPress media handling.
+			require_once ABSPATH . 'wp-admin/includes/image.php';
+			require_once ABSPATH . 'wp-admin/includes/file.php';
+			require_once ABSPATH . 'wp-admin/includes/media.php';
+
+			$upload_overrides = [
+				'test_form' => false,
+				'test_size' => true,
+				'test_upload_size' => true,
+			];
+
+			$uploaded_files = [];
+			$upload_errors = [];
+
+			// Handle multiple files.
+			foreach ( $_FILES as $file_key => $file_array ) {
+				// Handle array-style file uploads (multiple files).
+				if ( is_array( $file_array['name'] ) ) {
+					foreach ( $file_array['name'] as $i => $file_name ) {
+						// Check for upload errors.
+						if ( $file_array['error'][ $i ] !== UPLOAD_ERR_OK ) {
+							$upload_errors[] = "File {$file_name}: Upload error {$file_array['error'][ $i ]}";
+							continue;
+						}
+
+						$file = [
+							'name'     => sanitize_file_name( $file_name ),
+							'type'     => $file_array['type'][ $i ],
+							'tmp_name' => $file_array['tmp_name'][ $i ],
+							'error'    => $file_array['error'][ $i ],
+							'size'     => $file_array['size'][ $i ],
+						];
+
+						$movefile = wp_handle_upload( $file, $upload_overrides );
+
+						if ( $movefile && ! isset( $movefile['error'] ) ) {
+							$uploaded_files[] = [
+								'url'  => $movefile['url'],
+								'type' => $file_array['type'][ $i ],
+								'name' => $file_name,
+								'size' => $file_array['size'][ $i ],
+							];
+						} else {
+							$error_msg = isset( $movefile['error'] ) ? $movefile['error'] : 'Unknown error';
+							$upload_errors[] = "File {$file_name}: {$error_msg}";
+							// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+							error_log( 'Service Tracker Upload Error: ' . $error_msg );
+						}
+					}
+				} else {
+					// Single file upload.
+					// Check for upload errors.
+					if ( $file_array['error'] !== UPLOAD_ERR_OK ) {
+						$upload_errors[] = "Upload error {$file_array['error']}";
+						continue;
+					}
+
+					$file_array['name'] = sanitize_file_name( $file_array['name'] );
+					$movefile = wp_handle_upload( $file_array, $upload_overrides );
+
+					if ( $movefile && ! isset( $movefile['error'] ) ) {
+						$uploaded_files[] = [
+							'url'  => $movefile['url'],
+							'type' => $file_array['type'],
+							'name' => $file_array['name'],
+							'size' => $file_array['size'],
+						];
+					} else {
+						$error_msg = isset( $movefile['error'] ) ? $movefile['error'] : 'Unknown error';
+						$upload_errors[] = $error_msg;
+						// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+						error_log( 'Service Tracker Upload Error: ' . $error_msg );
+					}
+				}
+			}
+
+			if ( empty( $uploaded_files ) ) {
+				$error_message = ! empty( $upload_errors )
+					? 'Upload failed: ' . implode( '; ', $upload_errors )
+					: 'Failed to upload files';
+
+				return $this->rest_response(
+					[
+						'success' => false,
+						'message' => $error_message,
+					],
+					500
+				);
+			}
+
+			/**
+			 * Filters the uploaded file data.
+			 *
+			 * @since 1.2.0
+			 *
+			 * @param array $uploaded_files The uploaded files data.
+			 * @param WP_REST_Request $data The REST request object.
+			 */
+			return $this->rest_response(
+				[
+					'success' => true,
+					'files'   => apply_filters( 'stolmc_service_tracker_upload_files_response', $uploaded_files, $data ),
+				],
+				200
+			);
+
+		} catch ( \Exception $e ) {
+			// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+			error_log( 'Service Tracker Upload Error: ' . $e->getMessage() );
+			return $this->rest_response(
+				[
+					'success' => false,
+					'message' => $e->getMessage(),
+				],
+				500
+			);
+		}
 	}
 }
