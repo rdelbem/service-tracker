@@ -56,11 +56,25 @@ export default function Progress() {
       setLoadingCase(true);
       const apiUrlCases = `${data.root_url}/wp-json/${data.api_url}/cases`;
       try {
-        const res = await fetchGet(`${apiUrlCases}/${idUser}`, {
-          headers: { "X-WP-Nonce": data.nonce },
-        });
-        const cases = res.data || [];
-        const found = cases.find((c: any) => String(c.id) === String(idCase));
+        // Fetch all pages of cases for this user to find the one we need.
+        let found: any = null;
+        let casesPage = 1;
+        let casesTotalPages = 1;
+
+        do {
+          const res = await fetchGet(
+            `${apiUrlCases}/${idUser}?page=${casesPage}&per_page=6`,
+            { headers: { "X-WP-Nonce": data.nonce } }
+          );
+          const envelope = res.data;
+          const cases: any[] = envelope.data ?? [];
+          casesTotalPages = envelope.total_pages ?? 1;
+
+          found = cases.find((c: any) => String(c.id) === String(idCase));
+          if (found) break;
+          casesPage++;
+        } while (casesPage <= casesTotalPages);
+
         setCaseData(found || null);
         setSelectedOwner(found?.owner_id || "");
 
@@ -282,11 +296,9 @@ export default function Progress() {
     const files = e.target.files;
     if (!files || files.length === 0) return;
 
-    // Add files to pending list (don't upload yet)
     const newFiles = Array.from(files);
     setPendingFiles([...pendingFiles, ...newFiles]);
 
-    // Reset the input
     if (e.target) e.target.value = "";
   };
 
@@ -300,7 +312,6 @@ export default function Progress() {
     try {
       let attachmentsToSend: Attachment[] | undefined;
 
-      // Upload files first if there are any
       if (pendingFiles.length > 0) {
         const uploaded = await uploadFiles(idUser, idCase, pendingFiles);
         if (uploaded.length > 0) {
@@ -308,10 +319,8 @@ export default function Progress() {
         }
       }
 
-      // Create status with attachments
       await postStatus(idUser, idCase, newText.trim(), attachmentsToSend);
 
-      // Clean up
       setNewText("");
       setPendingFiles([]);
       setWritingStatus(false);

@@ -1,9 +1,9 @@
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { useInViewStore } from "../../stores/inViewStore";
 import { useClientsStore } from "../../stores/clientsStore";
+import { useCasesStore } from "../../stores/casesStore";
 import dateformat from "dateformat";
 import type { User, Case } from "../../types";
-import { get as fetchGet } from "../../utils/fetch";
 
 declare const data: Record<string, any>;
 
@@ -11,19 +11,23 @@ export default function ClientDetails() {
   const inViewState = useInViewStore((state) => state);
   const { navigate } = useInViewStore();
   const { users } = useClientsStore();
-  const [clientCases, setClientCases] = useState<Case[]>([]);
-  const [loadingCases, setLoadingCases] = useState(false);
+  const {
+    cases: clientCases,
+    loadingCases,
+    page,
+    totalPages,
+    total,
+    getCases,
+    setPage,
+  } = useCasesStore();
 
-  // Find the selected user from the clients list
+  // Find the selected user from the clients list.
   const selectedClient = users.find(
     (user: User) => String(user.id) === String(inViewState.userId)
   );
 
-  // If the user is in the URL but not in state yet (e.g., direct link),
-  // show a loading or not found state
   const clientName = selectedClient?.name || inViewState.name || "Client";
 
-  // Format the created date
   const createdDate = selectedClient?.created_at
     ? new Date(selectedClient.created_at).toLocaleDateString("en-US", {
         year: "numeric",
@@ -32,26 +36,10 @@ export default function ClientDetails() {
       })
     : "N/A";
 
-  // Fetch cases for this client
+  // Fetch cases for this client whenever the userId changes.
   useEffect(() => {
     if (!inViewState.userId) return;
-
-    const fetchClientCases = async () => {
-      setLoadingCases(true);
-      const apiUrlCases = `${data.root_url}/wp-json/${data.api_url}/cases`;
-      try {
-        const res = await fetchGet(`${apiUrlCases}/${inViewState.userId}`, {
-          headers: { "X-WP-Nonce": data.nonce },
-        });
-        setClientCases(res.data || []);
-      } catch (error) {
-        console.error("Error fetching client cases:", error);
-      } finally {
-        setLoadingCases(false);
-      }
-    };
-
-    fetchClientCases();
+    getCases(inViewState.userId, false, 1);
   }, [inViewState.userId]);
 
   // Keep hook order stable across route transitions.
@@ -167,9 +155,16 @@ export default function ClientDetails() {
 
         {/* Client Cases Section */}
         <div className="mt-12">
-          <h2 className="text-2xl font-black text-on-surface tracking-tight mb-6">
-            Cases
-          </h2>
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-2xl font-black text-on-surface tracking-tight">
+              Cases
+            </h2>
+            {total > 0 && (
+              <p className="text-xs text-on-surface-variant">
+                {total} case{total !== 1 ? "s" : ""} total
+              </p>
+            )}
+          </div>
 
           {loadingCases ? (
             <div className="flex items-center justify-center py-12">
@@ -187,42 +182,91 @@ export default function ClientDetails() {
               </p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 gap-4">
-              {clientCases.map((caseItem: Case) => (
-                <div key={caseItem.id} className="group cursor-pointer p-6 bg-surface-container-lowest rounded-2xl shadow-[0px_12px_32px_rgba(11,28,48,0.06)] border-l-4 border-primary hover:bg-surface-container-high transition-all">
-                  <div className="flex items-start justify-between mb-4">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-3 mb-2">
-                        <span
-                          onClick={() => handleCaseClick(caseItem)}
-                          className="text-xl font-bold text-on-surface cursor-pointer hover:text-primary transition-colors"
-                        >
-                          {caseItem.title}
-                        </span>
-                        <span className={`px-3 py-1 text-[10px] font-black uppercase tracking-wider rounded-md ${getStatusColor(caseItem.status)}`}>
-                          {getStatusLabel(caseItem.status)}
-                        </span>
+            <>
+              <div className="grid grid-cols-1 gap-4">
+                {clientCases.map((caseItem: Case) => (
+                  <div
+                    key={caseItem.id}
+                    className="group cursor-pointer p-6 bg-surface-container-lowest rounded-2xl shadow-[0px_12px_32px_rgba(11,28,48,0.06)] border-l-4 border-primary hover:bg-surface-container-high transition-all"
+                  >
+                    <div className="flex items-start justify-between mb-4">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-3 mb-2">
+                          <span
+                            onClick={() => handleCaseClick(caseItem)}
+                            className="text-xl font-bold text-on-surface cursor-pointer hover:text-primary transition-colors"
+                          >
+                            {caseItem.title}
+                          </span>
+                          <span
+                            className={`px-3 py-1 text-[10px] font-black uppercase tracking-wider rounded-md ${getStatusColor(caseItem.status)}`}
+                          >
+                            {getStatusLabel(caseItem.status)}
+                          </span>
+                        </div>
+                        <p className="text-xs text-outline">
+                          Created: {dateformat(caseItem.created_at, "mmm dd, yyyy, hh:MM TT")}
+                        </p>
                       </div>
-                      <p className="text-xs text-outline">
-                        Created: {dateformat(caseItem.created_at, "mmm dd, yyyy, hh:MM TT")}
-                      </p>
-                    </div>
 
-                    {/* Action Buttons */}
-                    <div className="flex items-center gap-2">
-                      <button
-                        onClick={() => handleCaseClick(caseItem)}
-                        className="p-2 rounded-lg hover:bg-surface-container-highest transition-colors text-on-surface-variant hover:text-primary"
-                        data-tooltip-id="service-tracker"
-                        data-tooltip-content="View Progress"
-                      >
-                        <span className="material-symbols-outlined text-sm">visibility</span>
-                      </button>
+                      {/* Action Buttons */}
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => handleCaseClick(caseItem)}
+                          className="p-2 rounded-lg hover:bg-surface-container-highest transition-colors text-on-surface-variant hover:text-primary"
+                          data-tooltip-id="service-tracker"
+                          data-tooltip-content="View Progress"
+                        >
+                          <span className="material-symbols-outlined text-sm">visibility</span>
+                        </button>
+                      </div>
                     </div>
                   </div>
+                ))}
+              </div>
+
+              {/* Pagination */}
+              {totalPages > 1 && (
+                <div className="mt-6 flex items-center justify-between gap-2">
+                  {/* Previous */}
+                  <button
+                    onClick={() => setPage(inViewState.userId, page - 1)}
+                    disabled={page <= 1}
+                    className="flex items-center gap-1 px-3 py-2 rounded-lg text-xs font-bold text-on-surface-variant hover:bg-surface-container-high disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+                  >
+                    <span className="material-symbols-outlined text-sm">chevron_left</span>
+                    Prev
+                  </button>
+
+                  {/* Page indicators */}
+                  <div className="flex items-center gap-1">
+                    {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
+                      <button
+                        key={p}
+                        onClick={() => setPage(inViewState.userId, p)}
+                        className={`w-7 h-7 rounded-lg text-xs font-bold transition-all ${
+                          p === page
+                            ? "bg-primary text-white shadow-sm"
+                            : "text-on-surface-variant hover:bg-surface-container-high"
+                        }`}
+                      >
+                        {p}
+                      </button>
+                    ))}
+                  </div>
+
+                  {/* Next */}
+                  <button
+                    onClick={() => setPage(inViewState.userId, page + 1)}
+                    disabled={page >= totalPages}
+                    className="flex items-center gap-1 px-3 py-2 rounded-lg text-xs font-bold text-on-surface-variant hover:bg-surface-container-high disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+                  >
+                    Next
+                    <span className="material-symbols-outlined text-sm">chevron_right</span>
+                  </button>
                 </div>
-              ))}
-            </div>
+              )}
+            </>
           )}
         </div>
       </div>

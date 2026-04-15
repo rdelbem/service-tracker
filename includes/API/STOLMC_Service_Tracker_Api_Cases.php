@@ -40,6 +40,13 @@ class STOLMC_Service_Tracker_Api_Cases extends STOLMC_Service_Tracker_Api implem
 	private const DB_PROGRESS = 'servicetracker_progress';
 
 	/**
+	 * Number of cases returned per page by default.
+	 *
+	 * @since 1.3.0
+	 */
+	private const PER_PAGE_DEFAULT = 6;
+
+	/**
 	 * Initialize the API and register routes.
 	 *
 	 * @return void
@@ -61,41 +68,104 @@ class STOLMC_Service_Tracker_Api_Cases extends STOLMC_Service_Tracker_Api implem
 	public function custom_api(): void {
 
 		// RegisterNewRoute -> Method from superclass / extended class.
-		$this->register_new_route( 'cases', '_user', WP_REST_Server::READABLE, [ $this, 'read' ] );
+		$this->register_new_route( 'cases', '_user', WP_REST_Server::READABLE, [ $this, 'read' ], [
+			'page'     => [
+				'default'           => 1,
+				'sanitize_callback' => 'absint',
+			],
+			'per_page' => [
+				'default'           => self::PER_PAGE_DEFAULT,
+				'sanitize_callback' => 'absint',
+			],
+		] );
 		$this->register_new_route( 'cases', '', WP_REST_Server::EDITABLE, [ $this, 'update' ] );
 		$this->register_new_route( 'cases', '', WP_REST_Server::DELETABLE, [ $this, 'delete' ] );
 		$this->register_new_route( 'cases', '_user', WP_REST_Server::CREATABLE, [ $this, 'create' ] );
 	}
 
 	/**
-	 * Read cases for a specific user.
+	 * Read cases for a specific user, with pagination.
+	 *
+	 * Accepts `page` (1-based) and `per_page` query parameters.
+	 * Returns a paginated envelope: { data, total, page, per_page, total_pages }.
 	 *
 	 * @param WP_REST_Request $data The REST request object.
 	 *
-	 * @return array<object>|object|null Array of cases or null on failure.
+	 * @return WP_REST_Response Paginated response.
 	 */
-	public function read( WP_REST_Request $data ): array|object|null {
+	public function read( WP_REST_Request $data ): WP_REST_Response {
+		global $wpdb;
+
+		$id_user  = (int) $data['id_user'];
+		$page     = max( 1, (int) $data->get_param( 'page' ) );
+		$per_page = max( 1, (int) $data->get_param( 'per_page' ) );
+
+		if ( $per_page === 0 ) {
+			$per_page = self::PER_PAGE_DEFAULT;
+		}
+
+		$table = $wpdb->prefix . self::DB;
+
 		/**
 		 * Filters the query parameters for reading cases.
 		 *
 		 * @since 1.0.0
 		 *
-		 * @param array $query_args The query parameters.
-		 * @param WP_REST_Request $data The REST request object.
+		 * @param array           $query_args The query parameters.
+		 * @param WP_REST_Request $data       The REST request object.
 		 */
-		$query_args = apply_filters( 'stolmc_service_tracker_cases_read_query_args', [ 'id_user' => $data['id_user'] ], $data );
+		$query_args = apply_filters(
+			'stolmc_service_tracker_cases_read_query_args',
+			[ 'id_user' => $id_user ],
+			$data
+		);
 
-		$response = $this->sql->get_by( $query_args );
+		// Count total cases for this user.
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$total = (int) $wpdb->get_var(
+			$wpdb->prepare(
+				"SELECT COUNT(*) FROM {$table} WHERE id_user = %d",
+				$query_args['id_user']
+			)
+		);
+
+		$total_pages = (int) ceil( $total / $per_page );
+
+		// Clamp page to valid range.
+		$page   = min( $page, max( 1, $total_pages ) );
+		$offset = ( $page - 1 ) * $per_page;
+
+		// Fetch paginated cases.
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$cases = $wpdb->get_results(
+			$wpdb->prepare(
+				"SELECT * FROM {$table} WHERE id_user = %d ORDER BY created_at DESC LIMIT %d OFFSET %d",
+				$query_args['id_user'],
+				$per_page,
+				$offset
+			)
+		);
 
 		/**
-		 * Filters the cases read response.
+		 * Filters the cases read response data.
 		 *
 		 * @since 1.0.0
 		 *
-		 * @param array|object|null $response The cases data.
-		 * @param WP_REST_Request   $data     The REST request object.
+		 * @param array           $cases The cases data.
+		 * @param WP_REST_Request $data  The REST request object.
 		 */
-		return apply_filters( 'stolmc_service_tracker_cases_read_response', $response, $data );
+		$cases = apply_filters( 'stolmc_service_tracker_cases_read_response', $cases, $data );
+
+		return $this->rest_response(
+			[
+				'data'        => $cases,
+				'total'       => $total,
+				'page'        => $page,
+				'per_page'    => $per_page,
+				'total_pages' => $total_pages,
+			],
+			200
+		);
 	}
 
 	/**

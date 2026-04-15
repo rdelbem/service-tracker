@@ -19,45 +19,56 @@ export default function Cases() {
 
   // Load all cases on mount
   useEffect(() => {
-    // Only load if we're in the cases view
     if (inViewState.view !== "cases") return;
 
     const loadAllCases = async () => {
       const apiUrlCases = `${data.root_url}/wp-json/${data.api_url}/cases`;
       try {
-        // Fetch all users across all pages to build the full cases list.
+        // Fetch all users across all pages.
         let allUsers: any[] = [];
-        let page = 1;
-        let totalPages = 1;
+        let usersPage = 1;
+        let usersTotalPages = 1;
 
         do {
           const usersRes = await fetchGet(
-            `${data.root_url}/wp-json/service-tracker-stolmc/v1/users?page=${page}&per_page=6`,
+            `${data.root_url}/wp-json/service-tracker-stolmc/v1/users?page=${usersPage}&per_page=6`,
             { headers: { "X-WP-Nonce": data.nonce } }
           );
           const envelope = usersRes.data;
           allUsers = [...allUsers, ...(envelope.data ?? [])];
-          totalPages = envelope.total_pages ?? 1;
-          page++;
-        } while (page <= totalPages);
+          usersTotalPages = envelope.total_pages ?? 1;
+          usersPage++;
+        } while (usersPage <= usersTotalPages);
 
         let casesList: CaseType[] = [];
 
-        // Fetch cases for each user
+        // For each user, fetch ALL their cases across all pages.
         for (const user of allUsers) {
-          const casesRes = await fetchGet(`${apiUrlCases}/${user.id}`, {
-            headers: { "X-WP-Nonce": data.nonce },
-          });
-          if (casesRes.data && casesRes.data.length > 0) {
-            casesList = [
-              ...casesList,
-              ...casesRes.data.map((c: CaseType) => ({
-                ...c,
-                clientName: user.name,
-                clientId: user.id,
-              })),
-            ];
-          }
+          let casesPage = 1;
+          let casesTotalPages = 1;
+
+          do {
+            const casesRes = await fetchGet(
+              `${apiUrlCases}/${user.id}?page=${casesPage}&per_page=6`,
+              { headers: { "X-WP-Nonce": data.nonce } }
+            );
+            // Unpack the paginated envelope.
+            const casesEnvelope = casesRes.data;
+            const pageCases: CaseType[] = casesEnvelope.data ?? [];
+            casesTotalPages = casesEnvelope.total_pages ?? 1;
+
+            if (pageCases.length > 0) {
+              casesList = [
+                ...casesList,
+                ...pageCases.map((c: CaseType) => ({
+                  ...c,
+                  clientName: user.name,
+                  clientId: user.id,
+                })),
+              ];
+            }
+            casesPage++;
+          } while (casesPage <= casesTotalPages);
         }
 
         setAllCases(casesList);
