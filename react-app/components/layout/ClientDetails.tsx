@@ -205,7 +205,11 @@ export default function ClientDetails() {
                           </span>
                         </div>
                         <p className="text-xs text-outline">
-                          Created: {dateformat(caseItem.created_at, "mmm dd, yyyy, hh:MM TT")}
+                          Created:{" "}
+                          {dateformat(
+                            caseItem.created_at,
+                            "mmm dd, yyyy, hh:MM TT"
+                          )}
                         </p>
                       </div>
 
@@ -217,7 +221,9 @@ export default function ClientDetails() {
                           data-tooltip-id="service-tracker"
                           data-tooltip-content="View Progress"
                         >
-                          <span className="material-symbols-outlined text-sm">visibility</span>
+                          <span className="material-symbols-outlined text-sm">
+                            visibility
+                          </span>
                         </button>
                       </div>
                     </div>
@@ -234,25 +240,29 @@ export default function ClientDetails() {
                     disabled={page <= 1}
                     className="flex items-center gap-1 px-3 py-2 rounded-lg text-xs font-bold text-on-surface-variant hover:bg-surface-container-high disabled:opacity-30 disabled:cursor-not-allowed transition-all"
                   >
-                    <span className="material-symbols-outlined text-sm">chevron_left</span>
+                    <span className="material-symbols-outlined text-sm">
+                      chevron_left
+                    </span>
                     Prev
                   </button>
 
                   {/* Page indicators */}
                   <div className="flex items-center gap-1">
-                    {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
-                      <button
-                        key={p}
-                        onClick={() => setPage(inViewState.userId, p)}
-                        className={`w-7 h-7 rounded-lg text-xs font-bold transition-all ${
-                          p === page
-                            ? "bg-primary text-white shadow-sm"
-                            : "text-on-surface-variant hover:bg-surface-container-high"
-                        }`}
-                      >
-                        {p}
-                      </button>
-                    ))}
+                    {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                      (p) => (
+                        <button
+                          key={p}
+                          onClick={() => setPage(inViewState.userId, p)}
+                          className={`w-7 h-7 rounded-lg text-xs font-bold transition-all ${
+                            p === page
+                              ? "bg-primary text-white shadow-sm"
+                              : "text-on-surface-variant hover:bg-surface-container-high"
+                          }`}
+                        >
+                          {p}
+                        </button>
+                      )
+                    )}
                   </div>
 
                   {/* Next */}
@@ -262,7 +272,9 @@ export default function ClientDetails() {
                     className="flex items-center gap-1 px-3 py-2 rounded-lg text-xs font-bold text-on-surface-variant hover:bg-surface-container-high disabled:opacity-30 disabled:cursor-not-allowed transition-all"
                   >
                     Next
-                    <span className="material-symbols-outlined text-sm">chevron_right</span>
+                    <span className="material-symbols-outlined text-sm">
+                      chevron_right
+                    </span>
                   </button>
                 </div>
               )}

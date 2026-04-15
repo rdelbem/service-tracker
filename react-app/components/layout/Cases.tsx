@@ -12,37 +12,59 @@ declare const data: Record<string, any>;
 export default function Cases() {
   const inViewState = useInViewStore((state) => state);
   const { navigate } = useInViewStore();
-  const { loadingCases } = useCasesStore();
+  // We only use useCasesStore here to avoid hook-order issues; we manage
+  // our own local state for the global all-cases view.
+  useCasesStore();
+
   const [allCases, setAllCases] = useState<CaseType[]>([]);
   const [filteredCases, setFilteredCases] = useState<CaseType[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  // Load all cases on mount
+  // Load all cases whenever the view becomes "cases"
   useEffect(() => {
     if (inViewState.view !== "cases") return;
 
     const loadAllCases = async () => {
-      const apiUrlCases = `${data.root_url}/wp-json/${data.api_url}/cases`;
+      setLoading(true);
+      setError(null);
+
       try {
-        // Fetch all users across all pages.
+        const apiUrlCases = `${data.root_url}/wp-json/${data.api_url}/cases`;
+        const apiUrlUsers = `${data.root_url}/wp-json/service-tracker-stolmc/v1/users`;
+
+        // Step 1: Fetch all users across all pages.
         let allUsers: any[] = [];
         let usersPage = 1;
         let usersTotalPages = 1;
 
         do {
           const usersRes = await fetchGet(
-            `${data.root_url}/wp-json/service-tracker-stolmc/v1/users?page=${usersPage}&per_page=6`,
+            `${apiUrlUsers}?page=${usersPage}&per_page=6`,
             { headers: { "X-WP-Nonce": data.nonce } }
           );
-          const envelope = usersRes.data;
-          allUsers = [...allUsers, ...(envelope.data ?? [])];
-          usersTotalPages = envelope.total_pages ?? 1;
+
+          // The users API returns { data: { data: [...], total, page, per_page, total_pages } }
+          // because the fetch utility wraps the response in { data: <body> }.
+          const body = usersRes.data;
+          const usersOnPage: any[] = Array.isArray(body?.data) ? body.data : [];
+          usersTotalPages = typeof body?.total_pages === "number" ? body.total_pages : 1;
+
+          allUsers = [...allUsers, ...usersOnPage];
           usersPage++;
         } while (usersPage <= usersTotalPages);
 
+        if (allUsers.length === 0) {
+          setAllCases([]);
+          setFilteredCases([]);
+          setLoading(false);
+          return;
+        }
+
+        // Step 2: For each user, fetch ALL their cases across all pages.
         let casesList: CaseType[] = [];
 
-        // For each user, fetch ALL their cases across all pages.
         for (const user of allUsers) {
           let casesPage = 1;
           let casesTotalPages = 1;
@@ -52,10 +74,11 @@ export default function Cases() {
               `${apiUrlCases}/${user.id}?page=${casesPage}&per_page=6`,
               { headers: { "X-WP-Nonce": data.nonce } }
             );
-            // Unpack the paginated envelope.
-            const casesEnvelope = casesRes.data;
-            const pageCases: CaseType[] = casesEnvelope.data ?? [];
-            casesTotalPages = casesEnvelope.total_pages ?? 1;
+
+            // The cases API returns { data: { data: [...], total, page, per_page, total_pages } }
+            const casesBody = casesRes.data;
+            const pageCases: CaseType[] = Array.isArray(casesBody?.data) ? casesBody.data : [];
+            casesTotalPages = typeof casesBody?.total_pages === "number" ? casesBody.total_pages : 1;
 
             if (pageCases.length > 0) {
               casesList = [
@@ -67,14 +90,18 @@ export default function Cases() {
                 })),
               ];
             }
+
             casesPage++;
           } while (casesPage <= casesTotalPages);
         }
 
         setAllCases(casesList);
         setFilteredCases(casesList);
-      } catch (error) {
-        console.error("Error loading cases:", error);
+      } catch (err) {
+        console.error("Error loading cases:", err);
+        setError("Failed to load cases. Please try again.");
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -86,10 +113,11 @@ export default function Cases() {
     if (searchQuery.trim() === "") {
       setFilteredCases(allCases);
     } else {
+      const q = searchQuery.toLowerCase();
       const filtered = allCases.filter(
         (c) =>
-          c.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          c.clientName?.toLowerCase().includes(searchQuery.toLowerCase())
+          c.title.toLowerCase().includes(q) ||
+          (c.clientName ?? "").toLowerCase().includes(q)
       );
       setFilteredCases(filtered);
     }
@@ -99,39 +127,65 @@ export default function Cases() {
     navigate("casesAddNew", "", "", "");
   };
 
-  const handleToggleCase = useCallback(async (caseId: string | number) => {
-    const theCase = allCases.find((c) => String(c.id) === String(caseId));
-    const targetStatus = theCase?.status === "open" ? "close" : "open";
+  const handleToggleCase = useCallback(
+    async (caseId: string | number) => {
+      const theCase = allCases.find((c) => String(c.id) === String(caseId));
+      const targetStatus = theCase?.status === "open" ? "close" : "open";
 
-    try {
-      await post(`${data.root_url}/wp-json/${data.api_url}/cases-status/${caseId}`, null, {
-        headers: { "X-WP-Nonce": data.nonce },
-      });
+      try {
+        await post(
+          `${data.root_url}/wp-json/${data.api_url}/cases-status/${caseId}`,
+          null,
+          { headers: { "X-WP-Nonce": data.nonce } }
+        );
 
-      setAllCases((prev) =>
-        prev.map((c) =>
-          String(c.id) === String(caseId) ? { ...c, status: targetStatus } : c
-        )
-      );
-      setFilteredCases((prev) =>
-        prev.map((c) =>
-          String(c.id) === String(caseId) ? { ...c, status: targetStatus } : c
-        )
-      );
-      toast.success(`Case is now ${targetStatus === "open" ? "open" : "closed"}`);
-    } catch (error) {
-      console.error("Error toggling case:", error);
-      toast.error("Failed to update case status");
-    }
-  }, [allCases]);
+        setAllCases((prev) =>
+          prev.map((c) =>
+            String(c.id) === String(caseId) ? { ...c, status: targetStatus } : c
+          )
+        );
+        setFilteredCases((prev) =>
+          prev.map((c) =>
+            String(c.id) === String(caseId) ? { ...c, status: targetStatus } : c
+          )
+        );
+        toast.success(
+          `Case is now ${targetStatus === "open" ? "open" : "closed"}`
+        );
+      } catch (err) {
+        console.error("Error toggling case:", err);
+        toast.error("Failed to update case status");
+      }
+    },
+    [allCases]
+  );
 
-  // Keep hook order stable across route transitions.
+  // Keep hook order stable — early return AFTER all hooks.
   if (inViewState.view !== "cases") {
     return null;
   }
 
-  if (loadingCases) {
+  if (loading) {
     return <Spinner />;
+  }
+
+  if (error) {
+    return (
+      <section className="flex-1 h-full overflow-y-auto">
+        <div className="p-8 text-center py-16">
+          <span className="material-symbols-outlined text-6xl text-error mb-4">
+            error
+          </span>
+          <p className="text-on-surface-variant text-sm font-medium">{error}</p>
+          <button
+            onClick={() => setError(null)}
+            className="mt-4 px-6 py-3 bg-primary text-white text-sm font-bold rounded-xl"
+          >
+            Retry
+          </button>
+        </div>
+      </section>
+    );
   }
 
   return (
@@ -144,7 +198,9 @@ export default function Cases() {
               Cases
             </h1>
             <p className="text-on-surface-variant text-sm mt-1">
-              Search and manage all service cases
+              {allCases.length > 0
+                ? `${allCases.length} case${allCases.length !== 1 ? "s" : ""} across all clients`
+                : "Search and manage all service cases"}
             </p>
           </div>
         </div>
@@ -177,7 +233,9 @@ export default function Cases() {
                 onClick={handleAddCase}
                 className="mt-4 flex items-center gap-2 px-6 py-3 bg-gradient-to-br from-primary to-primary-container text-white text-sm font-bold rounded-xl shadow-lg active:scale-95 transition-all mx-auto"
               >
-                <span className="material-symbols-outlined text-sm">add_circle</span>
+                <span className="material-symbols-outlined text-sm">
+                  add_circle
+                </span>
                 Create your first case
               </button>
             )}
