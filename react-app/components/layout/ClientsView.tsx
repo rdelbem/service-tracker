@@ -1,9 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { toast } from "react-toastify";
 import { useInViewStore } from "../../stores/inViewStore";
 import { useClientsStore } from "../../stores/clientsStore";
 import Spinner from "./Spinner";
-import Search from "./Search";
 import type { User } from "../../types";
 
 export default function ClientsView() {
@@ -18,13 +17,31 @@ export default function ClientsView() {
     totalPages,
     total,
     setPage,
+    searchQuery,
   } = useClientsStore();
+
   const [newClientName, setNewClientName] = useState("");
   const [newClientEmail, setNewClientEmail] = useState("");
   const [newClientPhone, setNewClientPhone] = useState("");
   const [newClientCellphone, setNewClientCellphone] = useState("");
   const [showAddForm, setShowAddForm] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
+  const [localQuery, setLocalQuery] = useState("");
+
+  // Debounce search — fire the API call 350 ms after the user stops typing.
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+
+    debounceRef.current = setTimeout(() => {
+      searchUsers(localQuery);
+    }, 350);
+
+    return () => {
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+    };
+  }, [localQuery]);
 
   // Only show this view when view === 'clients'
   if (inViewState.view !== "clients") {
@@ -61,6 +78,7 @@ export default function ClientsView() {
       setNewClientPhone("");
       setNewClientCellphone("");
       setShowAddForm(false);
+      setLocalQuery("");
     } else {
       toast.error(result.message);
     }
@@ -68,7 +86,7 @@ export default function ClientsView() {
 
   return (
     <section className="flex-shrink-0 w-[420px] bg-surface-container-low flex flex-col border-r border-outline-variant/10 h-full">
-      {/* Header with Search */}
+      {/* Header */}
       <div className="p-8 pb-4">
         <div className="flex items-center justify-between mb-6">
           <div>
@@ -77,7 +95,9 @@ export default function ClientsView() {
             </h2>
             {total > 0 && (
               <p className="text-xs text-on-surface-variant mt-0.5">
-                {total} client{total !== 1 ? "s" : ""} total
+                {searchQuery.trim() !== ""
+                  ? `${total} result${total !== 1 ? "s" : ""} for "${searchQuery}"`
+                  : `${total} client${total !== 1 ? "s" : ""} total`}
               </p>
             )}
           </div>
@@ -165,7 +185,28 @@ export default function ClientsView() {
           </form>
         )}
 
-        <Search onSearch={searchUsers} />
+        {/* Search input — inline, replaces the Search component so we can
+            control the value and debounce it ourselves. */}
+        <div className="relative">
+          <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline text-lg pointer-events-none">
+            search
+          </span>
+          <input
+            type="text"
+            value={localQuery}
+            onChange={(e) => setLocalQuery(e.target.value)}
+            placeholder="Search clients..."
+            className="w-full bg-surface-container-lowest border border-outline-variant/20 rounded-xl py-2.5 pl-10 pr-10 text-sm focus:ring-2 focus:ring-primary/10 transition-all placeholder:text-outline-variant"
+          />
+          {localQuery && (
+            <button
+              onClick={() => setLocalQuery("")}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-outline hover:text-on-surface transition-colors"
+            >
+              <span className="material-symbols-outlined text-lg">close</span>
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Client List */}
@@ -174,58 +215,63 @@ export default function ClientsView() {
         {!loadingUsers && users.length === 0 && (
           <div className="text-center py-12">
             <span className="material-symbols-outlined text-6xl text-outline-variant mb-4">
-              group
+              {localQuery ? "search_off" : "group"}
             </span>
             <p className="text-on-surface-variant text-sm font-medium">
-              No clients found
+              {localQuery
+                ? `No clients found for "${localQuery}"`
+                : "No clients found"}
             </p>
-            <p className="text-on-surface-variant/60 text-xs mt-1">
-              Add your first client to get started
-            </p>
+            {!localQuery && (
+              <p className="text-on-surface-variant/60 text-xs mt-1">
+                Add your first client to get started
+              </p>
+            )}
           </div>
         )}
-        {users.map((client: User) => {
-          const isSelected =
-            String(inViewState.userId) === String(client.id);
-          return (
-            <div
-              key={client.id}
-              onClick={() => handleSelectClient(client)}
-              className={`group cursor-pointer p-4 rounded-xl transition-all ${
-                isSelected
-                  ? "bg-surface-container-lowest shadow-[0px_8px_24px_rgba(11,28,48,0.08)] border-l-4 border-primary"
-                  : "hover:bg-surface-container-high/50"
-              }`}
-            >
-              <div className="flex items-center gap-3">
-                {/* Avatar */}
-                <div
-                  className={`w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 ${
-                    isSelected
-                      ? "bg-primary text-white"
-                      : "bg-surface-container-highest text-on-surface-variant"
-                  }`}
-                >
-                  <span className="text-sm font-bold">
-                    {client.name ? client.name.charAt(0).toUpperCase() : "C"}
-                  </span>
-                </div>
+        {!loadingUsers &&
+          users.map((client: User) => {
+            const isSelected =
+              String(inViewState.userId) === String(client.id);
+            return (
+              <div
+                key={client.id}
+                onClick={() => handleSelectClient(client)}
+                className={`group cursor-pointer p-4 rounded-xl transition-all ${
+                  isSelected
+                    ? "bg-surface-container-lowest shadow-[0px_8px_24px_rgba(11,28,48,0.08)] border-l-4 border-primary"
+                    : "hover:bg-surface-container-high/50"
+                }`}
+              >
+                <div className="flex items-center gap-3">
+                  {/* Avatar */}
+                  <div
+                    className={`w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 ${
+                      isSelected
+                        ? "bg-primary text-white"
+                        : "bg-surface-container-highest text-on-surface-variant"
+                    }`}
+                  >
+                    <span className="text-sm font-bold">
+                      {client.name ? client.name.charAt(0).toUpperCase() : "C"}
+                    </span>
+                  </div>
 
-                {/* Client Info */}
-                <div className="flex-1 min-w-0">
-                  <h3 className="text-sm font-bold text-on-surface truncate">
-                    {client.name}
-                  </h3>
-                  {client.email && (
-                    <p className="text-[11px] text-on-surface-variant/70 truncate">
-                      {client.email}
-                    </p>
-                  )}
+                  {/* Client Info */}
+                  <div className="flex-1 min-w-0">
+                    <h3 className="text-sm font-bold text-on-surface truncate">
+                      {client.name}
+                    </h3>
+                    {client.email && (
+                      <p className="text-[11px] text-on-surface-variant/70 truncate">
+                        {client.email}
+                      </p>
+                    )}
+                  </div>
                 </div>
               </div>
-            </div>
-          );
-        })}
+            );
+          })}
       </div>
 
       {/* Pagination */}
@@ -246,21 +292,19 @@ export default function ClientsView() {
 
             {/* Page indicators */}
             <div className="flex items-center gap-1">
-              {Array.from({ length: totalPages }, (_, i) => i + 1).map(
-                (p) => (
-                  <button
-                    key={p}
-                    onClick={() => setPage(p)}
-                    className={`w-7 h-7 rounded-lg text-xs font-bold transition-all ${
-                      p === page
-                        ? "bg-primary text-white shadow-sm"
-                        : "text-on-surface-variant hover:bg-surface-container-high"
-                    }`}
-                  >
-                    {p}
-                  </button>
-                )
-              )}
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
+                <button
+                  key={p}
+                  onClick={() => setPage(p)}
+                  className={`w-7 h-7 rounded-lg text-xs font-bold transition-all ${
+                    p === page
+                      ? "bg-primary text-white shadow-sm"
+                      : "text-on-surface-variant hover:bg-surface-container-high"
+                  }`}
+                >
+                  {p}
+                </button>
+              ))}
             </div>
 
             {/* Next */}

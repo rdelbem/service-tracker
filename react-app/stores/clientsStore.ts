@@ -11,11 +11,12 @@ export interface ClientsState {
   perPage: number;
   total: number;
   totalPages: number;
+  searchQuery: string;
 }
 
 export interface ClientsActions {
   getUsers: (page?: number) => Promise<void>;
-  searchUsers: (query: string) => void;
+  searchUsers: (query: string) => Promise<void>;
   setPage: (page: number) => Promise<void>;
   createUser: (userData: { name: string; email: string; phone?: string; cellphone?: string }) => Promise<{ success: boolean; message: string; user?: User }>;
 }
@@ -25,6 +26,7 @@ export interface ClientsStore extends ClientsState, ClientsActions {}
 export const useClientsStore = create<ClientsStore>((set, get) => {
   const api_url_users = data.users_api_url;
   const create_user_api_url = data.create_user_api_url;
+  const search_url = `${data.root_url}/wp-json/service-tracker-stolmc/v1/users/search`;
 
   return {
     users: [],
@@ -33,20 +35,20 @@ export const useClientsStore = create<ClientsStore>((set, get) => {
     perPage: 6,
     total: 0,
     totalPages: 1,
+    searchQuery: "",
 
     getUsers: async (page?: number) => {
       const currentPage = page ?? get().page;
       const perPage = get().perPage;
 
       try {
-        set({ loadingUsers: true });
+        set({ loadingUsers: true, searchQuery: "" });
 
         const url = `${api_url_users}?page=${currentPage}&per_page=${perPage}`;
         const res = await fetchGet(url, {
           headers: { "X-WP-Nonce": data.nonce },
         });
 
-        // API returns a paginated envelope: { data, total, page, per_page, total_pages }
         const envelope = res.data;
 
         set({
@@ -63,36 +65,72 @@ export const useClientsStore = create<ClientsStore>((set, get) => {
       }
     },
 
-    setPage: async (page: number) => {
-      const { totalPages } = get();
-      const clamped = Math.max(1, Math.min(page, totalPages));
-      set({ page: clamped });
-      await get().getUsers(clamped);
-    },
-
-    searchUsers: (query: string) => {
-      const specialChar = /[-!$%^&*()_+|~=`{}\[\]:";'<>?,.\/]/;
-      const specialCharRegEx = new RegExp(specialChar, "g");
-      if (specialCharRegEx.test(query)) return;
-
-      if (query === "") {
-        get().getUsers(1);
+    searchUsers: async (query: string) => {
+      // Clear search — restore the normal paginated list.
+      if (query.trim() === "") {
+        await get().getUsers(1);
         return;
       }
 
-      const usersInState = get().users;
-      const regex = new RegExp(query, "gi");
-      const foundUsers: User[] = [];
+      const perPage = get().perPage;
 
-      usersInState.forEach((user: User) => {
-        if (regex.test(user.name)) {
-          foundUsers.push(user);
-        }
-      });
+      try {
+        set({ loadingUsers: true, searchQuery: query, page: 1 });
 
-      if (foundUsers.length > 0) {
-        set({ users: foundUsers, loadingUsers: false });
+        const url = `${search_url}?q=${encodeURIComponent(query.trim())}&page=1&per_page=${perPage}`;
+        const res = await fetchGet(url, {
+          headers: { "X-WP-Nonce": data.nonce },
+        });
+
+        const envelope = res.data;
+
+        set({
+          users: envelope.data ?? [],
+          total: envelope.total ?? 0,
+          page: envelope.page ?? 1,
+          perPage: envelope.per_page ?? perPage,
+          totalPages: envelope.total_pages ?? 1,
+          loadingUsers: false,
+        });
+      } catch (error) {
+        console.error("Error searching users:", error);
+        set({ loadingUsers: false });
       }
+    },
+
+    setPage: async (page: number) => {
+      const { totalPages, searchQuery, perPage } = get();
+      const clamped = Math.max(1, Math.min(page, totalPages));
+      set({ page: clamped });
+
+      // If we are in search mode, paginate through search results.
+      if (searchQuery.trim() !== "") {
+        try {
+          set({ loadingUsers: true });
+
+          const url = `${search_url}?q=${encodeURIComponent(searchQuery.trim())}&page=${clamped}&per_page=${perPage}`;
+          const res = await fetchGet(url, {
+            headers: { "X-WP-Nonce": data.nonce },
+          });
+
+          const envelope = res.data;
+
+          set({
+            users: envelope.data ?? [],
+            total: envelope.total ?? 0,
+            page: envelope.page ?? clamped,
+            perPage: envelope.per_page ?? perPage,
+            totalPages: envelope.total_pages ?? 1,
+            loadingUsers: false,
+          });
+        } catch (error) {
+          console.error("Error paginating search results:", error);
+          set({ loadingUsers: false });
+        }
+        return;
+      }
+
+      await get().getUsers(clamped);
     },
 
     createUser: async (userData) => {
@@ -103,7 +141,8 @@ export const useClientsStore = create<ClientsStore>((set, get) => {
 
         if (res.data.success) {
           // Refresh current page so the new user appears.
-          await get().getUsers(get().page);
+          // Also bust the search index by going back to page 1.
+          await get().getUsers(1);
         }
 
         return res.data;

@@ -23,12 +23,246 @@ class STOLMC_Service_Tracker_Api_Users extends STOLMC_Service_Tracker_Api {
 	private const PER_PAGE_DEFAULT = 6;
 
 	/**
+	 * Transient key for the user search inverted index.
+	 *
+	 * @since 1.4.0
+	 */
+	private const SEARCH_INDEX_TRANSIENT = 'stolmc_st_user_search_index';
+
+	/**
+	 * How long (in seconds) the search index transient lives.
+	 * Default: 1 hour.
+	 *
+	 * @since 1.4.0
+	 */
+	private const SEARCH_INDEX_TTL = HOUR_IN_SECONDS;
+
+	/**
 	 * Initialize the API and register routes.
 	 *
 	 * @return void
 	 */
 	public function run(): void {
 		$this->custom_api();
+		$this->register_index_invalidation_hooks();
+	}
+
+	/**
+	 * Register hooks that bust the search index transient when user data changes.
+	 *
+	 * @since 1.4.0
+	 *
+	 * @return void
+	 */
+	private function register_index_invalidation_hooks(): void {
+		// Bust on any user profile save or registration.
+		add_action( 'user_register', [ $this, 'bust_search_index' ] );
+		add_action( 'profile_update', [ $this, 'bust_search_index' ] );
+		add_action( 'deleted_user', [ $this, 'bust_search_index' ] );
+
+		// Also bust when our own create endpoint fires.
+		add_action( 'stolmc_service_tracker_user_created', [ $this, 'bust_search_index' ] );
+	}
+
+	/**
+	 * Delete the cached search index transient.
+	 *
+	 * @since 1.4.0
+	 *
+	 * @return void
+	 */
+	public function bust_search_index(): void {
+		delete_transient( self::SEARCH_INDEX_TRANSIENT );
+	}
+
+	/**
+	 * Build (or retrieve from cache) the inverted search index.
+	 *
+	 * Structure:
+	 * [
+	 *   'token' => [ user_id, user_id, ... ],
+	 *   ...
+	 * ]
+	 *
+	 * Tokens are lower-cased substrings derived from display_name and user_email.
+	 *
+	 * @since 1.4.0
+	 *
+	 * @return array<string, int[]> The inverted index.
+	 */
+	private function get_search_index(): array {
+		$cached = get_transient( self::SEARCH_INDEX_TRANSIENT );
+
+		if ( is_array( $cached ) ) {
+			return $cached;
+		}
+
+		// Fetch all customer users — no pagination, we need the full set for indexing.
+		$users = get_users(
+			[
+				'role'    => 'customer',
+				'orderby' => 'display_name',
+				'order'   => 'ASC',
+				'fields'  => [ 'ID', 'display_name', 'user_email' ],
+			]
+		);
+
+		$index = [];
+
+		foreach ( $users as $user ) {
+			$id     = (int) $user->ID;
+			$tokens = $this->tokenize( $user->display_name . ' ' . $user->user_email );
+
+			foreach ( $tokens as $token ) {
+				if ( ! isset( $index[ $token ] ) ) {
+					$index[ $token ] = [];
+				}
+				if ( ! in_array( $id, $index[ $token ], true ) ) {
+					$index[ $token ][] = $id;
+				}
+			}
+		}
+
+		/**
+		 * Filters the built search index before it is cached.
+		 *
+		 * @since 1.4.0
+		 *
+		 * @param array $index The inverted index array.
+		 * @param array $users The raw WP_User objects used to build it.
+		 */
+		$index = apply_filters( 'stolmc_service_tracker_user_search_index', $index, $users );
+
+		set_transient( self::SEARCH_INDEX_TRANSIENT, $index, self::SEARCH_INDEX_TTL );
+
+		return $index;
+	}
+
+	/**
+	 * Tokenize a string into lower-cased substrings for indexing.
+	 *
+	 * Splits on whitespace and common separators, then also adds the full
+	 * word so prefix searches work (e.g. "jo" matches "john").
+	 *
+	 * @since 1.4.0
+	 *
+	 * @param string $text The text to tokenize.
+	 * @return string[]    Array of unique tokens.
+	 */
+	private function tokenize( string $text ): array {
+		$text   = mb_strtolower( $text );
+		$parts  = preg_split( '/[\s@._\-]+/', $text, -1, PREG_SPLIT_NO_EMPTY );
+		$tokens = [];
+
+		foreach ( $parts as $part ) {
+			// Add every prefix of the word so partial matches work.
+			$len = mb_strlen( $part );
+			for ( $i = 1; $i <= $len; $i++ ) {
+				$tokens[] = mb_substr( $part, 0, $i );
+			}
+		}
+
+		return array_unique( $tokens );
+	}
+
+	/**
+	 * Search customer users using the inverted index transient.
+	 *
+	 * @since 1.4.0
+	 *
+	 * @param WP_REST_Request $data The REST request object.
+	 *
+	 * @return WP_REST_Response Paginated response matching the standard envelope.
+	 */
+	public function search_users( WP_REST_Request $data ): WP_REST_Response {
+		$query    = mb_strtolower( trim( (string) $data->get_param( 'q' ) ) );
+		$page     = max( 1, (int) ( $data->get_param( 'page' ) ?: 1 ) );
+		$per_page = max( 1, (int) ( $data->get_param( 'per_page' ) ?: self::PER_PAGE_DEFAULT ) );
+
+		// Empty query — fall back to the normal paginated list.
+		if ( $query === '' ) {
+			return $this->get_users( $data );
+		}
+
+		$index        = $this->get_search_index();
+		$query_tokens = $this->tokenize( $query );
+
+		// Score each user by how many query tokens match index entries.
+		$scores = [];
+
+		foreach ( $query_tokens as $token ) {
+			if ( isset( $index[ $token ] ) ) {
+				foreach ( $index[ $token ] as $user_id ) {
+					$scores[ $user_id ] = ( $scores[ $user_id ] ?? 0 ) + 1;
+				}
+			}
+		}
+
+		if ( empty( $scores ) ) {
+			return $this->rest_response(
+				[
+					'data'        => [],
+					'total'       => 0,
+					'page'        => 1,
+					'per_page'    => $per_page,
+					'total_pages' => 1,
+				],
+				200
+			);
+		}
+
+		// Sort by score descending so best matches come first.
+		arsort( $scores );
+		$matched_ids = array_keys( $scores );
+
+		$total       = count( $matched_ids );
+		$total_pages = max( 1, (int) ceil( $total / $per_page ) );
+		$page        = min( $page, $total_pages );
+		$paged_ids   = array_slice( $matched_ids, ( $page - 1 ) * $per_page, $per_page );
+
+		// Fetch full user objects for the paged IDs.
+		$users = get_users(
+			[
+				'include' => $paged_ids,
+				'orderby' => 'include', // Preserve score order.
+			]
+		);
+
+		$user_data = [];
+
+		foreach ( $users as $user ) {
+			$user_data[] = [
+				'id'         => $user->ID,
+				'name'       => $user->display_name,
+				'email'      => $user->user_email,
+				'role'       => 'customer',
+				'phone'      => get_user_meta( $user->ID, 'phone', true ),
+				'cellphone'  => get_user_meta( $user->ID, 'cellphone', true ),
+				'created_at' => $user->user_registered,
+			];
+		}
+
+		/**
+		 * Filters the search results before they are returned.
+		 *
+		 * @since 1.4.0
+		 *
+		 * @param array $user_data   The matched user data.
+		 * @param array $scores      The score map (user_id => score).
+		 * @param string $query      The original search query.
+		 */
+		$user_data = apply_filters( 'stolmc_service_tracker_user_search_response', $user_data, $scores, $query );
+
+		return $this->rest_response(
+			[
+				'data'        => $user_data,
+				'total'       => $total,
+				'page'        => $page,
+				'per_page'    => $per_page,
+				'total_pages' => $total_pages,
+			],
+			200
+		);
 	}
 
 	/**
@@ -70,6 +304,31 @@ class STOLMC_Service_Tracker_Api_Users extends STOLMC_Service_Tracker_Api {
 			]
 		);
 
+		// GET /service-tracker-stolmc/v1/users/search - Search customer users.
+		register_rest_route(
+			'service-tracker-stolmc/v1',
+			'/users/search',
+			[
+				'methods'             => WP_REST_Server::READABLE,
+				'callback'            => [ $this, 'search_users' ],
+				'permission_callback' => [ $this, 'permission_check' ],
+				'args'                => [
+					'q'        => [
+						'default'           => '',
+						'sanitize_callback' => 'sanitize_text_field',
+					],
+					'page'     => [
+						'default'           => 1,
+						'sanitize_callback' => 'absint',
+					],
+					'per_page' => [
+						'default'           => self::PER_PAGE_DEFAULT,
+						'sanitize_callback' => 'absint',
+					],
+				],
+			]
+		);
+
 		// GET /service-tracker-stolmc/v1/users/staff - Get all staff/admin users.
 		register_rest_route(
 			'service-tracker-stolmc/v1',
@@ -93,12 +352,8 @@ class STOLMC_Service_Tracker_Api_Users extends STOLMC_Service_Tracker_Api {
 	 * @return WP_REST_Response Response with paginated user data.
 	 */
 	public function get_users( WP_REST_Request $data ): WP_REST_Response {
-		$page     = max( 1, (int) $data->get_param( 'page' ) );
-		$per_page = max( 1, (int) $data->get_param( 'per_page' ) );
-
-		if ( $per_page === 0 ) {
-			$per_page = self::PER_PAGE_DEFAULT;
-		}
+		$page     = max( 1, (int) ( $data->get_param( 'page' ) ?: 1 ) );
+		$per_page = max( 1, (int) ( $data->get_param( 'per_page' ) ?: self::PER_PAGE_DEFAULT ) );
 
 		// Count query — fetch only IDs to get the total efficiently.
 		$count_args = [
@@ -119,7 +374,7 @@ class STOLMC_Service_Tracker_Api_Users extends STOLMC_Service_Tracker_Api {
 
 		$all_ids     = get_users( $count_args );
 		$total       = count( $all_ids );
-		$total_pages = (int) ceil( $total / $per_page );
+		$total_pages = $total > 0 ? (int) ceil( $total / $per_page ) : 1;
 
 		// Clamp page to valid range.
 		$page = min( $page, max( 1, $total_pages ) );
