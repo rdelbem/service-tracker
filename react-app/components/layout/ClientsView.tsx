@@ -9,7 +9,16 @@ import type { User } from "../../types";
 export default function ClientsView() {
   const inViewState = useInViewStore((state) => state);
   const { navigate } = useInViewStore();
-  const { users, loadingUsers, searchUsers, createUser } = useClientsStore();
+  const {
+    users,
+    loadingUsers,
+    searchUsers,
+    createUser,
+    page,
+    totalPages,
+    total,
+    setPage,
+  } = useClientsStore();
   const [newClientName, setNewClientName] = useState("");
   const [newClientEmail, setNewClientEmail] = useState("");
   const [newClientPhone, setNewClientPhone] = useState("");
@@ -28,7 +37,7 @@ export default function ClientsView() {
 
   const handleAddClient = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!newClientName.trim() || !newClientEmail.trim()) {
       toast.error("Name and email are required");
       return;
@@ -62,9 +71,16 @@ export default function ClientsView() {
       {/* Header with Search */}
       <div className="p-8 pb-4">
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-black text-on-surface tracking-tighter">
-            Clients
-          </h2>
+          <div>
+            <h2 className="text-2xl font-black text-on-surface tracking-tighter">
+              Clients
+            </h2>
+            {total > 0 && (
+              <p className="text-xs text-on-surface-variant mt-0.5">
+                {total} client{total !== 1 ? "s" : ""} total
+              </p>
+            )}
+          </div>
           <button
             onClick={() => setShowAddForm(!showAddForm)}
             className="flex items-center gap-2 px-4 py-2 bg-gradient-to-br from-primary to-primary-container text-white text-xs font-bold rounded-lg shadow-lg active:scale-95 transition-all"
@@ -78,7 +94,10 @@ export default function ClientsView() {
 
         {/* Add Client Form */}
         {showAddForm && (
-          <form onSubmit={handleAddClient} className="mb-6 p-4 bg-surface-container-lowest rounded-xl shadow-[0px_4px_16px_rgba(11,28,48,0.06)] space-y-3">
+          <form
+            onSubmit={handleAddClient}
+            className="mb-6 p-4 bg-surface-container-lowest rounded-xl shadow-[0px_4px_16px_rgba(11,28,48,0.06)] space-y-3"
+          >
             <div>
               <label className="block text-xs font-bold text-on-surface-variant mb-1 uppercase tracking-wider">
                 Name *
@@ -150,7 +169,7 @@ export default function ClientsView() {
       </div>
 
       {/* Client List */}
-      <div className="flex-1 overflow-y-auto px-4 space-y-2 pb-8">
+      <div className="flex-1 overflow-y-auto px-4 space-y-2 pb-4">
         {loadingUsers && <Spinner />}
         {!loadingUsers && users.length === 0 && (
           <div className="text-center py-12">
@@ -166,7 +185,8 @@ export default function ClientsView() {
           </div>
         )}
         {users.map((client: User) => {
-          const isSelected = String(inViewState.userId) === String(client.id);
+          const isSelected =
+            String(inViewState.userId) === String(client.id);
           return (
             <div
               key={client.id}
@@ -207,6 +227,56 @@ export default function ClientsView() {
           );
         })}
       </div>
+
+      {/* Pagination */}
+      {!loadingUsers && totalPages > 1 && (
+        <div className="flex-shrink-0 px-4 py-4 border-t border-outline-variant/10">
+          <div className="flex items-center justify-between gap-2">
+            {/* Previous */}
+            <button
+              onClick={() => setPage(page - 1)}
+              disabled={page <= 1}
+              className="flex items-center gap-1 px-3 py-2 rounded-lg text-xs font-bold text-on-surface-variant hover:bg-surface-container-high disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+            >
+              <span className="material-symbols-outlined text-sm">
+                chevron_left
+              </span>
+              Prev
+            </button>
+
+            {/* Page indicators */}
+            <div className="flex items-center gap-1">
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                (p) => (
+                  <button
+                    key={p}
+                    onClick={() => setPage(p)}
+                    className={`w-7 h-7 rounded-lg text-xs font-bold transition-all ${
+                      p === page
+                        ? "bg-primary text-white shadow-sm"
+                        : "text-on-surface-variant hover:bg-surface-container-high"
+                    }`}
+                  >
+                    {p}
+                  </button>
+                )
+              )}
+            </div>
+
+            {/* Next */}
+            <button
+              onClick={() => setPage(page + 1)}
+              disabled={page >= totalPages}
+              className="flex items-center gap-1 px-3 py-2 rounded-lg text-xs font-bold text-on-surface-variant hover:bg-surface-container-high disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+            >
+              Next
+              <span className="material-symbols-outlined text-sm">
+                chevron_right
+              </span>
+            </button>
+          </div>
+        </div>
+      )}
     </section>
   );
 }
