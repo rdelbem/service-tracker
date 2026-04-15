@@ -62,23 +62,12 @@ export const useProgressStore = create<ProgressStore>((set, get) => {
           },
         });
 
+        // Fetch the full updated list from the server so attachments and all
+        // fields are sourced from the database rather than reconstructed locally.
         const getAllStatus = await get().getStatus(id_case, true, get().caseTitle);
         const statusArray = Array.isArray(getAllStatus) ? getAllStatus : [];
 
-        const { id, created_at } = statusArray[statusArray.length - 1];
-
-        const newStatus = {
-          id,
-          id_case,
-          id_user,
-          created_at,
-          text,
-          attachments: attachments || [],
-        };
-        const currentStatus = get().status;
-        const newStatusArray = [...currentStatus, newStatus];
-
-        set({ status: newStatusArray, loadingStatus: false });
+        set({ status: statusArray, loadingStatus: false });
 
         toast.success(data.toast_status_added);
       } catch (error) {
