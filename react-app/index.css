@@ -188,6 +188,29 @@ code {
   color: rgb(var(--on-surface));
 }
 
+/* Dark mode input overrides - slightly darker fields */
+.dark input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]):not([type="color"]):not([type="submit"]):not([type="button"]):not([type="reset"]),
+.dark textarea,
+.dark select {
+  background-color: rgb(var(--surface-container-low));
+  border-color: rgb(var(--outline-variant));
+  color: rgb(var(--on-surface));
+}
+
+.dark input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]):not([type="color"]):not([type="submit"]):not([type="button"]):not([type="reset"])::placeholder,
+.dark textarea::placeholder,
+.dark select::placeholder {
+  color: rgb(var(--on-surface-variant));
+}
+
+.dark input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]):not([type="color"]):not([type="submit"]):not([type="button"]):not([type="reset"]):focus,
+.dark textarea:focus,
+.dark select:focus {
+  outline: 2px solid rgb(var(--primary));
+  outline-offset: 0;
+  border-color: rgb(var(--primary));
+}
+
 /* Spinner animation */
 @keyframes spin {
   from {
