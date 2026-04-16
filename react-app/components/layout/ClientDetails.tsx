@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useInViewStore } from "../../stores/inViewStore";
 import { useClientsStore } from "../../stores/clientsStore";
 import { useCasesStore } from "../../stores/casesStore";
@@ -8,9 +8,9 @@ import type { User, Case } from "../../types";
 declare const data: Record<string, any>;
 
 export default function ClientDetails() {
-  const inViewState = useInViewStore((state) => state);
+  const inViewState  = useInViewStore((state) => state);
   const { navigate } = useInViewStore();
-  const { users } = useClientsStore();
+  const { users }    = useClientsStore();
   const {
     cases: clientCases,
     loadingCases,
@@ -18,8 +18,12 @@ export default function ClientDetails() {
     totalPages,
     total,
     getCases,
+    searchCases,
     setPage,
   } = useCasesStore();
+
+  const [localQuery, setLocalQuery] = useState("");
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Find the selected user from the clients list.
   const selectedClient = users.find(
@@ -39,8 +43,22 @@ export default function ClientDetails() {
   // Fetch cases for this client whenever the userId changes.
   useEffect(() => {
     if (!inViewState.userId) return;
+    setLocalQuery("");
     getCases(inViewState.userId, false, 1);
   }, [inViewState.userId]);
+
+  // Debounced search scoped to this client.
+  useEffect(() => {
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+
+    debounceRef.current = setTimeout(() => {
+      searchCases(localQuery, inViewState.userId);
+    }, 350);
+
+    return () => {
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+    };
+  }, [localQuery, inViewState.userId]);
 
   // Keep hook order stable across route transitions.
   if (inViewState.view !== "clients" || !inViewState.userId) {
@@ -48,13 +66,13 @@ export default function ClientDetails() {
   }
 
   const getStatusColor = (status: string) => {
-    if (status === "open") return "bg-secondary-container/40 text-on-secondary-container";
+    if (status === "open")  return "bg-secondary-container/40 text-on-secondary-container";
     if (status === "close") return "bg-surface-dim/40 text-outline";
     return "bg-outline-variant/20 text-on-surface-variant";
   };
 
   const getStatusLabel = (status: string) => {
-    if (status === "open") return "Active";
+    if (status === "open")  return "Active";
     if (status === "close") return "Closed";
     return "Unknown";
   };
@@ -86,9 +104,7 @@ export default function ClientDetails() {
           {/* Email */}
           <div className="bg-surface-container-low p-6 rounded-xl">
             <div className="flex items-center gap-3 mb-3">
-              <span className="material-symbols-outlined text-primary text-xl">
-                mail
-              </span>
+              <span className="material-symbols-outlined text-primary text-xl">mail</span>
               <label className="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">
                 Email
               </label>
@@ -101,9 +117,7 @@ export default function ClientDetails() {
           {/* Phone */}
           <div className="bg-surface-container-low p-6 rounded-xl">
             <div className="flex items-center gap-3 mb-3">
-              <span className="material-symbols-outlined text-primary text-xl">
-                phone
-              </span>
+              <span className="material-symbols-outlined text-primary text-xl">phone</span>
               <label className="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">
                 Phone
               </label>
@@ -116,9 +130,7 @@ export default function ClientDetails() {
           {/* Cellphone */}
           <div className="bg-surface-container-low p-6 rounded-xl">
             <div className="flex items-center gap-3 mb-3">
-              <span className="material-symbols-outlined text-primary text-xl">
-                smartphone
-              </span>
+              <span className="material-symbols-outlined text-primary text-xl">smartphone</span>
               <label className="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">
                 Cellphone
               </label>
@@ -131,16 +143,12 @@ export default function ClientDetails() {
           {/* Client Since */}
           <div className="bg-surface-container-low p-6 rounded-xl">
             <div className="flex items-center gap-3 mb-3">
-              <span className="material-symbols-outlined text-primary text-xl">
-                calendar_today
-              </span>
+              <span className="material-symbols-outlined text-primary text-xl">calendar_today</span>
               <label className="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">
                 Client Since
               </label>
             </div>
-            <p className="text-sm text-on-surface font-medium">
-              {createdDate}
-            </p>
+            <p className="text-sm text-on-surface font-medium">{createdDate}</p>
           </div>
         </div>
 
@@ -155,14 +163,34 @@ export default function ClientDetails() {
 
         {/* Client Cases Section */}
         <div className="mt-12">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-black text-on-surface tracking-tight">
-              Cases
-            </h2>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-2xl font-black text-on-surface tracking-tight">Cases</h2>
             {total > 0 && (
               <p className="text-xs text-on-surface-variant">
                 {total} case{total !== 1 ? "s" : ""} total
               </p>
+            )}
+          </div>
+
+          {/* Cases Search */}
+          <div className="relative mb-6">
+            <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline text-lg pointer-events-none">
+              search
+            </span>
+            <input
+              type="text"
+              value={localQuery}
+              onChange={(e) => setLocalQuery(e.target.value)}
+              placeholder="Search cases..."
+              className="w-full bg-surface-container-lowest border border-outline-variant/20 rounded-xl py-2.5 pl-10 pr-10 text-sm focus:ring-2 focus:ring-primary/10 transition-all placeholder:text-outline-variant"
+            />
+            {localQuery && (
+              <button
+                onClick={() => setLocalQuery("")}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-outline hover:text-on-surface transition-colors"
+              >
+                <span className="material-symbols-outlined text-lg">close</span>
+              </button>
             )}
           </div>
 
@@ -175,10 +203,12 @@ export default function ClientDetails() {
           ) : clientCases.length === 0 ? (
             <div className="text-center py-12 bg-surface-container-low rounded-xl">
               <span className="material-symbols-outlined text-5xl text-outline-variant mb-4">
-                folder_open
+                {localQuery ? "search_off" : "folder_open"}
               </span>
               <p className="text-on-surface-variant text-sm font-medium">
-                No cases for this client
+                {localQuery
+                  ? `No cases match "${localQuery}"`
+                  : "No cases for this client"}
               </p>
             </div>
           ) : (
@@ -206,14 +236,10 @@ export default function ClientDetails() {
                         </div>
                         <p className="text-xs text-outline">
                           Created:{" "}
-                          {dateformat(
-                            caseItem.created_at,
-                            "mmm dd, yyyy, hh:MM TT"
-                          )}
+                          {dateformat(caseItem.created_at, "mmm dd, yyyy, hh:MM TT")}
                         </p>
                       </div>
 
-                      {/* Action Buttons */}
                       <div className="flex items-center gap-2">
                         <button
                           onClick={() => handleCaseClick(caseItem)}
@@ -221,9 +247,7 @@ export default function ClientDetails() {
                           data-tooltip-id="service-tracker"
                           data-tooltip-content="View Progress"
                         >
-                          <span className="material-symbols-outlined text-sm">
-                            visibility
-                          </span>
+                          <span className="material-symbols-outlined text-sm">visibility</span>
                         </button>
                       </div>
                     </div>
@@ -234,47 +258,38 @@ export default function ClientDetails() {
               {/* Pagination */}
               {totalPages > 1 && (
                 <div className="mt-6 flex items-center justify-between gap-2">
-                  {/* Previous */}
                   <button
                     onClick={() => setPage(inViewState.userId, page - 1)}
                     disabled={page <= 1}
                     className="flex items-center gap-1 px-3 py-2 rounded-lg text-xs font-bold text-on-surface-variant hover:bg-surface-container-high disabled:opacity-30 disabled:cursor-not-allowed transition-all"
                   >
-                    <span className="material-symbols-outlined text-sm">
-                      chevron_left
-                    </span>
+                    <span className="material-symbols-outlined text-sm">chevron_left</span>
                     Prev
                   </button>
 
-                  {/* Page indicators */}
                   <div className="flex items-center gap-1">
-                    {Array.from({ length: totalPages }, (_, i) => i + 1).map(
-                      (p) => (
-                        <button
-                          key={p}
-                          onClick={() => setPage(inViewState.userId, p)}
-                          className={`w-7 h-7 rounded-lg text-xs font-bold transition-all ${
-                            p === page
-                              ? "bg-primary text-white shadow-sm"
-                              : "text-on-surface-variant hover:bg-surface-container-high"
-                          }`}
-                        >
-                          {p}
-                        </button>
-                      )
-                    )}
+                    {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
+                      <button
+                        key={p}
+                        onClick={() => setPage(inViewState.userId, p)}
+                        className={`w-7 h-7 rounded-lg text-xs font-bold transition-all ${
+                          p === page
+                            ? "bg-primary text-white shadow-sm"
+                            : "text-on-surface-variant hover:bg-surface-container-high"
+                        }`}
+                      >
+                        {p}
+                      </button>
+                    ))}
                   </div>
 
-                  {/* Next */}
                   <button
                     onClick={() => setPage(inViewState.userId, page + 1)}
                     disabled={page >= totalPages}
                     className="flex items-center gap-1 px-3 py-2 rounded-lg text-xs font-bold text-on-surface-variant hover:bg-surface-container-high disabled:opacity-30 disabled:cursor-not-allowed transition-all"
                   >
                     Next
-                    <span className="material-symbols-outlined text-sm">
-                      chevron_right
-                    </span>
+                    <span className="material-symbols-outlined text-sm">chevron_right</span>
                   </button>
                 </div>
               )}

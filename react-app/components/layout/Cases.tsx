@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useInViewStore } from "../../stores/inViewStore";
 import { useCasesStore } from "../../stores/casesStore";
 import Spinner from "./Spinner";
@@ -13,25 +13,29 @@ const CASES_PER_PAGE = 10;
 
 export default function Cases() {
   const inViewState = useInViewStore((state) => state);
-  const { navigate } = useInViewStore();
-  // Keep hook call stable across renders — we don't use store state here.
+  const { navigate }  = useInViewStore();
+
+  // We manage our own full list for the global view; the store is used only
+  // for the per-client view (ClientDetails). Keep the hook call stable.
   useCasesStore();
 
-  const [allCases, setAllCases] = useState<CaseType[]>([]);
+  const [allCases, setAllCases]         = useState<CaseType[]>([]);
   const [filteredCases, setFilteredCases] = useState<CaseType[]>([]);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [page, setPage] = useState(1);
+  const [localQuery, setLocalQuery]     = useState("");
+  const [loading, setLoading]           = useState(false);
+  const [error, setError]               = useState<string | null>(null);
+  const [page, setPage]                 = useState(1);
 
-  // Derived pagination values.
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Derived pagination values (client-side slice of the full fetched list).
   const totalPages = Math.max(1, Math.ceil(filteredCases.length / CASES_PER_PAGE));
   const pagedCases = filteredCases.slice(
     (page - 1) * CASES_PER_PAGE,
     page * CASES_PER_PAGE
   );
 
-  // Load all cases whenever the view becomes "cases".
+  // Load ALL cases (across all users/pages) whenever the view becomes "cases".
   useEffect(() => {
     if (inViewState.view !== "cases") return;
 
@@ -39,28 +43,26 @@ export default function Cases() {
       setLoading(true);
       setError(null);
       setPage(1);
+      setLocalQuery("");
 
       try {
         const apiUrlCases = `${data.root_url}/wp-json/${data.api_url}/cases`;
         const apiUrlUsers = `${data.root_url}/wp-json/service-tracker-stolmc/v1/users`;
 
         // Step 1: Fetch all users across all pages.
-        let allUsers: any[] = [];
-        let usersPage = 1;
-        let usersTotalPages = 1;
+        let allUsers: any[]  = [];
+        let usersPage        = 1;
+        let usersTotalPages  = 1;
 
         do {
           const usersRes = await fetchGet(
             `${apiUrlUsers}?page=${usersPage}&per_page=6`,
             { headers: { "X-WP-Nonce": data.nonce } }
           );
-
-          const body = usersRes.data;
+          const body          = usersRes.data;
           const usersOnPage: any[] = Array.isArray(body?.data) ? body.data : [];
-          usersTotalPages =
-            typeof body?.total_pages === "number" ? body.total_pages : 1;
-
-          allUsers = [...allUsers, ...usersOnPage];
+          usersTotalPages     = typeof body?.total_pages === "number" ? body.total_pages : 1;
+          allUsers            = [...allUsers, ...usersOnPage];
           usersPage++;
         } while (usersPage <= usersTotalPages);
 
@@ -75,7 +77,7 @@ export default function Cases() {
         let casesList: CaseType[] = [];
 
         for (const user of allUsers) {
-          let casesPage = 1;
+          let casesPage       = 1;
           let casesTotalPages = 1;
 
           do {
@@ -83,15 +85,9 @@ export default function Cases() {
               `${apiUrlCases}/${user.id}?page=${casesPage}&per_page=6`,
               { headers: { "X-WP-Nonce": data.nonce } }
             );
-
-            const casesBody = casesRes.data;
-            const pageCases: CaseType[] = Array.isArray(casesBody?.data)
-              ? casesBody.data
-              : [];
-            casesTotalPages =
-              typeof casesBody?.total_pages === "number"
-                ? casesBody.total_pages
-                : 1;
+            const casesBody     = casesRes.data;
+            const pageCases: CaseType[] = Array.isArray(casesBody?.data) ? casesBody.data : [];
+            casesTotalPages     = typeof casesBody?.total_pages === "number" ? casesBody.total_pages : 1;
 
             if (pageCases.length > 0) {
               casesList = [
@@ -103,7 +99,6 @@ export default function Cases() {
                 })),
               ];
             }
-
             casesPage++;
           } while (casesPage <= casesTotalPages);
         }
@@ -121,30 +116,38 @@ export default function Cases() {
     loadAllCases();
   }, [inViewState.view]);
 
-  // Filter cases based on search query — reset to page 1 on new query.
+  // Debounced local filter against the already-fetched full list.
+  // The inverted-index search endpoint is used by ClientDetails (per-user).
+  // For the global view we filter client-side since we already have all cases.
   useEffect(() => {
-    setPage(1);
-    if (searchQuery.trim() === "") {
-      setFilteredCases(allCases);
-    } else {
-      const q = searchQuery.toLowerCase();
-      setFilteredCases(
-        allCases.filter(
-          (c) =>
-            c.title.toLowerCase().includes(q) ||
-            (c.clientName ?? "").toLowerCase().includes(q)
-        )
-      );
-    }
-  }, [searchQuery, allCases]);
+    if (debounceRef.current) clearTimeout(debounceRef.current);
 
-  const handleAddCase = () => {
-    navigate("casesAddNew", "", "", "");
-  };
+    debounceRef.current = setTimeout(() => {
+      setPage(1);
+      if (localQuery.trim() === "") {
+        setFilteredCases(allCases);
+      } else {
+        const q = localQuery.toLowerCase();
+        setFilteredCases(
+          allCases.filter(
+            (c) =>
+              c.title.toLowerCase().includes(q) ||
+              (c.clientName ?? "").toLowerCase().includes(q)
+          )
+        );
+      }
+    }, 300);
+
+    return () => {
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+    };
+  }, [localQuery, allCases]);
+
+  const handleAddCase = () => navigate("casesAddNew", "", "", "");
 
   const handleToggleCase = useCallback(
     async (caseId: string | number) => {
-      const theCase = allCases.find((c) => String(c.id) === String(caseId));
+      const theCase      = allCases.find((c) => String(c.id) === String(caseId));
       const targetStatus = theCase?.status === "open" ? "close" : "open";
 
       try {
@@ -156,16 +159,12 @@ export default function Cases() {
 
         const update = (prev: CaseType[]) =>
           prev.map((c) =>
-            String(c.id) === String(caseId)
-              ? { ...c, status: targetStatus }
-              : c
+            String(c.id) === String(caseId) ? { ...c, status: targetStatus } : c
           );
 
         setAllCases(update);
         setFilteredCases(update);
-        toast.success(
-          `Case is now ${targetStatus === "open" ? "open" : "closed"}`
-        );
+        toast.success(`Case is now ${targetStatus === "open" ? "open" : "closed"}`);
       } catch (err) {
         console.error("Error toggling case:", err);
         toast.error("Failed to update case status");
@@ -175,21 +174,14 @@ export default function Cases() {
   );
 
   // Keep hook order stable — early return AFTER all hooks.
-  if (inViewState.view !== "cases") {
-    return null;
-  }
-
-  if (loading) {
-    return <Spinner />;
-  }
+  if (inViewState.view !== "cases") return null;
+  if (loading) return <Spinner />;
 
   if (error) {
     return (
       <section className="flex-1 h-full overflow-y-auto">
         <div className="p-8 text-center py-16">
-          <span className="material-symbols-outlined text-6xl text-error mb-4">
-            error
-          </span>
+          <span className="material-symbols-outlined text-6xl text-error mb-4">error</span>
           <p className="text-on-surface-variant text-sm font-medium">{error}</p>
           <button
             onClick={() => setError(null)}
@@ -208,9 +200,7 @@ export default function Cases() {
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h1 className="text-3xl font-black text-on-surface tracking-tight">
-              Cases
-            </h1>
+            <h1 className="text-3xl font-black text-on-surface tracking-tight">Cases</h1>
             <p className="text-on-surface-variant text-sm mt-1">
               {allCases.length > 0
                 ? `${allCases.length} case${allCases.length !== 1 ? "s" : ""} across all clients`
@@ -226,30 +216,36 @@ export default function Cases() {
           </span>
           <input
             type="text"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            value={localQuery}
+            onChange={(e) => setLocalQuery(e.target.value)}
             placeholder="Search cases by title or client name..."
-            className="w-full bg-surface-container-low border-0 rounded-xl py-4 pl-12 pr-4 text-sm focus:ring-2 focus:ring-primary/10 transition-all placeholder:text-outline-variant"
+            className="w-full bg-surface-container-low border-0 rounded-xl py-4 pl-12 pr-10 text-sm focus:ring-2 focus:ring-primary/10 transition-all placeholder:text-outline-variant"
           />
+          {localQuery && (
+            <button
+              onClick={() => setLocalQuery("")}
+              className="absolute right-4 top-1/2 -translate-y-1/2 text-outline hover:text-on-surface transition-colors"
+            >
+              <span className="material-symbols-outlined text-lg">close</span>
+            </button>
+          )}
         </div>
 
         {/* Cases List */}
         {filteredCases.length === 0 ? (
           <div className="text-center py-16">
             <span className="material-symbols-outlined text-6xl text-outline-variant mb-4">
-              folder_open
+              {localQuery ? "search_off" : "folder_open"}
             </span>
             <p className="text-on-surface-variant text-sm font-medium">
-              {searchQuery ? "No cases match your search" : "No cases found"}
+              {localQuery ? `No cases match "${localQuery}"` : "No cases found"}
             </p>
-            {!searchQuery && (
+            {!localQuery && (
               <button
                 onClick={handleAddCase}
                 className="mt-4 flex items-center gap-2 px-6 py-3 bg-gradient-to-br from-primary to-primary-container text-white text-sm font-bold rounded-xl shadow-lg active:scale-95 transition-all mx-auto"
               >
-                <span className="material-symbols-outlined text-sm">
-                  add_circle
-                </span>
+                <span className="material-symbols-outlined text-sm">add_circle</span>
                 Create your first case
               </button>
             )}
@@ -266,42 +262,26 @@ export default function Cases() {
             {/* Pagination */}
             {totalPages > 1 && (
               <div className="flex items-center justify-between gap-2 pb-24">
-                {/* Previous */}
                 <button
                   onClick={() => setPage((p) => Math.max(1, p - 1))}
                   disabled={page <= 1}
                   className="flex items-center gap-1 px-3 py-2 rounded-lg text-xs font-bold text-on-surface-variant hover:bg-surface-container-high disabled:opacity-30 disabled:cursor-not-allowed transition-all"
                 >
-                  <span className="material-symbols-outlined text-sm">
-                    chevron_left
-                  </span>
+                  <span className="material-symbols-outlined text-sm">chevron_left</span>
                   Prev
                 </button>
 
-                {/* Page indicators — show at most 7 buttons with ellipsis */}
                 <div className="flex items-center gap-1">
                   {Array.from({ length: totalPages }, (_, i) => i + 1)
-                    .filter(
-                      (p) =>
-                        p === 1 ||
-                        p === totalPages ||
-                        Math.abs(p - page) <= 2
-                    )
+                    .filter((p) => p === 1 || p === totalPages || Math.abs(p - page) <= 2)
                     .reduce<(number | "...")[]>((acc, p, idx, arr) => {
-                      if (idx > 0 && p - (arr[idx - 1] as number) > 1) {
-                        acc.push("...");
-                      }
+                      if (idx > 0 && p - (arr[idx - 1] as number) > 1) acc.push("...");
                       acc.push(p);
                       return acc;
                     }, [])
                     .map((p, idx) =>
                       p === "..." ? (
-                        <span
-                          key={`ellipsis-${idx}`}
-                          className="w-7 text-center text-xs text-outline-variant"
-                        >
-                          …
-                        </span>
+                        <span key={`ellipsis-${idx}`} className="w-7 text-center text-xs text-outline-variant">…</span>
                       ) : (
                         <button
                           key={p}
@@ -318,16 +298,13 @@ export default function Cases() {
                     )}
                 </div>
 
-                {/* Next */}
                 <button
                   onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
                   disabled={page >= totalPages}
                   className="flex items-center gap-1 px-3 py-2 rounded-lg text-xs font-bold text-on-surface-variant hover:bg-surface-container-high disabled:opacity-30 disabled:cursor-not-allowed transition-all"
                 >
                   Next
-                  <span className="material-symbols-outlined text-sm">
-                    chevron_right
-                  </span>
+                  <span className="material-symbols-outlined text-sm">chevron_right</span>
                 </button>
               </div>
             )}
