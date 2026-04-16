@@ -90,7 +90,7 @@ export default function Settings() {
             <div className="py-4">
               <h3 className="font-bold text-on-surface">User Information</h3>
               <div className="flex items-center gap-4 mt-4">
-                <div className="w-16 h-16 rounded-full bg-primary flex items-center justify-center text-white font-bold text-xl">
+                <div className="w-16 h-16 rounded-full bg-primary flex items-center justify-center text-on-primary font-bold text-xl">
                   A
                 </div>
                 <div>

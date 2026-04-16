@@ -14,17 +14,16 @@ export default function Sidebar() {
 
   const bottomNavItems = [
     { icon: "settings", label: "Settings", view: "settings" },
-    // Removed support link since there's no support view in routing
   ];
 
   return (
-    <aside className="flex-shrink-0 w-64 h-[calc(100vh-32px)] flex flex-col py-8 px-4 bg-slate-50/80 backdrop-blur-xl shadow-[12px_0_32px_rgba(11,28,48,0.06)] z-40">
+    <aside className="flex-shrink-0 w-64 h-[calc(100vh-32px)] flex flex-col py-8 px-4 bg-surface-container-lowest backdrop-blur-xl shadow-[12px_0_32px_rgba(11,28,48,0.06)] z-40">
       {/* Brand Header */}
       <div className="mb-10 px-4">
-        <h1 className="text-xl font-black text-slate-900 tracking-tighter uppercase">
+        <h1 className="text-xl font-black text-on-surface tracking-tighter uppercase">
           Service Tracker
         </h1>
-        <p className="font-['Manrope'] font-semibold tracking-tight text-xs text-slate-500 uppercase mt-1">
+        <p className="font-['Manrope'] font-semibold tracking-tight text-xs text-on-surface-variant uppercase mt-1">
           Administrator
         </p>
       </div>
@@ -39,8 +38,8 @@ export default function Sidebar() {
               onClick={() => navigate(item.view, "", "", "")}
               className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all cursor-pointer ${
                 isActive
-                  ? "text-slate-900 font-bold bg-slate-200/50"
-                  : "text-slate-500 hover:bg-slate-200/50 font-medium"
+                  ? "text-on-surface font-bold bg-surface-container"
+                  : "text-on-surface-variant hover:bg-surface-container-high font-medium"
               }`}
             >
               <span
@@ -58,7 +57,7 @@ export default function Sidebar() {
       </nav>
 
       {/* Bottom Navigation & User Profile */}
-      <div className="mt-auto border-t border-slate-200/50 pt-6 space-y-1">
+      <div className="mt-auto border-t border-outline-variant pt-6 space-y-1">
         {bottomNavItems.map((item) => {
           const isActive = inViewState.view === item.view;
           return (
@@ -67,8 +66,8 @@ export default function Sidebar() {
               onClick={() => navigate(item.view, "", "", "")}
               className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all cursor-pointer ${
                 isActive
-                  ? "text-slate-900 font-bold bg-slate-200/50"
-                  : "text-slate-500 hover:bg-slate-200/50 font-medium"
+                  ? "text-on-surface font-bold bg-surface-container"
+                  : "text-on-surface-variant hover:bg-surface-container-high font-medium"
               }`}
             >
               <span className="material-symbols-outlined">{item.icon}</span>
@@ -81,14 +80,14 @@ export default function Sidebar() {
 
         {/* User Profile */}
         <div className="flex items-center gap-3 px-4 py-4 mt-4">
-          <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-white font-bold">
+          <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-on-primary font-bold">
             {inViewState.name ? inViewState.name.charAt(0).toUpperCase() : "A"}
           </div>
           <div className="overflow-hidden">
-            <p className="text-sm font-bold text-slate-900 truncate">
+            <p className="text-sm font-bold text-on-surface truncate">
               {inViewState.name || "Admin User"}
             </p>
-            <p className="text-[10px] text-slate-500 uppercase tracking-widest">
+            <p className="text-[10px] text-on-surface-variant uppercase tracking-widest">
               Master Admin
             </p>
           </div>
