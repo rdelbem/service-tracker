@@ -38,6 +38,21 @@ function StoreInitializer() {
   return null;
 }
 
+// Initialize theme on app mount
+function ThemeInitializer() {
+  useEffect(() => {
+    // Check for saved theme or default to system preference
+    const savedTheme = localStorage.getItem('theme');
+    const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    
+    if (savedTheme === 'dark' || (!savedTheme && systemPrefersDark)) {
+      document.documentElement.classList.add('dark');
+    }
+  }, []);
+
+  return null;
+}
+
 // Main content router component
 function MainContent() {
   const view = useInViewStore((state) => state.view);
@@ -82,6 +97,7 @@ export default function App() {
   return (
     <>
       <StoreInitializer />
+      <ThemeInitializer />
       <ToastContainer position="bottom-right" transition={Bounce} hideProgressBar closeOnClick pauseOnHover draggable theme="colored" />
       <Wrapper>
         <ClientsView />

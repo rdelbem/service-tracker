@@ -14,7 +14,7 @@ export default function Sidebar() {
 
   const bottomNavItems = [
     { icon: "settings", label: "Settings", view: "settings" },
-    { icon: "help_outline", label: "Support", view: "support" },
+    // Removed support link since there's no support view in routing
   ];
 
   return (
