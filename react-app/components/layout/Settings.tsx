@@ -1,10 +1,6 @@
 import { useState, useEffect } from "react";
-import { useInViewStore } from "../../stores/inViewStore";
 
 export default function Settings() {
-  const inViewState = useInViewStore((state) => state);
-  const { navigate } = useInViewStore();
-  
   // Check if we're in dark mode by looking at the class on the html element
   const [darkMode, setDarkMode] = useState(() => {
     if (typeof window !== 'undefined') {
@@ -33,11 +29,6 @@ export default function Settings() {
       setDarkMode(true);
     }
   }, []);
-
-  // If we're not on the settings view, don't render anything
-  if (inViewState.view !== "settings") {
-    return null;
-  }
 
   return (
     <div className="flex-1 flex flex-col bg-background h-full">
@@ -100,11 +91,11 @@ export default function Settings() {
               <h3 className="font-bold text-on-surface">User Information</h3>
               <div className="flex items-center gap-4 mt-4">
                 <div className="w-16 h-16 rounded-full bg-primary flex items-center justify-center text-white font-bold text-xl">
-                  {inViewState.name ? inViewState.name.charAt(0).toUpperCase() : "A"}
+                  A
                 </div>
                 <div>
                   <p className="font-bold text-on-surface">
-                    {inViewState.name || "Admin User"}
+                    Admin User
                   </p>
                   <p className="text-on-surface-variant text-sm">
                     Master Admin
