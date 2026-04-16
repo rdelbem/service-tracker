@@ -1,0 +1,12 @@
+import '@testing-library/jest-dom/vitest';
+import { vi } from 'vitest';
+
+// Mock WordPress data object
+vi.stubGlobal('data', {
+  users_api_url: 'http://localhost/wp-json/service-tracker-stolmc/v1/users',
+  root_url: 'http://localhost',
+  nonce: 'test-nonce'
+});
+
+// Mock fetch globally
+global.fetch = vi.fn();
