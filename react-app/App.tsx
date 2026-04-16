@@ -25,6 +25,7 @@ const AddCase = lazy(() => import("./components/layout/AddCase"));
 const CaseDetails = lazy(() => import("./components/layout/CaseDetails"));
 const Calendar = lazy(() => import("./components/layout/Calendar"));
 const Analytics = lazy(() => import("./components/layout/Analytics"));
+const Settings = lazy(() => import("./components/layout/Settings"));
 
 // Initialize stores on app mount
 function StoreInitializer() {
@@ -59,6 +60,8 @@ function MainContent() {
       return <LazyView><Progress /></LazyView>;
     case "analytics":
       return <LazyView><Analytics /></LazyView>;
+    case "settings":
+      return <LazyView><Settings /></LazyView>;
     case "calendar":
       return <LazyView><Calendar /></LazyView>;
     case "clients":
