@@ -52,7 +52,8 @@ export default function ClientDetails() {
   // Fetch cases for this client when component mounts or userId changes
   useEffect(() => {
     if (inViewState.userId) {
-      getCases(1, inViewState.userId as string); // Reset to page 1 for this client
+      // getCases signature: (id_user, onlyFetch, page)
+      getCases(inViewState.userId as string, false, 1); // Reset to page 1 for this client
     }
   }, [inViewState.userId, getCases]);
 
@@ -226,7 +227,7 @@ export default function ClientDetails() {
             <Spinner />
           ) : cases.length > 0 ? (
             <>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+              <div className="grid grid-cols-1 gap-4 mb-6">
                 {cases.map((c) => (
                   <Case
                     key={c.id}
@@ -243,7 +244,7 @@ export default function ClientDetails() {
               {totalPages > 1 && (
                 <div className="flex items-center justify-between border-t border-outline-variant/20 pt-6">
                   <button
-                    onClick={() => getCases(page - 1, inViewState.userId as string)}
+                    onClick={() => getCases(inViewState.userId as string, false, page - 1)}
                     disabled={page === 1}
                     className="px-4 py-2 bg-surface-container-high text-on-surface rounded-xl disabled:opacity-50"
                   >
@@ -253,7 +254,7 @@ export default function ClientDetails() {
                     Page {page} of {totalPages}
                   </span>
                   <button
-                    onClick={() => getCases(page + 1, inViewState.userId as string)}
+                    onClick={() => getCases(inViewState.userId as string, false, page + 1)}
                     disabled={page === totalPages}
                     className="px-4 py-2 bg-surface-container-high text-on-surface rounded-xl disabled:opacity-50"
                   >

@@ -1,10 +1,14 @@
 import { useState, useEffect } from "react";
 
 export default function Settings() {
-  // Check if we're in dark mode by looking at the class on the html element
+  // Initialize from persisted preference first, then DOM class/system preference.
   const [darkMode, setDarkMode] = useState(() => {
     if (typeof window !== 'undefined') {
-      return document.documentElement.classList.contains('dark');
+      const savedTheme = localStorage.getItem('theme');
+      if (savedTheme === 'dark') return true;
+      if (savedTheme === 'light') return false;
+      if (document.documentElement.classList.contains('dark')) return true;
+      return window.matchMedia('(prefers-color-scheme: dark)').matches;
     }
     return false;
   });
@@ -19,16 +23,6 @@ export default function Settings() {
       localStorage.setItem('theme', 'light');
     }
   }, [darkMode]);
-
-  // Initialize theme from localStorage or system preference
-  useEffect(() => {
-    const savedTheme = localStorage.getItem('theme');
-    const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    
-    if (savedTheme === 'dark' || (!savedTheme && systemPrefersDark)) {
-      setDarkMode(true);
-    }
-  }, []);
 
   return (
     <div className="flex-1 flex flex-col bg-background h-full">

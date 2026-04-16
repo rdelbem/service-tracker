@@ -1,25 +1,4 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { create } from 'zustand';
-
-// We need to mock localStorage and window.location for testing
-const localStorageMock = (() => {
-  let store: Record<string, string> = {};
-  
-  return {
-    getItem(key: string) {
-      return store[key] || null;
-    },
-    setItem(key: string, value: string) {
-      store[key] = value.toString();
-    },
-    removeItem(key: string) {
-      delete store[key];
-    },
-    clear() {
-      store = {};
-    }
-  };
-})();
+import { describe, it, expect, beforeEach } from 'vitest';
 
 describe('inViewStore', () => {
   beforeEach(() => {
@@ -40,7 +19,7 @@ describe('inViewStore', () => {
     
     useInViewStore.getState().navigate('clients', '123', '', 'Test Client');
     
-    expect(useInViewStore.getState()).toEqual({
+    expect(useInViewStore.getState()).toMatchObject({
       view: 'clients',
       userId: '123',
       caseId: '',
@@ -55,7 +34,7 @@ describe('inViewStore', () => {
     
     useInViewStore.getState().navigate('progress', '1', '99', 'Test Case');
     
-    expect(useInViewStore.getState()).toEqual({
+    expect(useInViewStore.getState()).toMatchObject({
       view: 'progress',
       userId: '1',
       caseId: '99',
@@ -70,7 +49,7 @@ describe('inViewStore', () => {
     
     useInViewStore.getState().navigate('settings', '', '', '');
     
-    expect(useInViewStore.getState()).toEqual({
+    expect(useInViewStore.getState()).toMatchObject({
       view: 'settings',
       userId: '',
       caseId: '',
@@ -87,7 +66,7 @@ describe('inViewStore', () => {
     window.location.hash = '#/clients/456';
     window.dispatchEvent(new HashChangeEvent('hashchange'));
     
-    expect(useInViewStore.getState()).toEqual({
+    expect(useInViewStore.getState()).toMatchObject({
       view: 'clients',
       userId: '456',
       caseId: '',

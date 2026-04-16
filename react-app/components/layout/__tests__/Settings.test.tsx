@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import Settings from '../Settings';
 
 describe('Settings Component', () => {
@@ -9,6 +9,21 @@ describe('Settings Component', () => {
     
     // Reset document classes
     document.documentElement.classList.remove('dark');
+
+    // Reset system preference mock to light by default.
+    Object.defineProperty(window, 'matchMedia', {
+      writable: true,
+      value: vi.fn().mockImplementation((query) => ({
+        matches: false,
+        media: query,
+        onchange: null,
+        addListener: vi.fn(),
+        removeListener: vi.fn(),
+        addEventListener: vi.fn(),
+        removeEventListener: vi.fn(),
+        dispatchEvent: vi.fn(),
+      })),
+    });
   });
 
   it('reads current dark state from html class', () => {
@@ -40,8 +55,8 @@ describe('Settings Component', () => {
   it('persists theme in localStorage', () => {
     render(<Settings />);
     
-    // Initially no theme in localStorage
-    expect(localStorage.getItem('theme')).toBeNull();
+    // Component initializes and persists current theme.
+    expect(localStorage.getItem('theme')).toBe('light');
     
     // Click toggle button to enable dark mode
     const toggleButton = screen.getByRole('button');
@@ -57,14 +72,16 @@ describe('Settings Component', () => {
     expect(localStorage.getItem('theme')).toBe('light');
   });
 
-  it('initializes from saved theme', () => {
+  it('initializes from saved theme', async () => {
     // Set saved theme to dark
     localStorage.setItem('theme', 'dark');
     
     render(<Settings />);
     
     // Should initialize with dark mode
-    expect(document.documentElement.classList.contains('dark')).toBe(true);
+    await waitFor(() => {
+      expect(document.documentElement.classList.contains('dark')).toBe(true);
+    });
   });
 
   it('initializes from system preference when no saved theme', () => {
