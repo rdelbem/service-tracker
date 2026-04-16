@@ -59,18 +59,25 @@ export default function Sidebar() {
 
       {/* Bottom Navigation & User Profile */}
       <div className="mt-auto border-t border-slate-200/50 pt-6 space-y-1">
-        {bottomNavItems.map((item) => (
-          <a
-            key={item.label}
-            onClick={() => navigate(item.view, "", "", "")}
-            className="flex items-center gap-3 px-4 py-3 rounded-xl transition-colors text-slate-500 hover:bg-slate-200/50 font-medium cursor-pointer"
-          >
-            <span className="material-symbols-outlined">{item.icon}</span>
-            <span className="font-['Manrope'] font-semibold tracking-tight">
-              {item.label}
-            </span>
-          </a>
-        ))}
+        {bottomNavItems.map((item) => {
+          const isActive = inViewState.view === item.view;
+          return (
+            <a
+              key={item.label}
+              onClick={() => navigate(item.view, "", "", "")}
+              className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all cursor-pointer ${
+                isActive
+                  ? "text-slate-900 font-bold bg-slate-200/50"
+                  : "text-slate-500 hover:bg-slate-200/50 font-medium"
+              }`}
+            >
+              <span className="material-symbols-outlined">{item.icon}</span>
+              <span className="font-['Manrope'] font-semibold tracking-tight">
+                {item.label}
+              </span>
+            </a>
+          );
+        })}
 
         {/* User Profile */}
         <div className="flex items-center gap-3 px-4 py-4 mt-4">
