@@ -1,8 +1,11 @@
 import { useEffect, useState } from "react";
 import { useInViewStore } from "../../stores/inViewStore";
 import { useClientsStore } from "../../stores/clientsStore";
+import { useCasesStore } from "../../stores/casesStore";
 import { toast } from "react-toastify";
 import type { User } from "../../types";
+import Spinner from "./Spinner";
+import Case from "./Case";
 
 declare const data: Record<string, any>;
 
@@ -10,6 +13,7 @@ export default function ClientDetails() {
   const inViewState = useInViewStore((state) => state);
   const { navigate } = useInViewStore();
   const { users, updateUser } = useClientsStore();
+  const { cases, loadingCases, page, totalPages, total, searchQuery, getCases } = useCasesStore();
 
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
@@ -44,6 +48,13 @@ export default function ClientDetails() {
       });
     }
   }, [selectedClient]);
+
+  // Fetch cases for this client when component mounts or userId changes
+  useEffect(() => {
+    if (inViewState.userId) {
+      getCases(1, inViewState.userId as string); // Reset to page 1 for this client
+    }
+  }, [inViewState.userId, getCases]);
 
   // Keep hook order stable across route transitions.
   if (inViewState.view !== "clients" || !inViewState.userId) {
@@ -200,6 +211,62 @@ export default function ClientDetails() {
               <p className="text-on-surface-variant">{createdDate}</p>
             </div>
           </div>
+        </div>
+
+        {/* Client Cases Section */}
+        <div className="bg-surface-container-lowest rounded-2xl border border-outline-variant/20 shadow-sm p-6 mb-8">
+          <div className="border-b border-outline-variant pb-4 mb-6">
+            <h2 className="text-xl font-bold text-on-surface">Client Cases</h2>
+            <p className="text-on-surface-variant text-sm mt-1">
+              {total} {total === 1 ? "case" : "cases"} found
+            </p>
+          </div>
+
+          {loadingCases ? (
+            <Spinner />
+          ) : cases.length > 0 ? (
+            <>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                {cases.map((c) => (
+                  <Case
+                    key={c.id}
+                    id={c.id}
+                    id_user={c.id_user}
+                    title={c.title}
+                    status={c.status}
+                    created_at={c.created_at}
+                  />
+                ))}
+              </div>
+
+              {/* Pagination */}
+              {totalPages > 1 && (
+                <div className="flex items-center justify-between border-t border-outline-variant/20 pt-6">
+                  <button
+                    onClick={() => getCases(page - 1, inViewState.userId as string)}
+                    disabled={page === 1}
+                    className="px-4 py-2 bg-surface-container-high text-on-surface rounded-xl disabled:opacity-50"
+                  >
+                    Previous
+                  </button>
+                  <span className="text-on-surface-variant">
+                    Page {page} of {totalPages}
+                  </span>
+                  <button
+                    onClick={() => getCases(page + 1, inViewState.userId as string)}
+                    disabled={page === totalPages}
+                    className="px-4 py-2 bg-surface-container-high text-on-surface rounded-xl disabled:opacity-50"
+                  >
+                    Next
+                  </button>
+                </div>
+              )}
+            </>
+          ) : (
+            <div className="text-center py-12">
+              <p className="text-on-surface-variant">No cases found for this client</p>
+            </div>
+          )}
         </div>
 
         {/* Back to List Button */}
