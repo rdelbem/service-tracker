@@ -57,18 +57,18 @@
 }
 
 .dark {
-  /* Medium contrast dark theme colors */
+  /* Medium contrast dark theme colors with darker input fields */
   --background: 27 32 44;
   --on-background: 227 232 243;
   --surface: 31 37 51;
   --surface-dim: 23 28 40;
   --surface-bright: 45 52 69;
   --surface-container-lowest: 24 29 40;
-  --surface-container-low: 32 38 52;
-  --surface-container: 40 47 63;
-  --surface-container-high: 50 58 76;
-  --surface-container-highest: 61 69 88;
-  --surface-variant: 70 79 100;
+  --surface-container-low: 28 34 46;
+  --surface-container: 36 42 56;
+  --surface-container-high: 46 54 72;
+  --surface-container-highest: 57 65 84;
+  --surface-variant: 66 75 94;
   --on-surface: 224 229 240;
   --on-surface-variant: 177 187 207;
   --primary: 173 187 219;
@@ -100,7 +100,7 @@
   --error-container: 124 42 42;
   --on-error-container: 254 226 226;
   --outline: 131 142 165;
-  --outline-variant: 78 89 111;
+  --outline-variant: 74 85 105;
   --inverse-surface: 227 232 243;
   --inverse-on-surface: 40 47 63;
   --inverse-primary: 86 104 138;
