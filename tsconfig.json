@@ -25,7 +25,11 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["react-app/*"]
-    }
+    },
+
+    /* Testing */
+    "types": ["vitest/globals", "@testing-library/jest-dom"]
   },
-  "include": ["react-app"]
+  "include": ["react-app"],
+  "exclude": ["**/__tests__/**", "**/*.test.*", "**/*.spec.*"]
 }
