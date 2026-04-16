@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { get as fetchGet, post } from "../utils/fetch";
+import { get as fetchGet, post, put } from "../utils/fetch";
 import type { User } from "../types";
 
 declare const data: Record<string, any>;
@@ -12,6 +12,7 @@ export interface ClientsState {
   total: number;
   totalPages: number;
   searchQuery: string;
+  loading: boolean;
 }
 
 export interface ClientsActions {
@@ -19,6 +20,7 @@ export interface ClientsActions {
   searchUsers: (query: string) => Promise<void>;
   setPage: (page: number) => Promise<void>;
   createUser: (userData: { name: string; email: string; phone?: string; cellphone?: string }) => Promise<{ success: boolean; message: string; user?: User }>;
+  updateUser: (id: string | number, userData: Partial<User>) => Promise<void>;
 }
 
 export interface ClientsStore extends ClientsState, ClientsActions {}
@@ -27,6 +29,7 @@ export const useClientsStore = create<ClientsStore>((set, get) => {
   const api_url_users = data.users_api_url;
   const create_user_api_url = data.create_user_api_url;
   const search_url = `${data.root_url}/wp-json/service-tracker-stolmc/v1/users/search`;
+  const update_user_api_url = `${data.root_url}/wp-json/service-tracker-stolmc/v1/users`;
 
   return {
     users: [],
@@ -36,6 +39,7 @@ export const useClientsStore = create<ClientsStore>((set, get) => {
     total: 0,
     totalPages: 1,
     searchQuery: "",
+    loading: false,
 
     getUsers: async (page?: number) => {
       const currentPage = page ?? get().page;
@@ -149,6 +153,31 @@ export const useClientsStore = create<ClientsStore>((set, get) => {
       } catch (error) {
         console.error("Error creating user:", error);
         return { success: false, message: "Failed to create user. Please try again." };
+      }
+    },
+
+    updateUser: async (id, userData) => {
+      set({ loading: true });
+      try {
+        const url = `${update_user_api_url}/${id}`;
+        const res = await put(url, userData, {
+          headers: { "X-WP-Nonce": data.nonce },
+        });
+
+        if (res.data.success) {
+          // Update the user in the store
+          const updatedUsers = get().users.map(user => 
+            user.id === id ? { ...user, ...userData } : user
+          );
+          set({ users: updatedUsers });
+        } else {
+          throw new Error(res.data.message || "Failed to update user");
+        }
+      } catch (error) {
+        console.error("Error updating user:", error);
+        throw error;
+      } finally {
+        set({ loading: false });
       }
     },
   };
