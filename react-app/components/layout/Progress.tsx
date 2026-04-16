@@ -338,6 +338,11 @@ export default function Progress() {
     setPendingFiles(newFiles);
   };
 
+  // Keep behavior consistent with view-based layout components.
+  if (inViewState.view !== "progress") {
+    return null;
+  }
+
   if (progressState.loadingStatus || loadingCase) {
     return <Spinner />;
   }

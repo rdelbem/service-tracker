@@ -3,6 +3,39 @@ import react from "@vitejs/plugin-react-swc";
 import path from "path";
 
 /**
+ * Emits a stable JSON file that maps logical bundle keys to hashed file names.
+ * Example:
+ * {
+ *   "entrypoint": "App-ABC123.js"
+ * }
+ */
+function entrypointMapPlugin() {
+  return {
+    name: "stolmc-entrypoint-map",
+    generateBundle(_options, bundle) {
+      const entryChunk = Object.values(bundle).find(
+        (item) => item.type === "chunk" && item.isEntry
+      );
+
+      if (!entryChunk) {
+        this.error("Could not find Vite entry chunk to build entrypoints.json");
+        return;
+      }
+
+      this.emitFile({
+        type: "asset",
+        fileName: "entrypoints.json",
+        source: `${JSON.stringify(
+          { entrypoint: entryChunk.fileName },
+          null,
+          2
+        )}\n`,
+      });
+    },
+  };
+}
+
+/**
  * Vite config for the Service Tracker React admin SPA.
  *
  * Key decisions:
@@ -23,6 +56,7 @@ export default defineConfig(({ mode }) => {
         // Use classic JSX runtime (React.createElement)
         jsx: "classic",
       }),
+      entrypointMapPlugin(),
     ],
     server: {
       port: 3000,
@@ -44,7 +78,7 @@ export default defineConfig(({ mode }) => {
         input: path.resolve(__dirname, "react-app/index.tsx"),
         output: {
           // Main entry file name
-          entryFileNames: "App.js",
+          entryFileNames: "App-[hash].js",
           // Chunk file names for lazy-loaded components
           chunkFileNames: "assets/[name]-[hash].js",
           // Keep CSS in a predictable location

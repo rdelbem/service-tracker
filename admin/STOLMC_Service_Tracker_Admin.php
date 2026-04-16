@@ -204,7 +204,8 @@ class STOLMC_Service_Tracker_Admin {
 			return;
 		}
 
-		wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/prod/App.js', [], $this->version, true );
+		$entrypoint_file = $this->resolve_entrypoint_file();
+		wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/prod/' . $entrypoint_file, [], $this->version, true );
 
 		// Add type="module" to enable ES module syntax (dynamic imports for code splitting).
 		add_filter(
@@ -218,6 +219,50 @@ class STOLMC_Service_Tracker_Admin {
 			10,
 			2
 		);
+	}
+
+	/**
+	 * Resolve the hashed app entrypoint file from build mapping.
+	 *
+	 * Falls back to the latest App-*.js file when mapping is missing,
+	 * then to App.js for backward compatibility.
+	 *
+	 * @return string
+	 */
+	private function resolve_entrypoint_file(): string {
+		$default_file = 'App.js';
+		$prod_dir = plugin_dir_path( __FILE__ ) . 'js/prod/';
+		$map_file = $prod_dir . 'entrypoints.json';
+
+		if ( file_exists( $map_file ) && is_readable( $map_file ) ) {
+			$raw_map = file_get_contents( $map_file );
+			if ( false !== $raw_map ) {
+				$decoded_map = json_decode( $raw_map, true );
+
+				if ( is_array( $decoded_map ) && isset( $decoded_map['entrypoint'] ) && is_string( $decoded_map['entrypoint'] ) ) {
+					$entrypoint = basename( $decoded_map['entrypoint'] );
+					$is_valid_entrypoint = 1 === preg_match( '/^App-[A-Za-z0-9_-]+\.js$/', $entrypoint );
+
+					if ( $is_valid_entrypoint && file_exists( $prod_dir . $entrypoint ) ) {
+						return $entrypoint;
+					}
+				}
+			}
+		}
+
+		$hashed_matches = glob( $prod_dir . 'App-*.js' );
+		if ( is_array( $hashed_matches ) && ! empty( $hashed_matches ) ) {
+			usort(
+				$hashed_matches,
+				static function ( string $a, string $b ): int {
+					return filemtime( $b ) <=> filemtime( $a );
+				}
+			);
+
+			return basename( $hashed_matches[0] );
+		}
+
+		return $default_file;
 	}
 
 	/**

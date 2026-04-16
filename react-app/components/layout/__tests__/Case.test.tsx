@@ -1,31 +1,36 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import Case from "../Case";
 
-const mockCasesStore = {
-  deleteCase: vi.fn(),
-  toggleCase: vi.fn(),
-  editCase: vi.fn(),
-};
-const useCasesStoreMock = vi.fn((selector?: (state: typeof mockCasesStore) => any) =>
-  typeof selector === "function" ? selector(mockCasesStore) : mockCasesStore
-);
+const { mockCasesStore, useCasesStoreMock, mockInViewStoreState, useInViewStoreMock, mockProgressStore, useProgressStoreMock } = vi.hoisted(() => {
+  const mockCasesStore = {
+    deleteCase: vi.fn(),
+    toggleCase: vi.fn(),
+    editCase: vi.fn(),
+  };
+  const useCasesStoreMock = vi.fn((selector?: (state: typeof mockCasesStore) => any) =>
+    typeof selector === "function" ? selector(mockCasesStore) : mockCasesStore
+  );
 
-const mockInViewStoreState = {
-  view: "cases",
-  userId: "user-1",
-  caseId: "case-1",
-  name: "Test User",
-  navigate: vi.fn(),
-};
-const useInViewStoreMock = vi.fn((selector?: (state: typeof mockInViewStoreState) => any) =>
-  typeof selector === "function" ? selector(mockInViewStoreState) : mockInViewStoreState
-);
+  const mockInViewStoreState = {
+    view: "cases",
+    userId: "user-1",
+    caseId: "case-1",
+    name: "Test User",
+    navigate: vi.fn(),
+  };
+  const useInViewStoreMock = vi.fn((selector?: (state: typeof mockInViewStoreState) => any) =>
+    typeof selector === "function" ? selector(mockInViewStoreState) : mockInViewStoreState
+  );
 
-const mockProgressStore = { getStatus: vi.fn() };
-const useProgressStoreMock = vi.fn((selector?: (state: typeof mockProgressStore) => any) =>
-  typeof selector === "function" ? selector(mockProgressStore) : mockProgressStore
-);
+  const mockProgressStore = { getStatus: vi.fn() };
+  const useProgressStoreMock = vi.fn((selector?: (state: typeof mockProgressStore) => any) =>
+    typeof selector === "function" ? selector(mockProgressStore) : mockProgressStore
+  );
+
+  return { mockCasesStore, useCasesStoreMock, mockInViewStoreState, useInViewStoreMock, mockProgressStore, useProgressStoreMock };
+});
 
 vi.mock("../../../stores/casesStore", () => ({
   useCasesStore: useCasesStoreMock,
@@ -36,8 +41,6 @@ vi.mock("../../../stores/inViewStore", () => ({
 vi.mock("../../../stores/progressStore", () => ({
   useProgressStore: useProgressStoreMock,
 }));
-
-import Case from "../Case";
 
 describe("Case component", () => {
   beforeEach(() => {
@@ -132,7 +135,12 @@ describe("Case component", () => {
       />
     );
 
-    const editButton = screen.getByLabelText("edit");
+    // Find the edit icon (material symbol) and get its parent button
+    const editIcon = screen.getByText("edit", { selector: ".material-symbols-outlined" });
+    const editButton = editIcon.closest("button");
+    if (!editButton) {
+      throw new Error("Edit button not found");
+    }
     await user.click(editButton);
 
     expect(screen.getByPlaceholderText("Enter new title...")).toBeInTheDocument();

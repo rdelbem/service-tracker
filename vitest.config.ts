@@ -7,28 +7,30 @@ export default defineConfig({
     environment: 'jsdom',
     setupFiles: ['./vitest.setup.ts'],
     globals: true,
-    coverage: {
-      provider: 'v8',
-      reporter: ['text', 'json', 'html'],
-      exclude: [
-        'node_modules/',
-        'react-app/main.tsx',
-        'react-app/App.tsx',
-        '**/*.d.ts',
-        '**/{vite,vitest,tailwind,postcss,webpack}.config.*',
-        '**/.{eslint,mocha,prettier}rc.{?(c|m)js,yml}',
-        '**/*.{test,spec}.{ts,tsx}',
-        'react-app/stores/**',
-        'react-app/types/**'
-      ]
-    },
-    include: ['**/*.{test,spec}.{ts,tsx}'],
+    include: ['react-app/**/*.{test,spec}.{js,jsx,ts,tsx}'],
     exclude: [
       'node_modules',
       'dist',
       'coverage',
       '**/node_modules/**',
       '**/dist/**'
-    ]
+    ],
+    coverage: {
+      provider: 'v8',
+      reporter: ['text', 'json', 'html'],
+      include: ['react-app/**/*.{js,jsx,ts,tsx}'],
+      exclude: [
+        'node_modules/',
+        'react-app/App.tsx',
+        'react-app/main.tsx',
+        'react-app/setupTests.ts',
+        '**/*.d.ts',
+        '**/{vite,vitest,tailwind,postcss,webpack}.config.*',
+        '**/.{eslint,mocha,prettier}rc.{?(c|m)js,yml}',
+        '**/*.{test,spec}.{js,jsx,ts,tsx}',
+        'react-app/stores/**',
+        'react-app/types/**'
+      ]
+    },
   }
 });

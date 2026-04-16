@@ -181,7 +181,6 @@ export default function AddCase() {
               onChange={(e) => setCaseTitle(e.target.value)}
               placeholder="Enter case title..."
               className="w-full bg-surface-container-lowest border border-outline-variant/20 rounded-lg py-3 px-4 text-sm focus:ring-2 focus:ring-primary/10 transition-all placeholder:text-outline-variant"
-              required
             />
           </div>
 
