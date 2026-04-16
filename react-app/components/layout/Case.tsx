@@ -71,7 +71,7 @@ export default function Case({ id, id_user, status, created_at, title, onToggle 
 
   return (
     <Fragment>
-      <div className="group cursor-pointer p-6 bg-surface-container-lowest rounded-2xl shadow-[0px_12px_32px_rgba(11,28,48,0.06)] border-l-4 border-primary hover:bg-surface-container-high transition-all">
+      <div className="group cursor-pointer p-6 bg-surface-container-lowest rounded-2xl border border-outline-variant/20 border-l-4 border-l-primary shadow-sm hover:bg-surface-container-high/70 transition-all">
         <div className="flex items-start justify-between mb-4">
           <div className="flex-1">
             <div className="flex items-center gap-3 mb-2">
@@ -163,7 +163,7 @@ export default function Case({ id, id_user, status, created_at, title, onToggle 
                   editCase(id, id_user, newTitle);
                   setEditing(false);
                 }}
-                className="px-6 py-3 bg-primary text-white text-sm font-bold rounded-xl shadow-lg active:scale-95 transition-all"
+                className="px-6 py-3 bg-primary text-on-primary text-sm font-bold rounded-xl shadow-sm active:scale-95 transition-all hover:bg-primary-container"
               >
                 {data.btn_save_case || "Save"}
               </button>
@@ -172,7 +172,7 @@ export default function Case({ id, id_user, status, created_at, title, onToggle 
                   e.preventDefault();
                   setEditing(false);
                 }}
-                className="px-6 py-3 bg-surface-container-highest text-on-surface text-sm font-bold rounded-xl shadow-lg active:scale-95 transition-all"
+                className="px-6 py-3 bg-surface-container-highest text-on-surface text-sm font-bold rounded-xl shadow-sm active:scale-95 transition-all hover:bg-surface-container-high"
               >
                 {data.btn_dismiss_edit || "Dismiss"}
               </button>

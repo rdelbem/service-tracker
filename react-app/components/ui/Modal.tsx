@@ -48,7 +48,7 @@ function ModalDialog({ title, message, confirmText, cancelText, type, onConfirm,
           )}
           <button
             onClick={onConfirm}
-            className="px-6 py-2.5 bg-primary text-white text-sm font-bold rounded-xl shadow-lg hover:bg-primary-container active:scale-95 transition-all"
+            className="px-6 py-2.5 bg-primary text-on-primary text-sm font-bold rounded-xl shadow-sm hover:bg-primary-container active:scale-95 transition-all"
           >
             {confirmText}
           </button>

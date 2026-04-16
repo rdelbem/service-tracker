@@ -185,7 +185,7 @@ export default function Cases() {
           <p className="text-on-surface-variant text-sm font-medium">{error}</p>
           <button
             onClick={() => setError(null)}
-            className="mt-4 px-6 py-3 bg-primary text-white text-sm font-bold rounded-xl"
+            className="mt-4 px-6 py-3 bg-primary text-on-primary text-sm font-bold rounded-xl hover:bg-primary-container transition-colors"
           >
             Retry
           </button>
@@ -243,7 +243,7 @@ export default function Cases() {
             {!localQuery && (
               <button
                 onClick={handleAddCase}
-                className="mt-4 flex items-center gap-2 px-6 py-3 bg-gradient-to-br from-primary to-primary-container text-white text-sm font-bold rounded-xl shadow-lg active:scale-95 transition-all mx-auto"
+                className="mt-4 flex items-center gap-2 px-6 py-3 bg-primary text-on-primary text-sm font-bold rounded-xl shadow-sm active:scale-95 transition-all hover:bg-primary-container mx-auto"
               >
                 <span className="material-symbols-outlined text-sm">add_circle</span>
                 Create your first case
@@ -288,7 +288,7 @@ export default function Cases() {
                           onClick={() => setPage(p as number)}
                           className={`w-7 h-7 rounded-lg text-xs font-bold transition-all ${
                             p === page
-                              ? "bg-primary text-white shadow-sm"
+                              ? "bg-primary text-on-primary shadow-sm"
                               : "text-on-surface-variant hover:bg-surface-container-high"
                           }`}
                         >
@@ -315,7 +315,7 @@ export default function Cases() {
       {/* Floating Add Button */}
       <button
         onClick={handleAddCase}
-        className="fixed bottom-10 right-10 w-16 h-16 rounded-full bg-primary text-white shadow-2xl flex items-center justify-center active:scale-90 transition-all hover:bg-primary-container z-30"
+        className="fixed bottom-10 right-10 w-16 h-16 rounded-full bg-primary text-on-primary shadow-lg flex items-center justify-center active:scale-90 transition-all hover:bg-primary-container z-30"
         title="Add new case"
       >
         <span className="material-symbols-outlined text-3xl">add</span>

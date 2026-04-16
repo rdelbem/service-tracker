@@ -85,7 +85,7 @@ export default function ClientsView() {
   };
 
   return (
-    <section className="flex-shrink-0 w-[420px] bg-surface-container-low flex flex-col border-r border-outline-variant/10 h-full">
+    <section className="flex-shrink-0 w-[420px] bg-surface-container-low flex flex-col border-r border-outline-variant/20 h-full">
       {/* Header */}
       <div className="p-8 pb-4">
         <div className="flex items-center justify-between mb-6">
@@ -103,7 +103,7 @@ export default function ClientsView() {
           </div>
           <button
             onClick={() => setShowAddForm(!showAddForm)}
-            className="flex items-center gap-2 px-4 py-2 bg-gradient-to-br from-primary to-primary-container text-white text-xs font-bold rounded-lg shadow-lg active:scale-95 transition-all"
+            className="flex items-center gap-2 px-4 py-2 bg-primary text-on-primary text-xs font-bold rounded-lg shadow-sm active:scale-95 transition-all hover:bg-primary-container"
           >
             <span className="material-symbols-outlined text-sm">
               {showAddForm ? "close" : "person_add"}
@@ -116,7 +116,7 @@ export default function ClientsView() {
         {showAddForm && (
           <form
             onSubmit={handleAddClient}
-            className="mb-6 p-4 bg-surface-container-lowest rounded-xl shadow-[0px_4px_16px_rgba(11,28,48,0.06)] space-y-3"
+            className="mb-6 p-4 bg-surface-container-lowest rounded-xl border border-outline-variant/20 shadow-sm space-y-3"
           >
             <div>
               <label className="block text-xs font-bold text-on-surface-variant mb-1 uppercase tracking-wider">
@@ -175,7 +175,7 @@ export default function ClientsView() {
             <button
               type="submit"
               disabled={isCreating}
-              className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-gradient-to-br from-primary to-primary-container text-white text-xs font-bold rounded-lg shadow-lg active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-primary text-on-primary text-xs font-bold rounded-lg shadow-sm active:scale-95 transition-all hover:bg-primary-container disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <span className="material-symbols-outlined text-sm">
                 {isCreating ? "progress_activity" : "person_add"}
@@ -239,7 +239,7 @@ export default function ClientsView() {
                 onClick={() => handleSelectClient(client)}
                 className={`group cursor-pointer p-4 rounded-xl transition-all ${
                   isSelected
-                    ? "bg-surface-container-lowest shadow-[0px_8px_24px_rgba(11,28,48,0.08)] border-l-4 border-primary"
+                    ? "bg-surface-container-lowest border border-outline-variant/30 border-l-4 border-l-primary shadow-sm"
                     : "hover:bg-surface-container-high/50"
                 }`}
               >
@@ -248,7 +248,7 @@ export default function ClientsView() {
                   <div
                     className={`w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 ${
                       isSelected
-                        ? "bg-primary text-white"
+                        ? "bg-primary text-on-primary"
                         : "bg-surface-container-highest text-on-surface-variant"
                     }`}
                   >
@@ -276,7 +276,7 @@ export default function ClientsView() {
 
       {/* Pagination */}
       {!loadingUsers && totalPages > 1 && (
-        <div className="flex-shrink-0 px-4 py-4 border-t border-outline-variant/10">
+        <div className="flex-shrink-0 px-4 py-4 border-t border-outline-variant/20">
           <div className="flex items-center justify-between gap-2">
             {/* Previous */}
             <button
@@ -298,7 +298,7 @@ export default function ClientsView() {
                   onClick={() => setPage(p)}
                   className={`w-7 h-7 rounded-lg text-xs font-bold transition-all ${
                     p === page
-                      ? "bg-primary text-white shadow-sm"
+                      ? "bg-primary text-on-primary shadow-sm"
                       : "text-on-surface-variant hover:bg-surface-container-high"
                   }`}
                 >

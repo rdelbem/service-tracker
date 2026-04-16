@@ -201,6 +201,8 @@ class STOLMC_Service_Tracker_Api_Progress extends STOLMC_Service_Tracker_Api imp
 	 * @return string|false Insert result message.
 	 */
 	public function create( WP_REST_Request $data ): string|false {
+		global $wpdb;
+
 		$body = $data->get_json_params();
 
 		$id_user = $body['id_user'];

@@ -41,7 +41,7 @@ export default function Settings() {
             </p>
           </div>
 
-          <div className="bg-surface-container-lowest rounded-2xl shadow-[0px_12px_32px_rgba(11,28,48,0.06)] p-6">
+          <div className="bg-surface-container-lowest rounded-2xl border border-outline-variant/20 shadow-sm p-6">
             <div className="border-b border-outline-variant pb-4 mb-6">
               <h2 className="text-xl font-bold text-on-surface">Appearance</h2>
             </div>
@@ -60,7 +60,7 @@ export default function Settings() {
                 }`}
               >
                 <span
-                  className={`inline-block h-4 w-4 transform rounded-full bg-on-primary-container transition-transform ${
+                  className={`inline-block h-4 w-4 transform rounded-full bg-on-primary transition-transform ${
                     darkMode ? "translate-x-6" : "translate-x-1"
                   }`}
                 />
@@ -82,7 +82,7 @@ export default function Settings() {
             </div>
           </div>
 
-          <div className="bg-surface-container-lowest rounded-2xl shadow-[0px_12px_32px_rgba(11,28,48,0.06)] p-6 mt-6">
+          <div className="bg-surface-container-lowest rounded-2xl border border-outline-variant/20 shadow-sm p-6 mt-6">
             <div className="border-b border-outline-variant pb-4 mb-6">
               <h2 className="text-xl font-bold text-on-surface">Account</h2>
             </div>

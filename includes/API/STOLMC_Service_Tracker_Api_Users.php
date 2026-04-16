@@ -35,7 +35,7 @@ class STOLMC_Service_Tracker_Api_Users extends STOLMC_Service_Tracker_Api {
 	 *
 	 * @since 1.4.0
 	 */
-	private const SEARCH_INDEX_TTL = HOUR_IN_SECONDS;
+	private const SEARCH_INDEX_TTL = 3600;
 
 	/**
 	 * Initialize the API and register routes.

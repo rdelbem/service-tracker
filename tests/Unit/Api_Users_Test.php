@@ -61,21 +61,29 @@ class Api_Users_Test extends API_TestCase {
 		];
 
 		Functions\expect( 'get_users' )
-			->once()
-			->with(
-				Mockery::on(
-					static function ( $args ) {
-						self::assertSame( 'customer', $args['role'] );
-						self::assertSame( 'display_name', $args['orderby'] );
-						self::assertSame( 'ASC', $args['order'] );
-						return true;
+			->twice()
+			->andReturnUsing(
+				static function ( $args ) use ( $mock_users ) {
+					self::assertSame( 'customer', $args['role'] );
+					self::assertSame( 'display_name', $args['orderby'] );
+					self::assertSame( 'ASC', $args['order'] );
+
+					if ( 'ids' === ( $args['fields'] ?? null ) ) {
+						return [ 1, 2 ];
 					}
-				)
-			)
-			->andReturn( $mock_users );
+
+					self::assertSame( 6, $args['number'] );
+					self::assertSame( 0, $args['offset'] );
+
+					return $mock_users;
+				}
+			);
 
 		Functions\when( 'get_user_meta' )->justReturn( '123456789' );
 
+		Filters\expectApplied( 'stolmc_service_tracker_get_users_count_args' )
+			->once()
+			->andReturnUsing( static fn( $args ) => $args );
 		Filters\expectApplied( 'stolmc_service_tracker_get_users_args' )
 			->once()
 			->andReturnUsing( static fn( $args ) => $args );
@@ -91,9 +99,9 @@ class Api_Users_Test extends API_TestCase {
 		$this->assertSame( 200, $response->get_status() );
 
 		$data = $response->get_data();
-		$this->assertCount( 2, $data );
-		$this->assertSame( 'User One', $data[0]['name'] );
-		$this->assertSame( 'user1@example.com', $data[0]['email'] );
+		$this->assertCount( 2, $data['data'] );
+		$this->assertSame( 'User One', $data['data'][0]['name'] );
+		$this->assertSame( 'user1@example.com', $data['data'][0]['email'] );
 	}
 
 	/**
@@ -102,24 +110,29 @@ class Api_Users_Test extends API_TestCase {
 	public function test_get_users_applies_filters_to_query_args(): void {
 		$modified_args = null;
 		Functions\expect( 'get_users' )
-			->once()
-			->with(
-				Mockery::on(
-					static function ( $args ) use ( &$modified_args ) {
-						$modified_args = $args;
-						self::assertSame( 'customer', $args['role'] );
-						self::assertSame( 'email', $args['orderby'] );
-						self::assertSame( 'DESC', $args['order'] );
-						return true;
+			->twice()
+			->andReturnUsing(
+				static function ( $args ) use ( &$modified_args ) {
+					if ( 'ids' === ( $args['fields'] ?? null ) ) {
+						return [ 1, 2 ];
 					}
-				)
-			)
-			->andReturn( [] );
 
+					$modified_args = $args;
+					self::assertSame( 'customer', $args['role'] );
+					self::assertSame( 'email', $args['orderby'] );
+					self::assertSame( 'DESC', $args['order'] );
+					return [];
+				}
+			);
+
+		Filters\expectApplied( 'stolmc_service_tracker_get_users_count_args' )
+			->once()
+			->with( [ 'role' => 'customer', 'fields' => 'ids', 'orderby' => 'display_name', 'order' => 'ASC' ] )
+			->andReturnUsing( static fn( $args ) => $args );
 		Filters\expectApplied( 'stolmc_service_tracker_get_users_args' )
 			->once()
-			->with( [ 'role' => 'customer', 'orderby' => 'display_name', 'order' => 'ASC' ] )
-			->andReturn( [ 'role' => 'customer', 'orderby' => 'email', 'order' => 'DESC' ] );
+			->with( [ 'role' => 'customer', 'orderby' => 'display_name', 'order' => 'ASC', 'number' => 6, 'offset' => 0 ] )
+			->andReturn( [ 'role' => 'customer', 'orderby' => 'email', 'order' => 'DESC', 'number' => 6, 'offset' => 0 ] );
 		Filters\expectApplied( 'stolmc_service_tracker_users_response' )
 			->once()
 			->andReturnUsing( static fn( $data ) => $data );
@@ -136,8 +149,21 @@ class Api_Users_Test extends API_TestCase {
 	 * Test get_users applies filters to response.
 	 */
 	public function test_get_users_applies_filters_to_response(): void {
-		Functions\when( 'get_users' )->justReturn( [] );
+		Functions\expect( 'get_users' )
+			->twice()
+			->andReturnUsing(
+				static function ( $args ) {
+					if ( 'ids' === ( $args['fields'] ?? null ) ) {
+						return [];
+					}
 
+					return [];
+				}
+			);
+
+		Filters\expectApplied( 'stolmc_service_tracker_get_users_count_args' )
+			->once()
+			->andReturnUsing( static fn( $args ) => $args );
 		Filters\expectApplied( 'stolmc_service_tracker_get_users_args' )
 			->once()
 			->andReturnUsing( static fn( $args ) => $args );
@@ -150,7 +176,16 @@ class Api_Users_Test extends API_TestCase {
 
 		$response = $this->api->get_users( $request );
 
-		$this->assertSame( [ 'custom' => 'data' ], $response->get_data() );
+		$this->assertSame(
+			[
+				'data'        => [ 'custom' => 'data' ],
+				'total'       => 0,
+				'page'        => 1,
+				'per_page'    => 6,
+				'total_pages' => 1,
+			],
+			$response->get_data()
+		);
 	}
 
 	/**

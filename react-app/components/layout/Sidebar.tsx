@@ -17,7 +17,7 @@ export default function Sidebar() {
   ];
 
   return (
-    <aside className="flex-shrink-0 w-64 h-[calc(100vh-32px)] flex flex-col py-8 px-4 bg-surface-container-lowest backdrop-blur-xl shadow-[12px_0_32px_rgba(11,28,48,0.06)] z-40">
+    <aside className="flex-shrink-0 w-64 h-[calc(100vh-32px)] flex flex-col py-8 px-4 bg-surface-container-lowest backdrop-blur-xl border-r border-outline-variant/20 shadow-sm z-40">
       {/* Brand Header */}
       <div className="mb-10 px-4">
         <h1 className="text-xl font-black text-on-surface tracking-tighter uppercase">
@@ -57,7 +57,7 @@ export default function Sidebar() {
       </nav>
 
       {/* Bottom Navigation & User Profile */}
-      <div className="mt-auto border-t border-outline-variant pt-6 space-y-1">
+      <div className="mt-auto border-t border-outline-variant/40 pt-6 space-y-1">
         {bottomNavItems.map((item) => {
           const isActive = inViewState.view === item.view;
           return (

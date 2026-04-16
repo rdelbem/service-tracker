@@ -212,8 +212,8 @@ class Api_Cases_Test extends API_TestCase {
 
 		$this->api->custom_api();
 
-		// Should register 4 routes: read, update, delete, create.
-		$this->assertSame( 4, $registered_count );
+		// Should register 5 routes: read, update, delete, create, search.
+		$this->assertSame( 5, $registered_count );
 	}
 
 	/**
