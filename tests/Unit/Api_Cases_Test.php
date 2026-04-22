@@ -367,4 +367,124 @@ class Api_Cases_Test extends API_TestCase {
 
 		$this->assertSame( 1, Actions\did( 'stolmc_service_tracker_case_before_delete' ) );
 	}
+
+	// =========================================================================
+	// Contract Tests - Endpoint Payload & Status Codes
+	// =========================================================================
+
+	/**
+	 * Test create endpoint contract - required payload keys.
+	 */
+	public function test_create_endpoint_required_payload_keys(): void {
+		// Test missing id_user returns error
+		$case_data = [ 'title' => 'Test Case' ]; // Missing id_user
+		$body = json_encode( $case_data );
+		$request = $this->create_mock_request( [], [ 'x_wp_nonce' => [ 'valid_nonce' ] ], $body );
+		
+		$response = $this->api->create( $request );
+		
+		$this->assertInstanceOf( WP_REST_Response::class, $response );
+		$this->assertSame( 400, $response->get_status() );
+		
+		$data = $response->get_data();
+		$this->assertIsArray( $data );
+		$this->assertFalse( $data['success'] );
+
+		// Test missing title returns error
+		$case_data = [ 'id_user' => self::TEST_USER_ID ]; // Missing title
+		$body = json_encode( $case_data );
+		$request = $this->create_mock_request( [], [ 'x_wp_nonce' => [ 'valid_nonce' ] ], $body );
+		
+		$response = $this->api->create( $request );
+		
+		$this->assertInstanceOf( WP_REST_Response::class, $response );
+		$this->assertSame( 400, $response->get_status() );
+		
+		$data = $response->get_data();
+		$this->assertIsArray( $data );
+		$this->assertFalse( $data['success'] );
+	}
+
+	/**
+	 * Test create endpoint contract - status codes.
+	 */
+	public function test_create_endpoint_status_codes(): void {
+		$case_data = $this->create_sample_case_data();
+		$body = json_encode( $case_data );
+		$request = $this->create_mock_request( [], [ 'x_wp_nonce' => [ 'valid_nonce' ] ], $body );
+
+		$this->mock_cases_orm->allows( 'create' )
+			->andReturn( 'Success, data was inserted' );
+		$this->mock_cases_orm->allows( 'get_last_insert_id' )->andReturn( self::TEST_CASE_ID );
+
+		Filters\expectApplied( 'stolmc_service_tracker_case_create_data' )
+			->once()
+			->withAnyArgs()
+			->andReturnUsing( static fn( ...$args ) => $args[0] );
+
+		Actions\expectDone( 'stolmc_service_tracker_case_created' )
+			->once()
+			->with( self::TEST_CASE_ID, \Mockery::type( 'array' ), \Mockery::type( WP_REST_Request::class ) );
+
+		$response = $this->api->create( $request );
+
+		$this->assertInstanceOf( WP_REST_Response::class, $response );
+		$this->assertSame( 201, $response->get_status(), 'Create should return 201 on success' );
+
+		$data = $response->get_data();
+		$this->assertIsArray( $data );
+		$this->assertTrue( $data['success'] );
+		$this->assertSame( self::TEST_CASE_ID, $data['id'] );
+	}
+
+	// =========================================================================
+	// Contract Tests - Hook Signatures
+	// =========================================================================
+
+	/**
+	 * Test create method hook signatures.
+	 */
+	public function test_create_method_hook_signatures(): void {
+		$case_data = $this->create_sample_case_data();
+		$body = json_encode( $case_data );
+		$request = $this->create_mock_request( [], [ 'x_wp_nonce' => [ 'valid_nonce' ] ], $body );
+
+		$this->mock_cases_orm->allows( 'create' )
+			->andReturn( 'Success, data was inserted' );
+		$this->mock_cases_orm->allows( 'get_last_insert_id' )->andReturn( self::TEST_CASE_ID );
+
+		// Test filter signature
+		Filters\expectApplied( 'stolmc_service_tracker_case_create_data' )
+			->once()
+			->with( \Mockery::type( 'array' ), \Mockery::type( 'array' ) )
+			->andReturnUsing( static fn( ...$args ) => $args[0] );
+
+		// Test action signature
+		Actions\expectDone( 'stolmc_service_tracker_case_created' )
+			->once()
+			->with( \Mockery::type( 'int' ), \Mockery::type( 'array' ), \Mockery::type( WP_REST_Request::class ) );
+
+		$response = $this->api->create( $request );
+
+		$this->assertInstanceOf( WP_REST_Response::class, $response );
+		$this->assertSame( 201, $response->get_status() );
+	}
+
+	/**
+	 * Test invalid JSON returns proper error.
+	 */
+	public function test_invalid_json_returns_error(): void {
+		// Test with invalid JSON
+		$request = $this->create_mock_request( [], [ 'x_wp_nonce' => [ 'valid_nonce' ] ], 'invalid json' );
+		
+		$response = $this->api->create( $request );
+		
+		$this->assertInstanceOf( WP_REST_Response::class, $response );
+		$this->assertSame( 400, $response->get_status() );
+		
+		$data = $response->get_data();
+		$this->assertIsArray( $data );
+		$this->assertFalse( $data['success'] );
+		$this->assertStringContainsString( 'JSON', $data['message'] );
+	}
 }
