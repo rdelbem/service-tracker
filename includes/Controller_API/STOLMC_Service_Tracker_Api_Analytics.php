@@ -55,7 +55,7 @@ class STOLMC_Service_Tracker_Api_Analytics extends STOLMC_Service_Tracker_Api {
 		// Get analytics data from service.
 		$service_result = $this->analytics_service->get_analytics( $start, $end );
 
-		// Map service result to REST response using response mapper.
-		return STOLMC_Service_Tracker_Api_Response_Mapper::to_default_response( $service_result );
+		// Analytics endpoint historically returns raw payload.
+		return STOLMC_Service_Tracker_Api_Response_Mapper::from_service_result_passthrough( $service_result );
 	}
 }

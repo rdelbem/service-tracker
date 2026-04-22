@@ -30,7 +30,7 @@ export default function Analytics() {
     return <Spinner />;
   }
 
-  if (!analytics) {
+  if (!analytics?.summary) {
     return (
       <section className="flex-1 h-full overflow-y-auto">
         <div className="p-8 text-center">
