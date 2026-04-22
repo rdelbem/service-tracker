@@ -312,4 +312,130 @@ class Sql_Test extends Unit_TestCase {
 			$this->sql
 		);
 	}
+
+	/**
+	 * Test begin_transaction starts a transaction.
+	 */
+	public function test_begin_transaction_starts_transaction(): void {
+		$this->mock_wpdb->allows( 'query' )
+			->with( 'START TRANSACTION' )
+			->andReturn( 1 );
+
+		Actions\expectDone( 'stolmc_service_tracker_sql_transaction_started' )
+			->atMost()->once();
+
+		$result = $this->sql->begin_transaction();
+
+		$this->assertTrue( $result );
+		$this->assertTrue( $this->sql->in_transaction() );
+	}
+
+	/**
+	 * Test begin_transaction returns false when already in transaction.
+	 */
+	public function test_begin_transaction_returns_false_when_already_in_transaction(): void {
+		// First start a transaction
+		$this->mock_wpdb->allows( 'query' )
+			->with( 'START TRANSACTION' )
+			->andReturn( 1 );
+
+		$this->sql->begin_transaction();
+
+		// Try to start another transaction
+		$result = $this->sql->begin_transaction();
+
+		$this->assertFalse( $result );
+	}
+
+	/**
+	 * Test commit commits a transaction.
+	 */
+	public function test_commit_commits_transaction(): void {
+		// Start transaction first
+		$this->mock_wpdb->allows( 'query' )
+			->with( 'START TRANSACTION' )
+			->andReturn( 1 );
+
+		$this->sql->begin_transaction();
+
+		// Now commit
+		$this->mock_wpdb->allows( 'query' )
+			->with( 'COMMIT' )
+			->andReturn( 1 );
+
+		Actions\expectDone( 'stolmc_service_tracker_sql_transaction_committed' )
+			->atMost()->once();
+
+		$result = $this->sql->commit();
+
+		$this->assertTrue( $result );
+		$this->assertFalse( $this->sql->in_transaction() );
+	}
+
+	/**
+	 * Test commit returns false when not in transaction.
+	 */
+	public function test_commit_returns_false_when_not_in_transaction(): void {
+		$result = $this->sql->commit();
+
+		$this->assertFalse( $result );
+	}
+
+	/**
+	 * Test rollback rolls back a transaction.
+	 */
+	public function test_rollback_rolls_back_transaction(): void {
+		// Start transaction first
+		$this->mock_wpdb->allows( 'query' )
+			->with( 'START TRANSACTION' )
+			->andReturn( 1 );
+
+		$this->sql->begin_transaction();
+
+		// Now rollback
+		$this->mock_wpdb->allows( 'query' )
+			->with( 'ROLLBACK' )
+			->andReturn( 1 );
+
+		Actions\expectDone( 'stolmc_service_tracker_sql_transaction_rolled_back' )
+			->atMost()->once();
+
+		$result = $this->sql->rollback();
+
+		$this->assertTrue( $result );
+		$this->assertFalse( $this->sql->in_transaction() );
+	}
+
+	/**
+	 * Test rollback returns false when not in transaction.
+	 */
+	public function test_rollback_returns_false_when_not_in_transaction(): void {
+		$result = $this->sql->rollback();
+
+		$this->assertFalse( $result );
+	}
+
+	/**
+	 * Test in_transaction returns correct state.
+	 */
+	public function test_in_transaction_returns_correct_state(): void {
+		// Initially not in transaction
+		$this->assertFalse( $this->sql->in_transaction() );
+
+		// Start transaction
+		$this->mock_wpdb->allows( 'query' )
+			->with( 'START TRANSACTION' )
+			->andReturn( 1 );
+
+		$this->sql->begin_transaction();
+		$this->assertTrue( $this->sql->in_transaction() );
+
+		// Commit transaction
+		$this->mock_wpdb->allows( 'query' )
+			->with( 'COMMIT' )
+			->andReturn( 1 );
+
+		$this->sql->commit();
+		$this->assertFalse( $this->sql->in_transaction() );
+	}
 }

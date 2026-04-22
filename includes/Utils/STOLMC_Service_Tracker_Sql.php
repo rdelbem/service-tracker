@@ -846,4 +846,129 @@ class STOLMC_Service_Tracker_Sql {
 
 		return $deleted;
 	}
+
+	/**
+	 * Begin a database transaction.
+	 *
+	 * Starts a new transaction if not already in one.
+	 * Note: MySQL doesn't support true nested transactions.
+	 *
+	 * @since 1.5.0
+	 *
+	 * @return bool True if transaction started successfully, false otherwise.
+	 */
+	public function begin_transaction(): bool {
+		global $wpdb;
+
+		// Check if already in a transaction
+		if ( $this->in_transaction() ) {
+			return false;
+		}
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$result = $wpdb->query( 'START TRANSACTION' );
+
+		if ( $result !== false ) {
+			$this->transaction_active = true;
+			/**
+			 * Fires after a transaction has been started.
+			 *
+			 * @since 1.5.0
+			 *
+			 * @param string|false $table_name The table name.
+			 */
+			do_action( 'stolmc_service_tracker_sql_transaction_started', $this->table_name );
+		}
+
+		return $result !== false;
+	}
+
+	/**
+	 * Commit the current database transaction.
+	 *
+	 * Commits all changes made during the current transaction.
+	 *
+	 * @since 1.5.0
+	 *
+	 * @return bool True if transaction committed successfully, false otherwise.
+	 */
+	public function commit(): bool {
+		global $wpdb;
+
+		// Check if in a transaction
+		if ( ! $this->in_transaction() ) {
+			return false;
+		}
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$result = $wpdb->query( 'COMMIT' );
+
+		if ( $result !== false ) {
+			$this->transaction_active = false;
+			/**
+			 * Fires after a transaction has been committed.
+			 *
+			 * @since 1.5.0
+			 *
+			 * @param string|false $table_name The table name.
+			 */
+			do_action( 'stolmc_service_tracker_sql_transaction_committed', $this->table_name );
+		}
+
+		return $result !== false;
+	}
+
+	/**
+	 * Rollback the current database transaction.
+	 *
+	 * Reverts all changes made during the current transaction.
+	 *
+	 * @since 1.5.0
+	 *
+	 * @return bool True if transaction rolled back successfully, false otherwise.
+	 */
+	public function rollback(): bool {
+		global $wpdb;
+
+		// Check if in a transaction
+		if ( ! $this->in_transaction() ) {
+			return false;
+		}
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$result = $wpdb->query( 'ROLLBACK' );
+
+		if ( $result !== false ) {
+			$this->transaction_active = false;
+			/**
+			 * Fires after a transaction has been rolled back.
+			 *
+			 * @since 1.5.0
+			 *
+			 * @param string|false $table_name The table name.
+			 */
+			do_action( 'stolmc_service_tracker_sql_transaction_rolled_back', $this->table_name );
+		}
+
+		return $result !== false;
+	}
+
+	/**
+	 * Check if currently in a database transaction.
+	 *
+	 * @since 1.5.0
+	 *
+	 * @return bool True if in a transaction, false otherwise.
+	 */
+	public function in_transaction(): bool {
+		return $this->transaction_active;
+	}
+
+	/**
+	 * Transaction state flag.
+	 *
+	 * @since 1.5.0
+	 * @var bool
+	 */
+	private $transaction_active = false;
 }

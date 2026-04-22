@@ -641,11 +641,16 @@ class STOLMC_Service_Tracker_Api_Cases extends STOLMC_Service_Tracker_Api implem
 	/**
 	 * Delete a case entry and its associated progress records.
 	 *
+	 * Uses a database transaction to ensure atomicity: either both the case
+	 * and its progress records are deleted, or neither are.
+	 *
+	 * @since 1.5.0 Added transaction support for atomic deletion.
+	 *
 	 * @param WP_REST_Request $data The REST request object.
 	 *
-	 * @return mixed
+	 * @return array<string, mixed> Response with delete results.
 	 */
-	public function delete( WP_REST_Request $data ): mixed {
+	public function delete( WP_REST_Request $data ): array {
 		$case_id = $data['id'];
 
 		/**
@@ -658,24 +663,87 @@ class STOLMC_Service_Tracker_Api_Cases extends STOLMC_Service_Tracker_Api implem
 		 */
 		do_action( 'stolmc_service_tracker_case_before_delete', $case_id, $data );
 
-		$delete          = $this->sql->delete( [ 'id' => $case_id ] );
-		$delete_progress = $this->progress_sql->delete( [ 'id_case' => $case_id ] );
+		// Start transaction for atomic deletion
+		$transaction = new \STOLMC_Service_Tracker\includes\Utils\STOLMC_Service_Tracker_Transaction( $this->sql );
 
-		/**
-		 * Fires after a case has been deleted.
-		 *
-		 * @since 1.0.0
-		 *
-		 * @param mixed           $delete          The case delete result.
-		 * @param mixed           $delete_progress The progress delete result.
-		 * @param int             $case_id         The ID of the deleted case.
-		 * @param WP_REST_Request $data            The REST request object.
-		 */
-		do_action( 'stolmc_service_tracker_case_deleted', $delete, $delete_progress, $case_id, $data );
+		try {
+			// Delete the case
+			$delete = $this->sql->delete( [ 'id' => $case_id ] );
 
-		return [
-			'case_delete'     => $delete,
-			'progress_delete' => $delete_progress,
-		];
+			// Delete associated progress records
+			$delete_progress = $this->progress_sql->delete( [ 'id_case' => $case_id ] );
+
+			// Check if both operations succeeded
+			if ( $delete === false || $delete_progress === false ) {
+				// One of the operations failed, rollback transaction
+				$transaction->rollback();
+
+				/**
+				 * Fires when case deletion fails.
+				 *
+				 * @since 1.5.0
+				 *
+				 * @param int|false       $delete          The case delete result.
+				 * @param int|false       $delete_progress The progress delete result.
+				 * @param int             $case_id         The ID of the case.
+				 * @param WP_REST_Request $data            The REST request object.
+				 */
+				do_action( 'stolmc_service_tracker_case_delete_failed', $delete, $delete_progress, $case_id, $data );
+
+				return [
+					'success'          => false,
+					'message'          => 'Failed to delete case or associated progress records',
+					'case_delete'      => $delete,
+					'progress_delete'  => $delete_progress,
+					'transaction'      => 'rolled back',
+				];
+			}
+
+			// Both operations succeeded, commit transaction
+			$transaction->commit();
+
+			/**
+			 * Fires after a case has been deleted.
+			 *
+			 * @since 1.0.0
+			 *
+			 * @param mixed           $delete          The case delete result.
+			 * @param mixed           $delete_progress The progress delete result.
+			 * @param int             $case_id         The ID of the deleted case.
+			 * @param WP_REST_Request $data            The REST request object.
+			 */
+			do_action( 'stolmc_service_tracker_case_deleted', $delete, $delete_progress, $case_id, $data );
+
+			return [
+				'success'          => true,
+				'case_delete'      => $delete,
+				'progress_delete'  => $delete_progress,
+				'transaction'      => 'committed',
+			];
+
+		} catch ( \Exception $e ) {
+			// Exception occurred, rollback transaction
+			$transaction->rollback();
+
+			/**
+			 * Fires when case deletion throws an exception.
+			 *
+			 * @since 1.5.0
+			 *
+			 * @param \Exception      $e      The exception that was thrown.
+			 * @param int             $case_id The ID of the case.
+			 * @param WP_REST_Request $data   The REST request object.
+			 */
+			do_action( 'stolmc_service_tracker_case_delete_exception', $e, $case_id, $data );
+
+			// Log the error for debugging
+			error_log( 'Service Tracker: Case delete transaction failed - ' . $e->getMessage() );
+
+			return [
+				'success' => false,
+				'message' => 'Transaction failed: ' . $e->getMessage(),
+				'transaction' => 'rolled back due to exception',
+			];
+		}
 	}
 }
