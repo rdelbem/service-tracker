@@ -1,5 +1,5 @@
 <?php
-namespace STOLMC_Service_Tracker\includes\API;
+namespace STOLMC_Service_Tracker\includes\Controller_API;
 
 use WP_Error;
 use WP_REST_Response;
@@ -12,6 +12,11 @@ use WP_REST_Request;
  * user verification, security checks, and route registration.
  */
 class STOLMC_Service_Tracker_Api {
+
+	/**
+	 * Shared REST namespace for plugin endpoints.
+	 */
+	protected const REST_NAMESPACE = 'service-tracker-stolmc/v1';
 
 	/**
 	 * Central permission check for all routes.
@@ -71,27 +76,10 @@ class STOLMC_Service_Tracker_Api {
 	 * @return void
 	 */
 	public function register_new_route( string $api_type, string $api_argument, string $method, array $callback ): void {
-		$route_args = [
-			'methods'             => $method,
-			'callback'            => $callback,
-			'permission_callback' => [ $this, 'permission_check' ],
-		];
-
-		/**
-		 * Filters the REST route arguments before registration.
-		 *
-		 * @since 1.0.0
-		 *
-		 * @param array  $route_args   The route arguments.
-		 * @param string $api_type     The API endpoint type.
-		 * @param string $api_argument The API argument pattern.
-		 */
-		$route_args = apply_filters( 'stolmc_service_tracker_api_route_args', $route_args, $api_type, $api_argument );
-
-		register_rest_route(
-			'service-tracker-stolmc/v1',
+		$this->register_route(
 			'/' . $api_type . '/(?P<id' . $api_argument . '>\d+)',
-			$route_args
+			$method,
+			$callback
 		);
 
 		/**
@@ -105,6 +93,45 @@ class STOLMC_Service_Tracker_Api {
 		 * @param array  $callback     The callback function.
 		 */
 		do_action( 'stolmc_service_tracker_api_route_registered', $api_type, $api_argument, $method, $callback );
+	}
+
+	/**
+	 * Register a REST route using the shared plugin namespace.
+	 *
+	 * @param string                $route_path Route path (e.g. '/analytics').
+	 * @param string                $method     HTTP methods allowed.
+	 * @param array{object, string} $callback   Callback to execute.
+	 * @param array<string, mixed>  $args       Optional endpoint args schema.
+	 *
+	 * @return void
+	 */
+	protected function register_route( string $route_path, string $method, array $callback, array $args = [] ): void {
+		$route_args = [
+			'methods'             => $method,
+			'callback'            => $callback,
+			'permission_callback' => [ $this, 'permission_check' ],
+		];
+
+		if ( ! empty( $args ) ) {
+			$route_args['args'] = $args;
+		}
+
+		/**
+		 * Filters the REST route arguments before registration.
+		 *
+		 * @since 1.0.0
+		 *
+		 * @param array  $route_args The route arguments.
+		 * @param string $route_path The API route path.
+		 * @param string $method     The HTTP methods allowed.
+		 */
+		$route_args = apply_filters( 'stolmc_service_tracker_api_route_args', $route_args, $route_path, $method );
+
+		register_rest_route(
+			self::REST_NAMESPACE,
+			$route_path,
+			$route_args
+		);
 	}
 
 	/**

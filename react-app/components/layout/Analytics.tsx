@@ -368,6 +368,7 @@ function TrendBlock({
   icon: string;
 }) {
   const maxCount = Math.max(...data.map((d) => d.count), 1);
+  const TRENDS_ROWS_LIMIT = 5;
 
   return (
     <div className="bg-surface-container-low p-6 rounded-xl shadow-lg">
@@ -380,7 +381,7 @@ function TrendBlock({
         <p className="text-xs text-outline">No data available</p>
       ) : (
         <div className="space-y-2">
-          {data.slice(0, 10).map((item, index) => (
+          {data.slice(0, TRENDS_ROWS_LIMIT).map((item, index) => (
             <div key={item.period} className="flex items-center gap-3">
               <span className="text-xs text-outline w-20">
                 {new Date(item.period).toLocaleDateString("en-US", { month: "short", day: "numeric" })}

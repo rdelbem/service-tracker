@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { get as fetchGet, post, put } from "../utils/fetch";
+import { normalizeUsers } from "../utils/users";
 import type { User } from "../types";
 
 declare const data: Record<string, any>;
@@ -54,9 +55,10 @@ export const useClientsStore = create<ClientsStore>((set, get) => {
         });
 
         const envelope = res.data;
+        const users = normalizeUsers(envelope.data);
 
         set({
-          users: envelope.data ?? [],
+          users,
           total: envelope.total ?? 0,
           page: envelope.page ?? currentPage,
           perPage: envelope.per_page ?? perPage,
@@ -87,9 +89,10 @@ export const useClientsStore = create<ClientsStore>((set, get) => {
         });
 
         const envelope = res.data;
+        const users = normalizeUsers(envelope.data);
 
         set({
-          users: envelope.data ?? [],
+          users,
           total: envelope.total ?? 0,
           page: envelope.page ?? 1,
           perPage: envelope.per_page ?? perPage,
@@ -118,9 +121,10 @@ export const useClientsStore = create<ClientsStore>((set, get) => {
           });
 
           const envelope = res.data;
+          const users = normalizeUsers(envelope.data);
 
           set({
-            users: envelope.data ?? [],
+            users,
             total: envelope.total ?? 0,
             page: envelope.page ?? clamped,
             perPage: envelope.per_page ?? perPage,

@@ -48,6 +48,9 @@
 	<rule ref="Universal.Arrays.DuplicateArrayKey" />
 	<rule ref="Universal.CodeAnalysis.StaticInFinalClass" />
 	<rule ref="Universal.Operators.DisallowLogicalAndOr" />
+	<rule ref="Universal.Operators.DisallowShortTernary">
+		<exclude name="Universal.Operators.DisallowShortTernary.Found" />
+	</rule>
 	<rule ref="Universal.Operators.StrictComparisons" />
 	<rule ref="Universal.PHP.OneStatementInShortEchoTag" />
 	<rule ref="Universal.UseStatements.LowercaseFunctionConst" />
@@ -85,6 +88,7 @@
 		<exclude name="WordPress.Arrays.ArrayIndentation" />
 		<exclude name="WordPress.DB.SlowDBQuery" />
 		<exclude name="WordPress.Files" />
+		<exclude name="WordPress.PHP.YodaConditions" />
 		<exclude name="WordPress.WhiteSpace.OperatorSpacing" />
 		<exclude name="WordPress.WhiteSpace.PrecisionAlignment.Found" />
 		<exclude name="WordPress.WP.Capabilities.Unknown" />

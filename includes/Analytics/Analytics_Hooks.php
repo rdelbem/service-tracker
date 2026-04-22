@@ -34,21 +34,21 @@ class Analytics_Hooks {
 	 */
 	public function register_hooks(): void {
 		// Case activity hooks.
-		add_action( 'stolmc_service_tracker_case_created', [ $this, 'on_case_created' ], 10, 3 );
-		add_action( 'stolmc_service_tracker_case_updated', [ $this, 'on_case_updated' ], 10, 4 );
-		add_action( 'stolmc_service_tracker_case_deleted', [ $this, 'on_case_deleted' ], 10, 4 );
+		add_action( 'stolmc_service_tracker_case_created', [ $this, 'on_case_created' ], 10, 2 );
+		add_action( 'stolmc_service_tracker_case_updated', [ $this, 'on_case_updated' ], 10, 3 );
+		add_action( 'stolmc_service_tracker_case_deleted', [ $this, 'on_case_deleted' ], 10, 3 );
 
 		// Case status toggle hooks.
-		add_action( 'stolmc_service_tracker_case_closed', [ $this, 'on_case_closed' ], 10, 4 );
-		add_action( 'stolmc_service_tracker_case_reopened', [ $this, 'on_case_reopened' ], 10, 4 );
+		add_action( 'stolmc_service_tracker_case_closed', [ $this, 'on_case_closed' ], 10, 3 );
+		add_action( 'stolmc_service_tracker_case_reopened', [ $this, 'on_case_reopened' ], 10, 3 );
 
 		// Progress activity hooks.
-		add_action( 'stolmc_service_tracker_progress_created', [ $this, 'on_progress_created' ], 10, 3 );
-		add_action( 'stolmc_service_tracker_progress_updated', [ $this, 'on_progress_updated' ], 10, 4 );
-		add_action( 'stolmc_service_tracker_progress_deleted', [ $this, 'on_progress_deleted' ], 10, 3 );
+		add_action( 'stolmc_service_tracker_progress_created', [ $this, 'on_progress_created' ], 10, 2 );
+		add_action( 'stolmc_service_tracker_progress_updated', [ $this, 'on_progress_updated' ], 10, 3 );
+		add_action( 'stolmc_service_tracker_progress_deleted', [ $this, 'on_progress_deleted' ], 10, 2 );
 
 		// User activity hooks.
-		add_action( 'stolmc_service_tracker_user_created', [ $this, 'on_user_created' ], 10, 4 );
+		add_action( 'stolmc_service_tracker_user_created', [ $this, 'on_user_created' ], 10, 2 );
 
 		// Email notification result hooks.
 		add_action( 'stolmc_service_tracker_progress_email_result', [ $this, 'on_progress_email_result' ], 10, 6 );
@@ -64,7 +64,7 @@ class Analytics_Hooks {
 	 *
 	 * @return void
 	 */
-	public function on_case_created( $result, array $case_data, $data ): void {
+	public function on_case_created( $result, array $case_data, $data = null ): void {
 		if ( false === $result ) {
 			return;
 		}
@@ -96,7 +96,7 @@ class Analytics_Hooks {
 	 *
 	 * @return void
 	 */
-	public function on_case_updated( $response, array $update_data, array $condition, $data ): void {
+	public function on_case_updated( $response, array $update_data, array $condition, $data = null ): void {
 		if ( false === $response ) {
 			return;
 		}
@@ -128,7 +128,7 @@ class Analytics_Hooks {
 	 *
 	 * @return void
 	 */
-	public function on_case_deleted( $delete, $delete_progress, int $case_id, $data ): void {
+	public function on_case_deleted( $delete, $delete_progress, int $case_id, $data = null ): void {
 		if ( false === $delete ) {
 			return;
 		}
@@ -158,13 +158,13 @@ class Analytics_Hooks {
 	 *
 	 * @return void
 	 */
-	public function on_case_closed( $toggle, int $id_user, string $title, $data ): void {
+	public function on_case_closed( $toggle, int $id_user, string $title, $data = null ): void {
 		if ( false === $toggle ) {
 			return;
 		}
 
 		$actor   = AnalyticsLogger::capture_current_actor();
-		$case_id = $data['id'] ?? null;
+		$case_id = is_array( $data ) ? ( $data['id'] ?? null ) : null;
 
 		$this->logger->log_activity(
 			[
@@ -190,13 +190,13 @@ class Analytics_Hooks {
 	 *
 	 * @return void
 	 */
-	public function on_case_reopened( $toggle, int $id_user, string $title, $data ): void {
+	public function on_case_reopened( $toggle, int $id_user, string $title, $data = null ): void {
 		if ( false === $toggle ) {
 			return;
 		}
 
 		$actor   = AnalyticsLogger::capture_current_actor();
-		$case_id = $data['id'] ?? null;
+		$case_id = is_array( $data ) ? ( $data['id'] ?? null ) : null;
 
 		$this->logger->log_activity(
 			[
@@ -215,19 +215,38 @@ class Analytics_Hooks {
 	/**
 	 * Handle progress created event.
 	 *
-	 * @param string|false     $result        The insert result.
+	 * @param int|string|false $result        The insert result (ID in current flow, legacy success string in older flow).
 	 * @param array<string,mixed> $progress_data The progress data.
 	 * @param \WP_REST_Request $data          The REST request.
 	 *
 	 * @return void
 	 */
-	public function on_progress_created( $result, array $progress_data, $data ): void {
-		if ( false === $result || ! str_starts_with( $result, 'Success' ) ) {
+	public function on_progress_created( $result, array $progress_data, $data = null ): void {
+		if ( false === $result ) {
 			return;
 		}
 
 		$actor         = AnalyticsLogger::capture_current_actor();
-		$progress_id   = $this->get_last_insert_id();
+		$progress_id   = 0;
+
+		// Current create flow dispatches the created progress ID as an integer.
+		if ( is_int( $result ) ) {
+			$progress_id = $result;
+		} elseif ( is_string( $result ) ) {
+			// Legacy flow dispatched "Success..." strings.
+			if ( ! str_starts_with( $result, 'Success' ) ) {
+				return;
+			}
+			$progress_id = $this->get_last_insert_id();
+		}
+
+		if ( $progress_id <= 0 ) {
+			$progress_id = $this->get_last_insert_id();
+		}
+
+		if ( $progress_id <= 0 ) {
+			return;
+		}
 
 		$this->logger->log_activity(
 			[
@@ -254,7 +273,7 @@ class Analytics_Hooks {
 	 *
 	 * @return void
 	 */
-	public function on_progress_updated( $response, array $update_data, array $condition, $data ): void {
+	public function on_progress_updated( $response, array $update_data, array $condition, $data = null ): void {
 		if ( false === $response ) {
 			return;
 		}
@@ -284,7 +303,7 @@ class Analytics_Hooks {
 	 *
 	 * @return void
 	 */
-	public function on_progress_deleted( $delete, int $id, $data ): void {
+	public function on_progress_deleted( $delete, int $id, $data = null ): void {
 		if ( false === $delete ) {
 			return;
 		}
@@ -314,7 +333,7 @@ class Analytics_Hooks {
 	 *
 	 * @return void
 	 */
-	public function on_user_created( int $user_id, array $user_data, $body, string $password ): void {
+	public function on_user_created( int $user_id, array $user_data, $body = null, string $password = '' ): void {
 		$actor = AnalyticsLogger::capture_current_actor();
 
 		$this->logger->log_activity(

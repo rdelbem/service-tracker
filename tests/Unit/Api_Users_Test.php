@@ -28,7 +28,7 @@ class Api_Users_Test extends API_TestCase {
 	/**
 	 * Users API instance.
 	 *
-	 * @var \STOLMC_Service_Tracker\includes\API\STOLMC_Service_Tracker_Api_Users
+	 * @var \STOLMC_Service_Tracker\includes\Controller_API\STOLMC_Service_Tracker_Api_Users
 	 */
 	protected $api;
 
@@ -38,7 +38,7 @@ class Api_Users_Test extends API_TestCase {
 	protected function set_up(): void {
 		parent::set_up();
 
-		$this->api = new \STOLMC_Service_Tracker\includes\API\STOLMC_Service_Tracker_Api_Users();
+		$this->api = new \STOLMC_Service_Tracker\includes\Controller_API\STOLMC_Service_Tracker_Api_Users();
 	}
 
 	/**

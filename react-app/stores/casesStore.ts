@@ -37,6 +37,11 @@ export interface CasesStore extends CasesState, CasesActions {}
 export const useCasesStore = create<CasesStore>((set, get) => {
   const apiUrlCases  = `${data.root_url}/wp-json/${data.api_url}/cases`;
   const searchUrl    = `${data.root_url}/wp-json/service-tracker-stolmc/v1/cases/search`;
+  const isInvalidId = (id: unknown): boolean => {
+    if (id === undefined || id === null) return true;
+    const value = String(id).trim();
+    return value === "" || value === "undefined" || value === "null";
+  };
 
   return {
     user: "",
@@ -50,6 +55,13 @@ export const useCasesStore = create<CasesStore>((set, get) => {
 
     getCases: async (id: string | number, onlyFetch: boolean, page?: number): Promise<Case[] | void> => {
       try {
+        if (isInvalidId(id)) {
+          if (!onlyFetch) {
+            set({ loadingCases: false, cases: [], total: 0, totalPages: 1 });
+          }
+          return [];
+        }
+
         if (!onlyFetch) {
           set({ loadingCases: true, searchQuery: "" });
         }
@@ -128,6 +140,8 @@ export const useCasesStore = create<CasesStore>((set, get) => {
     },
 
     setPage: async (id: string | number, page: number): Promise<void> => {
+      if (isInvalidId(id)) return;
+
       const { totalPages, searchQuery, perPage } = get();
       const clamped = Math.max(1, Math.min(page, totalPages));
       set({ page: clamped });

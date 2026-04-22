@@ -29,9 +29,23 @@ class Api_Progress_Test extends API_TestCase {
 	/**
 	 * Progress API instance.
 	 *
-	 * @var \STOLMC_Service_Tracker\includes\API\STOLMC_Service_Tracker_Api_Progress
+	 * @var \STOLMC_Service_Tracker\includes\Controller_API\STOLMC_Service_Tracker_Api_Progress
 	 */
 	protected $api;
+
+	/**
+	 * Cases Repository mock.
+	 *
+	 * @var \Mockery\MockInterface
+	 */
+	protected $mock_cases_orm;
+
+	/**
+	 * Case-progress Repository mock.
+	 *
+	 * @var \Mockery\MockInterface
+	 */
+	protected $mock_case_progress_orm;
 
 	/**
 	 * Set up test fixtures.
@@ -39,12 +53,15 @@ class Api_Progress_Test extends API_TestCase {
 	protected function set_up(): void {
 		parent::set_up();
 
-		$this->api = new \STOLMC_Service_Tracker\includes\API\STOLMC_Service_Tracker_Api_Progress();
+		$this->mock_cases_orm = Mockery::mock( \STOLMC_Service_Tracker\includes\Repositories\STOLMC_Service_Tracker_Cases_Repository::class );
+		$this->mock_case_progress_orm = Mockery::mock( \STOLMC_Service_Tracker\includes\Repositories\STOLMC_Service_Tracker_Case_Progress_Repository::class );
 
-		// Create mock SQL instance WITHOUT default behavior - each test will set up its own expectations.
-		$this->mock_sql = \Mockery::mock( STOLMC_Service_Tracker_Sql::class );
+		$this->mock_cases_orm->allows( 'progress' )->andReturn( $this->mock_case_progress_orm );
+		$this->mock_cases_orm->allows( 'progress_from_progress_id' )->andReturn( $this->mock_case_progress_orm );
+		$this->mock_cases_orm->allows( 'find_by' )->andReturn( [] );
 
-		set_private_property( $this->api, 'sql', $this->mock_sql );
+		$this->api = new \STOLMC_Service_Tracker\includes\Controller_API\STOLMC_Service_Tracker_Api_Progress();
+		set_private_property( $this->api, 'cases', $this->mock_cases_orm );
 	}
 
 	/**
@@ -56,7 +73,7 @@ class Api_Progress_Test extends API_TestCase {
 			(object) [ 'id' => 2, 'text' => 'Progress 2', 'created_at' => '2024-01-02 12:00:00' ],
 		];
 
-		$this->mock_sql->allows( 'get_by' )
+		$this->mock_case_progress_orm->allows( 'find_all' )
 			->andReturn( $expected_progress );
 
 		Filters\expectApplied( 'stolmc_service_tracker_progress_read_query_args' )
@@ -82,7 +99,7 @@ class Api_Progress_Test extends API_TestCase {
 
 		$request = $this->create_mock_request( [], [ 'x_wp_nonce' => [ 'valid_nonce' ] ], $body );
 
-		$this->mock_sql->allows( 'insert' )
+		$this->mock_case_progress_orm->allows( 'create' )
 			->andReturn( 'Success' );
 
 		Actions\expectDone( 'stolmc_service_tracker_progress_created' )
@@ -123,7 +140,7 @@ class Api_Progress_Test extends API_TestCase {
 			->atMost()->once()
 			->andReturnUsing( static fn( $data ) => $data );
 
-		$this->mock_sql->allows( 'insert' )
+		$this->mock_case_progress_orm->allows( 'create' )
 			->andReturn( 'Success' );
 
 		Actions\expectDone( 'stolmc_service_tracker_progress_created' )
@@ -141,7 +158,7 @@ class Api_Progress_Test extends API_TestCase {
 		$body = json_encode( [ 'text' => 'Updated progress text' ] );
 		$request = $this->create_mock_request( [ 'id' => 1 ], [ 'x_wp_nonce' => [ 'valid_nonce' ] ], $body );
 
-		$this->mock_sql->allows( 'update' )
+		$this->mock_case_progress_orm->allows( 'update_by_id' )
 			->andReturn( 1 );
 
 		Actions\expectDone( 'stolmc_service_tracker_progress_updated' )
@@ -198,7 +215,7 @@ class Api_Progress_Test extends API_TestCase {
 	public function test_delete_removes_progress_entry(): void {
 		$request = $this->create_mock_request( [ 'id' => 1 ] );
 
-		$this->mock_sql->allows( 'delete' )
+		$this->mock_case_progress_orm->allows( 'delete_by_id' )
 			->andReturn( 1 );
 
 		Actions\expectDone( 'stolmc_service_tracker_progress_before_delete' )
@@ -258,7 +275,7 @@ class Api_Progress_Test extends API_TestCase {
 		Functions\expect( 'wp_mail' )
 			->never();
 
-		$this->mock_sql->allows( 'insert' )
+		$this->mock_case_progress_orm->allows( 'create' )
 			->andReturn( 'Success' );
 		Actions\expectDone( 'stolmc_service_tracker_progress_created' )
 			->atMost()->once();
@@ -275,7 +292,7 @@ class Api_Progress_Test extends API_TestCase {
 		$body = json_encode( [ 'text' => 'Original text' ] );
 		$request = $this->create_mock_request( [ 'id' => 1 ], [ 'x_wp_nonce' => [ 'valid_nonce' ] ], $body );
 
-		$this->mock_sql->allows( 'update' )
+		$this->mock_case_progress_orm->allows( 'update_by_id' )
 			->andReturn( 1 );
 
 		Filters\expectApplied( 'stolmc_service_tracker_progress_update_data' )
@@ -296,7 +313,7 @@ class Api_Progress_Test extends API_TestCase {
 	public function test_delete_fires_hooks_with_correct_parameters(): void {
 		$request = $this->create_mock_request( [ 'id' => 1 ] );
 
-		$this->mock_sql->allows( 'delete' )
+		$this->mock_case_progress_orm->allows( 'delete_by_id' )
 			->andReturn( 1 );
 
 		Actions\expectDone( 'stolmc_service_tracker_progress_before_delete' )

@@ -49,7 +49,12 @@ describe('fetch utils', () => {
 
     const res = await get('/api/text');
 
-    expect(res).toEqual({ data: 'plain' });
+    expect(res).toEqual({
+      data: 'plain',
+      success: true,
+      error_code: null,
+      message: null
+    });
   });
 
   it('returns null for empty non-json response body', async () => {
@@ -62,7 +67,12 @@ describe('fetch utils', () => {
 
     const res = await del('/api/empty');
 
-    expect(res).toEqual({ data: null });
+    expect(res).toEqual({
+      data: null,
+      success: true,
+      error_code: null,
+      message: null
+    });
   });
 
   it('does not force content-type for multipart uploads', async () => {
@@ -95,6 +105,11 @@ describe('fetch utils', () => {
 
     const res = await put('/api/item/1', { title: 'New' });
 
-    expect(res).toEqual({ data: { updated: true } });
+    expect(res).toEqual({
+      data: { updated: true },
+      success: true,
+      error_code: null,
+      message: null
+    });
   });
 });

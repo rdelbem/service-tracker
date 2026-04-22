@@ -14,6 +14,8 @@ use Brain\Monkey\Actions;
 use Brain\Monkey\Filters;
 use Mockery;
 use WP_REST_Request;
+use STOLMC_Service_Tracker\includes\Repositories\STOLMC_Service_Tracker_Toggle_Repository;
+use STOLMC_Service_Tracker\includes\DTO\STOLMC_Service_Tracker_Case_Dto;
 
 /**
  * Toggle API Test Class.
@@ -27,9 +29,16 @@ class Api_Toggle_Test extends API_TestCase {
 	/**
 	 * Toggle API instance.
 	 *
-	 * @var \STOLMC_Service_Tracker\includes\API\STOLMC_Service_Tracker_Api_Toggle
+	 * @var \STOLMC_Service_Tracker\includes\Controller_API\STOLMC_Service_Tracker_Api_Toggle
 	 */
 	protected $api;
+
+	/**
+	 * Mock Toggle Repository.
+	 *
+	 * @var \Mockery\MockInterface
+	 */
+	protected $mock_toggle_repository;
 
 	/**
 	 * Set up test fixtures.
@@ -37,25 +46,34 @@ class Api_Toggle_Test extends API_TestCase {
 	protected function set_up(): void {
 		parent::set_up();
 
-		$this->api = new \STOLMC_Service_Tracker\includes\API\STOLMC_Service_Tracker_Api_Toggle();
+		$this->api = new \STOLMC_Service_Tracker\includes\Controller_API\STOLMC_Service_Tracker_Api_Toggle();
 
-		// Create mock SQL instance WITHOUT default behavior - each test will set up its own expectations.
-		$this->mock_sql = \Mockery::mock( STOLMC_Service_Tracker_Sql::class );
+		// Create mock Toggle Repository instance WITHOUT default behavior - each test will set up its own expectations.
+		$this->mock_toggle_repository = \Mockery::mock( STOLMC_Service_Tracker_Toggle_Repository::class );
 
-		set_private_property( $this->api, 'sql', $this->mock_sql );
+		set_private_property( $this->api, 'toggle_repository', $this->mock_toggle_repository );
 	}
 
 	/**
 	 * Test toggle_status closes an open case.
 	 */
 	public function test_toggle_status_closes_open_case(): void {
-		$case = $this->create_sample_case_object( [ 'status' => 'open' ] );
+		$case = new STOLMC_Service_Tracker_Case_Dto(
+			self::TEST_CASE_ID,
+			self::TEST_USER_ID,
+			'Test Case',
+			'open'
+		);
 		$request = $this->create_mock_request( [ 'id' => self::TEST_CASE_ID ] );
 
-		$this->mock_sql->allows( 'get_by' )
-			->andReturn( [ $case ] );
+		$this->mock_toggle_repository->shouldReceive( 'find_by_id' )
+			->once()
+			->with( self::TEST_CASE_ID )
+			->andReturn( $case );
 
-		$this->mock_sql->allows( 'update' )
+		$this->mock_toggle_repository->shouldReceive( 'close_case' )
+			->once()
+			->with( self::TEST_CASE_ID )
 			->andReturn( 1 );
 
 		Filters\expectApplied( 'stolmc_service_tracker_toggle_case_data' )
@@ -85,13 +103,22 @@ class Api_Toggle_Test extends API_TestCase {
 	 * Test toggle_status reopens a closed case.
 	 */
 	public function test_toggle_status_reopens_closed_case(): void {
-		$case = $this->create_sample_case_object( [ 'status' => 'close' ] );
+		$case = new STOLMC_Service_Tracker_Case_Dto(
+			self::TEST_CASE_ID,
+			self::TEST_USER_ID,
+			'Test Case',
+			'close'
+		);
 		$request = $this->create_mock_request( [ 'id' => self::TEST_CASE_ID ] );
 
-		$this->mock_sql->allows( 'get_by' )
-			->andReturn( [ $case ] );
+		$this->mock_toggle_repository->shouldReceive( 'find_by_id' )
+			->once()
+			->with( self::TEST_CASE_ID )
+			->andReturn( $case );
 
-		$this->mock_sql->allows( 'update' )
+		$this->mock_toggle_repository->shouldReceive( 'open_case' )
+			->once()
+			->with( self::TEST_CASE_ID )
 			->andReturn( 1 );
 
 		Filters\expectApplied( 'stolmc_service_tracker_toggle_case_data' )
@@ -123,10 +150,10 @@ class Api_Toggle_Test extends API_TestCase {
 	public function test_toggle_status_returns_false_for_non_existent_case(): void {
 		$request = $this->create_mock_request( [ 'id' => self::TEST_CASE_ID ] );
 
-		$this->mock_sql->shouldReceive( 'get_by' )
+		$this->mock_toggle_repository->shouldReceive( 'find_by_id' )
 			->once()
-			->with( [ 'id' => self::TEST_CASE_ID ] )
-			->andReturn( [] );
+			->with( self::TEST_CASE_ID )
+			->andReturn( null );
 
 		$result = $this->api->toggle_status( $request );
 
@@ -137,13 +164,18 @@ class Api_Toggle_Test extends API_TestCase {
 	 * Test toggle_status returns null for invalid status.
 	 */
 	public function test_toggle_status_returns_null_for_invalid_status(): void {
-		$case = $this->create_sample_case_object( [ 'status' => 'invalid' ] );
+		$case = new STOLMC_Service_Tracker_Case_Dto(
+			self::TEST_CASE_ID,
+			self::TEST_USER_ID,
+			'Test Case',
+			'invalid'
+		);
 		$request = $this->create_mock_request( [ 'id' => self::TEST_CASE_ID ] );
 
-		$this->mock_sql->shouldReceive( 'get_by' )
+		$this->mock_toggle_repository->shouldReceive( 'find_by_id' )
 			->once()
-			->with( [ 'id' => self::TEST_CASE_ID ] )
-			->andReturn( [ $case ] );
+			->with( self::TEST_CASE_ID )
+			->andReturn( $case );
 
 		Filters\expectApplied( 'stolmc_service_tracker_toggle_case_data' )
 			->once()
@@ -159,11 +191,18 @@ class Api_Toggle_Test extends API_TestCase {
 	 * Test toggle_case_data filter can modify case data.
 	 */
 	public function test_toggle_case_data_filter_can_modify_case_data(): void {
-		$case = $this->create_sample_case_object( [ 'status' => 'open' ] );
+		$case = new STOLMC_Service_Tracker_Case_Dto(
+			self::TEST_CASE_ID,
+			self::TEST_USER_ID,
+			'Test Case',
+			'open'
+		);
 		$request = $this->create_mock_request( [ 'id' => self::TEST_CASE_ID ] );
 
-		$this->mock_sql->allows( 'get_by' )
-			->andReturn( [ $case ] );
+		$this->mock_toggle_repository->shouldReceive( 'find_by_id' )
+			->once()
+			->with( self::TEST_CASE_ID )
+			->andReturn( $case );
 
 		$modified_case = array_merge( (array) $case, [ 'status' => 'close' ] );
 
@@ -172,6 +211,11 @@ class Api_Toggle_Test extends API_TestCase {
 			->andReturn( $modified_case );
 
 		// Since filter changes status to 'close', API will try to reopen it.
+		$this->mock_toggle_repository->shouldReceive( 'open_case' )
+			->once()
+			->with( self::TEST_CASE_ID )
+			->andReturn( 1 );
+
 		Actions\expectDone( 'stolmc_service_tracker_case_before_reopening' )
 			->atMost()->once();
 		Actions\expectDone( 'stolmc_service_tracker_case_reopened' )
@@ -186,9 +230,6 @@ class Api_Toggle_Test extends API_TestCase {
 
 		Functions\when( 'wp_mail' )->justReturn( true );
 
-		$this->mock_sql->allows( 'update' )
-			->andReturn( 1 );
-
 		$result = $this->api->toggle_status( $request );
 
 		$this->assertNotNull( $result );
@@ -198,17 +239,22 @@ class Api_Toggle_Test extends API_TestCase {
 	 * Test closed status messages can be filtered.
 	 */
 	public function test_closed_status_messages_can_be_filtered(): void {
-		$case = $this->create_sample_case_object( [ 'status' => 'open' ] );
+		$case = new STOLMC_Service_Tracker_Case_Dto(
+			self::TEST_CASE_ID,
+			self::TEST_USER_ID,
+			'Test Case',
+			'open'
+		);
 		$request = $this->create_mock_request( [ 'id' => self::TEST_CASE_ID ] );
 
-		$this->mock_sql->shouldReceive( 'get_by' )
+		$this->mock_toggle_repository->shouldReceive( 'find_by_id' )
 			->once()
-			->with( [ 'id' => self::TEST_CASE_ID ] )
-			->andReturn( [ $case ] );
+			->with( self::TEST_CASE_ID )
+			->andReturn( $case );
 
-		$this->mock_sql->shouldReceive( 'update' )
+		$this->mock_toggle_repository->shouldReceive( 'close_case' )
 			->once()
-			->with( [ 'status' => 'close' ], [ 'id' => self::TEST_CASE_ID ] )
+			->with( self::TEST_CASE_ID )
 			->andReturn( 1 );
 
 		Filters\expectApplied( 'stolmc_service_tracker_toggle_case_data' )
@@ -245,17 +291,22 @@ class Api_Toggle_Test extends API_TestCase {
 	 * Test opened status messages can be filtered.
 	 */
 	public function test_opened_status_messages_can_be_filtered(): void {
-		$case = $this->create_sample_case_object( [ 'status' => 'close' ] );
+		$case = new STOLMC_Service_Tracker_Case_Dto(
+			self::TEST_CASE_ID,
+			self::TEST_USER_ID,
+			'Test Case',
+			'close'
+		);
 		$request = $this->create_mock_request( [ 'id' => self::TEST_CASE_ID ] );
 
-		$this->mock_sql->shouldReceive( 'get_by' )
+		$this->mock_toggle_repository->shouldReceive( 'find_by_id' )
 			->once()
-			->with( [ 'id' => self::TEST_CASE_ID ] )
-			->andReturn( [ $case ] );
+			->with( self::TEST_CASE_ID )
+			->andReturn( $case );
 
-		$this->mock_sql->shouldReceive( 'update' )
+		$this->mock_toggle_repository->shouldReceive( 'open_case' )
 			->once()
-			->with( [ 'status' => 'open' ], [ 'id' => self::TEST_CASE_ID ] )
+			->with( self::TEST_CASE_ID )
 			->andReturn( 1 );
 
 		Filters\expectApplied( 'stolmc_service_tracker_toggle_case_data' )

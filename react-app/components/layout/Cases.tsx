@@ -5,6 +5,7 @@ import Spinner from "./Spinner";
 import Case from "./Case";
 import type { Case as CaseType } from "../../types";
 import { get as fetchGet, post } from "../../utils/fetch";
+import { normalizeUsers } from "../../utils/users";
 import { toast } from "react-toastify";
 
 declare const data: Record<string, any>;
@@ -59,8 +60,8 @@ export default function Cases() {
             `${apiUrlUsers}?page=${usersPage}&per_page=6`,
             { headers: { "X-WP-Nonce": data.nonce } }
           );
-          const body          = usersRes.data;
-          const usersOnPage: any[] = Array.isArray(body?.data) ? body.data : [];
+          const body = usersRes.data;
+          const usersOnPage = normalizeUsers(body?.data);
           usersTotalPages     = typeof body?.total_pages === "number" ? body.total_pages : 1;
           allUsers            = [...allUsers, ...usersOnPage];
           usersPage++;

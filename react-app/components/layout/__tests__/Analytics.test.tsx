@@ -63,11 +63,40 @@ const {
         },
       ],
       trends: {
-        cases_created_by_period: [{ period: "2024-01-10", count: 2 }],
-        progress_created_by_period: [{ period: "2024-01-10", count: 3 }],
-        notifications_by_period: [{ period: "2024-01-10", count: 1 }],
-        admin_actions_by_period: [{ period: "2024-01-10", count: 4 }],
+        cases_created_by_period: [
+          { period: "2024-01-10", count: 2 },
+          { period: "2024-01-09", count: 3 },
+          { period: "2024-01-08", count: 1 },
+          { period: "2024-01-07", count: 4 },
+          { period: "2024-01-06", count: 2 },
+          { period: "2024-01-05", count: 5 }, // This should not be displayed (6th item)
+        ],
+        progress_created_by_period: [
+          { period: "2024-01-10", count: 3 },
+          { period: "2024-01-09", count: 2 },
+          { period: "2024-01-08", count: 4 },
+          { period: "2024-01-07", count: 1 },
+          { period: "2024-01-06", count: 3 },
+          { period: "2024-01-05", count: 2 }, // This should not be displayed (6th item)
+        ],
+        notifications_by_period: [
+          { period: "2024-01-10", count: 1 },
+          { period: "2024-01-09", count: 2 },
+          { period: "2024-01-08", count: 3 },
+          { period: "2024-01-07", count: 4 },
+          { period: "2024-01-06", count: 5 },
+          { period: "2024-01-05", count: 1 }, // This should not be displayed (6th item)
+        ],
+        admin_actions_by_period: [
+          { period: "2024-01-10", count: 4 },
+          { period: "2024-01-09", count: 3 },
+          { period: "2024-01-08", count: 2 },
+          { period: "2024-01-07", count: 1 },
+          { period: "2024-01-06", count: 4 },
+          { period: "2024-01-05", count: 3 }, // This should not be displayed (6th item)
+        ],
       },
+
     },
     loading: false,
     period: "30" as "7" | "30" | "90",
@@ -150,10 +179,38 @@ describe("Analytics component", () => {
         },
       ],
       trends: {
-        cases_created_by_period: [{ period: "2024-01-10", count: 2 }],
-        progress_created_by_period: [{ period: "2024-01-10", count: 3 }],
-        notifications_by_period: [{ period: "2024-01-10", count: 1 }],
-        admin_actions_by_period: [{ period: "2024-01-10", count: 4 }],
+        cases_created_by_period: [
+          { period: "2024-01-10", count: 2 },
+          { period: "2024-01-09", count: 3 },
+          { period: "2024-01-08", count: 1 },
+          { period: "2024-01-07", count: 4 },
+          { period: "2024-01-06", count: 2 },
+          { period: "2024-01-05", count: 5 }, // This should not be displayed (6th item)
+        ],
+        progress_created_by_period: [
+          { period: "2024-01-10", count: 3 },
+          { period: "2024-01-09", count: 2 },
+          { period: "2024-01-08", count: 4 },
+          { period: "2024-01-07", count: 1 },
+          { period: "2024-01-06", count: 3 },
+          { period: "2024-01-05", count: 2 }, // This should not be displayed (6th item)
+        ],
+        notifications_by_period: [
+          { period: "2024-01-10", count: 1 },
+          { period: "2024-01-09", count: 2 },
+          { period: "2024-01-08", count: 3 },
+          { period: "2024-01-07", count: 4 },
+          { period: "2024-01-06", count: 5 },
+          { period: "2024-01-05", count: 1 }, // This should not be displayed (6th item)
+        ],
+        admin_actions_by_period: [
+          { period: "2024-01-10", count: 4 },
+          { period: "2024-01-09", count: 3 },
+          { period: "2024-01-08", count: 2 },
+          { period: "2024-01-07", count: 1 },
+          { period: "2024-01-06", count: 4 },
+          { period: "2024-01-05", count: 3 }, // This should not be displayed (6th item)
+        ],
       },
     } as any;
   });
@@ -239,5 +296,29 @@ describe("Analytics component", () => {
     await user.click(screen.getByRole("button", { name: "admins" }));
 
     expect(screen.getByText(/no admin activity recorded/i)).toBeInTheDocument();
+  });
+
+  it("shows only 5 items in trend blocks", async () => {
+    const user = userEvent.setup();
+    render(<Analytics />);
+    
+    await user.click(screen.getByRole("button", { name: "trends" }));
+    
+    // Check that trend blocks are displayed
+    expect(screen.getByText(/cases created/i)).toBeInTheDocument();
+    expect(screen.getByText(/progress updates/i)).toBeInTheDocument();
+    expect(screen.getByText(/email notifications/i)).toBeInTheDocument();
+    expect(screen.getByText(/admin actions/i)).toBeInTheDocument();
+    
+    // Count all date elements - each trend block should show max 5 items
+    // With 4 trend blocks and 5 items each, max would be 20
+    // But the mock has 6 items per block, so if limit is not applied, we'd get 24
+    const dateElements = screen.getAllByText(/Jan \d+/);
+    
+    // Should have exactly 20 date elements (4 blocks × 5 items)
+    expect(dateElements).toHaveLength(20);
+    
+    // Verify we don't have more than 20 (which would happen if all 6 items were shown)
+    expect(dateElements.length).toBeLessThanOrEqual(20);
   });
 });

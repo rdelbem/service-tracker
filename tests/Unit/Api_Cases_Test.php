@@ -29,9 +29,23 @@ class Api_Cases_Test extends API_TestCase {
 	/**
 	 * Cases API instance.
 	 *
-	 * @var \STOLMC_Service_Tracker\includes\API\STOLMC_Service_Tracker_Api_Cases
+	 * @var \STOLMC_Service_Tracker\includes\Controller_API\STOLMC_Service_Tracker_Api_Cases
 	 */
 	protected $api;
+
+	/**
+	 * Cases Repository mock.
+	 *
+	 * @var \Mockery\MockInterface
+	 */
+	protected $mock_cases_orm;
+
+	/**
+	 * Case-scoped progress Repository mock.
+	 *
+	 * @var \Mockery\MockInterface
+	 */
+	protected $mock_case_progress_orm;
 
 	/**
 	 * Set up test fixtures.
@@ -39,14 +53,20 @@ class Api_Cases_Test extends API_TestCase {
 	protected function set_up(): void {
 		parent::set_up();
 
-		$this->api = new \STOLMC_Service_Tracker\includes\API\STOLMC_Service_Tracker_Api_Cases();
+		$this->mock_cases_orm = Mockery::mock( \STOLMC_Service_Tracker\includes\Repositories\STOLMC_Service_Tracker_Cases_Repository::class );
+		$this->mock_case_progress_orm = Mockery::mock( \STOLMC_Service_Tracker\includes\Repositories\STOLMC_Service_Tracker_Case_Progress_Repository::class );
+		$this->mock_case_progress_orm->allows( 'delete_all' )->andReturn( 1 );
+		$this->mock_cases_orm->allows( 'find_by' )->andReturn( [] );
+		$this->mock_cases_orm->allows( 'count_by_user' )->andReturn( 0 );
+		$this->mock_cases_orm->allows( 'find_paginated_by_user' )->andReturn( [] );
+		$this->mock_cases_orm->allows( 'update_by_id' )->andReturn( 1 );
+		$this->mock_cases_orm->allows( 'delete_by_id' )->andReturn( 1 );
+		$this->mock_cases_orm->allows( 'progress' )->andReturn( $this->mock_case_progress_orm );
+		$this->mock_cases_orm->allows( 'find_all' )->andReturn( [] );
+		$this->mock_cases_orm->allows( 'find_by_ids' )->andReturn( [] );
 
-		// Inject mock SQL instances using helper function.
-		$this->mock_sql = $this->create_mock_sql();
-		$this->mock_progress_sql = $this->create_mock_sql();
-
-		set_private_property( $this->api, 'sql', $this->mock_sql );
-		set_private_property( $this->api, 'progress_sql', $this->mock_progress_sql );
+		$this->api = new \STOLMC_Service_Tracker\includes\Controller_API\STOLMC_Service_Tracker_Api_Cases();
+		set_private_property( $this->api, 'cases', $this->mock_cases_orm );
 	}
 
 	/**
@@ -58,7 +78,7 @@ class Api_Cases_Test extends API_TestCase {
 			$this->create_sample_case_object( [ 'id' => 101 ] ),
 		];
 
-		$this->mock_sql->allows( 'get_by' )
+		$this->mock_cases_orm->allows( 'find_by' )
 			->andReturn( $expected_cases );
 
 		Filters\expectApplied( 'stolmc_service_tracker_cases_read_query_args' )
@@ -86,10 +106,9 @@ class Api_Cases_Test extends API_TestCase {
 
 		$request = $this->create_mock_request( [], [ 'x_wp_nonce' => [ 'valid_nonce' ] ], $body );
 
-		$this->mock_sql->allows( 'insert' )
+		$this->mock_cases_orm->allows( 'create' )
 			->andReturn( 'Success, data was inserted' );
-
-		$this->mock_wpdb->insert_id = self::TEST_CASE_ID;
+		$this->mock_cases_orm->allows( 'get_last_insert_id' )->andReturn( self::TEST_CASE_ID );
 
 		Actions\expectDone( 'stolmc_service_tracker_case_created' )
 			->once()
@@ -119,10 +138,12 @@ class Api_Cases_Test extends API_TestCase {
 
 		$request = $this->create_mock_request( [], [ 'x_wp_nonce' => [ 'valid_nonce' ] ], $body );
 
-		$this->mock_wpdb->insert_id = 0;
-
-		$this->mock_sql->allows( 'insert' )
+		$this->mock_cases_orm->shouldReceive( 'create' )
+			->once()
 			->andReturn( 'Error: Insert failed' );
+		$this->mock_cases_orm->shouldReceive( 'get_last_insert_id' )
+			->once()
+			->andReturn( 0 );
 
 		Filters\expectApplied( 'stolmc_service_tracker_case_create_data' )
 			->once()
@@ -145,7 +166,7 @@ class Api_Cases_Test extends API_TestCase {
 		$body = json_encode( [ 'title' => 'Updated Title' ] );
 		$request = $this->create_mock_request( [ 'id' => self::TEST_CASE_ID ], [ 'x_wp_nonce' => [ 'valid_nonce' ] ], $body );
 
-		$this->mock_sql->allows( 'update' )
+		$this->mock_cases_orm->allows( 'update_by_id' )
 			->andReturn( 1 );
 
 		Actions\expectDone( 'stolmc_service_tracker_case_updated' )
@@ -173,10 +194,9 @@ class Api_Cases_Test extends API_TestCase {
 	public function test_delete_removes_case_and_progress(): void {
 		$request = $this->create_mock_request( [ 'id' => self::TEST_CASE_ID ] );
 
-		$this->mock_sql->allows( 'delete' )
+		$this->mock_cases_orm->allows( 'delete_by_id' )
 			->andReturn( 1 );
-		$this->mock_progress_sql->allows( 'delete' )
-			->andReturn( 1 );
+		$this->mock_cases_orm->allows( 'progress' )->andReturn( $this->mock_case_progress_orm );
 
 		Actions\expectDone( 'stolmc_service_tracker_case_before_delete' )
 			->once()
@@ -225,10 +245,9 @@ class Api_Cases_Test extends API_TestCase {
 
 		$request = $this->create_mock_request( [], [ 'x_wp_nonce' => [ 'valid_nonce' ] ], $body );
 
-		$this->mock_sql->allows( 'insert' )
+		$this->mock_cases_orm->allows( 'create' )
 			->andReturn( 'Success, data was inserted' );
-
-		$this->mock_wpdb->insert_id = self::TEST_CASE_ID;
+		$this->mock_cases_orm->allows( 'get_last_insert_id' )->andReturn( self::TEST_CASE_ID );
 
 		Filters\expectApplied( 'stolmc_service_tracker_case_create_data' )
 			->once()
@@ -267,7 +286,7 @@ class Api_Cases_Test extends API_TestCase {
 				}
 			);
 
-		$this->mock_sql->allows( 'get_by' )
+		$this->mock_cases_orm->allows( 'find_by' )
 			->andReturnUsing(
 				static function ( $args ) {
 					self::assertSame( [ 'id_user' => 999 ], $args );
@@ -306,11 +325,11 @@ class Api_Cases_Test extends API_TestCase {
 				}
 			);
 
-		$this->mock_sql->allows( 'update' )
+		$this->mock_cases_orm->allows( 'update_by_id' )
 			->andReturnUsing(
-				static function ( $data, $condition ) {
+				static function ( $id, $data ) {
+					self::assertSame( self::TEST_CASE_ID, $id );
 					self::assertSame( [ 'title' => 'Modified Title' ], $data );
-					self::assertSame( [ 'id' => self::TEST_CASE_ID ], $condition );
 					return 1;
 				}
 			);
@@ -336,10 +355,9 @@ class Api_Cases_Test extends API_TestCase {
 	public function test_delete_fires_hooks_with_correct_parameters(): void {
 		$request = $this->create_mock_request( [ 'id' => self::TEST_CASE_ID ] );
 
-		$this->mock_sql->allows( 'delete' )
+		$this->mock_cases_orm->allows( 'delete_by_id' )
 			->andReturn( 1 );
-		$this->mock_progress_sql->allows( 'delete' )
-			->andReturn( 1 );
+		$this->mock_cases_orm->allows( 'progress' )->andReturn( $this->mock_case_progress_orm );
 
 		Actions\expectDone( 'stolmc_service_tracker_case_before_delete' )
 			->once()

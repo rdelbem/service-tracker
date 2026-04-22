@@ -18,6 +18,34 @@
 
 require_once plugin_dir_path( __FILE__ ) . '/vendor/autoload.php';
 
+/**
+ * Register a fallback autoloader for plugin classes.
+ *
+ * This prevents runtime failures when Composer autoload metadata is generated
+ * on a different machine/path and cannot resolve this plugin namespace.
+ *
+ * @return void
+ */
+function stolmc_register_service_tracker_fallback_autoloader(): void {
+	spl_autoload_register(
+		static function ( string $class ): void {
+			$prefix = 'STOLMC_Service_Tracker\\';
+			if ( ! str_starts_with( $class, $prefix ) ) {
+				return;
+			}
+
+			$relative_class = substr( $class, strlen( $prefix ) );
+			$file_path      = plugin_dir_path( __FILE__ ) . str_replace( '\\', '/', $relative_class ) . '.php';
+
+			if ( is_readable( $file_path ) ) {
+				require_once $file_path;
+			}
+		}
+	);
+}
+
+stolmc_register_service_tracker_fallback_autoloader();
+
 use STOLMC_Service_Tracker\includes\Life_Cycle\STOLMC_Service_Tracker_Activator;
 use STOLMC_Service_Tracker\includes\Life_Cycle\STOLMC_Service_Tracker_Deactivator;
 use STOLMC_Service_Tracker\STOLMC_Service_Tracker_Uninstall;

@@ -6,6 +6,7 @@ import Spinner from "./Spinner";
 import Status from "./Status";
 import UserAttachments from "./UserAttachments";
 import { get as fetchGet, put, post, del } from "../../utils/fetch";
+import { normalizeUsers } from "../../utils/users";
 import { toast } from "react-toastify";
 import { showConfirm, showAlert } from "../ui/Modal";
 import { useRef } from "react";
@@ -86,7 +87,7 @@ export default function Progress() {
               `${apiUrlUsers}?page=1&per_page=100`,
               { headers: { "X-WP-Nonce": data.nonce } }
             );
-            const userList = usersRes.data?.data ?? [];
+            const userList = normalizeUsers(usersRes.data?.data);
             const client = userList.find(
               (u: any) => String(u.id) === String(found.id_user)
             );
@@ -113,7 +114,7 @@ export default function Progress() {
         const res = await fetchGet(apiUrlStaff, {
           headers: { "X-WP-Nonce": data.nonce },
         });
-        setStaffUsers(res.data || []);
+        setStaffUsers(normalizeUsers(res.data));
       } catch (error) {
         console.error("Error fetching staff users:", error);
       }
