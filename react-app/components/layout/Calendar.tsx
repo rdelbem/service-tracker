@@ -145,7 +145,7 @@ export default function Calendar() {
     const dateStr = formatDate(currentDayDate);
 
     // Get start/end indicators from the date index
-    const dayIndex = calendarData?.date_index[dateStr];
+    const dayIndex = calendarData?.date_index?.[dateStr];
     const hasStarts = dayIndex && dayIndex.starts.length > 0;
     const hasEnds = dayIndex && dayIndex.ends.length > 0;
 

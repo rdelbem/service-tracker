@@ -124,7 +124,7 @@ class STOLMC_Service_Tracker_Api_Calendar extends STOLMC_Service_Tracker_Api imp
 		// Get calendar data from service.
 		$service_result = $this->calendar_service->get_calendar_data( $start, $end, $id_user, $status );
 
-		// Map service result to REST response using response mapper.
-		return STOLMC_Service_Tracker_Api_Response_Mapper::to_default_response( $service_result );
+		// Calendar endpoint historically returns raw payload (cases/progress/date_index).
+		return STOLMC_Service_Tracker_Api_Response_Mapper::from_service_result_passthrough( $service_result );
 	}
 }
