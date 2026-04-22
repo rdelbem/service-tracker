@@ -127,6 +127,30 @@ class STOLMC_Service_Tracker_Api_Cases extends STOLMC_Service_Tracker_Api implem
 	}
 
 	/**
+	 * Validate JSON request body.
+	 *
+	 * @param WP_REST_Request $data The REST request object.
+	 *
+	 * @return array|WP_REST_Response Parsed JSON array or error response.
+	 */
+	private function validate_json_body( WP_REST_Request $data ): array|WP_REST_Response {
+		$body = $data->get_body();
+		$body = json_decode( $body, true );
+
+		if ( ! is_array( $body ) ) {
+			return STOLMC_Service_Tracker_Api_Response_Mapper::to_default_response(
+				[],
+				false,
+				'Invalid JSON data',
+				'invalid_json',
+				400
+			);
+		}
+
+		return $body;
+	}
+
+	/**
 	 * Read cases for a specific user, with pagination.
 	 *
 	 * Accepts `page` (1-based) and `per_page` query parameters.
@@ -145,12 +169,7 @@ class STOLMC_Service_Tracker_Api_Cases extends STOLMC_Service_Tracker_Api implem
 
 		$result = $this->cases_service->get_cases_for_user( $id_user, $page, $per_page );
 
-		if ( ! $result->success ) {
-			return STOLMC_Service_Tracker_Api_Response_Mapper::to_default_response( $result );
-		}
-
-		// The service returns data in the correct paginated format.
-		return new WP_REST_Response( $result->data, $result->http_status );
+		return STOLMC_Service_Tracker_Api_Response_Mapper::from_service_result( $result );
 	}
 
 	/**
@@ -161,22 +180,14 @@ class STOLMC_Service_Tracker_Api_Cases extends STOLMC_Service_Tracker_Api implem
 	 * @return WP_REST_Response Response indicating success or failure.
 	 */
 	public function create( WP_REST_Request $data ): WP_REST_Response {
-		$body        = $data->get_body();
-		$body        = json_decode( $body, true );
-
-		if ( ! is_array( $body ) ) {
-			return new WP_REST_Response(
-				[
-					'success' => false,
-					'message' => 'Invalid JSON data',
-				],
-				400
-			);
+		$body = $this->validate_json_body( $data );
+		if ( $body instanceof WP_REST_Response ) {
+			return $body;
 		}
 
 		$result = $this->cases_service->create_case( $body );
 
-		return STOLMC_Service_Tracker_Api_Response_Mapper::to_legacy_message_response( $result );
+		return STOLMC_Service_Tracker_Api_Response_Mapper::from_service_result_legacy( $result );
 	}
 
 	/**
@@ -188,22 +199,14 @@ class STOLMC_Service_Tracker_Api_Cases extends STOLMC_Service_Tracker_Api implem
 	 */
 	public function update( WP_REST_Request $data ): WP_REST_Response {
 		$case_id = (int) $data['id'];
-		$body    = $data->get_body();
-		$body    = json_decode( $body, true );
-
-		if ( ! is_array( $body ) ) {
-			return new WP_REST_Response(
-				[
-					'success' => false,
-					'message' => 'Invalid JSON data',
-				],
-				400
-			);
+		$body = $this->validate_json_body( $data );
+		if ( $body instanceof WP_REST_Response ) {
+			return $body;
 		}
 
 		$result = $this->cases_service->update_case( $case_id, $body );
 
-		return STOLMC_Service_Tracker_Api_Response_Mapper::to_legacy_message_response( $result );
+		return STOLMC_Service_Tracker_Api_Response_Mapper::from_service_result_legacy( $result );
 	}
 
 	/**
@@ -218,7 +221,7 @@ class STOLMC_Service_Tracker_Api_Cases extends STOLMC_Service_Tracker_Api implem
 
 		$result = $this->cases_service->delete_case( $case_id );
 
-		return STOLMC_Service_Tracker_Api_Response_Mapper::to_legacy_message_response( $result );
+		return STOLMC_Service_Tracker_Api_Response_Mapper::from_service_result_legacy( $result );
 	}
 
 	/**
@@ -248,11 +251,6 @@ class STOLMC_Service_Tracker_Api_Cases extends STOLMC_Service_Tracker_Api implem
 
 		$result = $this->cases_service->search_cases( $query, $id_user, $page, $per_page );
 
-		if ( ! $result->success ) {
-			return STOLMC_Service_Tracker_Api_Response_Mapper::to_default_response( $result );
-		}
-
-		// The service returns data in the correct paginated format.
-		return new WP_REST_Response( $result->data, $result->http_status );
+		return STOLMC_Service_Tracker_Api_Response_Mapper::from_service_result( $result );
 	}
 }

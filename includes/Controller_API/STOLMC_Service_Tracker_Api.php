@@ -144,7 +144,8 @@ class STOLMC_Service_Tracker_Api {
 	/**
 	 * Create a REST response.
 	 *
-	 * @deprecated 1.0.0 Use explicit mapper methods instead.
+	 * @deprecated 1.0.0 Use STOLMC_Service_Tracker_Api_Response_Mapper methods instead.
+	 *             This method will be removed in a future version.
 	 *
 	 * @param array<string, mixed> $data The response data.
 	 * @param int                  $status The HTTP status code.
@@ -152,6 +153,12 @@ class STOLMC_Service_Tracker_Api {
 	 * @return WP_REST_Response
 	 */
 	public function rest_response( array $data, int $status ): WP_REST_Response {
+		// Trigger deprecation notice
+		trigger_error(
+			'Method STOLMC_Service_Tracker_Api::rest_response() is deprecated. Use STOLMC_Service_Tracker_Api_Response_Mapper methods instead.',
+			E_USER_DEPRECATED
+		);
+		
 		return new WP_REST_Response( $data, $status );
 	}
 
