@@ -13,6 +13,11 @@ require_once __DIR__ . '/../vendor/autoload.php';
 // Load test helper functions.
 require_once __DIR__ . '/helpers.php';
 
+// Load base test case classes explicitly.
+// This avoids reliance on autoload-dev resolution order in different environments.
+require_once __DIR__ . '/Unit/Unit_TestCase.php';
+require_once __DIR__ . '/Unit/API_TestCase.php';
+
 // Define constants for testing.
 if ( ! defined( 'ABSPATH' ) ) {
 	define( 'ABSPATH', '/tmp/wordpress/' );
