@@ -65,6 +65,6 @@ class STOLMC_Service_Tracker_Api_Toggle extends STOLMC_Service_Tracker_Api {
 
 		$result = $this->toggle_service->toggle_case_status( $case_id );
 
-		return STOLMC_Service_Tracker_Api_Response_Mapper::to_legacy_message_response( $result );
+		return STOLMC_Service_Tracker_Api_Response_Mapper::from_service_result_legacy( $result );
 	}
 }

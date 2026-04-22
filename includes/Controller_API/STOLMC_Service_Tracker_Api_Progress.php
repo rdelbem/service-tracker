@@ -75,11 +75,7 @@ class STOLMC_Service_Tracker_Api_Progress extends STOLMC_Service_Tracker_Api imp
 
 		$result = $this->progress_service->get_progress_for_case( $case_id );
 
-		if ( ! $result->success ) {
-			return STOLMC_Service_Tracker_Api_Response_Mapper::to_default_response( $result );
-		}
-
-		return new WP_REST_Response( $result->data, $result->http_status );
+		return STOLMC_Service_Tracker_Api_Response_Mapper::from_service_result_passthrough( $result );
 	}
 
 	/**
@@ -105,7 +101,7 @@ class STOLMC_Service_Tracker_Api_Progress extends STOLMC_Service_Tracker_Api imp
 
 		$result = $this->progress_service->create_progress( $body );
 
-		return STOLMC_Service_Tracker_Api_Response_Mapper::to_legacy_message_response( $result );
+		return STOLMC_Service_Tracker_Api_Response_Mapper::from_service_result_legacy( $result );
 	}
 
 	/**
@@ -132,7 +128,7 @@ class STOLMC_Service_Tracker_Api_Progress extends STOLMC_Service_Tracker_Api imp
 
 		$result = $this->progress_service->update_progress( $progress_id, $body );
 
-		return STOLMC_Service_Tracker_Api_Response_Mapper::to_legacy_message_response( $result );
+		return STOLMC_Service_Tracker_Api_Response_Mapper::from_service_result_legacy( $result );
 	}
 
 	/**
@@ -147,7 +143,7 @@ class STOLMC_Service_Tracker_Api_Progress extends STOLMC_Service_Tracker_Api imp
 
 		$result = $this->progress_service->delete_progress( $progress_id );
 
-		return STOLMC_Service_Tracker_Api_Response_Mapper::to_legacy_message_response( $result );
+		return STOLMC_Service_Tracker_Api_Response_Mapper::from_service_result_legacy( $result );
 	}
 
 	/**
@@ -266,7 +262,7 @@ class STOLMC_Service_Tracker_Api_Progress extends STOLMC_Service_Tracker_Api imp
 
 		$result = $this->progress_service->upload_file( $file_data, $progress_id );
 
-		return STOLMC_Service_Tracker_Api_Response_Mapper::to_legacy_message_response( $result );
+		return STOLMC_Service_Tracker_Api_Response_Mapper::from_service_result_legacy( $result );
 	}
 
 	/**
@@ -320,10 +316,6 @@ class STOLMC_Service_Tracker_Api_Progress extends STOLMC_Service_Tracker_Api imp
 
 		$result = $this->progress_service->get_user_attachments( $user_id );
 
-		if ( ! $result->success ) {
-			return STOLMC_Service_Tracker_Api_Response_Mapper::to_default_response( $result );
-		}
-
-		return new WP_REST_Response( $result->data, $result->http_status );
+		return STOLMC_Service_Tracker_Api_Response_Mapper::from_service_result_passthrough( $result );
 	}
 }
