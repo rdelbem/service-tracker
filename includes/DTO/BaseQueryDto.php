@@ -24,7 +24,7 @@ abstract class BaseQueryDto extends BaseDto {
     /**
      * Constructor.
      *
-     * @param array $data Query parameters.
+     * @param array<string, mixed> $data Query parameters.
      */
     public function __construct(array $data = []) {
         $this->page = $this->validateInt($data['page'] ?? 1, 'page', false, 1) ?? 1;
@@ -78,7 +78,7 @@ abstract class BaseQueryDto extends BaseDto {
     /**
      * Convert to array.
      *
-     * @return array
+     * @return array<string, mixed>
      */
     public function toArray(): array {
         return [

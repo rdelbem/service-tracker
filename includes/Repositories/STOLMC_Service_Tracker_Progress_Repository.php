@@ -9,6 +9,8 @@ use STOLMC_Service_Tracker\includes\Utils\STOLMC_Service_Tracker_Sql;
  * Progress Repository class.
  *
  * Progress records are modeled as dependent data of cases.
+ * 
+ * @template T of STOLMC_Service_Tracker_Progress_Dto
  */
 class STOLMC_Service_Tracker_Progress_Repository {
 
@@ -46,9 +48,9 @@ class STOLMC_Service_Tracker_Progress_Repository {
 	 *
 	 * @param int $id_case Case ID.
 	 *
-	 * @return array<STOLMC_Service_Tracker_Progress_Dto>|STOLMC_Service_Tracker_Progress_Dto|null
+	 * @return array<STOLMC_Service_Tracker_Progress_Dto>
 	 */
-	public function find_by_case_id( int $id_case ): array|STOLMC_Service_Tracker_Progress_Dto|null {
+	public function find_by_case_id( int $id_case ): array {
 		$rows = $this->progress_sql->get_by( [ 'id_case' => $id_case ] );
 
 		return $this->map_many_or_one_progress_rows( $rows );
@@ -122,9 +124,9 @@ class STOLMC_Service_Tracker_Progress_Repository {
 	 *
 	 * @param int $id_case Case ID.
 	 *
-	 * @return array<STOLMC_Service_Tracker_Progress_Dto>|STOLMC_Service_Tracker_Progress_Dto|null
+	 * @return array<STOLMC_Service_Tracker_Progress_Dto>
 	 */
-	public function get_by_case_id( int $id_case ): array|STOLMC_Service_Tracker_Progress_Dto|null {
+	public function get_by_case_id( int $id_case ): array {
 		return $this->find_by_case_id( $id_case );
 	}
 
@@ -153,7 +155,7 @@ class STOLMC_Service_Tracker_Progress_Repository {
 	/**
 	 * Map a raw progress row into a progress DTO.
 	 *
-	 * @param object|array<string, mixed>|null $row Raw database row.
+	 * @param object|array<int|string, mixed>|null $row Raw database row.
 	 *
 	 * @return STOLMC_Service_Tracker_Progress_Dto|null
 	 */
@@ -168,7 +170,7 @@ class STOLMC_Service_Tracker_Progress_Repository {
 	/**
 	 * Map a list of raw progress rows into progress DTOs.
 	 *
-	 * @param array<int, object|array<string, mixed>> $rows Raw rows.
+	 * @param array<int|string, mixed> $rows Raw rows.
 	 *
 	 * @return array<STOLMC_Service_Tracker_Progress_Dto>
 	 */
@@ -186,15 +188,15 @@ class STOLMC_Service_Tracker_Progress_Repository {
 	}
 
 	/**
-	 * Map repository raw response preserving array/single/null shape.
+	 * Map repository raw response to array of DTOs.
 	 *
-	 * @param array<int, object|array<string, mixed>>|object|array<string, mixed>|null $rows Raw rows.
+	 * @param array<int|string, mixed>|object|array<string, mixed>|null $rows Raw rows.
 	 *
-	 * @return array<STOLMC_Service_Tracker_Progress_Dto>|STOLMC_Service_Tracker_Progress_Dto|null
+	 * @return array<STOLMC_Service_Tracker_Progress_Dto>
 	 */
-	private function map_many_or_one_progress_rows( array|object|null $rows ): array|STOLMC_Service_Tracker_Progress_Dto|null {
+	private function map_many_or_one_progress_rows( array|object|null $rows ): array {
 		if ( null === $rows ) {
-			return null;
+			return [];
 		}
 
 		if ( is_array( $rows ) ) {
@@ -206,9 +208,11 @@ class STOLMC_Service_Tracker_Progress_Repository {
 				return $this->map_progress_rows( $rows );
 			}
 
-			return $this->map_progress_row( $rows );
+			$dto = $this->map_progress_row( $rows );
+			return $dto instanceof STOLMC_Service_Tracker_Progress_Dto ? [ $dto ] : [];
 		}
 
-		return $this->map_progress_row( $rows );
+		$dto = $this->map_progress_row( $rows );
+		return $dto instanceof STOLMC_Service_Tracker_Progress_Dto ? [ $dto ] : [];
 	}
 }

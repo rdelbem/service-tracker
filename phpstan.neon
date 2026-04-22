@@ -14,6 +14,14 @@ parameters:
     bootstrapFiles:
         - vendor/php-stubs/wordpress-stubs/wordpress-stubs.php
 
+    # Generic object types
+    universalObjectCratesClasses:
+        - stdClass
+        - WP_Error
+
+    # Treat PHPDoc types as certain (more strict)
+    treatPhpDocTypesAsCertain: true
+
 # Use WordPress extension for better WP integration
 includes:
     - vendor/szepeviktor/phpstan-wordpress/extension.neon

@@ -9,8 +9,8 @@ abstract class BaseDto {
     /**
      * Validate that required fields are present.
      *
-     * @param array $data The data to validate.
-     * @param array $requiredFields List of required field names.
+     * @param array<string, mixed> $data The data to validate.
+     * @param array<int, string> $requiredFields List of required field names.
      * @throws ValidationException If any required field is missing.
      */
     protected function validateRequired(array $data, array $requiredFields): void {
@@ -169,14 +169,14 @@ abstract class BaseDto {
     /**
      * Convert DTO to array for database operations.
      *
-     * @return array
+     * @return array<string, mixed>
      */
     abstract public function toArray(): array;
     
     /**
      * Get validation errors without throwing exceptions.
      *
-     * @return array List of validation errors.
+     * @return array<int, string> List of validation errors.
      */
     public function getValidationErrors(): array {
         try {

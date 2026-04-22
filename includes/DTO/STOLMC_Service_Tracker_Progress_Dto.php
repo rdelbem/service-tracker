@@ -71,7 +71,7 @@ class STOLMC_Service_Tracker_Progress_Dto {
 	/**
 	 * Build DTO from raw row.
 	 *
-	 * @param object|array<string, mixed> $row Raw row.
+	 * @param object|array<int|string, mixed> $row Raw row.
 	 *
 	 * @return self
 	 */
@@ -89,7 +89,7 @@ class STOLMC_Service_Tracker_Progress_Dto {
 	/**
 	 * Read integer key from row.
 	 *
-	 * @param object|array<string, mixed> $row Raw row.
+	 * @param object|array<int|string, mixed> $row Raw row.
 	 * @param string                      $key Field key.
 	 *
 	 * @return int
@@ -105,7 +105,7 @@ class STOLMC_Service_Tracker_Progress_Dto {
 	/**
 	 * Read string key from row.
 	 *
-	 * @param object|array<string, mixed> $row Raw row.
+	 * @param object|array<int|string, mixed> $row Raw row.
 	 * @param string                      $key Field key.
 	 *
 	 * @return string
@@ -121,7 +121,7 @@ class STOLMC_Service_Tracker_Progress_Dto {
 	/**
 	 * Read mixed value from row.
 	 *
-	 * @param object|array<string, mixed> $row Raw row.
+	 * @param object|array<int|string, mixed> $row Raw row.
 	 * @param string                      $key Field key.
 	 *
 	 * @return mixed
@@ -137,7 +137,7 @@ class STOLMC_Service_Tracker_Progress_Dto {
 	/**
 	 * Read nullable string key from row.
 	 *
-	 * @param object|array<string, mixed> $row Raw row.
+	 * @param object|array<int|string, mixed> $row Raw row.
 	 * @param string                      $key Field key.
 	 *
 	 * @return string|null

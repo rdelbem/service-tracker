@@ -8,6 +8,8 @@ use STOLMC_Service_Tracker\includes\Utils\STOLMC_Service_Tracker_Sql;
 
 /**
  * Cases Repository class, use for data resolving and type safety.
+ * 
+ * @template T of STOLMC_Service_Tracker_Case_Dto
  */
 class STOLMC_Service_Tracker_Cases_Repository {
 
@@ -16,9 +18,9 @@ class STOLMC_Service_Tracker_Cases_Repository {
 	/**
 	 * SQL handler for cases.
 	 *
-	 * @var STOLMC_Service_Tracker_Sql|null
+	 * @var STOLMC_Service_Tracker_Sql
 	 */
-	private $cases_sql = null;
+	private STOLMC_Service_Tracker_Sql $cases_sql;
 
 	/**
 	 * Progress Repository bound to cases as dependent relationship.
@@ -61,19 +63,15 @@ class STOLMC_Service_Tracker_Cases_Repository {
 			return $this->progress( $progress->id_case );
 		}
 
-		if ( ! is_object( $progress ) || ! isset( $progress->id_case ) ) {
-			return null;
-		}
-
-		return $this->progress( (int) $progress->id_case );
+		return null;
 	}
 
 	/**
 	 * Get all cases from the database for index/search building.
 	 *
-	 * @return array<STOLMC_Service_Tracker_Case_Dto>|STOLMC_Service_Tracker_Case_Dto|null
+	 * @return array<STOLMC_Service_Tracker_Case_Dto>
 	 */
-	public function find_all(): array|STOLMC_Service_Tracker_Case_Dto|null {
+	public function find_all(): array {
 		$rows = $this->cases_sql->get_all_with_columns(
 			[ 'id', 'id_user', 'title', 'status' ],
 			'id ASC'
@@ -136,9 +134,9 @@ class STOLMC_Service_Tracker_Cases_Repository {
 	 * @param int $per_page Items per page.
 	 * @param int $offset Offset.
 	 *
-	 * @return array<STOLMC_Service_Tracker_Case_Dto>|STOLMC_Service_Tracker_Case_Dto|null
+	 * @return array<STOLMC_Service_Tracker_Case_Dto>
 	 */
-	public function find_paginated_by_user( int $id_user, int $per_page, int $offset ): array|STOLMC_Service_Tracker_Case_Dto|null {
+	public function find_paginated_by_user( int $id_user, int $per_page, int $offset ): array {
 		$rows = $this->cases_sql->get_by_paginated(
 			[ 'id_user' => $id_user ],
 			$per_page,
@@ -154,9 +152,9 @@ class STOLMC_Service_Tracker_Cases_Repository {
 	 *
 	 * @param array<string, mixed> $query_args Query arguments.
 	 *
-	 * @return array<STOLMC_Service_Tracker_Case_Dto>|STOLMC_Service_Tracker_Case_Dto|null
+	 * @return array<STOLMC_Service_Tracker_Case_Dto>
 	 */
-	public function find_by( array $query_args ): array|STOLMC_Service_Tracker_Case_Dto|null {
+	public function find_by( array $query_args ): array {
 		$rows = $this->cases_sql->get_by( $query_args );
 
 		return $this->map_many_or_one_case_rows( $rows );
@@ -221,9 +219,9 @@ class STOLMC_Service_Tracker_Cases_Repository {
 	/**
 	 * Backward-compatible alias for find_all().
 	 *
-	 * @return array<STOLMC_Service_Tracker_Case_Dto>|STOLMC_Service_Tracker_Case_Dto|null
+	 * @return array<STOLMC_Service_Tracker_Case_Dto>
 	 */
-	public function get_all(): array|STOLMC_Service_Tracker_Case_Dto|null {
+	public function get_all(): array {
 		return $this->find_all();
 	}
 
@@ -256,9 +254,9 @@ class STOLMC_Service_Tracker_Cases_Repository {
 	 * @param int $per_page Page size.
 	 * @param int $offset Offset.
 	 *
-	 * @return array<STOLMC_Service_Tracker_Case_Dto>|STOLMC_Service_Tracker_Case_Dto|null
+	 * @return array<STOLMC_Service_Tracker_Case_Dto>
 	 */
-	public function get_by_user_paginated( int $id_user, int $per_page, int $offset ): array|STOLMC_Service_Tracker_Case_Dto|null {
+	public function get_by_user_paginated( int $id_user, int $per_page, int $offset ): array {
 		return $this->find_paginated_by_user( $id_user, $per_page, $offset );
 	}
 
@@ -267,9 +265,9 @@ class STOLMC_Service_Tracker_Cases_Repository {
 	 *
 	 * @param array<string, mixed> $query_args Query arguments.
 	 *
-	 * @return array<STOLMC_Service_Tracker_Case_Dto>|STOLMC_Service_Tracker_Case_Dto|null
+	 * @return array<STOLMC_Service_Tracker_Case_Dto>
 	 */
-	public function get_by( array $query_args ): array|STOLMC_Service_Tracker_Case_Dto|null {
+	public function get_by( array $query_args ): array {
 		return $this->find_by( $query_args );
 	}
 
@@ -287,7 +285,7 @@ class STOLMC_Service_Tracker_Cases_Repository {
 	/**
 	 * Map a raw case row into a case DTO.
 	 *
-	 * @param object|array<string, mixed>|null $row Raw database row.
+	 * @param object|array<int|string, mixed>|null $row Raw database row.
 	 *
 	 * @return STOLMC_Service_Tracker_Case_Dto|null
 	 */
@@ -302,7 +300,7 @@ class STOLMC_Service_Tracker_Cases_Repository {
 	/**
 	 * Map a list of raw case rows into case DTOs.
 	 *
-	 * @param array<int, object|array<string, mixed>> $rows Raw rows.
+	 * @param array<int|string, mixed> $rows Raw rows.
 	 *
 	 * @return array<STOLMC_Service_Tracker_Case_Dto>
 	 */
@@ -320,15 +318,15 @@ class STOLMC_Service_Tracker_Cases_Repository {
 	}
 
 	/**
-	 * Map repository raw response preserving array/single/null shape.
+	 * Map repository raw response to array of DTOs.
 	 *
-	 * @param array<int, object|array<string, mixed>>|object|array<string, mixed>|null $rows Raw rows.
+	 * @param array<int|string, mixed>|object|array<string, mixed>|null $rows Raw rows.
 	 *
-	 * @return array<STOLMC_Service_Tracker_Case_Dto>|STOLMC_Service_Tracker_Case_Dto|null
+	 * @return array<STOLMC_Service_Tracker_Case_Dto>
 	 */
-	private function map_many_or_one_case_rows( array|object|null $rows ): array|STOLMC_Service_Tracker_Case_Dto|null {
+	private function map_many_or_one_case_rows( array|object|null $rows ): array {
 		if ( null === $rows ) {
-			return null;
+			return [];
 		}
 
 		if ( is_array( $rows ) ) {
@@ -340,9 +338,11 @@ class STOLMC_Service_Tracker_Cases_Repository {
 				return $this->map_case_rows( $rows );
 			}
 
-			return $this->map_case_row( $rows );
+			$dto = $this->map_case_row( $rows );
+			return $dto instanceof STOLMC_Service_Tracker_Case_Dto ? [ $dto ] : [];
 		}
 
-		return $this->map_case_row( $rows );
+		$dto = $this->map_case_row( $rows );
+		return $dto instanceof STOLMC_Service_Tracker_Case_Dto ? [ $dto ] : [];
 	}
 }

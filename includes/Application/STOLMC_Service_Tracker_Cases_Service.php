@@ -237,7 +237,7 @@ class STOLMC_Service_Tracker_Cases_Service {
 	/**
 	 * Create a new case.
 	 *
-	 * @param array $case_data Case data.
+	 * @param array<string, mixed> $case_data Case data.
 	 *
 	 * @return STOLMC_Service_Tracker_Service_Result_Dto Service result.
 	 */
@@ -328,7 +328,7 @@ class STOLMC_Service_Tracker_Cases_Service {
 	 * Update an existing case.
 	 *
 	 * @param int   $case_id Case ID.
-	 * @param array $update_data Data to update.
+	 * @param array<string, mixed> $update_data Data to update.
 	 *
 	 * @return STOLMC_Service_Tracker_Service_Result_Dto Service result.
 	 */
