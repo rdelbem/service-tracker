@@ -1,118 +1,134 @@
 <?php
-
 namespace STOLMC_Service_Tracker\includes\Controller_API;
 
-use STOLMC_Service_Tracker\includes\DTO\STOLMC_Service_Tracker_Service_Result_Dto;
 use WP_REST_Response;
 
 /**
- * API Response Mapper for converting service results to REST responses.
+ * Response mapper for consistent API response formatting.
  *
- * This class provides methods to map service result DTOs to appropriate
- * REST API responses while preserving external API contracts.
+ * Provides strategies for different legacy response formats:
+ * - passthrough: raw data without envelope
+ * - paginated: paginated envelope with data, total, page, per_page, total_pages
+ * - legacy_message: success/message envelope for mutations
+ * - default: full envelope with success, data, error_code, message
+ *
+ * @since 1.0.0
  */
 class STOLMC_Service_Tracker_Api_Response_Mapper {
 
 	/**
-	 * Convert service result to default REST response.
+	 * Create a passthrough response (raw data without envelope).
 	 *
-	 * Standard shape: {success, data, error_code, message}
+	 * Used for endpoints that historically return raw arrays:
+	 * - Calendar.get_calendar
+	 * - Analytics.get_analytics
+	 * - Progress.read
+	 * - Progress.read_user_attachments
+	 * - Users.read_staff
 	 *
-	 * @param STOLMC_Service_Tracker_Service_Result_Dto $result Service result.
+	 * @param array<string, mixed> $data   The response data.
+	 * @param int                  $status HTTP status code.
 	 *
 	 * @return WP_REST_Response
 	 */
-	public static function to_default_response( STOLMC_Service_Tracker_Service_Result_Dto $result ): WP_REST_Response {
-		$response_data = [
-			'success'    => $result->success,
-			'data'       => $result->data,
-			'error_code' => $result->error_code,
-			'message'    => $result->message,
+	public function to_passthrough_response( array $data, int $status = 200 ): WP_REST_Response {
+		return new WP_REST_Response( $data, $status );
+	}
+
+	/**
+	 * Create a paginated response with legacy envelope.
+	 *
+	 * Used for paginated list endpoints:
+	 * - Cases.read
+	 * - Cases.search_cases
+	 * - Users.read
+	 * - Users.search_users
+	 *
+	 * @param array<string, mixed> $data      The paginated data items.
+	 * @param int                  $total     Total number of items.
+	 * @param int                  $page      Current page number.
+	 * @param int                  $per_page  Items per page.
+	 * @param int                  $status    HTTP status code.
+	 *
+	 * @return WP_REST_Response
+	 */
+	public function to_paginated_response( array $data, int $total, int $page, int $per_page, int $status = 200 ): WP_REST_Response {
+		$total_pages = $per_page > 0 ? (int) ceil( $total / $per_page ) : 0;
+
+		$response = [
+			'data'        => $data,
+			'total'       => $total,
+			'page'        => $page,
+			'per_page'    => $per_page,
+			'total_pages' => $total_pages,
 		];
 
-		return new WP_REST_Response( $response_data, $result->http_status );
+		return new WP_REST_Response( $response, $status );
 	}
 
 	/**
-	 * Convert service result to passthrough REST response.
+	 * Create a legacy message response for mutations.
 	 *
-	 * For endpoints that already have legacy envelopes in result->data.
-	 * The entire result->data is passed through as the response.
+	 * Used for create/update/delete/toggle/upload operations:
+	 * - Cases.create/update/delete
+	 * - Users.create/update/delete
+	 * - Progress.create/update/delete/upload_file
+	 * - Toggle.toggle
 	 *
-	 * @param STOLMC_Service_Tracker_Service_Result_Dto $result Service result.
+	 * @param bool        $success    Whether the operation succeeded.
+	 * @param string      $message    Response message.
+	 * @param array|null  $data       Optional additional data.
+	 * @param int|null    $error_code Optional error code.
+	 * @param int         $status     HTTP status code.
 	 *
 	 * @return WP_REST_Response
 	 */
-	public static function to_passthrough_response( STOLMC_Service_Tracker_Service_Result_Dto $result ): WP_REST_Response {
-		$response_data = $result->data;
+	public function to_legacy_message_response( bool $success, string $message, ?array $data = null, ?int $error_code = null, int $status = 200 ): WP_REST_Response {
+		$response = [
+			'success' => $success,
+			'message' => $message,
+		];
 
-		// Ensure response_data is an array for REST response.
-		if ( ! is_array( $response_data ) ) {
-			$response_data = (array) $response_data;
+		if ( null !== $data ) {
+			$response['data'] = $data;
 		}
 
-		return new WP_REST_Response( $response_data, $result->http_status );
+		if ( null !== $error_code ) {
+			$response['error_code'] = $error_code;
+		}
+
+		return new WP_REST_Response( $response, $status );
 	}
 
 	/**
-	 * Convert service result to legacy message response.
+	 * Create a default envelope response.
 	 *
-	 * For legacy {success, message, ...} style responses.
+	 * Used for endpoints that historically use full envelope:
+	 * - Default error responses
+	 * - Endpoints requiring success, data, error_code, message structure
 	 *
-	 * @param STOLMC_Service_Tracker_Service_Result_Dto $result Service result.
-	 * @param array                                     $extra  Extra data to include in response.
-	 *
-	 * @return WP_REST_Response
-	 */
-	public static function to_legacy_message_response(
-		STOLMC_Service_Tracker_Service_Result_Dto $result,
-		array $extra = []
-	): WP_REST_Response {
-		$response_data = array_merge(
-			[
-				'success' => $result->success,
-				'message' => $result->message,
-			],
-			$extra
-		);
-
-		// Include error_code if present.
-		if ( null !== $result->error_code ) {
-			$response_data['error_code'] = $result->error_code;
-		}
-
-		// Include data if present and not already in extra.
-		if ( null !== $result->data && ! isset( $extra['data'] ) ) {
-			$response_data['data'] = $result->data;
-		}
-
-		return new WP_REST_Response( $response_data, $result->http_status );
-	}
-
-	/**
-	 * Convert service result to paginated response.
-	 *
-	 * For endpoints that return paginated data with metadata.
-	 *
-	 * @param STOLMC_Service_Tracker_Service_Result_Dto $result Service result.
-	 * @param array                                     $pagination_meta Pagination metadata.
+	 * @param array<string, mixed> $data       The response data.
+	 * @param bool                 $success    Whether the operation succeeded.
+	 * @param string|null          $message    Optional message.
+	 * @param int|null             $error_code Optional error code.
+	 * @param int                  $status     HTTP status code.
 	 *
 	 * @return WP_REST_Response
 	 */
-	public static function to_paginated_response(
-		STOLMC_Service_Tracker_Service_Result_Dto $result,
-		array $pagination_meta = []
-	): WP_REST_Response {
-		$response_data = array_merge(
-			[
-				'data'       => $result->data,
-				'success'    => $result->success,
-				'message'    => $result->message,
-				'error_code' => $result->error_code,
-			],
-			$pagination_meta
-		);
+	public function to_default_response( array $data, bool $success = true, ?string $message = null, ?int $error_code = null, int $status = 200 ): WP_REST_Response {
+		$response = [
+			'success' => $success,
+			'data'    => $data,
+		];
 
-		return new WP_REST_Response( $response_data, $result->http_status );
+		if ( null !== $message ) {
+			$response['message'] = $message;
+		}
+
+		if ( null !== $error_code ) {
+			$response['error_code'] = $error_code;
+		}
+
+		return new WP_REST_Response( $response, $status );
 	}
 }

@@ -19,6 +19,13 @@ class STOLMC_Service_Tracker_Api {
 	protected const REST_NAMESPACE = 'service-tracker-stolmc/v1';
 
 	/**
+	 * Response mapper instance.
+	 *
+	 * @var STOLMC_Service_Tracker_Api_Response_Mapper|null
+	 */
+	protected $response_mapper = null;
+
+	/**
 	 * Central permission check for all routes.
 	 *
 	 * @param WP_REST_Request $request REST request.
@@ -137,6 +144,8 @@ class STOLMC_Service_Tracker_Api {
 	/**
 	 * Create a REST response.
 	 *
+	 * @deprecated 1.0.0 Use explicit mapper methods instead.
+	 *
 	 * @param array<string, mixed> $data The response data.
 	 * @param int                  $status The HTTP status code.
 	 *
@@ -144,5 +153,17 @@ class STOLMC_Service_Tracker_Api {
 	 */
 	public function rest_response( array $data, int $status ): WP_REST_Response {
 		return new WP_REST_Response( $data, $status );
+	}
+
+	/**
+	 * Get response mapper instance.
+	 *
+	 * @return STOLMC_Service_Tracker_Api_Response_Mapper
+	 */
+	protected function get_response_mapper(): STOLMC_Service_Tracker_Api_Response_Mapper {
+		if ( null === $this->response_mapper ) {
+			$this->response_mapper = new STOLMC_Service_Tracker_Api_Response_Mapper();
+		}
+		return $this->response_mapper;
 	}
 }
