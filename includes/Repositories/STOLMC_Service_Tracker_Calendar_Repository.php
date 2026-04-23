@@ -16,16 +16,16 @@ class STOLMC_Service_Tracker_Calendar_Repository {
 	/**
 	 * SQL handler for cases table.
 	 *
-	 * @var STOLMC_Service_Tracker_Sql|null
+	 * @var STOLMC_Service_Tracker_Sql
 	 */
-	private $cases_sql = null;
+	private STOLMC_Service_Tracker_Sql $cases_sql;
 
 	/**
 	 * SQL handler for progress table.
 	 *
-	 * @var STOLMC_Service_Tracker_Sql|null
+	 * @var STOLMC_Service_Tracker_Sql
 	 */
-	private $progress_sql = null;
+	private STOLMC_Service_Tracker_Sql $progress_sql;
 
 	/**
 	 * Database table name constants.
@@ -51,9 +51,9 @@ class STOLMC_Service_Tracker_Calendar_Repository {
 	 * @param int|null    $id_user Optional user ID to filter cases.
 	 * @param string|null $status  Optional status to filter cases.
 	 *
-	 * @return STOLMC_Service_Tracker_Calendar_Payload_Dto|array<string, mixed>
+	 * @return STOLMC_Service_Tracker_Calendar_Payload_Dto
 	 */
-	public function find_calendar_data( string $start, string $end, ?int $id_user = null, ?string $status = null ): STOLMC_Service_Tracker_Calendar_Payload_Dto|array {
+	public function find_calendar_data( string $start, string $end, ?int $id_user = null, ?string $status = null ): STOLMC_Service_Tracker_Calendar_Payload_Dto {
 		return new STOLMC_Service_Tracker_Calendar_Payload_Dto(
 			$this->find_calendar_cases( $start, $end, $id_user, $status ),
 			$this->find_calendar_progress( $start, $end, $id_user ),
@@ -96,10 +96,6 @@ class STOLMC_Service_Tracker_Calendar_Repository {
 
 		$calendar_cases = [];
 		foreach ( $cases as $case ) {
-			if ( ! is_object( $case ) ) {
-				continue;
-			}
-
 			if ( empty( $case->start_at ) && empty( $case->due_at ) ) {
 				continue;
 			}
@@ -145,10 +141,6 @@ class STOLMC_Service_Tracker_Calendar_Repository {
 
 		$calendar_progress = [];
 		foreach ( $progress as $entry ) {
-			if ( ! is_object( $entry ) ) {
-				continue;
-			}
-
 			$created_at = (string) ( $entry->created_at ?? '' );
 			if ( '' === $created_at ) {
 				continue;

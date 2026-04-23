@@ -5,7 +5,9 @@ use WP_REST_Request;
 use WP_REST_Response;
 use WP_REST_Server;
 use STOLMC_Service_Tracker\includes\Application\STOLMC_Service_Tracker_Users_Service;
-use STOLMC_Service_Tracker\includes\DTO\STOLMC_Service_Tracker_Service_Result_Dto;
+use STOLMC_Service_Tracker\includes\Application\STOLMC_Service_Tracker_Service_Factory;
+use STOLMC_Service_Tracker\includes\DTO\STOLMC_Service_Tracker_Dto_Factory;
+use STOLMC_Service_Tracker\includes\DTO\ValidationException;
 
 /**
  * This class handles user-related REST API operations.
@@ -31,25 +33,10 @@ class STOLMC_Service_Tracker_Api_Users extends STOLMC_Service_Tracker_Api {
 	private const PER_PAGE_DEFAULT = 6;
 
 	/**
-	 * Transient key for the user search inverted index.
-	 *
-	 * @since 1.4.0
-	 */
-	private const SEARCH_INDEX_TRANSIENT = 'stolmc_st_user_search_index';
-
-	/**
-	 * How long (in seconds) the search index transient lives.
-	 * Default: 1 hour.
-	 *
-	 * @since 1.4.0
-	 */
-	private const SEARCH_INDEX_TTL = 3600;
-
-	/**
 	 * Constructor.
 	 */
 	public function __construct() {
-		$this->users_service = new STOLMC_Service_Tracker_Users_Service();
+		$this->users_service = STOLMC_Service_Tracker_Service_Factory::create_users_service();
 	}
 
 	/**
@@ -94,7 +81,7 @@ class STOLMC_Service_Tracker_Api_Users extends STOLMC_Service_Tracker_Api {
 	 */
 	public function custom_api(): void {
 
-		// GET /users - List users with pagination (no ID required)
+			// GET /users - List users with pagination (no ID required).
 		$this->register_route(
 			'/users',
 			WP_REST_Server::READABLE,
@@ -112,7 +99,7 @@ class STOLMC_Service_Tracker_Api_Users extends STOLMC_Service_Tracker_Api {
 		);
 
 		// RegisterNewRoute -> Method from superclass / extended class.
-		// These routes require ID parameter
+			// These routes require ID parameter.
 		$this->register_new_route( 'users', '', WP_REST_Server::EDITABLE, [ $this, 'update' ] );
 		$this->register_new_route( 'users', '', WP_REST_Server::DELETABLE, [ $this, 'delete' ] );
 		$this->register_new_route( 'users', '', WP_REST_Server::CREATABLE, [ $this, 'create' ] );
@@ -147,30 +134,6 @@ class STOLMC_Service_Tracker_Api_Users extends STOLMC_Service_Tracker_Api {
 	}
 
 	/**
-	 * Validate JSON request body.
-	 *
-	 * @param WP_REST_Request $data The REST request object.
-	 *
-	 * @return array|WP_REST_Response Parsed JSON array or error response.
-	 */
-	private function validate_json_body( WP_REST_Request $data ): array|WP_REST_Response {
-		$body = $data->get_body();
-		$body = json_decode( $body, true );
-
-		if ( ! is_array( $body ) ) {
-			return STOLMC_Service_Tracker_Api_Response_Mapper::to_default_response(
-				[],
-				false,
-				'Invalid JSON data',
-				'invalid_json',
-				400
-			);
-		}
-
-		return $body;
-	}
-
-	/**
 	 * Read users with pagination.
 	 *
 	 * Accepts `page` (1-based) and `per_page` query parameters.
@@ -181,12 +144,8 @@ class STOLMC_Service_Tracker_Api_Users extends STOLMC_Service_Tracker_Api {
 	 * @return WP_REST_Response Paginated response.
 	 */
 	public function read( WP_REST_Request $data ): WP_REST_Response {
-		$page_param     = $data->get_param( 'page' );
-		$page           = max( 1, (int) ( $page_param ? $page_param : 1 ) );
-		$per_page_param = $data->get_param( 'per_page' );
-		$per_page       = max( 1, (int) ( $per_page_param ? $per_page_param : self::PER_PAGE_DEFAULT ) );
-
-		$result = $this->users_service->get_users( $page, $per_page );
+		$query_dto = STOLMC_Service_Tracker_Dto_Factory::create_users_query_dto( $data );
+		$result    = $this->users_service->get_users( $query_dto );
 
 		return STOLMC_Service_Tracker_Api_Response_Mapper::from_service_result( $result );
 	}
@@ -199,14 +158,21 @@ class STOLMC_Service_Tracker_Api_Users extends STOLMC_Service_Tracker_Api {
 	 * @return WP_REST_Response Response indicating success or failure.
 	 */
 	public function create( WP_REST_Request $data ): WP_REST_Response {
-		$body = $this->validate_json_body( $data );
-		if ( $body instanceof WP_REST_Response ) {
-			return $body;
+		try {
+			$create_dto = STOLMC_Service_Tracker_Dto_Factory::create_user_create_dto( $data );
+		} catch ( ValidationException $exception ) {
+			return STOLMC_Service_Tracker_Api_Response_Mapper::to_default_response(
+				[],
+				false,
+				$exception->getMessage(),
+				'invalid_payload',
+				400
+			);
 		}
 
-		$result = $this->users_service->create_user( $body );
+		$result = $this->users_service->create_user( $create_dto );
 
-		return STOLMC_Service_Tracker_Api_Response_Mapper::from_service_result_legacy( $result );
+		return STOLMC_Service_Tracker_Api_Response_Mapper::from_service_result( $result );
 	}
 
 	/**
@@ -217,15 +183,21 @@ class STOLMC_Service_Tracker_Api_Users extends STOLMC_Service_Tracker_Api {
 	 * @return WP_REST_Response Update result message.
 	 */
 	public function update( WP_REST_Request $data ): WP_REST_Response {
-		$user_id = (int) $data['id'];
-		$body = $this->validate_json_body( $data );
-		if ( $body instanceof WP_REST_Response ) {
-			return $body;
+		try {
+			$update_dto = STOLMC_Service_Tracker_Dto_Factory::create_user_update_dto( $data );
+		} catch ( ValidationException $exception ) {
+			return STOLMC_Service_Tracker_Api_Response_Mapper::to_default_response(
+				[],
+				false,
+				$exception->getMessage(),
+				'invalid_payload',
+				400
+			);
 		}
 
-		$result = $this->users_service->update_user( $user_id, $body );
+		$result = $this->users_service->update_user( $update_dto );
 
-		return STOLMC_Service_Tracker_Api_Response_Mapper::from_service_result_legacy( $result );
+		return STOLMC_Service_Tracker_Api_Response_Mapper::from_service_result( $result );
 	}
 
 	/**
@@ -236,17 +208,27 @@ class STOLMC_Service_Tracker_Api_Users extends STOLMC_Service_Tracker_Api {
 	 * @return WP_REST_Response
 	 */
 	public function delete( WP_REST_Request $data ): WP_REST_Response {
-		$user_id = (int) $data['id'];
+		try {
+			$delete_dto = STOLMC_Service_Tracker_Dto_Factory::create_user_delete_dto( $data );
+		} catch ( ValidationException $exception ) {
+			return STOLMC_Service_Tracker_Api_Response_Mapper::to_default_response(
+				[],
+				false,
+				$exception->getMessage(),
+				'invalid_payload',
+				400
+			);
+		}
 
-		$result = $this->users_service->delete_user( $user_id );
+		$result = $this->users_service->delete_user( $delete_dto );
 
-		return STOLMC_Service_Tracker_Api_Response_Mapper::from_service_result_legacy( $result );
+		return STOLMC_Service_Tracker_Api_Response_Mapper::from_service_result( $result );
 	}
 
 	/**
 	 * Search users using the inverted index transient.
 	 *
-	 * Returns a paginated envelope: { data, total, page, per_page, total_pages }.
+	 * Returns canonical v2 envelope with pagination in meta.pagination.
 	 *
 	 * @since 1.4.0
 	 *
@@ -255,18 +237,8 @@ class STOLMC_Service_Tracker_Api_Users extends STOLMC_Service_Tracker_Api {
 	 * @return WP_REST_Response Paginated response.
 	 */
 	public function search_users( WP_REST_Request $data ): WP_REST_Response {
-		$query          = trim( (string) $data->get_param( 'q' ) );
-		$page_param     = $data->get_param( 'page' );
-		$page           = max( 1, (int) ( $page_param ? $page_param : 1 ) );
-		$per_page_param = $data->get_param( 'per_page' );
-		$per_page       = max( 1, (int) ( $per_page_param ? $per_page_param : self::PER_PAGE_DEFAULT ) );
-
-		// Empty query — fall back to normal paginated read.
-		if ( '' === $query ) {
-			return $this->read( $data );
-		}
-
-		$result = $this->users_service->search_users( $query, $page, $per_page );
+		$query_dto = STOLMC_Service_Tracker_Dto_Factory::create_users_query_dto( $data );
+		$result    = $this->users_service->search_users( $query_dto );
 
 		return STOLMC_Service_Tracker_Api_Response_Mapper::from_service_result( $result );
 	}
@@ -274,7 +246,7 @@ class STOLMC_Service_Tracker_Api_Users extends STOLMC_Service_Tracker_Api {
 	/**
 	 * Read staff/admin users.
 	 *
-	 * Returns a plain array for legacy frontend compatibility.
+	 * Returns canonical v2 envelope.
 	 *
 	 * @param WP_REST_Request $data The REST request object.
 	 *
@@ -283,6 +255,6 @@ class STOLMC_Service_Tracker_Api_Users extends STOLMC_Service_Tracker_Api {
 	public function read_staff( WP_REST_Request $data ): WP_REST_Response {
 		$result = $this->users_service->get_staff_users();
 
-		return STOLMC_Service_Tracker_Api_Response_Mapper::from_service_result_passthrough( $result );
+		return STOLMC_Service_Tracker_Api_Response_Mapper::from_service_result( $result );
 	}
 }

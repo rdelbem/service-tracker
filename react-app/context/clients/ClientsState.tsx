@@ -55,7 +55,7 @@ export default function ClientsState({ children }: ClientsStateProps) {
 
     dispatch({
       type: GET_USERS,
-      payload: { users: res.data, loadingUsers: false },
+      payload: { users: res.data.data, loadingUsers: false },
     });
   };
 

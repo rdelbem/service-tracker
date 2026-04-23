@@ -153,12 +153,13 @@ class STOLMC_Service_Tracker_Api {
 	 * @return WP_REST_Response
 	 */
 	public function rest_response( array $data, int $status ): WP_REST_Response {
-		// Trigger deprecation notice
-		trigger_error(
+			// Trigger deprecation notice.
+			// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_trigger_error -- Intentional explicit deprecation signal.
+			trigger_error(
 			'Method STOLMC_Service_Tracker_Api::rest_response() is deprecated. Use STOLMC_Service_Tracker_Api_Response_Mapper methods instead.',
 			E_USER_DEPRECATED
 		);
-		
+
 		return new WP_REST_Response( $data, $status );
 	}
 

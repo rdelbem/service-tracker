@@ -18,7 +18,7 @@ namespace STOLMC_Service_Tracker\includes\Utils;
  *         $transaction->rollback();
  *         // Handle error
  *     }
- *     
+ *
  *     update_user_meta($user_id, 'phone', $phone);
  *     $transaction->commit();
  * } catch (\Exception $e) {
@@ -57,20 +57,17 @@ class STOLMC_Service_Tracker_WordPress_Transaction {
 	public function __construct() {
 		global $wpdb;
 
-		// Check if already in a transaction by checking $wpdb state
-		if ( ! $this->in_transaction() ) {
-			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-			$result = $wpdb->query( 'START TRANSACTION' );
-			if ( $result !== false ) {
-				$this->started_transaction = true;
-				
-				/**
-				 * Fires after a WordPress transaction has been started.
-				 *
-				 * @since 1.5.0
-				 */
-				do_action( 'stolmc_service_tracker_wordpress_transaction_started' );
-			}
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$result = $wpdb->query( 'START TRANSACTION' );
+		if ( $result !== false ) {
+			$this->started_transaction = true;
+
+			/**
+			 * Fires after a WordPress transaction has been started.
+			 *
+			 * @since 1.5.0
+			 */
+			do_action( 'stolmc_service_tracker_wordpress_transaction_started' );
 		}
 	}
 
@@ -87,16 +84,16 @@ class STOLMC_Service_Tracker_WordPress_Transaction {
 		global $wpdb;
 
 		if ( $this->committed ) {
-			return false; // Already committed
+				return false; // Already committed.
 		}
 
-		// Only commit if we started the transaction
+			// Only commit if we started the transaction.
 		if ( $this->started_transaction ) {
 			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 			$result = $wpdb->query( 'COMMIT' );
 			if ( $result !== false ) {
 				$this->committed = true;
-				
+
 				/**
 				 * Fires after a WordPress transaction has been committed.
 				 *
@@ -107,7 +104,7 @@ class STOLMC_Service_Tracker_WordPress_Transaction {
 			return $result !== false;
 		}
 
-		// If we didn't start the transaction, just mark as committed
+			// If we didn't start the transaction, just mark as committed.
 		$this->committed = true;
 		return true;
 	}
@@ -125,10 +122,10 @@ class STOLMC_Service_Tracker_WordPress_Transaction {
 		global $wpdb;
 
 		if ( $this->committed ) {
-			return false; // Already committed, cannot rollback
+				return false; // Already committed, cannot rollback.
 		}
 
-		// Only rollback if we started the transaction
+			// Only rollback if we started the transaction.
 		if ( $this->started_transaction ) {
 			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 			$result = $wpdb->query( 'ROLLBACK' );
@@ -147,40 +144,14 @@ class STOLMC_Service_Tracker_WordPress_Transaction {
 	}
 
 	/**
-	 * Check if currently in a transaction.
-	 *
-	 * Note: This is a best-effort check since WordPress doesn't
-	 * expose transaction state directly.
+	 * Check if currently in a transaction started by this helper.
 	 *
 	 * @since 1.5.0
 	 *
-	 * @return bool True if likely in a transaction, false otherwise.
+	 * @return bool True if started and not committed.
 	 */
 	public function in_transaction(): bool {
-		global $wpdb;
-
-		// Try to detect if we're in a transaction by checking
-		// if we can start and rollback a savepoint
-		// This is a heuristic and may not be 100% accurate
-		static $transaction_check = null;
-
-		if ( $transaction_check === null ) {
-			// Try to create a savepoint - if it fails, we might be in a transaction
-			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-			$savepoint_result = $wpdb->query( 'SAVEPOINT st_transaction_check' );
-			if ( $savepoint_result !== false ) {
-				// Clean up the savepoint
-				// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-				$wpdb->query( 'ROLLBACK TO SAVEPOINT st_transaction_check' );
-				// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-				$wpdb->query( 'RELEASE SAVEPOINT st_transaction_check' );
-				$transaction_check = false;
-			} else {
-				$transaction_check = true;
-			}
-		}
-
-		return $transaction_check;
+		return $this->started_transaction && ! $this->committed;
 	}
 
 	/**

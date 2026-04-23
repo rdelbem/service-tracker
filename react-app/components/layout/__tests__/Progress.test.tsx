@@ -110,16 +110,23 @@ function mockDefaultFetches(caseStatus: "open" | "close" = "open") {
   mockFetchGet.mockImplementation((url: string) => {
     if (url.includes("/users/staff")) {
       return Promise.resolve({
-        data: [
-          { id: "1", name: "Alice", role: "administrator" },
-          { id: "2", name: "Bob", role: "editor" },
-        ],
+        data: {
+          success: true,
+          data: [
+            { id: "1", name: "Alice", role: "administrator" },
+            { id: "2", name: "Bob", role: "editor" },
+          ],
+          error_code: null,
+          message: null,
+          meta: {},
+        },
       });
     }
 
     if (url.includes("/cases/user-1?page=1&per_page=6")) {
       return Promise.resolve({
         data: {
+          success: true,
           data: [
             {
               id: "case-1",
@@ -131,7 +138,9 @@ function mockDefaultFetches(caseStatus: "open" | "close" = "open") {
               due_at: "2024-01-05T10:00:00",
             },
           ],
-          total_pages: 1,
+          error_code: null,
+          message: null,
+          meta: { pagination: { total_pages: 1 } },
         },
       });
     }
@@ -139,12 +148,16 @@ function mockDefaultFetches(caseStatus: "open" | "close" = "open") {
     if (url.includes("/users?page=1&per_page=100")) {
       return Promise.resolve({
         data: {
+          success: true,
           data: [{ id: "user-1", name: "John Client" }],
+          error_code: null,
+          message: null,
+          meta: {},
         },
       });
     }
 
-    return Promise.resolve({ data: [] });
+    return Promise.resolve({ data: { success: true, data: [], error_code: null, message: null, meta: {} } });
   });
 }
 

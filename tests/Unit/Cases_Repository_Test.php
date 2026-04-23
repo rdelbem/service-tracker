@@ -220,9 +220,9 @@ class Cases_Repository_Test extends Unit_TestCase {
 	}
 
 	/**
-	 * Test get_all returns null when no cases found.
+	 * Test get_all returns empty array when no cases found.
 	 */
-	public function test_get_all_returns_null_when_no_cases_found(): void {
+	public function test_get_all_returns_empty_array_when_no_cases_found(): void {
 		$this->mock_cases_sql->shouldReceive( 'get_all_with_columns' )
 			->once()
 			->with( [ 'id', 'id_user', 'title', 'status' ], 'id ASC' )
@@ -230,7 +230,7 @@ class Cases_Repository_Test extends Unit_TestCase {
 
 		$result = $this->cases_orm->get_all();
 
-		$this->assertNull( $result );
+		$this->assertSame( [], $result );
 	}
 
 	/**
@@ -597,9 +597,9 @@ class Cases_Repository_Test extends Unit_TestCase {
 	}
 
 	/**
-	 * Test get_by returns null when SQL get_by returns null.
+	 * Test get_by returns empty array when SQL get_by returns null.
 	 */
-	public function test_get_by_returns_null_when_sql_get_by_returns_null(): void {
+	public function test_get_by_returns_empty_array_when_sql_get_by_returns_null(): void {
 		$query_args = [ 'status' => 'open' ];
 
 		$this->mock_cases_sql->shouldReceive( 'get_by' )
@@ -609,13 +609,13 @@ class Cases_Repository_Test extends Unit_TestCase {
 
 		$result = $this->cases_orm->get_by( $query_args );
 
-		$this->assertNull( $result );
+		$this->assertSame( [], $result );
 	}
 
 	/**
-	 * Test get_by returns object when SQL get_by returns single object.
+	 * Test get_by returns array when SQL get_by returns single object.
 	 */
-	public function test_get_by_returns_object_when_sql_get_by_returns_single_object(): void {
+	public function test_get_by_returns_array_when_sql_get_by_returns_single_object(): void {
 		$query_args = [ 'id' => self::TEST_CASE_ID ];
 		$expected_case = (object) [
 			'id'      => self::TEST_CASE_ID,
@@ -630,16 +630,17 @@ class Cases_Repository_Test extends Unit_TestCase {
 
 		$result = $this->cases_orm->get_by( $query_args );
 
-		$this->assertInstanceOf( STOLMC_Service_Tracker_Case_Dto::class, $result );
-		$this->assertSame( self::TEST_CASE_ID, $result->id );
-		$this->assertSame( self::TEST_USER_ID, $result->id_user );
-		$this->assertSame( 'Single Case', $result->title );
+		$this->assertCount( 1, $result );
+		$this->assertInstanceOf( STOLMC_Service_Tracker_Case_Dto::class, $result[0] );
+		$this->assertSame( self::TEST_CASE_ID, $result[0]->id );
+		$this->assertSame( self::TEST_USER_ID, $result[0]->id_user );
+		$this->assertSame( 'Single Case', $result[0]->title );
 	}
 
 	/**
-	 * Test get_by_user_paginated returns null when SQL get_by_paginated returns null.
+	 * Test get_by_user_paginated returns empty array when SQL get_by_paginated returns null.
 	 */
-	public function test_get_by_user_paginated_returns_null_when_sql_get_by_paginated_returns_null(): void {
+	public function test_get_by_user_paginated_returns_empty_array_when_sql_get_by_paginated_returns_null(): void {
 		$user_id = self::TEST_USER_ID;
 		$per_page = 10;
 		$offset = 0;
@@ -651,13 +652,13 @@ class Cases_Repository_Test extends Unit_TestCase {
 
 		$result = $this->cases_orm->get_by_user_paginated( $user_id, $per_page, $offset );
 
-		$this->assertNull( $result );
+		$this->assertSame( [], $result );
 	}
 
 	/**
-	 * Test get_by_user_paginated returns object when SQL get_by_paginated returns single object.
+	 * Test get_by_user_paginated returns array when SQL get_by_paginated returns single object.
 	 */
-	public function test_get_by_user_paginated_returns_object_when_sql_get_by_paginated_returns_single_object(): void {
+	public function test_get_by_user_paginated_returns_array_when_sql_get_by_paginated_returns_single_object(): void {
 		$user_id = self::TEST_USER_ID;
 		$per_page = 10;
 		$offset = 0;
@@ -674,9 +675,10 @@ class Cases_Repository_Test extends Unit_TestCase {
 
 		$result = $this->cases_orm->get_by_user_paginated( $user_id, $per_page, $offset );
 
-		$this->assertInstanceOf( STOLMC_Service_Tracker_Case_Dto::class, $result );
-		$this->assertSame( self::TEST_CASE_ID, $result->id );
-		$this->assertSame( $user_id, $result->id_user );
-		$this->assertSame( 'Single Paginated Case', $result->title );
+		$this->assertCount( 1, $result );
+		$this->assertInstanceOf( STOLMC_Service_Tracker_Case_Dto::class, $result[0] );
+		$this->assertSame( self::TEST_CASE_ID, $result[0]->id );
+		$this->assertSame( $user_id, $result[0]->id_user );
+		$this->assertSame( 'Single Paginated Case', $result[0]->title );
 	}
 }

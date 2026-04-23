@@ -25,13 +25,25 @@ describe('clientsStore', () => {
       nonce: 'nonce',
     };
     mockGet.mockResolvedValue({
-      data: { data: [], page: 1, per_page: 6, total: 0, total_pages: 1 },
+      data: {
+        success: true,
+        data: [],
+        error_code: null,
+        message: null,
+        meta: { pagination: { page: 1, per_page: 6, total: 0, total_pages: 1 } },
+      },
     });
   });
 
   it('getUsers populates user list and paging', async () => {
     mockGet.mockResolvedValue({
-      data: { data: [{ id: '1', name: 'John' }], page: 2, per_page: 6, total: 7, total_pages: 2 },
+      data: {
+        success: true,
+        data: [{ id: '1', name: 'John' }],
+        error_code: null,
+        message: null,
+        meta: { pagination: { page: 2, per_page: 6, total: 7, total_pages: 2 } },
+      },
     });
 
     const { useClientsStore } = await import('../clientsStore');
@@ -58,7 +70,13 @@ describe('clientsStore', () => {
 
   it('setPage clamps and fetches search page when searchQuery exists', async () => {
     mockGet.mockResolvedValue({
-      data: { data: [{ id: '2', name: 'Jane' }], page: 2, per_page: 6, total: 10, total_pages: 2 },
+      data: {
+        success: true,
+        data: [{ id: '2', name: 'Jane' }],
+        error_code: null,
+        message: null,
+        meta: { pagination: { page: 2, per_page: 6, total: 10, total_pages: 2 } },
+      },
     });
 
     const { useClientsStore } = await import('../clientsStore');

@@ -2,13 +2,13 @@
 namespace STOLMC_Service_Tracker\includes\Controller_API;
 
 use STOLMC_Service_Tracker\includes\Application\STOLMC_Service_Tracker_Calendar_Service;
+use STOLMC_Service_Tracker\includes\Application\STOLMC_Service_Tracker_Service_Factory;
 use STOLMC_Service_Tracker\includes\Controller_API\STOLMC_Service_Tracker_Api_Response_Mapper;
+use STOLMC_Service_Tracker\includes\DTO\STOLMC_Service_Tracker_Dto_Factory;
+use STOLMC_Service_Tracker\includes\DTO\ValidationException;
 use WP_REST_Request;
 use WP_REST_Response;
 use WP_REST_Server;
-use STOLMC_Service_Tracker\includes\DB\CalendarIndex;
-use STOLMC_Service_Tracker\includes\DTO\STOLMC_Service_Tracker_Calendar_Payload_Dto;
-use STOLMC_Service_Tracker\includes\Repositories\STOLMC_Service_Tracker_Calendar_Repository;
 
 /**
  * Calendar API class for aggregating case and progress data.
@@ -28,13 +28,19 @@ class STOLMC_Service_Tracker_Api_Calendar extends STOLMC_Service_Tracker_Api imp
 	private $calendar_service;
 
 	/**
+	 * Constructor.
+	 */
+	public function __construct() {
+		$this->calendar_service = STOLMC_Service_Tracker_Service_Factory::create_calendar_service();
+	}
+
+	/**
 	 * Initialize the API and register routes.
 	 *
 	 * @return void
 	 */
 	public function run(): void {
 		$this->custom_api();
-		$this->calendar_service = new STOLMC_Service_Tracker_Calendar_Service();
 	}
 
 	/**
@@ -47,68 +53,6 @@ class STOLMC_Service_Tracker_Api_Calendar extends STOLMC_Service_Tracker_Api imp
 	}
 
 	/**
-	 * Read method (required by contract, not used for calendar).
-	 *
-	 * @param WP_REST_Request $data The REST request object.
-	 *
-	 * @return WP_REST_Response Method not allowed response.
-	 */
-	public function read( WP_REST_Request $data ): WP_REST_Response {
-		return $this->get_calendar( $data );
-	}
-
-	/**
-	 * Create method (not applicable for calendar).
-	 *
-	 * @param WP_REST_Request $data The REST request object.
-	 *
-	 * @return WP_REST_Response Method not allowed response.
-	 */
-	public function create( WP_REST_Request $data ): WP_REST_Response {
-		return $this->rest_response(
-			[
-				'success' => false,
-				'message' => 'Method not allowed',
-			],
-			405
-		);
-	}
-
-	/**
-	 * Update method (not applicable for calendar).
-	 *
-	 * @param WP_REST_Request $data The REST request object.
-	 *
-	 * @return WP_REST_Response Method not allowed response.
-	 */
-	public function update( WP_REST_Request $data ): WP_REST_Response {
-		return $this->rest_response(
-			[
-				'success' => false,
-				'message' => 'Method not allowed',
-			],
-			405
-		);
-	}
-
-	/**
-	 * Delete method (not applicable for calendar).
-	 *
-	 * @param WP_REST_Request $data The REST request object.
-	 *
-	 * @return WP_REST_Response Method not allowed response.
-	 */
-	public function delete( WP_REST_Request $data ): WP_REST_Response {
-		return $this->rest_response(
-			[
-				'success' => false,
-				'message' => 'Method not allowed',
-			],
-			405
-		);
-	}
-
-	/**
 	 * Get calendar data aggregated from cases and progress.
 	 *
 	 * @param WP_REST_Request $data The REST request object.
@@ -116,15 +60,22 @@ class STOLMC_Service_Tracker_Api_Calendar extends STOLMC_Service_Tracker_Api imp
 	 * @return WP_REST_Response Calendar data with cases and progress entries.
 	 */
 	public function get_calendar( WP_REST_Request $data ): WP_REST_Response {
-		$start = $data->get_param( 'start' );
-		$end = $data->get_param( 'end' );
-		$id_user = $data->get_param( 'id_user' );
-		$status = $data->get_param( 'status' );
+		try {
+			$query_dto = STOLMC_Service_Tracker_Dto_Factory::create_calendar_query_dto( $data );
+		} catch ( ValidationException $exception ) {
+			return STOLMC_Service_Tracker_Api_Response_Mapper::to_default_response(
+				[],
+				false,
+				$exception->getMessage(),
+				'invalid_payload',
+				400
+			);
+		}
 
 		// Get calendar data from service.
-		$service_result = $this->calendar_service->get_calendar_data( $start, $end, $id_user, $status );
+		$service_result = $this->calendar_service->get_calendar_data( $query_dto );
 
 		// Calendar endpoint historically returns raw payload (cases/progress/date_index).
-		return STOLMC_Service_Tracker_Api_Response_Mapper::from_service_result_passthrough( $service_result );
+		return STOLMC_Service_Tracker_Api_Response_Mapper::from_service_result( $service_result );
 	}
 }

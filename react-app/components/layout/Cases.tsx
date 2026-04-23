@@ -61,8 +61,9 @@ export default function Cases() {
             { headers: { "X-WP-Nonce": data.nonce } }
           );
           const body = usersRes.data;
+          const pagination = body?.meta?.pagination ?? {};
           const usersOnPage = normalizeUsers(body?.data);
-          usersTotalPages     = typeof body?.total_pages === "number" ? body.total_pages : 1;
+          usersTotalPages = typeof pagination.total_pages === "number" ? pagination.total_pages : 1;
           allUsers            = [...allUsers, ...usersOnPage];
           usersPage++;
         } while (usersPage <= usersTotalPages);
@@ -86,9 +87,10 @@ export default function Cases() {
               `${apiUrlCases}/${user.id}?page=${casesPage}&per_page=6`,
               { headers: { "X-WP-Nonce": data.nonce } }
             );
-            const casesBody     = casesRes.data;
+            const casesBody = casesRes.data;
+            const casesPagination = casesBody?.meta?.pagination ?? {};
             const pageCases: CaseType[] = Array.isArray(casesBody?.data) ? casesBody.data : [];
-            casesTotalPages     = typeof casesBody?.total_pages === "number" ? casesBody.total_pages : 1;
+            casesTotalPages = typeof casesPagination.total_pages === "number" ? casesPagination.total_pages : 1;
 
             if (pageCases.length > 0) {
               casesList = [

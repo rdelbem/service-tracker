@@ -3,6 +3,11 @@
 namespace STOLMC_Service_Tracker\includes\Application;
 
 use STOLMC_Service_Tracker\includes\DTO\STOLMC_Service_Tracker_Service_Result_Dto;
+use STOLMC_Service_Tracker\includes\DTO\STOLMC_Service_Tracker_Cases_Read_Query_Dto;
+use STOLMC_Service_Tracker\includes\DTO\STOLMC_Service_Tracker_Cases_Search_Query_Dto;
+use STOLMC_Service_Tracker\includes\DTO\STOLMC_Service_Tracker_Case_Create_Dto;
+use STOLMC_Service_Tracker\includes\DTO\STOLMC_Service_Tracker_Case_Update_Dto;
+use STOLMC_Service_Tracker\includes\DTO\STOLMC_Service_Tracker_Case_Delete_Dto;
 use STOLMC_Service_Tracker\includes\Repositories\STOLMC_Service_Tracker_Cases_Repository;
 
 /**
@@ -19,13 +24,6 @@ class STOLMC_Service_Tracker_Cases_Service {
 	 * @var STOLMC_Service_Tracker_Cases_Repository
 	 */
 	private $cases_repository;
-
-	/**
-	 * Number of cases returned per page by default.
-	 *
-	 * @since 1.3.0
-	 */
-	private const PER_PAGE_DEFAULT = 6;
 
 	/**
 	 * Transient key for the cases search inverted index.
@@ -54,16 +52,15 @@ class STOLMC_Service_Tracker_Cases_Service {
 	/**
 	 * Get paginated cases for a user.
 	 *
-	 * @param int $user_id   User ID.
-	 * @param int $page      Page number (1-based).
-	 * @param int $per_page  Items per page.
+	 * @param STOLMC_Service_Tracker_Cases_Read_Query_Dto $query_dto Query DTO.
 	 *
 	 * @return STOLMC_Service_Tracker_Service_Result_Dto Service result.
 	 */
-	public function get_cases_for_user( int $user_id, int $page = 1, int $per_page = self::PER_PAGE_DEFAULT ): STOLMC_Service_Tracker_Service_Result_Dto {
+	public function get_cases_for_user( STOLMC_Service_Tracker_Cases_Read_Query_Dto $query_dto ): STOLMC_Service_Tracker_Service_Result_Dto {
 		try {
-			$page     = max( 1, $page );
-			$per_page = max( 1, $per_page );
+			$user_id  = $query_dto->user_id;
+			$page     = $query_dto->page;
+			$per_page = $query_dto->per_page;
 
 			$total = $this->cases_repository->count_by_user( $user_id );
 			$total_pages = $total > 0 ? (int) ceil( $total / $per_page ) : 1;
@@ -107,22 +104,22 @@ class STOLMC_Service_Tracker_Cases_Service {
 	/**
 	 * Search cases using the inverted index.
 	 *
-	 * @param string $query    Search query.
-	 * @param int    $user_id  Optional user ID to scope results.
-	 * @param int    $page     Page number (1-based).
-	 * @param int    $per_page Items per page.
+	 * @param STOLMC_Service_Tracker_Cases_Search_Query_Dto $query_dto Search query DTO.
 	 *
 	 * @return STOLMC_Service_Tracker_Service_Result_Dto Service result.
 	 */
-	public function search_cases( string $query, int $user_id = 0, int $page = 1, int $per_page = self::PER_PAGE_DEFAULT ): STOLMC_Service_Tracker_Service_Result_Dto {
+	public function search_cases( STOLMC_Service_Tracker_Cases_Search_Query_Dto $query_dto ): STOLMC_Service_Tracker_Service_Result_Dto {
 		try {
-			$query    = mb_strtolower( trim( $query ) );
-			$page     = max( 1, $page );
-			$per_page = max( 1, $per_page );
+			$query    = mb_strtolower( trim( $query_dto->query ) );
+			$user_id  = $query_dto->user_id;
+			$page     = $query_dto->page;
+			$per_page = $query_dto->per_page;
 
 			// Empty query — fall back to normal paginated read if user_id provided.
 			if ( $query === '' && $user_id > 0 ) {
-				return $this->get_cases_for_user( $user_id, $page, $per_page );
+				return $this->get_cases_for_user(
+					new STOLMC_Service_Tracker_Cases_Read_Query_Dto( $user_id, $page, $per_page )
+				);
 			} elseif ( $query === '' ) {
 				return STOLMC_Service_Tracker_Service_Result_Dto::fail(
 					'empty_search_query',
@@ -150,7 +147,10 @@ class STOLMC_Service_Tracker_Cases_Service {
 					}
 
 					if ( ! isset( $scores[ $case_id ] ) ) {
-						$scores[ $case_id ] = [ 'score' => 0, 'id_user' => $entry['id_user'] ];
+						$scores[ $case_id ] = [
+						'score'   => 0,
+						'id_user' => $entry['id_user'],
+						];
 					}
 					++$scores[ $case_id ]['score'];
 				}
@@ -193,9 +193,7 @@ class STOLMC_Service_Tracker_Cases_Service {
 
 			$cases_by_id = [];
 			foreach ( $cases as $case ) {
-				if ( isset( $case->id ) ) {
-					$cases_by_id[ (int) $case->id ] = $case;
-				}
+				$cases_by_id[ (int) $case->id ] = $case;
 			}
 
 			$ordered_cases = [];
@@ -237,36 +235,15 @@ class STOLMC_Service_Tracker_Cases_Service {
 	/**
 	 * Create a new case.
 	 *
-	 * @param array<string, mixed> $case_data Case data.
+	 * @param STOLMC_Service_Tracker_Case_Create_Dto $create_dto Create DTO.
 	 *
 	 * @return STOLMC_Service_Tracker_Service_Result_Dto Service result.
 	 */
-	public function create_case( array $case_data ): STOLMC_Service_Tracker_Service_Result_Dto {
+	public function create_case( STOLMC_Service_Tracker_Case_Create_Dto $create_dto ): STOLMC_Service_Tracker_Service_Result_Dto {
+		$transaction_started = false;
+
 		try {
-			// Validate required fields.
-			if ( ! isset( $case_data['id_user'] ) || ! isset( $case_data['title'] ) ) {
-				return STOLMC_Service_Tracker_Service_Result_Dto::fail(
-					'missing_required_fields',
-					'id_user and title are required fields',
-					400
-				);
-			}
-
-			// Set defaults.
-			$case_data['status'] = $case_data['status'] ?? 'open';
-			$case_data['description'] = $case_data['description'] ?? '';
-			$case_data['start_at'] = $case_data['start_at'] ?? null;
-			$case_data['due_at'] = $case_data['due_at'] ?? null;
-			$case_data['owner_id'] = $case_data['owner_id'] ?? null;
-
-			// Validate date range if both are provided.
-			if ( ! empty( $case_data['start_at'] ) && ! empty( $case_data['due_at'] ) && $case_data['start_at'] > $case_data['due_at'] ) {
-				return STOLMC_Service_Tracker_Service_Result_Dto::fail(
-					'invalid_date_range',
-					'start_at must be before or equal to due_at',
-					400
-				);
-			}
+			$case_data = $create_dto->to_array();
 
 			/**
 			 * Filters the case data before insertion.
@@ -276,11 +253,29 @@ class STOLMC_Service_Tracker_Cases_Service {
 			 * @param array $case_data The case data to insert.
 			 */
 			$case_data = apply_filters( 'stolmc_service_tracker_case_create_data', $case_data );
+			$transaction_started = $this->cases_repository->begin_transaction();
+			if ( ! $transaction_started ) {
+				return STOLMC_Service_Tracker_Service_Result_Dto::fail(
+					'transaction_start_failed',
+					'Failed to start transaction for case creation',
+					500
+				);
+			}
 
 			$inserted = $this->cases_repository->create( $case_data );
 			$insert_id = $this->cases_repository->get_last_insert_id();
 
 			if ( $insert_id > 0 ) {
+				if ( ! $this->cases_repository->commit_transaction() ) {
+					$this->cases_repository->rollback_transaction();
+
+					return STOLMC_Service_Tracker_Service_Result_Dto::fail(
+						'transaction_commit_failed',
+						'Failed to commit transaction for case creation',
+						500
+					);
+				}
+
 				/**
 				 * Fires after a case has been created.
 				 *
@@ -292,12 +287,10 @@ class STOLMC_Service_Tracker_Cases_Service {
 				do_action( 'stolmc_service_tracker_case_created', $insert_id, $case_data );
 
 				$data = [
-					'success' => true,
-					'id'      => $insert_id,
-					'message' => 'Case created successfully',
+					'id' => $insert_id,
 				];
 
-				return STOLMC_Service_Tracker_Service_Result_Dto::ok( $data, 201 );
+				return STOLMC_Service_Tracker_Service_Result_Dto::ok( $data, 201, 'Case created successfully' );
 			}
 
 			/**
@@ -309,6 +302,7 @@ class STOLMC_Service_Tracker_Cases_Service {
 			 * @param array        $case_data The case data that failed.
 			 */
 			do_action( 'stolmc_service_tracker_case_create_failed', $inserted, $case_data );
+			$this->cases_repository->rollback_transaction();
 
 			return STOLMC_Service_Tracker_Service_Result_Dto::fail(
 				'case_creation_failed',
@@ -316,6 +310,10 @@ class STOLMC_Service_Tracker_Cases_Service {
 				500
 			);
 		} catch ( \Exception $e ) {
+			if ( $transaction_started ) {
+				$this->cases_repository->rollback_transaction();
+			}
+
 			return STOLMC_Service_Tracker_Service_Result_Dto::fail(
 				'case_creation_error',
 				'Failed to create case: ' . $e->getMessage(),
@@ -327,13 +325,17 @@ class STOLMC_Service_Tracker_Cases_Service {
 	/**
 	 * Update an existing case.
 	 *
-	 * @param int   $case_id Case ID.
-	 * @param array<string, mixed> $update_data Data to update.
+	 * @param STOLMC_Service_Tracker_Case_Update_Dto $update_dto Update DTO.
 	 *
 	 * @return STOLMC_Service_Tracker_Service_Result_Dto Service result.
 	 */
-	public function update_case( int $case_id, array $update_data ): STOLMC_Service_Tracker_Service_Result_Dto {
+	public function update_case( STOLMC_Service_Tracker_Case_Update_Dto $update_dto ): STOLMC_Service_Tracker_Service_Result_Dto {
+		$transaction_started = false;
+
 		try {
+			$case_id     = $update_dto->case_id;
+			$update_data = $update_dto->to_array();
+
 			// Validate date range if both are provided.
 			if ( isset( $update_data['start_at'] ) && isset( $update_data['due_at'] )
 				&& $update_data['start_at'] > $update_data['due_at'] ) {
@@ -355,13 +357,33 @@ class STOLMC_Service_Tracker_Cases_Service {
 			 * @param array $condition   The WHERE condition.
 			 */
 			$update_data = apply_filters( 'stolmc_service_tracker_case_update_data', $update_data, $condition );
+			$transaction_started = $this->cases_repository->begin_transaction();
+			if ( ! $transaction_started ) {
+				return STOLMC_Service_Tracker_Service_Result_Dto::fail(
+					'transaction_start_failed',
+					'Failed to start transaction for case update',
+					500
+				);
+			}
 
 			$response = $this->cases_repository->update_by_id( $case_id, $update_data );
 
 			if ( false === $response ) {
+				$this->cases_repository->rollback_transaction();
+
 				return STOLMC_Service_Tracker_Service_Result_Dto::fail(
 					'case_update_failed',
 					'Failed to update case',
+					500
+				);
+			}
+
+			if ( ! $this->cases_repository->commit_transaction() ) {
+				$this->cases_repository->rollback_transaction();
+
+				return STOLMC_Service_Tracker_Service_Result_Dto::fail(
+					'transaction_commit_failed',
+					'Failed to commit transaction for case update',
 					500
 				);
 			}
@@ -378,13 +400,15 @@ class STOLMC_Service_Tracker_Cases_Service {
 			do_action( 'stolmc_service_tracker_case_updated', $response, $update_data, $condition );
 
 			$data = [
-				'success' => true,
-				'message' => 'Case updated successfully',
 				'affected_rows' => $response,
 			];
 
-			return STOLMC_Service_Tracker_Service_Result_Dto::ok( $data, 200 );
+			return STOLMC_Service_Tracker_Service_Result_Dto::ok( $data, 200, 'Case updated successfully' );
 		} catch ( \Exception $e ) {
+			if ( $transaction_started ) {
+				$this->cases_repository->rollback_transaction();
+			}
+
 			return STOLMC_Service_Tracker_Service_Result_Dto::fail(
 				'case_update_error',
 				'Failed to update case: ' . $e->getMessage(),
@@ -396,12 +420,23 @@ class STOLMC_Service_Tracker_Cases_Service {
 	/**
 	 * Delete a case and its associated progress records.
 	 *
-	 * @param int $case_id Case ID.
+	 * @param STOLMC_Service_Tracker_Case_Delete_Dto $delete_dto Delete DTO.
 	 *
 	 * @return STOLMC_Service_Tracker_Service_Result_Dto Service result.
 	 */
-	public function delete_case( int $case_id ): STOLMC_Service_Tracker_Service_Result_Dto {
+	public function delete_case( STOLMC_Service_Tracker_Case_Delete_Dto $delete_dto ): STOLMC_Service_Tracker_Service_Result_Dto {
 		try {
+			$case_id = $delete_dto->case_id;
+
+			$transaction_started = $this->cases_repository->begin_transaction();
+			if ( ! $transaction_started ) {
+				return STOLMC_Service_Tracker_Service_Result_Dto::fail(
+					'transaction_start_failed',
+					'Failed to start transaction for case deletion',
+					500
+				);
+			}
+
 			/**
 			 * Fires before a case is deleted.
 			 *
@@ -414,10 +449,22 @@ class STOLMC_Service_Tracker_Cases_Service {
 			$delete_case = $this->cases_repository->delete_by_id( $case_id );
 			$delete_progress = $this->cases_repository->delete_progress_by_case_id( $case_id );
 
-			if ( false === $delete_case ) {
+			if ( false === $delete_case || false === $delete_progress ) {
+				$this->cases_repository->rollback_transaction();
+
 				return STOLMC_Service_Tracker_Service_Result_Dto::fail(
 					'case_deletion_failed',
-					'Failed to delete case',
+					'Failed to delete case and related progress',
+					500
+				);
+			}
+
+			if ( ! $this->cases_repository->commit_transaction() ) {
+				$this->cases_repository->rollback_transaction();
+
+				return STOLMC_Service_Tracker_Service_Result_Dto::fail(
+					'transaction_commit_failed',
+					'Failed to commit transaction for case deletion',
 					500
 				);
 			}
@@ -434,14 +481,14 @@ class STOLMC_Service_Tracker_Cases_Service {
 			do_action( 'stolmc_service_tracker_case_deleted', $delete_case, $delete_progress, $case_id );
 
 			$data = [
-				'success' => true,
-				'message' => 'Case deleted successfully',
-				'case_delete' => $delete_case,
+				'case_delete'     => $delete_case,
 				'progress_delete' => $delete_progress,
 			];
 
-			return STOLMC_Service_Tracker_Service_Result_Dto::ok( $data, 200 );
+			return STOLMC_Service_Tracker_Service_Result_Dto::ok( $data, 200, 'Case deleted successfully' );
 		} catch ( \Exception $e ) {
+			$this->cases_repository->rollback_transaction();
+
 			return STOLMC_Service_Tracker_Service_Result_Dto::fail(
 				'case_deletion_error',
 				'Failed to delete case: ' . $e->getMessage(),
@@ -571,6 +618,9 @@ class STOLMC_Service_Tracker_Cases_Service {
 	private function tokenize( string $text ): array {
 		$text  = mb_strtolower( $text );
 		$parts = preg_split( '/[\s@._\-]+/', $text, -1, PREG_SPLIT_NO_EMPTY );
+		if ( false === $parts ) {
+			return [];
+		}
 
 		$tokens = [];
 

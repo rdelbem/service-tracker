@@ -20,16 +20,16 @@ class STOLMC_Service_Tracker_Toggle_Repository {
 	/**
 	 * SQL handler for cases table operations.
 	 *
-	 * @var STOLMC_Service_Tracker_Sql|null
+	 * @var STOLMC_Service_Tracker_Sql
 	 */
-	private $cases_sql = null;
+	private STOLMC_Service_Tracker_Sql $cases_sql;
 
 	/**
 	 * Cases Repository for case operations.
 	 *
 	 * @var STOLMC_Service_Tracker_Cases_Repository
 	 */
-	private $cases_repository;
+	private STOLMC_Service_Tracker_Cases_Repository $cases_repository;
 
 	/**
 	 * Constructor for the Toggle Repository class.
@@ -172,6 +172,33 @@ class STOLMC_Service_Tracker_Toggle_Repository {
 		}
 
 		return $case->status;
+	}
+
+	/**
+	 * Begin database transaction for toggle operations.
+	 *
+	 * @return bool
+	 */
+	public function begin_transaction(): bool {
+		return $this->cases_sql->begin_transaction();
+	}
+
+	/**
+	 * Commit active toggle transaction.
+	 *
+	 * @return bool
+	 */
+	public function commit_transaction(): bool {
+		return $this->cases_sql->commit();
+	}
+
+	/**
+	 * Rollback active toggle transaction.
+	 *
+	 * @return bool
+	 */
+	public function rollback_transaction(): bool {
+		return $this->cases_sql->rollback();
 	}
 
 	/**

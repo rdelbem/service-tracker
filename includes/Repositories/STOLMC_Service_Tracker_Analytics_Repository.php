@@ -117,7 +117,7 @@ class STOLMC_Service_Tracker_Analytics_Repository {
 	/**
 	 * Get per-customer statistics.
 	 *
-	 * @return array{
+	 * @return array<int, array{
 	 *     user_id: int,
 	 *     name: string,
 	 *     email: string,
@@ -127,7 +127,7 @@ class STOLMC_Service_Tracker_Analytics_Repository {
 	 *     progress_updates: int,
 	 *     notifications_sent: int,
 	 *     last_activity_at: string|null
-	 * }
+	 * }>
 	 */
 	public function find_customer_stats(): array {
 		$customers = $this->users_sql->get_all_with_columns(
@@ -197,7 +197,7 @@ class STOLMC_Service_Tracker_Analytics_Repository {
 	/**
 	 * Get per-admin/staff statistics.
 	 *
-	 * @return array{
+	 * @return array<int, array{
 	 *     user_id: int,
 	 *     display_name: string,
 	 *     email: string,
@@ -209,7 +209,7 @@ class STOLMC_Service_Tracker_Analytics_Repository {
 	 *     progress_deleted: int,
 	 *     notifications_triggered: int,
 	 *     last_activity_at: string|null
-	 * }
+	 * }>
 	 */
 	public function find_admin_stats(): array {
 		$admin_ids = $this->activity_log_sql->get_distinct_values(
@@ -313,10 +313,10 @@ class STOLMC_Service_Tracker_Analytics_Repository {
 	 * @param string|null $end   End date.
 	 *
 	 * @return array{
-	 *     cases_created_by_period: array<string, int>,
-	 *     progress_created_by_period: array<string, int>,
-	 *     notifications_by_period: array<string, int>,
-	 *     admin_actions_by_period: array<string, int>
+	 *     cases_created_by_period: array<int, array<string, mixed>>,
+	 *     progress_created_by_period: array<int, array<string, mixed>>,
+	 *     notifications_by_period: array<int, array<string, mixed>>,
+	 *     admin_actions_by_period: array<int, array<string, mixed>>
 	 * }
 	 */
 	public function find_trends( ?string $start, ?string $end ): array {

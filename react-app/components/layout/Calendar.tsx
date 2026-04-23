@@ -91,7 +91,7 @@ export default function Calendar() {
         headers: { "X-WP-Nonce": data.nonce },
       });
 
-      setCalendarData(response.data || { cases: [], progress: [], date_index: {} });
+      setCalendarData(response.data?.data || { cases: [], progress: [], date_index: {} });
     } catch (error) {
       console.error("Error fetching calendar:", error);
     } finally {

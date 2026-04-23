@@ -46,14 +46,14 @@ export default function ProgressState({ children }: ProgressStateProps) {
         dispatch({
           type: GET_STATUS,
           payload: {
-            status: res.data,
+            status: res.data.data,
             caseTitle: caseTitle,
             loadingStatus: false,
           },
         });
       }
 
-      return res.data;
+      return res.data.data;
     } catch (error) {
       console.log(error);
     }

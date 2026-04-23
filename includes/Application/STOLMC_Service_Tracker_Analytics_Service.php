@@ -3,6 +3,7 @@
 namespace STOLMC_Service_Tracker\includes\Application;
 
 use STOLMC_Service_Tracker\includes\DTO\STOLMC_Service_Tracker_Service_Result_Dto;
+use STOLMC_Service_Tracker\includes\DTO\STOLMC_Service_Tracker_Analytics_Query_Dto;
 use STOLMC_Service_Tracker\includes\Repositories\STOLMC_Service_Tracker_Analytics_Repository;
 
 /**
@@ -32,13 +33,15 @@ class STOLMC_Service_Tracker_Analytics_Service {
 	/**
 	 * Get aggregated analytics data.
 	 *
-	 * @param string|null $start Start date (YYYY-MM-DD).
-	 * @param string|null $end   End date (YYYY-MM-DD).
+	 * @param STOLMC_Service_Tracker_Analytics_Query_Dto $query_dto Analytics query DTO.
 	 *
 	 * @return STOLMC_Service_Tracker_Service_Result_Dto Service result.
 	 */
-	public function get_analytics( ?string $start = null, ?string $end = null ): STOLMC_Service_Tracker_Service_Result_Dto {
+	public function get_analytics( STOLMC_Service_Tracker_Analytics_Query_Dto $query_dto ): STOLMC_Service_Tracker_Service_Result_Dto {
 		try {
+			$start = $query_dto->start;
+			$end   = $query_dto->end;
+
 			// Validate date parameters if provided.
 			if ( $start !== null && ! $this->is_valid_date( $start ) ) {
 				return STOLMC_Service_Tracker_Service_Result_Dto::fail(

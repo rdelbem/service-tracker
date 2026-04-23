@@ -48,13 +48,13 @@ export default function CasesState({ children }: CasesStateProps) {
           type: GET_CASES,
           payload: {
             user: state.user,
-            cases: res.data,
+            cases: res.data.data,
             loadingCases: false,
           },
         });
       }
 
-      return res.data;
+      return res.data.data;
     } catch (error) {
       console.log(error);
     }

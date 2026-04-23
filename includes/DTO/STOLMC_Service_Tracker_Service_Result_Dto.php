@@ -73,11 +73,12 @@ class STOLMC_Service_Tracker_Service_Result_Dto {
 	 *
 	 * @param mixed $data        Result data.
 	 * @param int   $http_status HTTP status code.
+	 * @param string|null $message Human-readable success message.
 	 *
 	 * @return self
 	 */
-	public static function ok( mixed $data = null, int $http_status = 200 ): self {
-		return new self( true, $data, null, null, $http_status );
+	public static function ok( mixed $data = null, int $http_status = 200, ?string $message = null ): self {
+		return new self( true, $data, null, $message, $http_status );
 	}
 
 	/**

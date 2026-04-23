@@ -1,5 +1,5 @@
-// Simple fetch helper to replace axios
-// Returns Promise<{ data: any }> to match axios response shape
+// Simple fetch helper to replace axios.
+// Always returns canonical v2 envelope under `response.data`.
 
 interface FetchOptions {
   method?: "GET" | "POST" | "PUT" | "DELETE";
@@ -9,10 +9,13 @@ interface FetchOptions {
 }
 
 interface FetchResponse {
-  data: any;
-  success?: boolean;
-  error_code?: string | null;
-  message?: string | null;
+  data: {
+    success: boolean;
+    data: any;
+    error_code: string | null;
+    message: string | null;
+    meta: Record<string, any>;
+  };
 }
 
 export async function request(
@@ -37,90 +40,52 @@ export async function request(
 
   const response = await fetch(url, config);
 
-  // Handle empty or non-JSON responses
-  const contentType = response.headers.get('content-type');
+  // Handle empty or non-JSON responses.
+  const contentType = response.headers.get("content-type");
   let responseData: any = null;
 
-  if (contentType && contentType.includes('application/json')) {
+  if (contentType && contentType.includes("application/json")) {
     responseData = await response.json();
   } else {
-    // For non-JSON responses (like empty 200/204 responses)
+    // For non-JSON responses (like empty 200/204 responses).
     const text = await response.text();
-    responseData = text ? text : null;
+    responseData = text || null;
   }
 
-  // Normalize the response to handle both old and new API formats
-  // New API format: { success, data, error_code, message }
-  // Some endpoints return just data directly for success responses
-  // Some endpoints return legacy format: { success, message, ... }
-  // Paginated endpoints return: { data: [...], total, page, per_page, total_pages }
-
-  let normalizedData = responseData;
-  let success = response.ok;
-  let error_code: string | null = null;
-  let message: string | null = null;
-
-  if (responseData && typeof responseData === 'object') {
-    // Check if it's the new API format with success flag
-    if ('success' in responseData) {
-      success = responseData.success;
-      error_code = responseData.error_code || null;
-      message = responseData.message || null;
-
-      // If success is true and data property exists, use it
-      // But be careful: paginated endpoints have data property that's an array,
-      // not the entire envelope
-      if (success && 'data' in responseData && responseData.data !== undefined) {
-        // Check if this looks like a paginated response
-        // Paginated responses have data (array) plus pagination metadata
-        const hasPaginationFields = 'total' in responseData || 'page' in responseData || 'total_pages' in responseData;
-        if (hasPaginationFields) {
-          // This is a paginated envelope, keep the whole object
-          normalizedData = responseData;
-        } else {
-          // This is a regular data wrapper, extract the data
-          normalizedData = responseData.data;
+  const envelope =
+    responseData && typeof responseData === "object" && "success" in responseData
+      ? {
+          success: Boolean(responseData.success),
+          data: "data" in responseData ? responseData.data : null,
+          error_code:
+            typeof responseData.error_code === "string" ? responseData.error_code : null,
+          message: typeof responseData.message === "string" ? responseData.message : null,
+          meta:
+            responseData.meta && typeof responseData.meta === "object"
+              ? responseData.meta
+              : {},
         }
-      } else if (!success) {
-        // For errors, include the full response for debugging
-        normalizedData = responseData;
-      }
-    } else if ('data' in responseData && responseData.data !== undefined) {
-      // Check if this is a paginated response without success flag
-      const hasPaginationFields = 'total' in responseData || 'page' in responseData || 'total_pages' in responseData;
-      if (hasPaginationFields) {
-        // Paginated envelope, keep it as-is
-        normalizedData = responseData;
-      } else {
-        // Regular data wrapper, extract data
-        normalizedData = responseData.data;
-      }
-    }
-    // Otherwise, use responseData as-is
-  }
+      : {
+          success: response.ok,
+          data: responseData,
+          error_code: null,
+          message: null,
+          meta: {},
+        };
 
-  // If the response wasn't OK, throw an error with the message
+  // If the response wasn't OK, throw an error with the canonical message when available.
   if (!response.ok) {
-    const errorMessage = message ||
-                        (responseData && responseData.message) ||
-                        `HTTP error! status: ${response.status}`;
+    const errorMessage = envelope.message || `HTTP error! status: ${response.status}`;
     throw new Error(errorMessage);
   }
 
-  // Also check success flag for API errors (even with 200 OK)
-  if (success === false) {
-    const errorMessage = message ||
-                        (responseData && responseData.message) ||
-                        'API request failed';
+  // Also check canonical success flag for API errors (even with 200 OK).
+  if (!envelope.success) {
+    const errorMessage = envelope.message || "API request failed";
     throw new Error(errorMessage);
   }
 
-  return {
-    data: normalizedData,
-    success,
-    error_code,
-    message
-  };
+  return { data: envelope };
 }
 
 // Convenience methods matching axios API

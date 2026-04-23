@@ -60,7 +60,7 @@ class STOLMC_Service_Tracker_Transaction {
 	public function __construct( STOLMC_Service_Tracker_Sql $sql ) {
 		$this->sql = $sql;
 
-		// Start transaction if not already in one
+			// Start transaction if not already in one.
 		if ( ! $this->sql->in_transaction() ) {
 			$this->sql->begin_transaction();
 			$this->started_transaction = true;
@@ -78,10 +78,10 @@ class STOLMC_Service_Tracker_Transaction {
 	 */
 	public function commit(): bool {
 		if ( $this->committed ) {
-			return false; // Already committed
+				return false; // Already committed.
 		}
 
-		// Only commit if we started the transaction
+			// Only commit if we started the transaction.
 		if ( $this->started_transaction ) {
 			$result = $this->sql->commit();
 			if ( $result ) {
@@ -90,7 +90,7 @@ class STOLMC_Service_Tracker_Transaction {
 			return $result;
 		}
 
-		// If we didn't start the transaction, just mark as committed
+			// If we didn't start the transaction, just mark as committed.
 		$this->committed = true;
 		return true;
 	}
@@ -106,10 +106,10 @@ class STOLMC_Service_Tracker_Transaction {
 	 */
 	public function rollback(): bool {
 		if ( $this->committed ) {
-			return false; // Already committed, cannot rollback
+				return false; // Already committed, cannot rollback.
 		}
 
-		// Only rollback if we started the transaction
+			// Only rollback if we started the transaction.
 		if ( $this->started_transaction ) {
 			return $this->sql->rollback();
 		}

@@ -64,6 +64,7 @@ class Analytics_Hooks {
 	 *
 	 * @return void
 	 */
+	// phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.FoundAfterLastUsed -- Hook signature keeps reserved argument slot.
 	public function on_case_created( $result, array $case_data, $data = null ): void {
 		if ( false === $result ) {
 			return;
@@ -96,6 +97,7 @@ class Analytics_Hooks {
 	 *
 	 * @return void
 	 */
+	// phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.FoundAfterLastUsed -- Hook signature keeps reserved argument slot.
 	public function on_case_updated( $response, array $update_data, array $condition, $data = null ): void {
 		if ( false === $response ) {
 			return;
@@ -128,6 +130,7 @@ class Analytics_Hooks {
 	 *
 	 * @return void
 	 */
+	// phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.FoundAfterLastUsed -- Hook signature keeps reserved argument slot.
 	public function on_case_deleted( $delete, $delete_progress, int $case_id, $data = null ): void {
 		if ( false === $delete ) {
 			return;
@@ -154,7 +157,7 @@ class Analytics_Hooks {
 	 * @param int|false        $toggle  The toggle result.
 	 * @param int              $id_user The user ID.
 	 * @param string           $title   The case title.
-	 * @param \WP_REST_Request $data    The REST request.
+	 * @param mixed            $data    Optional context payload.
 	 *
 	 * @return void
 	 */
@@ -186,7 +189,7 @@ class Analytics_Hooks {
 	 * @param int|false        $toggle  The toggle result.
 	 * @param int              $id_user The user ID.
 	 * @param string           $title   The case title.
-	 * @param \WP_REST_Request $data    The REST request.
+	 * @param mixed            $data    Optional context payload.
 	 *
 	 * @return void
 	 */
@@ -221,6 +224,7 @@ class Analytics_Hooks {
 	 *
 	 * @return void
 	 */
+	// phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.FoundAfterLastUsed -- Hook signature keeps reserved argument slot.
 	public function on_progress_created( $result, array $progress_data, $data = null ): void {
 		if ( false === $result ) {
 			return;
@@ -273,6 +277,7 @@ class Analytics_Hooks {
 	 *
 	 * @return void
 	 */
+	// phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.FoundAfterLastUsed -- Hook signature keeps reserved argument slot.
 	public function on_progress_updated( $response, array $update_data, array $condition, $data = null ): void {
 		if ( false === $response ) {
 			return;
@@ -303,6 +308,7 @@ class Analytics_Hooks {
 	 *
 	 * @return void
 	 */
+	// phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.FoundAfterLastUsed -- Hook signature keeps reserved argument slot.
 	public function on_progress_deleted( $delete, int $id, $data = null ): void {
 		if ( false === $delete ) {
 			return;
@@ -333,6 +339,7 @@ class Analytics_Hooks {
 	 *
 	 * @return void
 	 */
+	// phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.FoundAfterLastUsed -- Hook signature keeps reserved argument slots.
 	public function on_user_created( int $user_id, array $user_data, $body = null, string $password = '' ): void {
 		$actor = AnalyticsLogger::capture_current_actor();
 

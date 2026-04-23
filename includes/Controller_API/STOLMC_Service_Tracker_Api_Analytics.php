@@ -3,7 +3,9 @@
 namespace STOLMC_Service_Tracker\includes\Controller_API;
 
 use STOLMC_Service_Tracker\includes\Application\STOLMC_Service_Tracker_Analytics_Service;
+use STOLMC_Service_Tracker\includes\Application\STOLMC_Service_Tracker_Service_Factory;
 use STOLMC_Service_Tracker\includes\Controller_API\STOLMC_Service_Tracker_Api_Response_Mapper;
+use STOLMC_Service_Tracker\includes\DTO\STOLMC_Service_Tracker_Dto_Factory;
 use WP_REST_Request;
 use WP_REST_Response;
 use WP_REST_Server;
@@ -14,7 +16,7 @@ use WP_REST_Server;
  * Provides aggregated analytics data for the admin dashboard.
  *
  * @since    1.2.0
- * @package  STOLMC_Service_Tracker\includes\API
+ * @package  STOLMC_Service_Tracker\includes\Controller_API
  */
 class STOLMC_Service_Tracker_Api_Analytics extends STOLMC_Service_Tracker_Api {
 
@@ -29,7 +31,7 @@ class STOLMC_Service_Tracker_Api_Analytics extends STOLMC_Service_Tracker_Api {
 	 * Constructor.
 	 */
 	public function __construct() {
-		$this->analytics_service = new STOLMC_Service_Tracker_Analytics_Service();
+		$this->analytics_service = STOLMC_Service_Tracker_Service_Factory::create_analytics_service();
 	}
 
 	/**
@@ -49,13 +51,12 @@ class STOLMC_Service_Tracker_Api_Analytics extends STOLMC_Service_Tracker_Api {
 	 * @return WP_REST_Response
 	 */
 	public function get_analytics( WP_REST_Request $request ): WP_REST_Response {
-		$start = $request->get_param( 'start' );
-		$end   = $request->get_param( 'end' );
+		$query_dto = STOLMC_Service_Tracker_Dto_Factory::create_analytics_query_dto( $request );
 
 		// Get analytics data from service.
-		$service_result = $this->analytics_service->get_analytics( $start, $end );
+		$service_result = $this->analytics_service->get_analytics( $query_dto );
 
 		// Analytics endpoint historically returns raw payload.
-		return STOLMC_Service_Tracker_Api_Response_Mapper::from_service_result_passthrough( $service_result );
+		return STOLMC_Service_Tracker_Api_Response_Mapper::from_service_result( $service_result );
 	}
 }

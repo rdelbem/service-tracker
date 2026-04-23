@@ -124,6 +124,12 @@ abstract class API_TestCase extends Unit_TestCase {
 		Functions\when( 'sanitize_user' )->returnArg( 1 );
 		Functions\when( 'sanitize_email' )->returnArg( 1 );
 		Functions\when( 'sanitize_text_field' )->returnArg( 1 );
+		Functions\when( 'is_email' )->alias(
+			static function ( $email ) {
+				return is_string( $email ) && false !== strpos( $email, '@' );
+			}
+		);
+		Functions\when( 'email_exists' )->justReturn( false );
 
 		// Mock WordPress password generation.
 		Functions\when( 'wp_generate_password' )->justReturn( 'test_password_123' );

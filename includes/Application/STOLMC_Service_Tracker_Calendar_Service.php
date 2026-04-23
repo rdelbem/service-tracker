@@ -3,7 +3,7 @@
 namespace STOLMC_Service_Tracker\includes\Application;
 
 use STOLMC_Service_Tracker\includes\DTO\STOLMC_Service_Tracker_Service_Result_Dto;
-use STOLMC_Service_Tracker\includes\DTO\STOLMC_Service_Tracker_Calendar_Payload_Dto;
+use STOLMC_Service_Tracker\includes\DTO\STOLMC_Service_Tracker_Calendar_Query_Dto;
 use STOLMC_Service_Tracker\includes\Repositories\STOLMC_Service_Tracker_Calendar_Repository;
 
 /**
@@ -33,41 +33,16 @@ class STOLMC_Service_Tracker_Calendar_Service {
 	/**
 	 * Get calendar data aggregated from cases and progress.
 	 *
-	 * @param string      $start Start date (YYYY-MM-DD).
-	 * @param string      $end   End date (YYYY-MM-DD).
-	 * @param int|null    $user_id Optional user ID to filter by.
-	 * @param string|null $status Optional status to filter by.
+	 * @param STOLMC_Service_Tracker_Calendar_Query_Dto $query_dto Query DTO.
 	 *
 	 * @return STOLMC_Service_Tracker_Service_Result_Dto Service result.
 	 */
-	public function get_calendar_data( string $start, string $end, ?int $user_id = null, ?string $status = null ): STOLMC_Service_Tracker_Service_Result_Dto {
+	public function get_calendar_data( STOLMC_Service_Tracker_Calendar_Query_Dto $query_dto ): STOLMC_Service_Tracker_Service_Result_Dto {
 		try {
-			// Validate required parameters.
-			if ( empty( $start ) || empty( $end ) ) {
-				return STOLMC_Service_Tracker_Service_Result_Dto::fail(
-					'missing_required_parameters',
-					'Missing required parameters: start and end',
-					400
-				);
-			}
-
-			// Validate date format.
-			if ( ! $this->is_valid_date( $start ) || ! $this->is_valid_date( $end ) ) {
-				return STOLMC_Service_Tracker_Service_Result_Dto::fail(
-					'invalid_date_format',
-					'Invalid date format. Expected YYYY-MM-DD',
-					400
-				);
-			}
-
-			// Validate date range.
-			if ( strtotime( $start ) > strtotime( $end ) ) {
-				return STOLMC_Service_Tracker_Service_Result_Dto::fail(
-					'invalid_date_range',
-					'Start date must be before or equal to end date',
-					400
-				);
-			}
+			$start   = $query_dto->start;
+			$end     = $query_dto->end;
+			$user_id = $query_dto->user_id;
+			$status  = $query_dto->status;
 
 			// Build query args for filtering.
 			$query_args = [];
@@ -103,10 +78,7 @@ class STOLMC_Service_Tracker_Calendar_Service {
 				$filtered_status
 			);
 
-			// Convert to array if it's a DTO.
-			$calendar_data = $calendar_payload instanceof STOLMC_Service_Tracker_Calendar_Payload_Dto
-				? $calendar_payload->to_array()
-				: (array) $calendar_payload;
+			$calendar_data = $calendar_payload->to_array();
 
 			/**
 			 * Filters the calendar cases response.
@@ -155,27 +127,5 @@ class STOLMC_Service_Tracker_Calendar_Service {
 				500
 			);
 		}
-	}
-
-	/**
-	 * Check if a string is a valid date in YYYY-MM-DD format.
-	 *
-	 * @param string $date Date string.
-	 *
-	 * @return bool True if valid, false otherwise.
-	 */
-	private function is_valid_date( string $date ): bool {
-		if ( preg_match( '/^\d{4}-\d{2}-\d{2}$/', $date ) !== 1 ) {
-			return false;
-		}
-
-		$date_parts = explode( '-', $date );
-		if ( count( $date_parts ) !== 3 ) {
-			return false;
-		}
-
-		list( $year, $month, $day ) = $date_parts;
-
-		return checkdate( (int) $month, (int) $day, (int) $year );
 	}
 }

@@ -130,8 +130,11 @@ describe("Cases component", () => {
     // Mock empty users response
     mockFetchGet.mockResolvedValueOnce({
       data: {
+        success: true,
         data: [],
-        total_pages: 1,
+        error_code: null,
+        message: null,
+        meta: { pagination: { total_pages: 1 } },
       },
     });
 
@@ -149,20 +152,26 @@ describe("Cases component", () => {
     // Mock users response with one user
     mockFetchGet.mockResolvedValueOnce({
       data: {
+        success: true,
         data: [
           { id: "user-1", name: "John Doe", email: "john@example.com" },
         ],
-        total_pages: 1,
+        error_code: null,
+        message: null,
+        meta: { pagination: { total_pages: 1 } },
       },
     });
 
     // Mock cases response for that user
     mockFetchGet.mockResolvedValueOnce({
       data: {
+        success: true,
         data: [
           { id: "case-1", title: "Test Case", status: "open", created_at: "2023-01-01T00:00:00Z" },
         ],
-        total_pages: 1,
+        error_code: null,
+        message: null,
+        meta: { pagination: { total_pages: 1 } },
       },
     });
 
@@ -180,20 +189,26 @@ describe("Cases component", () => {
     // Mock data with multiple cases
     mockFetchGet.mockResolvedValueOnce({
       data: {
+        success: true,
         data: [
           { id: "user-1", name: "John Doe", email: "john@example.com" },
         ],
-        total_pages: 1,
+        error_code: null,
+        message: null,
+        meta: { pagination: { total_pages: 1 } },
       },
     });
 
     mockFetchGet.mockResolvedValueOnce({
       data: {
+        success: true,
         data: [
           { id: "case-1", title: "Apple Case", status: "open", created_at: "2023-01-01T00:00:00Z" },
           { id: "case-2", title: "Banana Case", status: "open", created_at: "2023-01-01T00:00:00Z" },
         ],
-        total_pages: 1,
+        error_code: null,
+        message: null,
+        meta: { pagination: { total_pages: 1 } },
       },
     });
 
@@ -219,8 +234,11 @@ describe("Cases component", () => {
   it("navigates to add case view when add button is clicked", async () => {
     mockFetchGet.mockResolvedValueOnce({
       data: {
+        success: true,
         data: [],
-        total_pages: 1,
+        error_code: null,
+        message: null,
+        meta: { pagination: { total_pages: 1 } },
       },
     });
 

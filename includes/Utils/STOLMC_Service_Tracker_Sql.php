@@ -860,7 +860,7 @@ class STOLMC_Service_Tracker_Sql {
 	public function begin_transaction(): bool {
 		global $wpdb;
 
-		// Check if already in a transaction
+			// Check if already in a transaction.
 		if ( $this->in_transaction() ) {
 			return false;
 		}
@@ -895,7 +895,7 @@ class STOLMC_Service_Tracker_Sql {
 	public function commit(): bool {
 		global $wpdb;
 
-		// Check if in a transaction
+			// Check if in a transaction.
 		if ( ! $this->in_transaction() ) {
 			return false;
 		}
@@ -930,7 +930,7 @@ class STOLMC_Service_Tracker_Sql {
 	public function rollback(): bool {
 		global $wpdb;
 
-		// Check if in a transaction
+			// Check if in a transaction.
 		if ( ! $this->in_transaction() ) {
 			return false;
 		}

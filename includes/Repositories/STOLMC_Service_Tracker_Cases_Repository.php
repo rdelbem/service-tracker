@@ -8,8 +8,6 @@ use STOLMC_Service_Tracker\includes\Utils\STOLMC_Service_Tracker_Sql;
 
 /**
  * Cases Repository class, use for data resolving and type safety.
- * 
- * @template T of STOLMC_Service_Tracker_Case_Dto
  */
 class STOLMC_Service_Tracker_Cases_Repository {
 
@@ -27,7 +25,7 @@ class STOLMC_Service_Tracker_Cases_Repository {
 	 *
 	 * @var STOLMC_Service_Tracker_Progress_Repository
 	 */
-	private $progress_repository;
+	private STOLMC_Service_Tracker_Progress_Repository $progress_repository;
 
 	/**
 	 * Constructor for the Cases Repository class.
@@ -203,6 +201,33 @@ class STOLMC_Service_Tracker_Cases_Repository {
 	 */
 	public function delete_progress_by_case_id( int $id_case ): int|false {
 		return $this->progress( $id_case )->delete_all();
+	}
+
+	/**
+	 * Begin database transaction for multi-write operations.
+	 *
+	 * @return bool
+	 */
+	public function begin_transaction(): bool {
+		return $this->cases_sql->begin_transaction();
+	}
+
+	/**
+	 * Commit current database transaction.
+	 *
+	 * @return bool
+	 */
+	public function commit_transaction(): bool {
+		return $this->cases_sql->commit();
+	}
+
+	/**
+	 * Rollback current database transaction.
+	 *
+	 * @return bool
+	 */
+	public function rollback_transaction(): bool {
+		return $this->cases_sql->rollback();
 	}
 
 	/**

@@ -121,6 +121,16 @@ if ( ! class_exists( 'WP_REST_Request' ) ) {
 		public function get_headers() { 
 			return $this->headers; 
 		}
+
+		public function get_file_params() {
+			$files = $this->params['__files'] ?? [];
+			return is_array( $files ) ? $files : [];
+		}
+
+		public function get_body_params() {
+			$decoded = json_decode( $this->body, true );
+			return is_array( $decoded ) ? $decoded : [];
+		}
 		
 		// ArrayAccess implementation.
 		public function offsetExists( $offset ): bool {

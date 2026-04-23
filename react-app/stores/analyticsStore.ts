@@ -92,7 +92,7 @@ export const useAnalyticsStore = create<AnalyticsStore>((set) => ({
         headers: { "X-WP-Nonce": data.nonce },
       });
 
-      set({ analytics: response.data, loading: false });
+      set({ analytics: response.data.data, loading: false });
     } catch (error) {
       console.error("Error fetching analytics:", error);
       set({ loading: false });

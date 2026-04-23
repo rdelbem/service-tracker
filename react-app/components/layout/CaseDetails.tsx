@@ -54,8 +54,8 @@ export default function CaseDetails() {
             headers: { "X-WP-Nonce": data.nonce },
           });
 
-          if (casesRes.data) {
-            const foundCase = casesRes.data.find((c: CaseData) => String(c.id) === String(inViewState.caseId));
+          if (Array.isArray(casesRes.data?.data)) {
+            const foundCase = casesRes.data.data.find((c: CaseData) => String(c.id) === String(inViewState.caseId));
             if (foundCase) {
               setCaseData(foundCase);
               setClient(user);

@@ -3,7 +3,12 @@
 namespace STOLMC_Service_Tracker\includes\Application;
 
 use STOLMC_Service_Tracker\includes\DTO\STOLMC_Service_Tracker_Service_Result_Dto;
+use STOLMC_Service_Tracker\includes\DTO\STOLMC_Service_Tracker_User_Create_Dto;
+use STOLMC_Service_Tracker\includes\DTO\STOLMC_Service_Tracker_User_Delete_Dto;
+use STOLMC_Service_Tracker\includes\DTO\STOLMC_Service_Tracker_User_Update_Dto;
+use STOLMC_Service_Tracker\includes\DTO\STOLMC_Service_Tracker_Users_Query_Dto;
 use STOLMC_Service_Tracker\includes\Repositories\STOLMC_Service_Tracker_Users_Repository;
+use STOLMC_Service_Tracker\includes\Utils\STOLMC_Service_Tracker_WordPress_Transaction;
 
 /**
  * Users Service for business logic operations on users.
@@ -19,13 +24,6 @@ class STOLMC_Service_Tracker_Users_Service {
 	 * @var STOLMC_Service_Tracker_Users_Repository
 	 */
 	private $users_repository;
-
-	/**
-	 * Number of users returned per page by default.
-	 *
-	 * @since 1.3.0
-	 */
-	private const PER_PAGE_DEFAULT = 6;
 
 	/**
 	 * Transient key for the user search inverted index.
@@ -54,15 +52,14 @@ class STOLMC_Service_Tracker_Users_Service {
 	/**
 	 * Get paginated users.
 	 *
-	 * @param int $page     Page number (1-based).
-	 * @param int $per_page Items per page.
+	 * @param STOLMC_Service_Tracker_Users_Query_Dto $query_dto Query DTO.
 	 *
 	 * @return STOLMC_Service_Tracker_Service_Result_Dto Service result.
 	 */
-	public function get_users( int $page = 1, int $per_page = self::PER_PAGE_DEFAULT ): STOLMC_Service_Tracker_Service_Result_Dto {
+	public function get_users( STOLMC_Service_Tracker_Users_Query_Dto $query_dto ): STOLMC_Service_Tracker_Service_Result_Dto {
 		try {
-			$page     = max( 1, $page );
-			$per_page = max( 1, $per_page );
+			$page     = max( 1, $query_dto->page );
+			$per_page = max( 1, $query_dto->per_page );
 
 			$total = $this->users_repository->count_all();
 			$total_pages = $total > 0 ? (int) ceil( $total / $per_page ) : 1;
@@ -105,21 +102,19 @@ class STOLMC_Service_Tracker_Users_Service {
 	/**
 	 * Search users using the inverted index.
 	 *
-	 * @param string $query    Search query.
-	 * @param int    $page     Page number (1-based).
-	 * @param int    $per_page Items per page.
+	 * @param STOLMC_Service_Tracker_Users_Query_Dto $query_dto Query DTO.
 	 *
 	 * @return STOLMC_Service_Tracker_Service_Result_Dto Service result.
 	 */
-	public function search_users( string $query, int $page = 1, int $per_page = self::PER_PAGE_DEFAULT ): STOLMC_Service_Tracker_Service_Result_Dto {
+	public function search_users( STOLMC_Service_Tracker_Users_Query_Dto $query_dto ): STOLMC_Service_Tracker_Service_Result_Dto {
 		try {
-			$query    = mb_strtolower( trim( $query ) );
-			$page     = max( 1, $page );
-			$per_page = max( 1, $per_page );
+			$query    = mb_strtolower( trim( $query_dto->query ) );
+			$page     = max( 1, $query_dto->page );
+			$per_page = max( 1, $query_dto->per_page );
 
 			// Empty query — fall back to normal paginated read.
 			if ( '' === $query ) {
-				return $this->get_users( $page, $per_page );
+				return $this->get_users( $query_dto );
 			}
 
 			$index = $this->get_search_index();
@@ -175,11 +170,9 @@ class STOLMC_Service_Tracker_Users_Service {
 
 			$users = $this->users_repository->find_by_ids( array_map( 'intval', $paged_ids ) );
 
-			$users_by_id = [];
+				$users_by_id = [];
 			foreach ( $users as $user ) {
-				if ( isset( $user->ID ) ) {
-					$users_by_id[ (int) $user->ID ] = $user;
-				}
+				$users_by_id[ (int) $user->ID ] = $user;
 			}
 
 			$ordered_users = [];
@@ -249,29 +242,13 @@ class STOLMC_Service_Tracker_Users_Service {
 	/**
 	 * Create a new user.
 	 *
-	 * @param array $user_data User data.
+	 * @param STOLMC_Service_Tracker_User_Create_Dto $create_dto Create DTO.
 	 *
 	 * @return STOLMC_Service_Tracker_Service_Result_Dto Service result.
 	 */
-	public function create_user( array $user_data ): STOLMC_Service_Tracker_Service_Result_Dto {
+	public function create_user( STOLMC_Service_Tracker_User_Create_Dto $create_dto ): STOLMC_Service_Tracker_Service_Result_Dto {
 		try {
-			// Validate required fields - match old API contract.
-			if ( ! isset( $user_data['email'] ) || ! isset( $user_data['name'] ) ) {
-				return STOLMC_Service_Tracker_Service_Result_Dto::fail(
-					'missing_required_fields',
-					'Name and email are required',
-					400
-				);
-			}
-
-			// Validate email format.
-			if ( ! \is_email( $user_data['email'] ) ) {
-				return STOLMC_Service_Tracker_Service_Result_Dto::fail(
-					'invalid_email',
-					'Invalid email address',
-					400
-				);
-			}
+			$user_data = $create_dto->to_array();
 
 			// Check if user already exists - match old API contract (409 status).
 			if ( \email_exists( $user_data['email'] ) ) {
@@ -283,9 +260,14 @@ class STOLMC_Service_Tracker_Users_Service {
 			}
 
 			// Set defaults.
-			$user_data['role'] = $user_data['role'] ?? 'customer';
+			$user_data['role']     = $user_data['role'] ?? 'customer';
 			$user_data['username'] = $user_data['username'] ?? $user_data['email'];
 			$user_data['password'] = $user_data['password'] ?? \wp_generate_password( 12, true, true );
+			$has_phone             = array_key_exists( 'phone', $user_data );
+			$has_cellphone         = array_key_exists( 'cellphone', $user_data );
+			$phone_value           = $user_data['phone'] ?? null;
+			$cellphone_value       = $user_data['cellphone'] ?? null;
+			unset( $user_data['phone'], $user_data['cellphone'] );
 
 			/**
 			 * Filters the user data before insertion.
@@ -295,16 +277,26 @@ class STOLMC_Service_Tracker_Users_Service {
 			 * @param array $user_data The user data to insert.
 			 */
 			$user_data = apply_filters( 'stolmc_service_tracker_user_create_data', $user_data );
+			$transaction = new STOLMC_Service_Tracker_WordPress_Transaction();
+			if ( ! $transaction->in_transaction() ) {
+				return STOLMC_Service_Tracker_Service_Result_Dto::fail(
+					'transaction_start_failed',
+					'Failed to start transaction for user creation',
+					500
+				);
+			}
 
 			$user_id = $this->users_repository->create( $user_data );
 
 			if ( is_wp_error( $user_id ) ) {
+				$transaction->rollback();
+
 				/**
 				 * Fires when a user creation fails.
 				 *
 				 * @since 1.0.0
 				 *
-				 * @param WP_Error $user_id   The error object.
+				 * @param \WP_Error $user_id   The error object.
 				 * @param array    $user_data The user data that failed.
 				 */
 				do_action( 'stolmc_service_tracker_user_create_failed', $user_id, $user_data );
@@ -312,6 +304,42 @@ class STOLMC_Service_Tracker_Users_Service {
 				return STOLMC_Service_Tracker_Service_Result_Dto::fail(
 					'user_creation_failed',
 					'Failed to create user: ' . $user_id->get_error_message(),
+					500
+				);
+			}
+
+			if ( $has_phone ) {
+				$phone_updated = $this->users_repository->update_meta( (int) $user_id, 'phone', $phone_value );
+				if ( false === $phone_updated ) {
+					$transaction->rollback();
+
+					return STOLMC_Service_Tracker_Service_Result_Dto::fail(
+						'user_meta_update_failed',
+						'Failed to persist user phone metadata',
+						500
+					);
+				}
+			}
+
+			if ( $has_cellphone ) {
+				$cellphone_updated = $this->users_repository->update_meta( (int) $user_id, 'cellphone', $cellphone_value );
+				if ( false === $cellphone_updated ) {
+					$transaction->rollback();
+
+					return STOLMC_Service_Tracker_Service_Result_Dto::fail(
+						'user_meta_update_failed',
+						'Failed to persist user cellphone metadata',
+						500
+					);
+				}
+			}
+
+			if ( ! $transaction->commit() ) {
+				$transaction->rollback();
+
+				return STOLMC_Service_Tracker_Service_Result_Dto::fail(
+					'transaction_commit_failed',
+					'Failed to commit transaction for user creation',
 					500
 				);
 			}
@@ -325,19 +353,22 @@ class STOLMC_Service_Tracker_Users_Service {
 			 * @param array $user_data The user data.
 			 */
 			do_action( 'stolmc_service_tracker_user_created', $user_id, $user_data );
+			do_action( 'stolmc_service_tracker_user_created_with_meta', $user_id, $user_data );
 
 			$data = [
-				'success' => true,
-				'id'      => $user_id,
-				'message' => 'User created successfully',
+				'id' => $user_id,
 			];
 
-			return STOLMC_Service_Tracker_Service_Result_Dto::ok( $data, 201 );
+			return STOLMC_Service_Tracker_Service_Result_Dto::ok( $data, 201, 'User created successfully' );
 		} catch ( \Exception $e ) {
+			if ( isset( $transaction ) ) {
+				$transaction->rollback();
+			}
+
 			return STOLMC_Service_Tracker_Service_Result_Dto::fail(
-				'user_creation_error',
-				'Failed to create user: ' . $e->getMessage(),
-				500
+			'user_creation_error',
+			'Failed to create user: ' . $e->getMessage(),
+			500
 			);
 		}
 	}
@@ -345,13 +376,15 @@ class STOLMC_Service_Tracker_Users_Service {
 	/**
 	 * Update an existing user.
 	 *
-	 * @param int   $user_id     User ID.
-	 * @param array $update_data Data to update.
+	 * @param STOLMC_Service_Tracker_User_Update_Dto $update_dto Update DTO.
 	 *
 	 * @return STOLMC_Service_Tracker_Service_Result_Dto Service result.
 	 */
-	public function update_user( int $user_id, array $update_data ): STOLMC_Service_Tracker_Service_Result_Dto {
+	public function update_user( STOLMC_Service_Tracker_User_Update_Dto $update_dto ): STOLMC_Service_Tracker_Service_Result_Dto {
 		try {
+			$user_id     = $update_dto->user_id;
+			$update_data = $update_dto->to_array();
+
 			// Check if user exists.
 			$user = \get_user_by( 'id', $user_id );
 			if ( ! $user ) {
@@ -359,15 +392,6 @@ class STOLMC_Service_Tracker_Users_Service {
 					'user_not_found',
 					'User not found',
 					404
-				);
-			}
-
-			// Validate email if provided.
-			if ( isset( $update_data['email'] ) && ! \is_email( $update_data['email'] ) ) {
-				return STOLMC_Service_Tracker_Service_Result_Dto::fail(
-					'invalid_email',
-					'Invalid email address',
-					400
 				);
 			}
 
@@ -382,13 +406,64 @@ class STOLMC_Service_Tracker_Users_Service {
 			 * @param array $condition   The WHERE condition.
 			 */
 			$update_data = apply_filters( 'stolmc_service_tracker_user_update_data', $update_data, $condition );
+			$has_phone   = array_key_exists( 'phone', $update_data );
+			$has_cellphone = array_key_exists( 'cellphone', $update_data );
+			$phone_value   = $update_data['phone'] ?? null;
+			$cellphone_value = $update_data['cellphone'] ?? null;
+			unset( $update_data['phone'], $update_data['cellphone'] );
+			$transaction = new STOLMC_Service_Tracker_WordPress_Transaction();
+			if ( ! $transaction->in_transaction() ) {
+				return STOLMC_Service_Tracker_Service_Result_Dto::fail(
+					'transaction_start_failed',
+					'Failed to start transaction for user update',
+					500
+				);
+			}
 
 			$response = $this->users_repository->update( $user_id, $update_data );
 
 			if ( is_wp_error( $response ) ) {
+				$transaction->rollback();
+
 				return STOLMC_Service_Tracker_Service_Result_Dto::fail(
 					'user_update_failed',
 					'Failed to update user: ' . $response->get_error_message(),
+					500
+				);
+			}
+
+			if ( $has_phone ) {
+				$phone_updated = $this->users_repository->update_meta( $user_id, 'phone', $phone_value );
+				if ( false === $phone_updated ) {
+					$transaction->rollback();
+
+					return STOLMC_Service_Tracker_Service_Result_Dto::fail(
+						'user_meta_update_failed',
+						'Failed to persist user phone metadata',
+						500
+					);
+				}
+			}
+
+			if ( $has_cellphone ) {
+				$cellphone_updated = $this->users_repository->update_meta( $user_id, 'cellphone', $cellphone_value );
+				if ( false === $cellphone_updated ) {
+					$transaction->rollback();
+
+					return STOLMC_Service_Tracker_Service_Result_Dto::fail(
+						'user_meta_update_failed',
+						'Failed to persist user cellphone metadata',
+						500
+					);
+				}
+			}
+
+			if ( ! $transaction->commit() ) {
+				$transaction->rollback();
+
+				return STOLMC_Service_Tracker_Service_Result_Dto::fail(
+					'transaction_commit_failed',
+					'Failed to commit transaction for user update',
 					500
 				);
 			}
@@ -404,17 +479,16 @@ class STOLMC_Service_Tracker_Users_Service {
 			 */
 			do_action( 'stolmc_service_tracker_user_updated', $response, $update_data, $condition );
 
-			$data = [
-				'success' => true,
-				'message' => 'User updated successfully',
-			];
-
-			return STOLMC_Service_Tracker_Service_Result_Dto::ok( $data, 200 );
+			return STOLMC_Service_Tracker_Service_Result_Dto::ok( [], 200, 'User updated successfully' );
 		} catch ( \Exception $e ) {
+			if ( isset( $transaction ) ) {
+				$transaction->rollback();
+			}
+
 			return STOLMC_Service_Tracker_Service_Result_Dto::fail(
-				'user_update_error',
-				'Failed to update user: ' . $e->getMessage(),
-				500
+			'user_update_error',
+			'Failed to update user: ' . $e->getMessage(),
+			500
 			);
 		}
 	}
@@ -422,12 +496,15 @@ class STOLMC_Service_Tracker_Users_Service {
 	/**
 	 * Delete a user.
 	 *
-	 * @param int $user_id User ID.
+	 * @param STOLMC_Service_Tracker_User_Delete_Dto $delete_dto Delete DTO.
 	 *
 	 * @return STOLMC_Service_Tracker_Service_Result_Dto Service result.
 	 */
-	public function delete_user( int $user_id ): STOLMC_Service_Tracker_Service_Result_Dto {
+	public function delete_user( STOLMC_Service_Tracker_User_Delete_Dto $delete_dto ): STOLMC_Service_Tracker_Service_Result_Dto {
+		$transaction = null;
+
 		try {
+			$user_id = $delete_dto->user_id;
 			// Check if user exists.
 			$user = get_user_by( 'id', $user_id );
 			if ( ! $user ) {
@@ -435,6 +512,15 @@ class STOLMC_Service_Tracker_Users_Service {
 					'user_not_found',
 					'User not found',
 					404
+				);
+			}
+
+			$transaction = new STOLMC_Service_Tracker_WordPress_Transaction();
+			if ( ! $transaction->in_transaction() ) {
+				return STOLMC_Service_Tracker_Service_Result_Dto::fail(
+					'transaction_start_failed',
+					'Failed to start transaction for user deletion',
+					500
 				);
 			}
 
@@ -450,9 +536,21 @@ class STOLMC_Service_Tracker_Users_Service {
 			$delete = $this->users_repository->delete( $user_id );
 
 			if ( is_wp_error( $delete ) ) {
+				$transaction->rollback();
+
 				return STOLMC_Service_Tracker_Service_Result_Dto::fail(
 					'user_deletion_failed',
 					'Failed to delete user: ' . $delete->get_error_message(),
+					500
+				);
+			}
+
+			if ( ! $transaction->commit() ) {
+				$transaction->rollback();
+
+				return STOLMC_Service_Tracker_Service_Result_Dto::fail(
+					'transaction_commit_failed',
+					'Failed to commit transaction for user deletion',
 					500
 				);
 			}
@@ -467,13 +565,12 @@ class STOLMC_Service_Tracker_Users_Service {
 			 */
 			do_action( 'stolmc_service_tracker_user_deleted', $delete, $user_id );
 
-			$data = [
-				'success' => true,
-				'message' => 'User deleted successfully',
-			];
-
-			return STOLMC_Service_Tracker_Service_Result_Dto::ok( $data, 200 );
+			return STOLMC_Service_Tracker_Service_Result_Dto::ok( [], 200, 'User deleted successfully' );
 		} catch ( \Exception $e ) {
+			if ( $transaction instanceof STOLMC_Service_Tracker_WordPress_Transaction ) {
+				$transaction->rollback();
+			}
+
 			return STOLMC_Service_Tracker_Service_Result_Dto::fail(
 				'user_deletion_error',
 				'Failed to delete user: ' . $e->getMessage(),
@@ -594,6 +691,9 @@ class STOLMC_Service_Tracker_Users_Service {
 	private function tokenize( string $text ): array {
 		$text  = mb_strtolower( $text );
 		$parts = preg_split( '/[\s@._\-]+/', $text, -1, PREG_SPLIT_NO_EMPTY );
+		if ( false === $parts ) {
+			return [];
+		}
 
 		$tokens = [];
 

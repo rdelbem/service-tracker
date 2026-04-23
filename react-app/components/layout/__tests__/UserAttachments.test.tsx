@@ -31,7 +31,9 @@ describe("UserAttachments component", () => {
   });
 
   it("renders empty state when api returns no attachments", async () => {
-    mockFetchGet.mockResolvedValue({ data: [] });
+    mockFetchGet.mockResolvedValue({
+      data: { success: true, data: [], error_code: null, message: null, meta: {} },
+    });
 
     render(<UserAttachments idUser="42" />);
 
@@ -42,30 +44,36 @@ describe("UserAttachments component", () => {
 
   it("renders attachments and formats metadata", async () => {
     mockFetchGet.mockResolvedValue({
-      data: [
-        {
-          url: "https://example.com/a.png",
-          type: "image/png",
-          name: "a.png",
-          size: 1024,
-          progress_id: 1,
-          id_case: 10,
-          case_title: "Case A",
-          created_at: "2024-01-15T08:00:00",
-          status_text: "Uploaded",
-        },
-        {
-          url: "https://example.com/spec.pdf",
-          type: "application/pdf",
-          name: "spec.pdf",
-          size: 2 * 1024 * 1024,
-          progress_id: 2,
-          id_case: 10,
-          case_title: "Case A",
-          created_at: "2024-01-16T09:00:00",
-          status_text: "Uploaded",
-        },
-      ],
+      data: {
+        success: true,
+        data: [
+          {
+            url: "https://example.com/a.png",
+            type: "image/png",
+            name: "a.png",
+            size: 1024,
+            progress_id: 1,
+            id_case: 10,
+            case_title: "Case A",
+            created_at: "2024-01-15T08:00:00",
+            status_text: "Uploaded",
+          },
+          {
+            url: "https://example.com/spec.pdf",
+            type: "application/pdf",
+            name: "spec.pdf",
+            size: 2 * 1024 * 1024,
+            progress_id: 2,
+            id_case: 10,
+            case_title: "Case A",
+            created_at: "2024-01-16T09:00:00",
+            status_text: "Uploaded",
+          },
+        ],
+        error_code: null,
+        message: null,
+        meta: {},
+      },
     });
 
     render(<UserAttachments idUser="42" />);
@@ -80,30 +88,36 @@ describe("UserAttachments component", () => {
 
   it("filters attachments by selected case when multiple cases exist", async () => {
     mockFetchGet.mockResolvedValue({
-      data: [
-        {
-          url: "https://example.com/a.png",
-          type: "image/png",
-          name: "a.png",
-          size: 1024,
-          progress_id: 1,
-          id_case: 10,
-          case_title: "Case A",
-          created_at: "2024-01-15T08:00:00",
-          status_text: "Uploaded",
-        },
-        {
-          url: "https://example.com/b.pdf",
-          type: "application/pdf",
-          name: "b.pdf",
-          size: 2048,
-          progress_id: 2,
-          id_case: 20,
-          case_title: "Case B",
-          created_at: "2024-01-16T08:00:00",
-          status_text: "Uploaded",
-        },
-      ],
+      data: {
+        success: true,
+        data: [
+          {
+            url: "https://example.com/a.png",
+            type: "image/png",
+            name: "a.png",
+            size: 1024,
+            progress_id: 1,
+            id_case: 10,
+            case_title: "Case A",
+            created_at: "2024-01-15T08:00:00",
+            status_text: "Uploaded",
+          },
+          {
+            url: "https://example.com/b.pdf",
+            type: "application/pdf",
+            name: "b.pdf",
+            size: 2048,
+            progress_id: 2,
+            id_case: 20,
+            case_title: "Case B",
+            created_at: "2024-01-16T08:00:00",
+            status_text: "Uploaded",
+          },
+        ],
+        error_code: null,
+        message: null,
+        meta: {},
+      },
     });
 
     render(<UserAttachments idUser="42" />);

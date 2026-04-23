@@ -69,7 +69,7 @@ export default function Progress() {
           );
           const envelope = res.data;
           const cases: any[] = envelope.data ?? [];
-          casesTotalPages = envelope.total_pages ?? 1;
+          casesTotalPages = envelope.meta?.pagination?.total_pages ?? 1;
 
           found = cases.find((c: any) => String(c.id) === String(idCase));
           if (found) break;
@@ -114,7 +114,7 @@ export default function Progress() {
         const res = await fetchGet(apiUrlStaff, {
           headers: { "X-WP-Nonce": data.nonce },
         });
-        setStaffUsers(normalizeUsers(res.data));
+        setStaffUsers(normalizeUsers(res.data?.data));
       } catch (error) {
         console.error("Error fetching staff users:", error);
       }

@@ -9,8 +9,6 @@ use STOLMC_Service_Tracker\includes\Utils\STOLMC_Service_Tracker_Sql;
  * Progress Repository class.
  *
  * Progress records are modeled as dependent data of cases.
- * 
- * @template T of STOLMC_Service_Tracker_Progress_Dto
  */
 class STOLMC_Service_Tracker_Progress_Repository {
 
@@ -21,7 +19,7 @@ class STOLMC_Service_Tracker_Progress_Repository {
 	 *
 	 * @var STOLMC_Service_Tracker_Sql
 	 */
-	private $progress_sql;
+	private STOLMC_Service_Tracker_Sql $progress_sql;
 
 	/**
 	 * Constructor.
@@ -117,6 +115,33 @@ class STOLMC_Service_Tracker_Progress_Repository {
 				'id_case' => $id_case,
 			]
 		);
+	}
+
+	/**
+	 * Begin transaction for multi-step operations.
+	 *
+	 * @return bool
+	 */
+	public function begin_transaction(): bool {
+		return $this->progress_sql->begin_transaction();
+	}
+
+	/**
+	 * Commit transaction for multi-step operations.
+	 *
+	 * @return bool
+	 */
+	public function commit_transaction(): bool {
+		return $this->progress_sql->commit();
+	}
+
+	/**
+	 * Rollback transaction for multi-step operations.
+	 *
+	 * @return bool
+	 */
+	public function rollback_transaction(): bool {
+		return $this->progress_sql->rollback();
 	}
 
 	/**

@@ -55,14 +55,15 @@ export const useClientsStore = create<ClientsStore>((set, get) => {
         });
 
         const envelope = res.data;
+        const pagination = envelope.meta?.pagination ?? {};
         const users = normalizeUsers(envelope.data);
 
         set({
           users,
-          total: envelope.total ?? 0,
-          page: envelope.page ?? currentPage,
-          perPage: envelope.per_page ?? perPage,
-          totalPages: envelope.total_pages ?? 1,
+          total: pagination.total ?? 0,
+          page: pagination.page ?? currentPage,
+          perPage: pagination.per_page ?? perPage,
+          totalPages: pagination.total_pages ?? 1,
           loadingUsers: false,
         });
       } catch (error) {
@@ -89,14 +90,15 @@ export const useClientsStore = create<ClientsStore>((set, get) => {
         });
 
         const envelope = res.data;
+        const pagination = envelope.meta?.pagination ?? {};
         const users = normalizeUsers(envelope.data);
 
         set({
           users,
-          total: envelope.total ?? 0,
-          page: envelope.page ?? 1,
-          perPage: envelope.per_page ?? perPage,
-          totalPages: envelope.total_pages ?? 1,
+          total: pagination.total ?? 0,
+          page: pagination.page ?? 1,
+          perPage: pagination.per_page ?? perPage,
+          totalPages: pagination.total_pages ?? 1,
           loadingUsers: false,
         });
       } catch (error) {
@@ -121,14 +123,15 @@ export const useClientsStore = create<ClientsStore>((set, get) => {
           });
 
           const envelope = res.data;
+          const pagination = envelope.meta?.pagination ?? {};
           const users = normalizeUsers(envelope.data);
 
           set({
             users,
-            total: envelope.total ?? 0,
-            page: envelope.page ?? clamped,
-            perPage: envelope.per_page ?? perPage,
-            totalPages: envelope.total_pages ?? 1,
+            total: pagination.total ?? 0,
+            page: pagination.page ?? clamped,
+            perPage: pagination.per_page ?? perPage,
+            totalPages: pagination.total_pages ?? 1,
             loadingUsers: false,
           });
         } catch (error) {

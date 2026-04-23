@@ -144,14 +144,14 @@ class STOLMC_Service_Tracker_Progress_Dto {
 	 */
 	private static function read_nullable_string( object|array $row, string $key ): ?string {
 		if ( is_array( $row ) ) {
-			if ( ! isset( $row[ $key ] ) || null === $row[ $key ] ) {
+			if ( ! array_key_exists( $key, $row ) || null === $row[ $key ] ) {
 				return null;
 			}
 
 			return (string) $row[ $key ];
 		}
 
-		if ( ! isset( $row->{$key} ) || null === $row->{$key} ) {
+		if ( ! isset( $row->{$key} ) ) {
 			return null;
 		}
 

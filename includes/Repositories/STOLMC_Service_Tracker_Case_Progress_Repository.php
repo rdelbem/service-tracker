@@ -2,6 +2,8 @@
 
 namespace STOLMC_Service_Tracker\includes\Repositories;
 
+use STOLMC_Service_Tracker\includes\DTO\STOLMC_Service_Tracker_Progress_Dto;
+
 /**
  * Case-scoped progress Repository.
  *
@@ -38,9 +40,9 @@ class STOLMC_Service_Tracker_Case_Progress_Repository {
 	/**
 	 * Read all progress entries for the bound case.
 	 *
-	 * @return array<object>|object|null
+	 * @return array<STOLMC_Service_Tracker_Progress_Dto>
 	 */
-	public function find_all(): array|object|null {
+	public function find_all(): array {
 		return $this->progress_repository->find_by_case_id( $this->case_id );
 	}
 
@@ -92,9 +94,9 @@ class STOLMC_Service_Tracker_Case_Progress_Repository {
 	/**
 	 * Backward-compatible alias for find_all().
 	 *
-	 * @return array<object>|object|null
+	 * @return array<STOLMC_Service_Tracker_Progress_Dto>
 	 */
-	public function read_all(): array|object|null {
+	public function read_all(): array {
 		return $this->find_all();
 	}
 }

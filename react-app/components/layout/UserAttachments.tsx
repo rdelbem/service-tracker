@@ -43,7 +43,7 @@ export default function UserAttachments({ idUser }: UserAttachmentsProps) {
         const res = await fetchGet(apiUrl, {
           headers: { "X-WP-Nonce": data.nonce },
         });
-        setAttachments(res.data || []);
+        setAttachments(Array.isArray(res.data?.data) ? res.data.data : []);
       } catch (error) {
         console.error("Error fetching user attachments:", error);
         setAttachments([]);

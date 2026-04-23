@@ -114,7 +114,15 @@ describe("Calendar component", () => {
       nonce: "nonce",
     };
 
-    mockFetchGet.mockResolvedValue({ data: calendarResponse() });
+    mockFetchGet.mockResolvedValue({
+      data: {
+        success: true,
+        data: calendarResponse(),
+        error_code: null,
+        message: null,
+        meta: {},
+      },
+    });
   });
 
   afterEach(() => {

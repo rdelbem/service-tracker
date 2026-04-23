@@ -116,17 +116,17 @@ class Case_Progress_Repository_Test extends Unit_TestCase {
 	}
 
 	/**
-	 * Test read_all returns null when no progress entries.
+	 * Test read_all returns empty array when no progress entries.
 	 */
-	public function test_read_all_returns_null_when_no_progress_entries(): void {
+	public function test_read_all_returns_empty_array_when_no_progress_entries(): void {
 		$this->mock_progress_orm->shouldReceive( 'find_by_case_id' )
 			->once()
 			->with( self::TEST_CASE_ID )
-			->andReturn( null );
+			->andReturn( [] );
 
 		$result = $this->case_progress_orm->read_all();
 
-		$this->assertNull( $result );
+		$this->assertSame( [], $result );
 	}
 
 	/**
@@ -307,9 +307,9 @@ class Case_Progress_Repository_Test extends Unit_TestCase {
 	}
 
 	/**
-	 * Test read_all returns object when single progress entry.
+	 * Test read_all returns array when single progress entry.
 	 */
-	public function test_read_all_returns_object_when_single_progress_entry(): void {
+	public function test_read_all_returns_array_when_single_progress_entry(): void {
 		$expected_progress = new STOLMC_Service_Tracker_Progress_Dto(
 			self::TEST_PROGRESS_ID,
 			1,
@@ -322,10 +322,10 @@ class Case_Progress_Repository_Test extends Unit_TestCase {
 		$this->mock_progress_orm->shouldReceive( 'find_by_case_id' )
 			->once()
 			->with( self::TEST_CASE_ID )
-			->andReturn( $expected_progress );
+			->andReturn( [ $expected_progress ] );
 
 		$result = $this->case_progress_orm->read_all();
 
-		$this->assertSame( $expected_progress, $result );
+		$this->assertSame( [ $expected_progress ], $result );
 	}
 }

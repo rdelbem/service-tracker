@@ -97,6 +97,34 @@ class STOLMC_Service_Tracker_Public_User_Content {
 	}
 
 	/**
+	 * SQL helper instance for cases table operations.
+	 *
+	 * @var STOLMC_Service_Tracker_Sql
+	 */
+	private $cases_sql;
+
+	/**
+	 * SQL helper instance for progress table operations.
+	 *
+	 * @var STOLMC_Service_Tracker_Sql
+	 */
+	private $progress_sql;
+
+	/**
+	 * Constructor.
+	 *
+	 * @param STOLMC_Service_Tracker_Sql|null $cases_sql SQL service for cases table.
+	 * @param STOLMC_Service_Tracker_Sql|null $progress_sql SQL service for progress table.
+	 */
+	public function __construct( ?STOLMC_Service_Tracker_Sql $cases_sql = null, ?STOLMC_Service_Tracker_Sql $progress_sql = null ) {
+		global $wpdb;
+
+			// Use provided services or create defaults for backward compatibility.
+		$this->cases_sql = $cases_sql ?? new STOLMC_Service_Tracker_Sql( $wpdb->prefix . 'servicetracker_cases' );
+		$this->progress_sql = $progress_sql ?? new STOLMC_Service_Tracker_Sql( $wpdb->prefix . 'servicetracker_progress' );
+	}
+
+	/**
 	 * Get all cases for the current user.
 	 *
 	 * @since    1.0.0
@@ -105,8 +133,7 @@ class STOLMC_Service_Tracker_Public_User_Content {
 	 * @return array<object>|object|null Array of cases or null on failure.
 	 */
 	public function get_user_cases(): array|object|null {
-		$sql = new STOLMC_Service_Tracker_Sql( 'servicetracker_cases' );
-		$cases = $sql->get_by( [ 'id_user' => $this->current_user_id ] );
+		$cases = $this->cases_sql->get_by( [ 'id_user' => $this->current_user_id ] );
 
 		/**
 		 * Filters the cases shown to the public user.
@@ -130,8 +157,7 @@ class STOLMC_Service_Tracker_Public_User_Content {
 	 * @return array<int, array{created_at: string, text: string}> Array of progress entries with formatted dates.
 	 */
 	public function get_case_progress( int $id_case ): array {
-		$sql = new STOLMC_Service_Tracker_Sql( 'servicetracker_progress' );
-		$status = $sql->get_by( [ 'id_case' => $id_case ] );
+		$status = $this->progress_sql->get_by( [ 'id_case' => $id_case ] );
 		$progress_array = [];
 
 		if ( ! is_iterable( $status ) ) {

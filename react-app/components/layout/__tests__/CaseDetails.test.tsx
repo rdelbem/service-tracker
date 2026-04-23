@@ -110,7 +110,9 @@ describe("CaseDetails component", () => {
 
     useClientsStoreMock.getState.mockReturnValue({ users: mockUsers });
 
-    mockFetchGet.mockResolvedValue({ data: [baseCase] });
+    mockFetchGet.mockResolvedValue({
+      data: { success: true, data: [baseCase], error_code: null, message: null, meta: {} },
+    });
     mockEditCase.mockResolvedValue(undefined);
     mockPost.mockResolvedValue({ data: {} });
     mockDel.mockResolvedValue({ data: {} });
@@ -151,7 +153,9 @@ describe("CaseDetails component", () => {
   });
 
   it("shows case not found when no case matches", async () => {
-    mockFetchGet.mockResolvedValue({ data: [] });
+    mockFetchGet.mockResolvedValue({
+      data: { success: true, data: [], error_code: null, message: null, meta: {} },
+    });
 
     render(<CaseDetails />);
 

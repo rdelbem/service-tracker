@@ -43,7 +43,13 @@ describe('casesStore', () => {
 
   it('getCases updates pagination and case list', async () => {
     mockGet.mockResolvedValue({
-      data: { data: [{ id: 1, title: 'A' }], page: 2, per_page: 6, total: 11, total_pages: 2 },
+      data: {
+        success: true,
+        data: [{ id: 1, title: 'A' }],
+        error_code: null,
+        message: null,
+        meta: { pagination: { page: 2, per_page: 6, total: 11, total_pages: 2 } },
+      },
     });
 
     const { useCasesStore } = await import('../casesStore');
@@ -62,7 +68,13 @@ describe('casesStore', () => {
 
   it('searchCases with empty query restores normal list', async () => {
     mockGet.mockResolvedValue({
-      data: { data: [{ id: 2, title: 'Restored' }], page: 1, per_page: 6, total: 1, total_pages: 1 },
+      data: {
+        success: true,
+        data: [{ id: 2, title: 'Restored' }],
+        error_code: null,
+        message: null,
+        meta: { pagination: { page: 1, per_page: 6, total: 1, total_pages: 1 } },
+      },
     });
 
     const { useCasesStore } = await import('../casesStore');
@@ -77,7 +89,13 @@ describe('casesStore', () => {
 
   it('setPage clamps page and paginates search results when searching', async () => {
     mockGet.mockResolvedValue({
-      data: { data: [{ id: 9, title: 'Search result' }], page: 3, per_page: 6, total: 20, total_pages: 4 },
+      data: {
+        success: true,
+        data: [{ id: 9, title: 'Search result' }],
+        error_code: null,
+        message: null,
+        meta: { pagination: { page: 3, per_page: 6, total: 20, total_pages: 4 } },
+      },
     });
 
     const { useCasesStore } = await import('../casesStore');

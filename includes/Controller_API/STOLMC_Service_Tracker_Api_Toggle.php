@@ -2,7 +2,9 @@
 namespace STOLMC_Service_Tracker\includes\Controller_API;
 
 use STOLMC_Service_Tracker\includes\Application\STOLMC_Service_Tracker_Toggle_Service;
-use STOLMC_Service_Tracker\includes\DTO\STOLMC_Service_Tracker_Service_Result_Dto;
+use STOLMC_Service_Tracker\includes\Application\STOLMC_Service_Tracker_Service_Factory;
+use STOLMC_Service_Tracker\includes\DTO\STOLMC_Service_Tracker_Dto_Factory;
+use STOLMC_Service_Tracker\includes\DTO\ValidationException;
 use WP_REST_Request;
 use WP_REST_Response;
 use WP_REST_Server;
@@ -20,13 +22,19 @@ class STOLMC_Service_Tracker_Api_Toggle extends STOLMC_Service_Tracker_Api {
 	private $toggle_service;
 
 	/**
+	 * Constructor.
+	 */
+	public function __construct() {
+		$this->toggle_service = STOLMC_Service_Tracker_Service_Factory::create_toggle_service();
+	}
+
+	/**
 	 * Initialize the API and register routes.
 	 *
 	 * @return void
 	 */
 	public function run(): void {
 		$this->custom_api();
-		$this->toggle_service = new STOLMC_Service_Tracker_Toggle_Service();
 	}
 
 	/**
@@ -48,23 +56,20 @@ class STOLMC_Service_Tracker_Api_Toggle extends STOLMC_Service_Tracker_Api {
 	 * @return WP_REST_Response
 	 */
 	public function toggle_status( WP_REST_Request $data ): WP_REST_Response {
-		$body = $data->get_body();
-		$body = json_decode( $body, true );
-
-		if ( ! is_array( $body ) || ! isset( $body['id'] ) ) {
-			return new WP_REST_Response(
-				[
-					'success' => false,
-					'message' => 'Invalid JSON data or missing case ID',
-				],
+		try {
+			$toggle_dto = STOLMC_Service_Tracker_Dto_Factory::create_toggle_request_dto( $data );
+		} catch ( ValidationException $exception ) {
+			return STOLMC_Service_Tracker_Api_Response_Mapper::to_default_response(
+				[],
+				false,
+				$exception->getMessage(),
+				'invalid_payload',
 				400
 			);
 		}
 
-		$case_id = (int) $body['id'];
+		$result = $this->toggle_service->toggle_case_status( $toggle_dto );
 
-		$result = $this->toggle_service->toggle_case_status( $case_id );
-
-		return STOLMC_Service_Tracker_Api_Response_Mapper::from_service_result_legacy( $result );
+		return STOLMC_Service_Tracker_Api_Response_Mapper::from_service_result( $result );
 	}
 }

@@ -5,7 +5,9 @@ use WP_REST_Request;
 use WP_REST_Response;
 use WP_REST_Server;
 use STOLMC_Service_Tracker\includes\Application\STOLMC_Service_Tracker_Cases_Service;
-use STOLMC_Service_Tracker\includes\DTO\STOLMC_Service_Tracker_Service_Result_Dto;
+use STOLMC_Service_Tracker\includes\Application\STOLMC_Service_Tracker_Service_Factory;
+use STOLMC_Service_Tracker\includes\DTO\STOLMC_Service_Tracker_Dto_Factory;
+use STOLMC_Service_Tracker\includes\DTO\ValidationException;
 
 /**
  * This class will resolve API calls intended to manipulate the cases table.
@@ -31,25 +33,10 @@ class STOLMC_Service_Tracker_Api_Cases extends STOLMC_Service_Tracker_Api implem
 	private const PER_PAGE_DEFAULT = 6;
 
 	/**
-	 * Transient key for the cases search inverted index.
-	 *
-	 * @since 1.4.0
-	 */
-	private const SEARCH_INDEX_TRANSIENT = 'stolmc_st_case_search_index';
-
-	/**
-	 * How long (in seconds) the cases search index transient lives.
-	 * Default: 1 hour.
-	 *
-	 * @since 1.4.0
-	 */
-	private const SEARCH_INDEX_TTL = 3600;
-
-	/**
 	 * Constructor.
 	 */
 	public function __construct() {
-		$this->cases_service = new STOLMC_Service_Tracker_Cases_Service();
+		$this->cases_service = STOLMC_Service_Tracker_Service_Factory::create_cases_service();
 	}
 
 	/**
@@ -127,30 +114,6 @@ class STOLMC_Service_Tracker_Api_Cases extends STOLMC_Service_Tracker_Api implem
 	}
 
 	/**
-	 * Validate JSON request body.
-	 *
-	 * @param WP_REST_Request $data The REST request object.
-	 *
-	 * @return array|WP_REST_Response Parsed JSON array or error response.
-	 */
-	private function validate_json_body( WP_REST_Request $data ): array|WP_REST_Response {
-		$body = $data->get_body();
-		$body = json_decode( $body, true );
-
-		if ( ! is_array( $body ) ) {
-			return STOLMC_Service_Tracker_Api_Response_Mapper::to_default_response(
-				[],
-				false,
-				'Invalid JSON data',
-				'invalid_json',
-				400
-			);
-		}
-
-		return $body;
-	}
-
-	/**
 	 * Read cases for a specific user, with pagination.
 	 *
 	 * Accepts `page` (1-based) and `per_page` query parameters.
@@ -161,13 +124,19 @@ class STOLMC_Service_Tracker_Api_Cases extends STOLMC_Service_Tracker_Api implem
 	 * @return WP_REST_Response Paginated response.
 	 */
 	public function read( WP_REST_Request $data ): WP_REST_Response {
-		$id_user        = (int) $data['id_user'];
-		$page_param     = $data->get_param( 'page' );
-		$page           = max( 1, (int) ( $page_param ? $page_param : 1 ) );
-		$per_page_param = $data->get_param( 'per_page' );
-		$per_page       = max( 1, (int) ( $per_page_param ? $per_page_param : self::PER_PAGE_DEFAULT ) );
+		try {
+			$read_dto = STOLMC_Service_Tracker_Dto_Factory::create_cases_read_query_dto( $data );
+		} catch ( ValidationException $exception ) {
+			return STOLMC_Service_Tracker_Api_Response_Mapper::to_default_response(
+				[],
+				false,
+				$exception->getMessage(),
+				'invalid_payload',
+				400
+			);
+		}
 
-		$result = $this->cases_service->get_cases_for_user( $id_user, $page, $per_page );
+		$result = $this->cases_service->get_cases_for_user( $read_dto );
 
 		return STOLMC_Service_Tracker_Api_Response_Mapper::from_service_result( $result );
 	}
@@ -180,14 +149,21 @@ class STOLMC_Service_Tracker_Api_Cases extends STOLMC_Service_Tracker_Api implem
 	 * @return WP_REST_Response Response indicating success or failure.
 	 */
 	public function create( WP_REST_Request $data ): WP_REST_Response {
-		$body = $this->validate_json_body( $data );
-		if ( $body instanceof WP_REST_Response ) {
-			return $body;
+		try {
+			$create_dto = STOLMC_Service_Tracker_Dto_Factory::create_case_create_dto( $data );
+		} catch ( ValidationException $exception ) {
+			return STOLMC_Service_Tracker_Api_Response_Mapper::to_default_response(
+				[],
+				false,
+				$exception->getMessage(),
+				'invalid_json',
+				400
+			);
 		}
 
-		$result = $this->cases_service->create_case( $body );
+		$result = $this->cases_service->create_case( $create_dto );
 
-		return STOLMC_Service_Tracker_Api_Response_Mapper::from_service_result_legacy( $result );
+		return STOLMC_Service_Tracker_Api_Response_Mapper::from_service_result( $result );
 	}
 
 	/**
@@ -198,15 +174,21 @@ class STOLMC_Service_Tracker_Api_Cases extends STOLMC_Service_Tracker_Api implem
 	 * @return WP_REST_Response Update result message.
 	 */
 	public function update( WP_REST_Request $data ): WP_REST_Response {
-		$case_id = (int) $data['id'];
-		$body = $this->validate_json_body( $data );
-		if ( $body instanceof WP_REST_Response ) {
-			return $body;
+		try {
+			$update_dto = STOLMC_Service_Tracker_Dto_Factory::create_case_update_dto( $data );
+		} catch ( ValidationException $exception ) {
+			return STOLMC_Service_Tracker_Api_Response_Mapper::to_default_response(
+				[],
+				false,
+				$exception->getMessage(),
+				'invalid_json',
+				400
+			);
 		}
 
-		$result = $this->cases_service->update_case( $case_id, $body );
+		$result = $this->cases_service->update_case( $update_dto );
 
-		return STOLMC_Service_Tracker_Api_Response_Mapper::from_service_result_legacy( $result );
+		return STOLMC_Service_Tracker_Api_Response_Mapper::from_service_result( $result );
 	}
 
 	/**
@@ -217,11 +199,21 @@ class STOLMC_Service_Tracker_Api_Cases extends STOLMC_Service_Tracker_Api implem
 	 * @return WP_REST_Response
 	 */
 	public function delete( WP_REST_Request $data ): WP_REST_Response {
-		$case_id = (int) $data['id'];
+		try {
+			$delete_dto = STOLMC_Service_Tracker_Dto_Factory::create_case_delete_dto( $data );
+		} catch ( ValidationException $exception ) {
+			return STOLMC_Service_Tracker_Api_Response_Mapper::to_default_response(
+				[],
+				false,
+				$exception->getMessage(),
+				'invalid_payload',
+				400
+			);
+		}
 
-		$result = $this->cases_service->delete_case( $case_id );
+		$result = $this->cases_service->delete_case( $delete_dto );
 
-		return STOLMC_Service_Tracker_Api_Response_Mapper::from_service_result_legacy( $result );
+		return STOLMC_Service_Tracker_Api_Response_Mapper::from_service_result( $result );
 	}
 
 	/**
@@ -237,19 +229,8 @@ class STOLMC_Service_Tracker_Api_Cases extends STOLMC_Service_Tracker_Api implem
 	 * @return WP_REST_Response Paginated response.
 	 */
 	public function search_cases( WP_REST_Request $data ): WP_REST_Response {
-		$query          = trim( (string) $data->get_param( 'q' ) );
-		$id_user        = (int) $data->get_param( 'id_user' );
-		$page_param     = $data->get_param( 'page' );
-		$page           = max( 1, (int) ( $page_param ? $page_param : 1 ) );
-		$per_page_param = $data->get_param( 'per_page' );
-		$per_page       = max( 1, (int) ( $per_page_param ? $per_page_param : self::PER_PAGE_DEFAULT ) );
-
-		// Empty query — fall back to the normal paginated read.
-		if ( '' === $query ) {
-			return $this->read( $data );
-		}
-
-		$result = $this->cases_service->search_cases( $query, $id_user, $page, $per_page );
+		$search_dto = STOLMC_Service_Tracker_Dto_Factory::create_cases_search_query_dto( $data );
+		$result     = $this->cases_service->search_cases( $search_dto );
 
 		return STOLMC_Service_Tracker_Api_Response_Mapper::from_service_result( $result );
 	}

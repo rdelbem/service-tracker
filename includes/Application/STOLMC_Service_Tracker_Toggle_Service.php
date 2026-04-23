@@ -3,6 +3,7 @@
 namespace STOLMC_Service_Tracker\includes\Application;
 
 use STOLMC_Service_Tracker\includes\DTO\STOLMC_Service_Tracker_Service_Result_Dto;
+use STOLMC_Service_Tracker\includes\DTO\STOLMC_Service_Tracker_Toggle_Request_Dto;
 use STOLMC_Service_Tracker\includes\Repositories\STOLMC_Service_Tracker_Toggle_Repository;
 
 /**
@@ -32,12 +33,16 @@ class STOLMC_Service_Tracker_Toggle_Service {
 	/**
 	 * Toggle case status between open and closed.
 	 *
-	 * @param int $case_id The ID of the case to toggle.
+	 * @param STOLMC_Service_Tracker_Toggle_Request_Dto $toggle_dto Toggle request DTO.
 	 *
 	 * @return STOLMC_Service_Tracker_Service_Result_Dto Service result.
 	 */
-	public function toggle_case_status( int $case_id ): STOLMC_Service_Tracker_Service_Result_Dto {
+	public function toggle_case_status( STOLMC_Service_Tracker_Toggle_Request_Dto $toggle_dto ): STOLMC_Service_Tracker_Service_Result_Dto {
+		$transaction_started = false;
+
 		try {
+			$case_id = $toggle_dto->case_id;
+
 			// Validate case ID.
 			if ( $case_id <= 0 ) {
 				return STOLMC_Service_Tracker_Service_Result_Dto::fail(
@@ -83,6 +88,15 @@ class STOLMC_Service_Tracker_Toggle_Service {
 			 */
 			$case_array = apply_filters( 'stolmc_service_tracker_toggle_case_data', $case_array, $case_id );
 
+			$transaction_started = $this->toggle_repository->begin_transaction();
+			if ( ! $transaction_started ) {
+				return STOLMC_Service_Tracker_Service_Result_Dto::fail(
+					'transaction_start_failed',
+					'Failed to start transaction for case toggle',
+					500
+				);
+			}
+
 			// Determine new status and appropriate messages.
 			if ( 'open' === $case_array['status'] ) {
 				/**
@@ -98,26 +112,14 @@ class STOLMC_Service_Tracker_Toggle_Service {
 				$toggle_result = $this->toggle_repository->close_case( $case_id );
 
 				if ( false === $toggle_result ) {
+					$this->toggle_repository->rollback_transaction();
+
 					return STOLMC_Service_Tracker_Service_Result_Dto::fail(
 						'close_failed',
 						'Failed to close case',
 						500
 					);
 				}
-
-				// Send email notification.
-				$this->send_email_notification( $id_user, $title, $this->get_closed_messages(), $case_id );
-
-				/**
-				 * Fires after a case has been closed.
-				 *
-				 * @since 1.0.0
-				 *
-				 * @param int|false|null $toggle_result The update result.
-				 * @param int            $id_user       The user ID.
-				 * @param string         $title         The case title.
-				 */
-				do_action( 'stolmc_service_tracker_case_closed', $toggle_result, $id_user, $title );
 
 				$new_status = 'close';
 				$action = 'closed';
@@ -135,6 +137,8 @@ class STOLMC_Service_Tracker_Toggle_Service {
 				$toggle_result = $this->toggle_repository->open_case( $case_id );
 
 				if ( false === $toggle_result ) {
+					$this->toggle_repository->rollback_transaction();
+
 					return STOLMC_Service_Tracker_Service_Result_Dto::fail(
 						'open_failed',
 						'Failed to open case',
@@ -142,23 +146,11 @@ class STOLMC_Service_Tracker_Toggle_Service {
 					);
 				}
 
-				// Send email notification.
-				$this->send_email_notification( $id_user, $title, $this->get_opened_messages(), $case_id );
-
-				/**
-				 * Fires after a case has been reopened.
-				 *
-				 * @since 1.0.0
-				 *
-				 * @param int|false|null $toggle_result The update result.
-				 * @param int            $id_user       The user ID.
-				 * @param string         $title         The case title.
-				 */
-				do_action( 'stolmc_service_tracker_case_reopened', $toggle_result, $id_user, $title );
-
 				$new_status = 'open';
 				$action = 'opened';
 			} else {
+				$this->toggle_repository->rollback_transaction();
+
 				return STOLMC_Service_Tracker_Service_Result_Dto::fail(
 					'invalid_case_status',
 					'Case has invalid status for toggling',
@@ -166,16 +158,64 @@ class STOLMC_Service_Tracker_Toggle_Service {
 				);
 			}
 
+			if ( ! $this->toggle_repository->commit_transaction() ) {
+				$this->toggle_repository->rollback_transaction();
+
+				return STOLMC_Service_Tracker_Service_Result_Dto::fail(
+					'transaction_commit_failed',
+					'Failed to commit transaction for case toggle',
+					500
+				);
+			}
+
+			/**
+			 * Fires after a case has been closed.
+			 *
+			 * @since 1.0.0
+			 *
+			 * @param int|false|null $toggle_result The update result.
+			 * @param int            $id_user       The user ID.
+			 * @param string         $title         The case title.
+			 */
+			if ( 'closed' === $action ) {
+				do_action( 'stolmc_service_tracker_case_closed', $toggle_result, $id_user, $title );
+			}
+
+			/**
+			 * Fires after a case has been reopened.
+			 *
+			 * @since 1.0.0
+			 *
+			 * @param int|false|null $toggle_result The update result.
+			 * @param int            $id_user       The user ID.
+			 * @param string         $title         The case title.
+			 */
+			if ( 'opened' === $action ) {
+				do_action( 'stolmc_service_tracker_case_reopened', $toggle_result, $id_user, $title );
+			}
+
+			// Send email notification after successful commit.
+			if ( 'closed' === $action ) {
+				$this->send_email_notification( $id_user, $title, $this->get_closed_messages(), $case_id );
+			}
+			if ( 'opened' === $action ) {
+				$this->send_email_notification( $id_user, $title, $this->get_opened_messages(), $case_id );
+			}
+
 			$result_data = [
-				'case_id'       => $case_id,
+				'case_id'         => $case_id,
 				'previous_status' => $current_status,
-				'new_status'    => $new_status,
-				'action'        => $action,
-				'rows_affected' => $toggle_result,
+				'new_status'      => $new_status,
+				'action'          => $action,
+				'rows_affected'   => $toggle_result,
 			];
 
 			return STOLMC_Service_Tracker_Service_Result_Dto::ok( $result_data, 200 );
 		} catch ( \Exception $e ) {
+			if ( $transaction_started ) {
+				$this->toggle_repository->rollback_transaction();
+			}
+
 			return STOLMC_Service_Tracker_Service_Result_Dto::fail(
 				'toggle_error',
 				'Failed to toggle case status: ' . $e->getMessage(),
@@ -317,9 +357,9 @@ class STOLMC_Service_Tracker_Toggle_Service {
 			$case = $this->toggle_repository->find_by_id( $case_id );
 
 			$result_data = [
-				'can_toggle' => $can_toggle,
-				'case_id'    => $case_id,
-				'case_exists' => null !== $case,
+				'can_toggle'     => $can_toggle,
+				'case_id'        => $case_id,
+				'case_exists'    => null !== $case,
 				'current_status' => $case ? $case->status : null,
 			];
 

@@ -28,7 +28,9 @@ describe('analyticsStore', () => {
 
   it('fetchAnalytics populates analytics and clears loading', async () => {
     const payload = { summary: { total_customers: 1 } };
-    mockFetchGet.mockResolvedValue({ data: payload });
+    mockFetchGet.mockResolvedValue({
+      data: { success: true, data: payload, error_code: null, message: null, meta: {} },
+    });
 
     const { useAnalyticsStore } = await import('../analyticsStore');
 

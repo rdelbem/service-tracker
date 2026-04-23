@@ -10,7 +10,7 @@
  * Version: 1.0.1
  * Description: This plugin offers the possibilitie to track the services you provide.
  * Author: Rodrigo Del Bem <servicetracker@delbem.net>
- * Author URI: https://delbem.net/portfolio/
+ * Author URI: https://delbem.net/
  * Plugin URI: https://delbem.net/portfolio/service-tracker-sto/
  * Text Domain: service-tracker-stolmc
  * Domain Path: languages
@@ -27,20 +27,20 @@ require_once plugin_dir_path( __FILE__ ) . '/vendor/autoload.php';
  * @return void
  */
 function stolmc_register_service_tracker_fallback_autoloader(): void {
-	spl_autoload_register(
-		static function ( string $class ): void {
-			$prefix = 'STOLMC_Service_Tracker\\';
-			if ( ! str_starts_with( $class, $prefix ) ) {
-				return;
-			}
+		spl_autoload_register(
+			static function ( string $class_name ): void {
+				$prefix = 'STOLMC_Service_Tracker\\';
+				if ( ! str_starts_with( $class_name, $prefix ) ) {
+					return;
+				}
 
-			$relative_class = substr( $class, strlen( $prefix ) );
-			$file_path      = plugin_dir_path( __FILE__ ) . str_replace( '\\', '/', $relative_class ) . '.php';
+				$relative_class = substr( $class_name, strlen( $prefix ) );
+				$file_path      = plugin_dir_path( __FILE__ ) . str_replace( '\\', '/', $relative_class ) . '.php';
 
-			if ( is_readable( $file_path ) ) {
-				require_once $file_path;
+				if ( is_readable( $file_path ) ) {
+					require_once $file_path;
+				}
 			}
-		}
 	);
 }
 

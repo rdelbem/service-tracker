@@ -268,7 +268,8 @@ class SchemaManager {
 		if ( false === $result ) {
 			// Log the error but do not halt — partial migrations are better
 			// than a fatal error on every page load.
-			error_log(
+				// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log -- Logged once during migrations for operator visibility.
+				error_log(
 				sprintf(
 					'[Service Tracker] Schema migration failed for table `%s`: %s',
 					$plain_name,
@@ -291,15 +292,16 @@ class SchemaManager {
 	private function table_exists( string $table_name ): bool {
 		global $wpdb;
 
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-		$result = $wpdb->get_var(
-			$wpdb->prepare(
-				'SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES
-				WHERE TABLE_SCHEMA = %s AND TABLE_NAME = %s',
-				$wpdb->dbname,
-				$table_name
-			)
-		);
+			// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+			$result = $wpdb->get_var(
+				$wpdb->prepare(
+					'SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES
+					WHERE TABLE_SCHEMA = %s AND TABLE_NAME = %s',
+					$wpdb->dbname,
+					$table_name
+				)
+			);
+			// phpcs:enable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 
 		return (bool) $result;
 	}
@@ -318,18 +320,19 @@ class SchemaManager {
 	private function get_table_columns( string $table_name ): array {
 		global $wpdb;
 
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-		$results = $wpdb->get_results(
-			$wpdb->prepare(
-				'SELECT COLUMN_NAME, DATA_TYPE, IS_NULLABLE, COLUMN_DEFAULT, COLUMN_TYPE
-				FROM INFORMATION_SCHEMA.COLUMNS
-				WHERE TABLE_SCHEMA = %s AND TABLE_NAME = %s
-				ORDER BY ORDINAL_POSITION',
-				$wpdb->dbname,
-				$table_name
-			),
-			ARRAY_A
-		);
+			// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+			$results = $wpdb->get_results(
+				$wpdb->prepare(
+					'SELECT COLUMN_NAME, DATA_TYPE, IS_NULLABLE, COLUMN_DEFAULT, COLUMN_TYPE
+					FROM INFORMATION_SCHEMA.COLUMNS
+					WHERE TABLE_SCHEMA = %s AND TABLE_NAME = %s
+					ORDER BY ORDINAL_POSITION',
+					$wpdb->dbname,
+					$table_name
+				),
+				ARRAY_A
+			);
+			// phpcs:enable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 
 		if ( ! is_array( $results ) ) {
 			return [];
@@ -357,18 +360,19 @@ class SchemaManager {
 	private function get_table_indexes( string $table_name ): array {
 		global $wpdb;
 
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-		$results = $wpdb->get_results(
-			$wpdb->prepare(
-				'SELECT INDEX_NAME, NON_UNIQUE, COLUMN_NAME, SEQ_IN_INDEX
-				FROM INFORMATION_SCHEMA.STATISTICS
-				WHERE TABLE_SCHEMA = %s AND TABLE_NAME = %s
-				ORDER BY INDEX_NAME, SEQ_IN_INDEX',
-				$wpdb->dbname,
-				$table_name
-			),
-			ARRAY_A
-		);
+			// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+			$results = $wpdb->get_results(
+				$wpdb->prepare(
+					'SELECT INDEX_NAME, NON_UNIQUE, COLUMN_NAME, SEQ_IN_INDEX
+					FROM INFORMATION_SCHEMA.STATISTICS
+					WHERE TABLE_SCHEMA = %s AND TABLE_NAME = %s
+					ORDER BY INDEX_NAME, SEQ_IN_INDEX',
+					$wpdb->dbname,
+					$table_name
+				),
+				ARRAY_A
+			);
+			// phpcs:enable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 
 		if ( ! is_array( $results ) ) {
 			return [];

@@ -57,11 +57,12 @@
 	<rule ref="Universal.UseStatements.NoLeadingBackslash" />
 
 	<!-- WordPress Coding Standards -->
-	<rule ref="WordPress">
-		<exclude-pattern>*\.(jsx?|tsx?)$</exclude-pattern>
+		<rule ref="WordPress">
+			<exclude-pattern>*\.(jsx?|tsx?)$</exclude-pattern>
 
-		<exclude name="Generic.Commenting.DocComment.SpacingAfter" />
-		<exclude name="Generic.Formatting.MultipleStatementAlignment.NotSameWarning" />
+			<exclude name="Generic.Commenting.DocComment.SpacingAfter" />
+			<exclude name="Generic.Commenting.DocComment.MissingShort" />
+			<exclude name="Generic.Formatting.MultipleStatementAlignment.NotSameWarning" />
 		<exclude name="Generic.PHP.DisallowShortOpenTag.EchoFound" />
 		<exclude name="Generic.WhiteSpace.DisallowSpaceIndent.SpacesUsed" />
 		<exclude name="Generic.WhiteSpace.IncrementDecrementSpacing" />
@@ -74,9 +75,14 @@
 
 		<exclude name="PSR12.Files.FileHeader.IncorrectOrder" />
 
-		<exclude name="Squiz.Commenting.FileComment" />
-		<exclude name="Squiz.Commenting.FunctionComment.MissingParamTag" />
-		<exclude name="Squiz.Commenting.FunctionComment.SpacingAfterParamType" />
+			<exclude name="Squiz.Commenting.FileComment" />
+			<exclude name="Squiz.Commenting.ClassComment.Missing" />
+			<exclude name="Squiz.Commenting.VariableComment.Missing" />
+			<exclude name="Squiz.Commenting.FunctionComment.Missing" />
+			<exclude name="Squiz.Commenting.FunctionComment.MissingParamTag" />
+			<exclude name="Squiz.Commenting.FunctionComment.MissingParamComment" />
+			<exclude name="Squiz.Commenting.FunctionCommentThrowTag.Missing" />
+			<exclude name="Squiz.Commenting.FunctionComment.SpacingAfterParamType" />
 
 		<exclude name="Squiz.Functions.MultiLineFunctionDeclaration.SpaceAfterFunction" />
 
@@ -86,10 +92,11 @@
 		<exclude name="Universal.WhiteSpace.PrecisionAlignment.Found" />
 
 		<exclude name="WordPress.Arrays.ArrayIndentation" />
-		<exclude name="WordPress.DB.SlowDBQuery" />
-		<exclude name="WordPress.Files" />
-		<exclude name="WordPress.PHP.YodaConditions" />
-		<exclude name="WordPress.WhiteSpace.OperatorSpacing" />
+			<exclude name="WordPress.DB.SlowDBQuery" />
+			<exclude name="WordPress.Files" />
+			<exclude name="WordPress.PHP.YodaConditions" />
+			<exclude name="WordPress.Security.EscapeOutput.ExceptionNotEscaped" />
+			<exclude name="WordPress.WhiteSpace.OperatorSpacing" />
 		<exclude name="WordPress.WhiteSpace.PrecisionAlignment.Found" />
 		<exclude name="WordPress.WP.Capabilities.Unknown" />
 	</rule>

@@ -50,10 +50,13 @@ describe('fetch utils', () => {
     const res = await get('/api/text');
 
     expect(res).toEqual({
-      data: 'plain',
-      success: true,
-      error_code: null,
-      message: null
+      data: {
+        success: true,
+        data: 'plain',
+        error_code: null,
+        message: null,
+        meta: {},
+      },
     });
   });
 
@@ -68,10 +71,13 @@ describe('fetch utils', () => {
     const res = await del('/api/empty');
 
     expect(res).toEqual({
-      data: null,
-      success: true,
-      error_code: null,
-      message: null
+      data: {
+        success: true,
+        data: null,
+        error_code: null,
+        message: null,
+        meta: {},
+      },
     });
   });
 
@@ -106,10 +112,13 @@ describe('fetch utils', () => {
     const res = await put('/api/item/1', { title: 'New' });
 
     expect(res).toEqual({
-      data: { updated: true },
-      success: true,
-      error_code: null,
-      message: null
+      data: {
+        success: true,
+        data: { updated: true },
+        error_code: null,
+        message: null,
+        meta: {},
+      },
     });
   });
 });

@@ -4,13 +4,6 @@ namespace STOLMC_Service_Tracker\includes;
 use STOLMC_Service_Tracker\admin\STOLMC_Service_Tracker_Admin;
 use STOLMC_Service_Tracker\includes\Analytics\AnalyticsLogger;
 use STOLMC_Service_Tracker\includes\Analytics\Analytics_Hooks;
-use STOLMC_Service_Tracker\includes\Controller_API\STOLMC_Service_Tracker_Api;
-use STOLMC_Service_Tracker\includes\Controller_API\STOLMC_Service_Tracker_Api_Analytics;
-use STOLMC_Service_Tracker\includes\Controller_API\STOLMC_Service_Tracker_Api_Cases;
-use STOLMC_Service_Tracker\includes\Controller_API\STOLMC_Service_Tracker_Api_Calendar;
-use STOLMC_Service_Tracker\includes\Controller_API\STOLMC_Service_Tracker_Api_Progress;
-use STOLMC_Service_Tracker\includes\Controller_API\STOLMC_Service_Tracker_Api_Toggle;
-use STOLMC_Service_Tracker\includes\Controller_API\STOLMC_Service_Tracker_Api_Users;
 use STOLMC_Service_Tracker\includes\CLI\Service_Tracker_Commands;
 use STOLMC_Service_Tracker\includes\DB\CalendarIndex;
 use STOLMC_Service_Tracker\includes\DB\SchemaManager;
@@ -19,6 +12,7 @@ use STOLMC_Service_Tracker\includes\Utils\STOLMC_Service_Tracker_Loader;
 use STOLMC_Service_Tracker\includes\Utils\STOLMC_Service_Tracker_Permalink_Validator;
 use STOLMC_Service_Tracker\includes\Publics\STOLMC_Service_Tracker_Public;
 use STOLMC_Service_Tracker\includes\Publics\STOLMC_Service_Tracker_Public_User_Content;
+use STOLMC_Service_Tracker\includes\Application\STOLMC_Service_Tracker_Service_Factory;
 
 // This must be here, since PSR4 determines that define should not be used in an output file.
 define( 'STOLMC_SERVICE_TRACKER_VERSION', '1.0.0' );
@@ -176,23 +170,10 @@ class STOLMC_Service_Tracker {
 	 * @return void
 	 */
 	private function api(): void {
-		$service_tracker_api_cases = new STOLMC_Service_Tracker_Api_Cases();
-		$this->loader->add_action( 'rest_api_init', $service_tracker_api_cases, 'run' );
-
-		$service_tracker_api_progress = new STOLMC_Service_Tracker_Api_Progress();
-		$this->loader->add_action( 'rest_api_init', $service_tracker_api_progress, 'run' );
-
-		$service_tracker_api_toggle = new STOLMC_Service_Tracker_Api_Toggle();
-		$this->loader->add_action( 'rest_api_init', $service_tracker_api_toggle, 'run' );
-
-		$service_tracker_api_users = new STOLMC_Service_Tracker_Api_Users();
-		$this->loader->add_action( 'rest_api_init', $service_tracker_api_users, 'run' );
-
-		$service_tracker_api_calendar = new STOLMC_Service_Tracker_Api_Calendar();
-		$this->loader->add_action( 'rest_api_init', $service_tracker_api_calendar, 'run' );
-
-		$service_tracker_api_analytics = new STOLMC_Service_Tracker_Api_Analytics();
-		$this->loader->add_action( 'rest_api_init', $service_tracker_api_analytics, 'run' );
+		$api_controllers = STOLMC_Service_Tracker_Service_Factory::create_api_controllers();
+		foreach ( $api_controllers as $api_controller ) {
+			$this->loader->add_action( 'rest_api_init', $api_controller, 'run' );
+		}
 	}
 
 	/**
@@ -382,13 +363,7 @@ class STOLMC_Service_Tracker {
 	 * @return void
 	 */
 	private function define_analytics_hooks(): void {
-		global $wpdb;
-
-		$notifications_table = $wpdb->prefix . 'servicetracker_notifications';
-		$activity_log_table  = $wpdb->prefix . 'servicetracker_activity_log';
-
-		$logger        = new AnalyticsLogger( $notifications_table, $activity_log_table );
-		$analytics     = new Analytics_Hooks( $logger );
+		$analytics = STOLMC_Service_Tracker_Service_Factory::create_analytics_hooks_with_logger();
 		$analytics->register_hooks();
 	}
 
@@ -457,7 +432,13 @@ class STOLMC_Service_Tracker {
 			return;
 		}
 
-		$public_user_content = new STOLMC_Service_Tracker_Public_User_Content();
+		global $wpdb;
+
+			// Create SQL services using factory.
+		$cases_sql = STOLMC_Service_Tracker_Service_Factory::create_sql_service( $wpdb->prefix . 'servicetracker_cases' );
+		$progress_sql = STOLMC_Service_Tracker_Service_Factory::create_sql_service( $wpdb->prefix . 'servicetracker_progress' );
+
+		$public_user_content = new STOLMC_Service_Tracker_Public_User_Content( $cases_sql, $progress_sql );
 		$this->loader->add_action( 'init', $public_user_content, 'get_user_id' );
 	}
 

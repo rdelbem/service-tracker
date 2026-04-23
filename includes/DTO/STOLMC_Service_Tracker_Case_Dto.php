@@ -168,14 +168,14 @@ class STOLMC_Service_Tracker_Case_Dto {
 	 */
 	private static function read_nullable_string( object|array $row, string $key ): ?string {
 		if ( is_array( $row ) ) {
-			if ( ! isset( $row[ $key ] ) || null === $row[ $key ] ) {
+			if ( ! array_key_exists( $key, $row ) || null === $row[ $key ] ) {
 				return null;
 			}
 
 			return (string) $row[ $key ];
 		}
 
-		if ( ! isset( $row->{$key} ) || null === $row->{$key} ) {
+		if ( ! isset( $row->{$key} ) ) {
 			return null;
 		}
 
@@ -192,14 +192,14 @@ class STOLMC_Service_Tracker_Case_Dto {
 	 */
 	private static function read_nullable_int( object|array $row, string $key ): ?int {
 		if ( is_array( $row ) ) {
-			if ( ! isset( $row[ $key ] ) || null === $row[ $key ] || '' === $row[ $key ] ) {
+			if ( ! array_key_exists( $key, $row ) || null === $row[ $key ] || '' === $row[ $key ] ) {
 				return null;
 			}
 
 			return (int) $row[ $key ];
 		}
 
-		if ( ! isset( $row->{$key} ) || null === $row->{$key} || '' === $row->{$key} ) {
+		if ( ! isset( $row->{$key} ) || '' === $row->{$key} ) {
 			return null;
 		}
 

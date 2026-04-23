@@ -42,7 +42,9 @@ describe('progressStore', () => {
   });
 
   it('getStatus updates state when onlyFetch is false', async () => {
-    mockGet.mockResolvedValue({ data: [{ id: 1, text: 'hello' }] });
+    mockGet.mockResolvedValue({
+      data: { success: true, data: [{ id: 1, text: 'hello' }], error_code: null, message: null, meta: {} },
+    });
     const { useProgressStore } = await import('../progressStore');
 
     await useProgressStore.getState().getStatus('case-1', false, 'Case title');
@@ -56,7 +58,9 @@ describe('progressStore', () => {
 
   it('postStatus refetches full list and stores server result', async () => {
     mockPost.mockResolvedValue({ data: {} });
-    mockGet.mockResolvedValue({ data: [{ id: 10, text: 'new' }] });
+    mockGet.mockResolvedValue({
+      data: { success: true, data: [{ id: 10, text: 'new' }], error_code: null, message: null, meta: {} },
+    });
 
     const { useProgressStore } = await import('../progressStore');
     useProgressStore.setState({ caseTitle: 'Title', status: [] });
@@ -95,7 +99,15 @@ describe('progressStore', () => {
   });
 
   it('uploadFiles returns uploaded files on success', async () => {
-    mockPostMultipart.mockResolvedValue({ data: { success: true, files: [{ url: '/f.png' }] } });
+    mockPostMultipart.mockResolvedValue({
+      data: {
+        success: true,
+        data: { files: [{ url: '/f.png' }] },
+        error_code: null,
+        message: null,
+        meta: {},
+      },
+    });
     const { useProgressStore } = await import('../progressStore');
 
     const files = [new File(['x'], 'x.txt', { type: 'text/plain' })];

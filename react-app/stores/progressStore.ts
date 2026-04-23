@@ -39,11 +39,13 @@ export const useProgressStore = create<ProgressStore>((set, get) => {
           headers: { "X-WP-Nonce": data.nonce },
         });
 
+        const statusData = Array.isArray(res.data.data) ? res.data.data : [];
+
         if (!onlyFetch) {
-          set({ status: res.data, caseTitle: caseTitle || get().caseTitle, loadingStatus: false });
+          set({ status: statusData, caseTitle: caseTitle || get().caseTitle, loadingStatus: false });
         }
 
-        return res.data;
+        return statusData;
       } catch (error) {
         console.error("Error fetching status:", error);
         if (!onlyFetch) {
@@ -137,7 +139,8 @@ export const useProgressStore = create<ProgressStore>((set, get) => {
         });
 
         if (res.data.success) {
-          return res.data.files as Attachment[];
+          const files = Array.isArray(res.data.data?.files) ? res.data.data.files : [];
+          return files as Attachment[];
         } else {
           throw new Error(res.data.message || "Upload failed");
         }

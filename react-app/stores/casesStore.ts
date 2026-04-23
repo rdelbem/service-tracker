@@ -74,17 +74,18 @@ export const useCasesStore = create<CasesStore>((set, get) => {
           headers: { "X-WP-Nonce": data.nonce },
         });
 
-        const envelope    = res.data;
+        const envelope = res.data;
+        const pagination = envelope.meta?.pagination ?? {};
         const casesArray: Case[] = envelope.data ?? [];
 
         if (!onlyFetch) {
           set({
             user: id,
             cases: casesArray,
-            page: envelope.page ?? currentPage,
-            perPage: envelope.per_page ?? perPage,
-            total: envelope.total ?? 0,
-            totalPages: envelope.total_pages ?? 1,
+            page: pagination.page ?? currentPage,
+            perPage: pagination.per_page ?? perPage,
+            total: pagination.total ?? 0,
+            totalPages: pagination.total_pages ?? 1,
             loadingCases: false,
           });
         }
@@ -124,13 +125,14 @@ export const useCasesStore = create<CasesStore>((set, get) => {
           headers: { "X-WP-Nonce": data.nonce },
         });
         const envelope = res.data;
+        const pagination = envelope.meta?.pagination ?? {};
 
         set({
           cases: envelope.data ?? [],
-          total: envelope.total ?? 0,
-          page: envelope.page ?? 1,
-          perPage: envelope.per_page ?? perPage,
-          totalPages: envelope.total_pages ?? 1,
+          total: pagination.total ?? 0,
+          page: pagination.page ?? 1,
+          perPage: pagination.per_page ?? perPage,
+          totalPages: pagination.total_pages ?? 1,
           loadingCases: false,
         });
       } catch (error) {
@@ -160,13 +162,14 @@ export const useCasesStore = create<CasesStore>((set, get) => {
             headers: { "X-WP-Nonce": data.nonce },
           });
           const envelope = res.data;
+          const pagination = envelope.meta?.pagination ?? {};
 
           set({
             cases: envelope.data ?? [],
-            total: envelope.total ?? 0,
-            page: envelope.page ?? clamped,
-            perPage: envelope.per_page ?? perPage,
-            totalPages: envelope.total_pages ?? 1,
+            total: pagination.total ?? 0,
+            page: pagination.page ?? clamped,
+            perPage: pagination.per_page ?? perPage,
+            totalPages: pagination.total_pages ?? 1,
             loadingCases: false,
           });
         } catch (error) {

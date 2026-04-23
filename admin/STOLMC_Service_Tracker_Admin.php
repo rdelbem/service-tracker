@@ -235,7 +235,8 @@ class STOLMC_Service_Tracker_Admin {
 		$map_file = $prod_dir . 'entrypoints.json';
 
 		if ( file_exists( $map_file ) && is_readable( $map_file ) ) {
-			$raw_map = file_get_contents( $map_file );
+				// phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents -- Reading local plugin asset mapping file.
+				$raw_map = file_get_contents( $map_file );
 			if ( false !== $raw_map ) {
 				$decoded_map = json_decode( $raw_map, true );
 
