@@ -1,0 +1,242 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800;900&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Light theme colors */
+  --background: 246 248 253;
+  --on-background: 20 30 48;
+  --surface: 243 246 252;
+  --surface-dim: 219 228 243;
+  --surface-bright: 251 252 255;
+  --surface-container-lowest: 255 255 255;
+  --surface-container-low: 239 243 250;
+  --surface-container: 230 237 247;
+  --surface-container-high: 220 229 242;
+  --surface-container-highest: 212 223 239;
+  --surface-variant: 205 217 234;
+  --on-surface: 20 30 48;
+  --on-surface-variant: 74 82 98;
+  --primary: 28 40 66;
+  --on-primary: 248 250 255;
+  --primary-container: 52 67 98;
+  --on-primary-container: 226 233 248;
+  --primary-fixed: 218 226 245;
+  --primary-fixed-dim: 190 202 228;
+  --on-primary-fixed: 20 30 49;
+  --on-primary-fixed-variant: 66 78 104;
+  --secondary: 0 108 73;
+  --on-secondary: 244 255 250;
+  --secondary-container: 185 241 215;
+  --on-secondary-container: 17 83 61;
+  --secondary-fixed: 198 247 224;
+  --secondary-fixed-dim: 158 224 192;
+  --on-secondary-fixed: 10 58 42;
+  --on-secondary-fixed-variant: 24 96 71;
+  --tertiary: 104 69 8;
+  --on-tertiary: 255 250 241;
+  --tertiary-container: 146 103 26;
+  --on-tertiary-container: 255 234 196;
+  --tertiary-fixed: 255 226 171;
+  --tertiary-fixed-dim: 239 191 112;
+  --on-tertiary-fixed: 63 40 4;
+  --on-tertiary-fixed-variant: 122 84 17;
+  --error: 179 37 37;
+  --on-error: 255 245 245;
+  --error-container: 253 224 224;
+  --on-error-container: 123 24 24;
+  --outline: 112 122 141;
+  --outline-variant: 188 199 218;
+  --inverse-surface: 34 47 72;
+  --inverse-on-surface: 233 240 252;
+  --inverse-primary: 190 202 228;
+  --shadow: 0 0 0;
+  --surface-tint: 86 104 138;
+}
+
+.dark {
+  /* Medium contrast dark theme colors with darker input fields */
+  --background: 27 32 44;
+  --on-background: 227 232 243;
+  --surface: 31 37 51;
+  --surface-dim: 23 28 40;
+  --surface-bright: 45 52 69;
+  --surface-container-lowest: 24 29 40;
+  --surface-container-low: 28 34 46;
+  --surface-container: 36 42 56;
+  --surface-container-high: 46 54 72;
+  --surface-container-highest: 57 65 84;
+  --surface-variant: 66 75 94;
+  --on-surface: 224 229 240;
+  --on-surface-variant: 177 187 207;
+  --primary: 173 187 219;
+  --on-primary: 24 33 53;
+  --primary-container: 64 76 107;
+  --on-primary-container: 220 229 250;
+  --primary-fixed: 210 221 246;
+  --primary-fixed-dim: 173 187 219;
+  --on-primary-fixed: 19 28 45;
+  --on-primary-fixed-variant: 154 169 202;
+  --secondary: 130 202 171;
+  --on-secondary: 19 66 49;
+  --secondary-container: 41 94 73;
+  --on-secondary-container: 197 241 220;
+  --secondary-fixed: 174 227 198;
+  --secondary-fixed-dim: 130 202 171;
+  --on-secondary-fixed: 12 54 39;
+  --on-secondary-fixed-variant: 155 219 189;
+  --tertiary: 226 188 124;
+  --on-tertiary: 78 56 14;
+  --tertiary-container: 107 78 21;
+  --on-tertiary-container: 244 219 173;
+  --tertiary-fixed: 244 219 173;
+  --tertiary-fixed-dim: 226 188 124;
+  --on-tertiary-fixed: 63 44 11;
+  --on-tertiary-fixed-variant: 198 159 95;
+  --error: 242 165 165;
+  --on-error: 92 23 23;
+  --error-container: 124 42 42;
+  --on-error-container: 254 226 226;
+  --outline: 131 142 165;
+  --outline-variant: 74 85 105;
+  --inverse-surface: 227 232 243;
+  --inverse-on-surface: 40 47 63;
+  --inverse-primary: 86 104 138;
+  --shadow: 0 0 0;
+  --surface-tint: 173 187 219;
+}
+
+body {
+  margin: 0;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: rgb(var(--background));
+  color: rgb(var(--on-surface));
+  transition: background-color 0.3s, color 0.3s;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+/* Material Symbols */
+.material-symbols-outlined {
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 48;
+  transition: all 0.2s ease;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgb(var(--surface-container));
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgb(var(--outline-variant));
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgb(var(--outline));
+}
+
+/* Focus styles */
+:focus-visible {
+  outline: 2px solid rgb(var(--primary));
+  outline-offset: 2px;
+}
+
+/* Toastify overrides */
+.Toastify__toast {
+  background: rgb(var(--surface-container-lowest));
+  color: rgb(var(--on-surface));
+  border-radius: 0.5rem;
+  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.12);
+}
+
+.Toastify__toast--success {
+  background: rgb(var(--secondary-container));
+  color: rgb(var(--on-secondary-container));
+}
+
+.Toastify__toast--error {
+  background: rgb(var(--error-container));
+  color: rgb(var(--on-error-container));
+}
+
+.Toastify__toast--warning {
+  background: rgb(var(--tertiary-container));
+  color: rgb(var(--on-tertiary-container));
+}
+
+.Toastify__toast--info {
+  background: rgb(var(--primary-container));
+  color: rgb(var(--on-primary-container));
+}
+
+.Toastify__close-button {
+  color: rgb(var(--on-surface));
+}
+
+/* Dark mode input overrides - slightly darker fields */
+.dark input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]):not([type="color"]):not([type="submit"]):not([type="button"]):not([type="reset"]),
+.dark textarea,
+.dark select {
+  background-color: rgb(var(--surface-container-low));
+  border-color: rgb(var(--outline-variant));
+  color: rgb(var(--on-surface));
+}
+
+.dark input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]):not([type="color"]):not([type="submit"]):not([type="button"]):not([type="reset"])::placeholder,
+.dark textarea::placeholder,
+.dark select::placeholder {
+  color: rgb(var(--on-surface-variant));
+}
+
+.dark input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]):not([type="color"]):not([type="submit"]):not([type="button"]):not([type="reset"]):focus,
+.dark textarea:focus,
+.dark select:focus {
+  outline: 2px solid rgb(var(--primary));
+  outline-offset: 0;
+  border-color: rgb(var(--primary));
+}
+
+/* Spinner animation */
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+/* Modal animations */
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.animate-scale-in {
+  animation: scaleIn 0.2s ease-out;
+}

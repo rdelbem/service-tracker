@@ -1,0 +1,98 @@
+import { useInViewStore } from "../../stores/inViewStore";
+
+export default function Sidebar() {
+  const inViewState = useInViewStore((state) => state);
+  const { navigate } = useInViewStore();
+
+  const navItems = [
+    { icon: "dashboard", label: "Dashboard", view: "init" },
+    { icon: "group", label: "Clients", view: "clients" },
+    { icon: "folder_open", label: "Cases", view: "cases" },
+    { icon: "event", label: "Calendar", view: "calendar" },
+    { icon: "analytics", label: "Analytics", view: "analytics" },
+  ];
+
+  const bottomNavItems = [
+    { icon: "settings", label: "Settings", view: "settings" },
+  ];
+
+  return (
+    <aside className="flex-shrink-0 w-64 h-[calc(100vh-32px)] flex flex-col py-8 px-4 bg-surface-container-lowest backdrop-blur-xl border-r border-outline-variant/20 shadow-sm z-40">
+      {/* Brand Header */}
+      <div className="mb-10 px-4">
+        <h1 className="text-xl font-black text-on-surface tracking-tighter uppercase">
+          Service Tracker
+        </h1>
+        <p className="font-['Manrope'] font-semibold tracking-tight text-xs text-on-surface-variant uppercase mt-1">
+          Administrator
+        </p>
+      </div>
+
+      {/* Main Navigation */}
+      <nav className="flex-1 space-y-1">
+        {navItems.map((item) => {
+          const isActive = inViewState.view === item.view;
+          return (
+            <a
+              key={item.label}
+              onClick={() => navigate(item.view, "", "", "")}
+              className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all cursor-pointer ${
+                isActive
+                  ? "text-on-surface font-bold bg-surface-container"
+                  : "text-on-surface-variant hover:bg-surface-container-high font-medium"
+              }`}
+            >
+              <span
+                className="material-symbols-outlined"
+                style={{ fontVariationSettings: isActive ? "'FILL' 1" : "'FILL' 0" }}
+              >
+                {item.icon}
+              </span>
+              <span className="font-['Manrope'] font-semibold tracking-tight">
+                {item.label}
+              </span>
+            </a>
+          );
+        })}
+      </nav>
+
+      {/* Bottom Navigation & User Profile */}
+      <div className="mt-auto border-t border-outline-variant/40 pt-6 space-y-1">
+        {bottomNavItems.map((item) => {
+          const isActive = inViewState.view === item.view;
+          return (
+            <a
+              key={item.label}
+              onClick={() => navigate(item.view, "", "", "")}
+              className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all cursor-pointer ${
+                isActive
+                  ? "text-on-surface font-bold bg-surface-container"
+                  : "text-on-surface-variant hover:bg-surface-container-high font-medium"
+              }`}
+            >
+              <span className="material-symbols-outlined">{item.icon}</span>
+              <span className="font-['Manrope'] font-semibold tracking-tight">
+                {item.label}
+              </span>
+            </a>
+          );
+        })}
+
+        {/* User Profile */}
+        <div className="flex items-center gap-3 px-4 py-4 mt-4">
+          <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-on-primary font-bold">
+            {inViewState.name ? inViewState.name.charAt(0).toUpperCase() : "A"}
+          </div>
+          <div className="overflow-hidden">
+            <p className="text-sm font-bold text-on-surface truncate">
+              {inViewState.name || "Admin User"}
+            </p>
+            <p className="text-[10px] text-on-surface-variant uppercase tracking-widest">
+              Master Admin
+            </p>
+          </div>
+        </div>
+      </div>
+    </aside>
+  );
+}

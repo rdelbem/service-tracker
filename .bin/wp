@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+set -e
+
+# Pass all arguments to WP-CLI
+docker compose run --rm wpcli "$@"

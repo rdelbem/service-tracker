@@ -4,6 +4,19 @@
 node_modules/
 /node_modules/
 
+# Local WordPress core files
+wordpress/
+
+# PHP dependencies
+vendor/
+
+# PHPUnit cache
+.phpunit.cache/
+.coverage/
+
+# PHPStan baseline (auto-generated file, can be committed to track baseline)
+# Uncomment to ignore: phpstan-baseline.neon
+
 # Packages #
 ############
 *.7z
@@ -64,3 +77,5 @@ assets/bower_components/*
 .idea/
 assets/img/.DS_Store
 
+admin/js/prod
+.aider*

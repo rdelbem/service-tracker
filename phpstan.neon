@@ -1,0 +1,33 @@
+parameters:
+    level: 8
+
+    # Paths to analyze
+    paths:
+        - admin
+        - includes
+
+    # Exclude CLI classes that depend on WP-CLI (not available as stubs)
+    excludePaths:
+        - includes/CLI/*
+        - includes/API/*
+        - includes/Services/*
+
+    # WordPress integration
+    bootstrapFiles:
+        - vendor/php-stubs/wordpress-stubs/wordpress-stubs.php
+
+    # Generic object types
+    universalObjectCratesClasses:
+        - stdClass
+        - WP_Error
+
+    # Reduce false positives for WP-stub PHPDoc-heavy APIs.
+    treatPhpDocTypesAsCertain: false
+
+    # Run in a single worker to avoid local TCP worker bind issues in this env.
+    parallel:
+        maximumNumberOfProcesses: 1
+
+# Use WordPress extension for better WP integration
+includes:
+    - vendor/szepeviktor/phpstan-wordpress/extension.neon

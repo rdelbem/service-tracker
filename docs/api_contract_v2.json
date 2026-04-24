@@ -1,0 +1,94 @@
+{
+  "version": "v2",
+  "response_envelope": {
+    "required_keys": [
+      "success",
+      "data",
+      "error_code",
+      "message",
+      "meta"
+    ]
+  },
+  "endpoints": {
+    "GET /analytics": {
+      "statuses": [200, 400, 401, 403, 500],
+      "meta_required": []
+    },
+    "GET /calendar": {
+      "statuses": [200, 400, 401, 403, 500],
+      "meta_required": []
+    },
+    "DELETE /cases/(?P<id>\\d+)": {
+      "statuses": [200, 400, 401, 403, 404, 500],
+      "meta_required": []
+    },
+    "GET /cases/(?P<id_user>\\d+)": {
+      "statuses": [200, 400, 401, 403, 500],
+      "meta_required": ["pagination"]
+    },
+    "GET /cases/search": {
+      "statuses": [200, 400, 401, 403, 500],
+      "meta_required": ["pagination"]
+    },
+    "POST /cases-status/(?P<id>\\d+)": {
+      "statuses": [200, 400, 401, 403, 404, 500],
+      "meta_required": []
+    },
+    "POST /cases/(?P<id_user>\\d+)": {
+      "statuses": [201, 400, 401, 403, 500],
+      "meta_required": []
+    },
+    "POST, PUT, PATCH /cases/(?P<id>\\d+)": {
+      "statuses": [200, 400, 401, 403, 404, 500],
+      "meta_required": []
+    },
+    "DELETE /progress/(?P<id>\\d+)": {
+      "statuses": [200, 400, 401, 403, 404, 500],
+      "meta_required": []
+    },
+    "GET /progress/(?P<id_case>\\d+)": {
+      "statuses": [200, 400, 401, 403, 404, 500],
+      "meta_required": []
+    },
+    "GET /progress/user-attachments/(?P<id_user>\\d+)": {
+      "statuses": [200, 400, 401, 403, 404, 500],
+      "meta_required": []
+    },
+    "POST /progress/(?P<id_case>\\d+)": {
+      "statuses": [201, 400, 401, 403, 404, 500],
+      "meta_required": []
+    },
+    "POST /progress/upload": {
+      "statuses": [200, 400, 401, 403, 404, 413, 415, 500],
+      "meta_required": []
+    },
+    "POST, PUT, PATCH /progress/(?P<id>\\d+)": {
+      "statuses": [200, 400, 401, 403, 404, 500],
+      "meta_required": []
+    },
+    "DELETE /users/(?P<id>\\d+)": {
+      "statuses": [200, 400, 401, 403, 404, 500],
+      "meta_required": []
+    },
+    "GET /users": {
+      "statuses": [200, 400, 401, 403, 500],
+      "meta_required": ["pagination"]
+    },
+    "GET /users/search": {
+      "statuses": [200, 400, 401, 403, 500],
+      "meta_required": ["pagination"]
+    },
+    "GET /users/staff": {
+      "statuses": [200, 401, 403, 500],
+      "meta_required": []
+    },
+    "POST /users/(?P<id>\\d+)": {
+      "statuses": [201, 400, 401, 403, 409, 500],
+      "meta_required": []
+    },
+    "POST, PUT, PATCH /users/(?P<id>\\d+)": {
+      "statuses": [200, 400, 401, 403, 404, 500],
+      "meta_required": []
+    }
+  }
+}
