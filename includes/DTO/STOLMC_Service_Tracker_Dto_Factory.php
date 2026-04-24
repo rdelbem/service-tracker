@@ -140,12 +140,12 @@ class STOLMC_Service_Tracker_Dto_Factory {
 	private static function decode_json_body( WP_REST_Request $request ): array {
 		$body = $request->get_body();
 		if ( '' === trim( $body ) ) {
-			throw new ValidationException( 'Invalid JSON data' );
+			throw new Validation_Exception( 'Invalid JSON data' );
 		}
 
 		$decoded = json_decode( $body, true );
 		if ( ! is_array( $decoded ) ) {
-			throw new ValidationException( 'Invalid JSON data' );
+			throw new Validation_Exception( 'Invalid JSON data' );
 		}
 
 		return $decoded;

@@ -13,7 +13,7 @@ export default function ClientDetails() {
   const inViewState = useInViewStore((state) => state);
   const { navigate } = useInViewStore();
   const { users, updateUser } = useClientsStore();
-  const { cases, loadingCases, page, totalPages, total, searchQuery, getCases } = useCasesStore();
+  const { cases, loadingCases, page, totalPages, total, getCases } = useCasesStore();
 
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({

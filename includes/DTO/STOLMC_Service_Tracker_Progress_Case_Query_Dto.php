@@ -7,7 +7,7 @@ class STOLMC_Service_Tracker_Progress_Case_Query_Dto {
 
 	public function __construct( int $case_id ) {
 		if ( $case_id <= 0 ) {
-			throw new ValidationException( 'Invalid case ID' );
+			throw new Validation_Exception( 'Invalid case ID' );
 		}
 
 		$this->case_id = $case_id;

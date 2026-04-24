@@ -3,7 +3,7 @@ import { afterEach } from 'vitest';
 import { cleanup } from '@testing-library/react';
 
 // Mock global data object
-global.data = {
+(globalThis as Record<string, any>).data = {
   root_url: 'http://localhost',
   api_url: 'api',
   users_api_url: 'http://localhost/api/users',

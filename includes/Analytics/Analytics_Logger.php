@@ -9,7 +9,7 @@ namespace STOLMC_Service_Tracker\includes\Analytics;
  * @since    1.2.0
  * @package  STOLMC_Service_Tracker\includes\Analytics
  */
-class AnalyticsLogger {
+class Analytics_Logger {
 
 	/**
 	 * Notifications table name.

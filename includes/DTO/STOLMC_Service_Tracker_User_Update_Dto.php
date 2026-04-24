@@ -16,11 +16,11 @@ class STOLMC_Service_Tracker_User_Update_Dto {
 	 */
 	public function __construct( int $user_id, array $data ) {
 		if ( $user_id <= 0 ) {
-			throw new ValidationException( 'Invalid user ID' );
+			throw new Validation_Exception( 'Invalid user ID' );
 		}
 
 		if ( isset( $data['email'] ) && '' !== (string) $data['email'] && ! is_email( (string) $data['email'] ) ) {
-			throw new ValidationException( 'Invalid email address' );
+			throw new Validation_Exception( 'Invalid email address' );
 		}
 
 		$this->user_id     = $user_id;

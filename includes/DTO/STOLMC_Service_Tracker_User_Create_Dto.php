@@ -19,11 +19,11 @@ class STOLMC_Service_Tracker_User_Create_Dto {
 		$email = isset( $data['email'] ) ? trim( (string) $data['email'] ) : '';
 
 		if ( '' === $name || '' === $email ) {
-			throw new ValidationException( 'Name and email are required' );
+			throw new Validation_Exception( 'Name and email are required' );
 		}
 
 		if ( ! is_email( $email ) ) {
-			throw new ValidationException( 'Invalid email address' );
+			throw new Validation_Exception( 'Invalid email address' );
 		}
 
 		$this->name     = $name;

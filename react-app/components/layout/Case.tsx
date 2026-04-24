@@ -53,7 +53,7 @@ export default function Case({ id, id_user, status, created_at, title, onToggle 
     });
 
     if (confirmed) {
-      deleteCase(id);
+      deleteCase(id, title);
     }
   };
 

@@ -7,7 +7,7 @@ use WP_REST_Server;
 use STOLMC_Service_Tracker\includes\Application\STOLMC_Service_Tracker_Progress_Service;
 use STOLMC_Service_Tracker\includes\Application\STOLMC_Service_Tracker_Service_Factory;
 use STOLMC_Service_Tracker\includes\DTO\STOLMC_Service_Tracker_Dto_Factory;
-use STOLMC_Service_Tracker\includes\DTO\ValidationException;
+use STOLMC_Service_Tracker\includes\DTO\Validation_Exception;
 
 /**
  * This class will resolve API calls intended to manipulate the progress table.
@@ -75,7 +75,7 @@ class STOLMC_Service_Tracker_Api_Progress extends STOLMC_Service_Tracker_Api imp
 	public function read( WP_REST_Request $data ): WP_REST_Response {
 		try {
 			$query_dto = STOLMC_Service_Tracker_Dto_Factory::create_progress_case_query_dto( $data );
-		} catch ( ValidationException $exception ) {
+		} catch ( Validation_Exception $exception ) {
 			return STOLMC_Service_Tracker_Api_Response_Mapper::to_default_response(
 				[],
 				false,
@@ -100,7 +100,7 @@ class STOLMC_Service_Tracker_Api_Progress extends STOLMC_Service_Tracker_Api imp
 	public function create( WP_REST_Request $data ): WP_REST_Response {
 		try {
 			$create_dto = STOLMC_Service_Tracker_Dto_Factory::create_progress_create_dto( $data );
-		} catch ( ValidationException $exception ) {
+		} catch ( Validation_Exception $exception ) {
 			return STOLMC_Service_Tracker_Api_Response_Mapper::to_default_response(
 				[],
 				false,
@@ -125,7 +125,7 @@ class STOLMC_Service_Tracker_Api_Progress extends STOLMC_Service_Tracker_Api imp
 	public function update( WP_REST_Request $data ): WP_REST_Response {
 		try {
 			$update_dto = STOLMC_Service_Tracker_Dto_Factory::create_progress_update_dto( $data );
-		} catch ( ValidationException $exception ) {
+		} catch ( Validation_Exception $exception ) {
 			return STOLMC_Service_Tracker_Api_Response_Mapper::to_default_response(
 				[],
 				false,
@@ -150,7 +150,7 @@ class STOLMC_Service_Tracker_Api_Progress extends STOLMC_Service_Tracker_Api imp
 	public function delete( WP_REST_Request $data ): WP_REST_Response {
 		try {
 			$delete_dto = STOLMC_Service_Tracker_Dto_Factory::create_progress_delete_dto( $data );
-		} catch ( ValidationException $exception ) {
+		} catch ( Validation_Exception $exception ) {
 			return STOLMC_Service_Tracker_Api_Response_Mapper::to_default_response(
 				[],
 				false,
@@ -189,7 +189,7 @@ class STOLMC_Service_Tracker_Api_Progress extends STOLMC_Service_Tracker_Api imp
 	public function read_user_attachments( WP_REST_Request $data ): WP_REST_Response {
 		try {
 			$query_dto = STOLMC_Service_Tracker_Dto_Factory::create_progress_user_attachments_query_dto( $data );
-		} catch ( ValidationException $exception ) {
+		} catch ( Validation_Exception $exception ) {
 			return STOLMC_Service_Tracker_Api_Response_Mapper::to_default_response(
 				[],
 				false,

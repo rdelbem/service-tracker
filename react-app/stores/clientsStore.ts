@@ -156,7 +156,12 @@ export const useClientsStore = create<ClientsStore>((set, get) => {
           await get().getUsers(1);
         }
 
-        return res.data;
+        const payload = res.data;
+        return {
+          success: Boolean(payload?.success),
+          message: payload?.message ?? (payload?.success ? "User created successfully." : "Failed to create user."),
+          user: payload?.data,
+        };
       } catch (error) {
         console.error("Error creating user:", error);
         return { success: false, message: "Failed to create user. Please try again." };

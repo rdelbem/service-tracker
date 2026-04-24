@@ -24,7 +24,7 @@ namespace STOLMC_Service_Tracker\includes\DB;
  * @since    1.1.0
  * @package  STOLMC_Service_Tracker\includes\DB
  */
-class SchemaManager {
+class Schema_Manager {
 
 	/**
 	 * Option key for storing the applied migrations log.

@@ -381,7 +381,7 @@ function TrendBlock({
         <p className="text-xs text-outline">No data available</p>
       ) : (
         <div className="space-y-2">
-          {data.slice(0, TRENDS_ROWS_LIMIT).map((item, index) => (
+          {data.slice(0, TRENDS_ROWS_LIMIT).map((item) => (
             <div key={item.period} className="flex items-center gap-3">
               <span className="text-xs text-outline w-20">
                 {new Date(item.period).toLocaleDateString("en-US", { month: "short", day: "numeric" })}

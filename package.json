@@ -39,6 +39,7 @@
     "dev": "vite serve --mode development",
     "build": "vite build --mode production && node move-css.js",
     "build:watch": "vite build --watch --mode development",
+    "lint": "tsc -p tsconfig.json --noEmit",
     "prepare:files": "./prepare-stable.sh",
     "zip": "cd ../ && bestzip service-tracker-olmc.zip service-tracker-olmc && rimraf service-tracker-olmc",
     "generate:stable": "npm run build && npm run prepare:files && npm run zip",

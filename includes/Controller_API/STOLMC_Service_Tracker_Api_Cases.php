@@ -7,7 +7,7 @@ use WP_REST_Server;
 use STOLMC_Service_Tracker\includes\Application\STOLMC_Service_Tracker_Cases_Service;
 use STOLMC_Service_Tracker\includes\Application\STOLMC_Service_Tracker_Service_Factory;
 use STOLMC_Service_Tracker\includes\DTO\STOLMC_Service_Tracker_Dto_Factory;
-use STOLMC_Service_Tracker\includes\DTO\ValidationException;
+use STOLMC_Service_Tracker\includes\DTO\Validation_Exception;
 
 /**
  * This class will resolve API calls intended to manipulate the cases table.
@@ -126,7 +126,7 @@ class STOLMC_Service_Tracker_Api_Cases extends STOLMC_Service_Tracker_Api implem
 	public function read( WP_REST_Request $data ): WP_REST_Response {
 		try {
 			$read_dto = STOLMC_Service_Tracker_Dto_Factory::create_cases_read_query_dto( $data );
-		} catch ( ValidationException $exception ) {
+		} catch ( Validation_Exception $exception ) {
 			return STOLMC_Service_Tracker_Api_Response_Mapper::to_default_response(
 				[],
 				false,
@@ -151,7 +151,7 @@ class STOLMC_Service_Tracker_Api_Cases extends STOLMC_Service_Tracker_Api implem
 	public function create( WP_REST_Request $data ): WP_REST_Response {
 		try {
 			$create_dto = STOLMC_Service_Tracker_Dto_Factory::create_case_create_dto( $data );
-		} catch ( ValidationException $exception ) {
+		} catch ( Validation_Exception $exception ) {
 			return STOLMC_Service_Tracker_Api_Response_Mapper::to_default_response(
 				[],
 				false,
@@ -176,7 +176,7 @@ class STOLMC_Service_Tracker_Api_Cases extends STOLMC_Service_Tracker_Api implem
 	public function update( WP_REST_Request $data ): WP_REST_Response {
 		try {
 			$update_dto = STOLMC_Service_Tracker_Dto_Factory::create_case_update_dto( $data );
-		} catch ( ValidationException $exception ) {
+		} catch ( Validation_Exception $exception ) {
 			return STOLMC_Service_Tracker_Api_Response_Mapper::to_default_response(
 				[],
 				false,
@@ -201,7 +201,7 @@ class STOLMC_Service_Tracker_Api_Cases extends STOLMC_Service_Tracker_Api implem
 	public function delete( WP_REST_Request $data ): WP_REST_Response {
 		try {
 			$delete_dto = STOLMC_Service_Tracker_Dto_Factory::create_case_delete_dto( $data );
-		} catch ( ValidationException $exception ) {
+		} catch ( Validation_Exception $exception ) {
 			return STOLMC_Service_Tracker_Api_Response_Mapper::to_default_response(
 				[],
 				false,

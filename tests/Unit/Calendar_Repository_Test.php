@@ -487,7 +487,7 @@ class Calendar_Repository_Test extends Unit_TestCase {
 			],
 		];
 
-		// Mock CalendarIndex::get().
+		// Mock Calendar_Index::get().
 		Functions\when( 'get_option' )->justReturn( [ 'only_dates_index' => $mock_index ] );
 
 		$result = $this->calendar_orm->get_date_index();

@@ -2,7 +2,7 @@ import { useState, Fragment, useEffect } from "react";
 import { useInViewStore } from "../../stores/inViewStore";
 import { useClientsStore } from "../../stores/clientsStore";
 import { useCasesStore } from "../../stores/casesStore";
-import { get as fetchGet, post, put, del } from "../../utils/fetch";
+import { get as fetchGet, post, del } from "../../utils/fetch";
 import { toast } from "react-toastify";
 import { showConfirm } from "../ui/Modal";
 import Spinner from "./Spinner";

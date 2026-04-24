@@ -1,7 +1,6 @@
 import { create } from "zustand";
 import { get as fetchGet, post, put, del, postMultipart } from "../utils/fetch";
 import { toast } from "react-toastify";
-import dateformat from "dateformat";
 import type { Status, Attachment } from "../types";
 
 declare const data: Record<string, any>;

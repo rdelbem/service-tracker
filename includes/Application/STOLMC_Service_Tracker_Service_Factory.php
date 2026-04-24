@@ -2,7 +2,7 @@
 namespace STOLMC_Service_Tracker\includes\Application;
 
 use STOLMC_Service_Tracker\includes\Utils\STOLMC_Service_Tracker_Sql;
-use STOLMC_Service_Tracker\includes\Analytics\AnalyticsLogger;
+use STOLMC_Service_Tracker\includes\Analytics\Analytics_Logger;
 use STOLMC_Service_Tracker\includes\Analytics\Analytics_Hooks;
 use STOLMC_Service_Tracker\includes\Controller_API\STOLMC_Service_Tracker_Api_Analytics;
 use STOLMC_Service_Tracker\includes\Controller_API\STOLMC_Service_Tracker_Api_Calendar;
@@ -65,41 +65,41 @@ class STOLMC_Service_Tracker_Service_Factory {
 	}
 
 	/**
-	 * Create an AnalyticsLogger instance.
+	 * Create an Analytics_Logger instance.
 	 *
 	 * @since 1.0.0
 	 *
-	 * @return AnalyticsLogger
+	 * @return Analytics_Logger
 	 */
-	public static function create_analytics_logger(): AnalyticsLogger {
+	public static function create_analytics_logger(): Analytics_Logger {
 		global $wpdb;
 
 		$notifications_table = $wpdb->prefix . 'servicetracker_notifications';
 		$activity_log_table  = $wpdb->prefix . 'servicetracker_activity_log';
 
 		/**
-		 * Filters the AnalyticsLogger instance before creation.
+		 * Filters the Analytics_Logger instance before creation.
 		 *
 		 * @since 1.0.0
 		 *
-		 * @param AnalyticsLogger|null $logger The AnalyticsLogger instance.
+		 * @param Analytics_Logger|null $logger The Analytics_Logger instance.
 		 * @param string $notifications_table The notifications table name.
 		 * @param string $activity_log_table The activity log table name.
 		 */
 		$logger = apply_filters( 'stolmc_service_tracker_pre_create_analytics_logger', null, $notifications_table, $activity_log_table );
 
-		if ( $logger instanceof AnalyticsLogger ) {
+		if ( $logger instanceof Analytics_Logger ) {
 			return $logger;
 		}
 
-		$logger = new AnalyticsLogger( $notifications_table, $activity_log_table );
+		$logger = new Analytics_Logger( $notifications_table, $activity_log_table );
 
 		/**
-		 * Filters the AnalyticsLogger instance after creation.
+		 * Filters the Analytics_Logger instance after creation.
 		 *
 		 * @since 1.0.0
 		 *
-		 * @param AnalyticsLogger $logger The AnalyticsLogger instance.
+		 * @param Analytics_Logger $logger The Analytics_Logger instance.
 		 * @param string $notifications_table The notifications table name.
 		 * @param string $activity_log_table The activity log table name.
 		 */
@@ -111,17 +111,17 @@ class STOLMC_Service_Tracker_Service_Factory {
 	 *
 	 * @since 1.0.0
 	 *
-	 * @param AnalyticsLogger $logger The AnalyticsLogger instance.
+	 * @param Analytics_Logger $logger The Analytics_Logger instance.
 	 * @return Analytics_Hooks
 	 */
-	public static function create_analytics_hooks( AnalyticsLogger $logger ): Analytics_Hooks {
+	public static function create_analytics_hooks( Analytics_Logger $logger ): Analytics_Hooks {
 		/**
 		 * Filters the Analytics_Hooks instance before creation.
 		 *
 		 * @since 1.0.0
 		 *
 		 * @param Analytics_Hooks|null $analytics_hooks The Analytics_Hooks instance.
-		 * @param AnalyticsLogger $logger The AnalyticsLogger instance.
+		 * @param Analytics_Logger $logger The Analytics_Logger instance.
 		 */
 		$analytics_hooks = apply_filters( 'stolmc_service_tracker_pre_create_analytics_hooks', null, $logger );
 
@@ -137,7 +137,7 @@ class STOLMC_Service_Tracker_Service_Factory {
 		 * @since 1.0.0
 		 *
 		 * @param Analytics_Hooks $analytics_hooks The Analytics_Hooks instance.
-		 * @param AnalyticsLogger $logger The AnalyticsLogger instance.
+		 * @param Analytics_Logger $logger The Analytics_Logger instance.
 		 */
 		return apply_filters( 'stolmc_service_tracker_post_create_analytics_hooks', $analytics_hooks, $logger );
 	}

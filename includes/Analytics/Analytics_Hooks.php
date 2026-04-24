@@ -14,16 +14,16 @@ class Analytics_Hooks {
 	/**
 	 * Analytics logger instance.
 	 *
-	 * @var AnalyticsLogger
+	 * @var Analytics_Logger
 	 */
 	private $logger;
 
 	/**
 	 * Constructor.
 	 *
-	 * @param AnalyticsLogger $logger The analytics logger instance.
+	 * @param Analytics_Logger $logger The analytics logger instance.
 	 */
-	public function __construct( AnalyticsLogger $logger ) {
+	public function __construct( Analytics_Logger $logger ) {
 		$this->logger = $logger;
 	}
 
@@ -70,7 +70,7 @@ class Analytics_Hooks {
 			return;
 		}
 
-		$actor = AnalyticsLogger::capture_current_actor();
+		$actor = Analytics_Logger::capture_current_actor();
 
 		$this->logger->log_activity(
 			[
@@ -103,7 +103,7 @@ class Analytics_Hooks {
 			return;
 		}
 
-		$actor   = AnalyticsLogger::capture_current_actor();
+		$actor   = Analytics_Logger::capture_current_actor();
 		$case_id = $condition['id'] ?? null;
 
 		$this->logger->log_activity(
@@ -136,7 +136,7 @@ class Analytics_Hooks {
 			return;
 		}
 
-		$actor = AnalyticsLogger::capture_current_actor();
+		$actor = Analytics_Logger::capture_current_actor();
 
 		$this->logger->log_activity(
 			[
@@ -166,7 +166,7 @@ class Analytics_Hooks {
 			return;
 		}
 
-		$actor   = AnalyticsLogger::capture_current_actor();
+		$actor   = Analytics_Logger::capture_current_actor();
 		$case_id = is_array( $data ) ? ( $data['id'] ?? null ) : null;
 
 		$this->logger->log_activity(
@@ -198,7 +198,7 @@ class Analytics_Hooks {
 			return;
 		}
 
-		$actor   = AnalyticsLogger::capture_current_actor();
+		$actor   = Analytics_Logger::capture_current_actor();
 		$case_id = is_array( $data ) ? ( $data['id'] ?? null ) : null;
 
 		$this->logger->log_activity(
@@ -230,7 +230,7 @@ class Analytics_Hooks {
 			return;
 		}
 
-		$actor         = AnalyticsLogger::capture_current_actor();
+		$actor         = Analytics_Logger::capture_current_actor();
 		$progress_id   = 0;
 
 		// Current create flow dispatches the created progress ID as an integer.
@@ -283,7 +283,7 @@ class Analytics_Hooks {
 			return;
 		}
 
-		$actor         = AnalyticsLogger::capture_current_actor();
+		$actor         = Analytics_Logger::capture_current_actor();
 		$progress_id   = $condition['id'] ?? null;
 
 		$this->logger->log_activity(
@@ -314,7 +314,7 @@ class Analytics_Hooks {
 			return;
 		}
 
-		$actor = AnalyticsLogger::capture_current_actor();
+		$actor = Analytics_Logger::capture_current_actor();
 
 		$this->logger->log_activity(
 			[
@@ -341,7 +341,7 @@ class Analytics_Hooks {
 	 */
 	// phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.FoundAfterLastUsed -- Hook signature keeps reserved argument slots.
 	public function on_user_created( int $user_id, array $user_data, $body = null, string $password = '' ): void {
-		$actor = AnalyticsLogger::capture_current_actor();
+		$actor = Analytics_Logger::capture_current_actor();
 
 		$this->logger->log_activity(
 			[
@@ -375,7 +375,7 @@ class Analytics_Hooks {
 	 * @return void
 	 */
 	public function on_progress_email_result( bool $sent, string $to, string $subject, int $id_user, int $id_case, $progress_id ): void {
-		$actor = AnalyticsLogger::capture_current_actor();
+		$actor = Analytics_Logger::capture_current_actor();
 
 		$this->logger->log_notification(
 			[
@@ -404,7 +404,7 @@ class Analytics_Hooks {
 	 * @return void
 	 */
 	public function on_toggle_email_result( bool $sent, string $to, string $subject, int $id_user, int $id_case ): void {
-		$actor = AnalyticsLogger::capture_current_actor();
+		$actor = Analytics_Logger::capture_current_actor();
 
 		$this->logger->log_notification(
 			[

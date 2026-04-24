@@ -3,7 +3,7 @@ import { useInViewStore } from "../../stores/inViewStore";
 import { useClientsStore } from "../../stores/clientsStore";
 import { get as fetchGet } from "../../utils/fetch";
 import Spinner from "./Spinner";
-import type { Case, User } from "../../types";
+import type { User } from "../../types";
 
 declare const data: Record<string, any>;
 
@@ -117,14 +117,6 @@ export default function Calendar() {
 
   const handleCaseClick = (caseItem: CalendarCase) => {
     navigate("progress", caseItem.id_user.toString(), caseItem.id.toString(), caseItem.client_name);
-  };
-
-  const handleProgressClick = (caseId: number) => {
-    // Find the client ID for this progress
-    const progress = calendarData?.progress.find((p) => p.id_case === caseId);
-    if (progress) {
-      navigate("progress", progress.id_user.toString(), caseId.toString(), "");
-    }
   };
 
   // Generate calendar grid

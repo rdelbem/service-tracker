@@ -2,7 +2,7 @@
 
 namespace STOLMC_Service_Tracker\includes\Life_Cycle;
 
-use STOLMC_Service_Tracker\includes\DB\SchemaManager;
+use STOLMC_Service_Tracker\includes\DB\Schema_Manager;
 use STOLMC_Service_Tracker\includes\DB\Schema;
 
 /**
@@ -30,11 +30,11 @@ class STOLMC_Service_Tracker_Deactivator {
 	 * @return void
 	 */
 	public static function deactivate(): void {
-		$manager = new SchemaManager();
+		$manager = new Schema_Manager();
 		$manager->drop_tables();
 
 		// Clear version tracking so re-activation treats this as a fresh install.
 		delete_option( Schema::VERSION_OPTION );
-		delete_option( SchemaManager::MIGRATIONS_LOG_OPTION );
+		delete_option( Schema_Manager::MIGRATIONS_LOG_OPTION );
 	}
 }

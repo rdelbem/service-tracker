@@ -2,7 +2,7 @@
 
 namespace STOLMC_Service_Tracker\includes\CLI;
 
-use STOLMC_Service_Tracker\includes\DB\CalendarIndex;
+use STOLMC_Service_Tracker\includes\DB\Calendar_Index;
 use WP_CLI;
 use WP_CLI_Command;
 
@@ -53,8 +53,8 @@ class Service_Tracker_Commands extends WP_CLI_Command {
 			return;
 		}
 
-		CalendarIndex::rebuild();
-		$index = CalendarIndex::get();
+		Calendar_Index::rebuild();
+		$index = Calendar_Index::get();
 		$total_dates = count( $index );
 
 		$total_starts = 0;
@@ -90,7 +90,7 @@ class Service_Tracker_Commands extends WP_CLI_Command {
 	 * @return void
 	 */
 	public function show_calendar_index( $args ): void {
-		$index = CalendarIndex::get();
+		$index = Calendar_Index::get();
 
 		if ( empty( $index ) ) {
 			WP_CLI::warning( 'Calendar index is empty. Run `wp service-tracker rebuild-calendar-index` to populate it.' );

@@ -13,15 +13,15 @@ class STOLMC_Service_Tracker_Calendar_Query_Dto {
 		$end   = trim( $end );
 
 		if ( '' === $start || '' === $end ) {
-			throw new ValidationException( 'Missing required parameters: start and end' );
+			throw new Validation_Exception( 'Missing required parameters: start and end' );
 		}
 
 		if ( ! $this->is_valid_date( $start ) || ! $this->is_valid_date( $end ) ) {
-			throw new ValidationException( 'Invalid date format. Expected YYYY-MM-DD' );
+			throw new Validation_Exception( 'Invalid date format. Expected YYYY-MM-DD' );
 		}
 
 		if ( strtotime( $start ) > strtotime( $end ) ) {
-			throw new ValidationException( 'Start date must be before or equal to end date' );
+			throw new Validation_Exception( 'Start date must be before or equal to end date' );
 		}
 
 		$this->start   = $start;

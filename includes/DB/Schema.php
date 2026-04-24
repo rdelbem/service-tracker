@@ -7,7 +7,7 @@ namespace STOLMC_Service_Tracker\includes\DB;
  *
  * This class is the single source of truth for the database schema.
  * Every column, type, and index for every table managed by this plugin
- * is described here. The SchemaManager reads this definition and
+ * is described here. The Schema_Manager reads this definition and
  * reconciles the actual database state against it.
  *
  * To add a new column in a future version:
@@ -26,7 +26,7 @@ class Schema {
 	 *
 	 * Increment this constant whenever the schema definition changes
 	 * (new columns, removed columns, index changes, etc.). The
-	 * SchemaManager compares this value against the stored
+	 * Schema_Manager compares this value against the stored
 	 * `stolmc_service_tracker_db_version` option and runs migrations
 	 * when the stored version is lower.
 	 *

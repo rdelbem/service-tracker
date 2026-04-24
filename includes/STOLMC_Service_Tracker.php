@@ -2,11 +2,11 @@
 namespace STOLMC_Service_Tracker\includes;
 
 use STOLMC_Service_Tracker\admin\STOLMC_Service_Tracker_Admin;
-use STOLMC_Service_Tracker\includes\Analytics\AnalyticsLogger;
+use STOLMC_Service_Tracker\includes\Analytics\Analytics_Logger;
 use STOLMC_Service_Tracker\includes\Analytics\Analytics_Hooks;
 use STOLMC_Service_Tracker\includes\CLI\Service_Tracker_Commands;
-use STOLMC_Service_Tracker\includes\DB\CalendarIndex;
-use STOLMC_Service_Tracker\includes\DB\SchemaManager;
+use STOLMC_Service_Tracker\includes\DB\Calendar_Index;
+use STOLMC_Service_Tracker\includes\DB\Schema_Manager;
 use STOLMC_Service_Tracker\includes\I18n\STOLMC_Service_Tracker_I18n;
 use STOLMC_Service_Tracker\includes\Utils\STOLMC_Service_Tracker_Loader;
 use STOLMC_Service_Tracker\includes\Utils\STOLMC_Service_Tracker_Permalink_Validator;
@@ -335,7 +335,7 @@ class STOLMC_Service_Tracker {
 	/**
 	 * Register database schema synchronization hooks.
 	 *
-	 * The SchemaManager runs on every `init` to compare the actual
+	 * The Schema_Manager runs on every `init` to compare the actual
 	 * database schema against the declarative definition and apply
 	 * any pending ALTER TABLE migrations.  The fast-path version
 	 * check costs a single option read and returns immediately when
@@ -347,14 +347,14 @@ class STOLMC_Service_Tracker {
 	 * @return void
 	 */
 	private function define_schema_hooks(): void {
-		$schema_manager = new SchemaManager();
+		$schema_manager = new Schema_Manager();
 		$this->loader->add_action( 'init', $schema_manager, 'sync' );
 	}
 
 	/**
 	 * Register analytics hooks for activity and notification logging.
 	 *
-	 * Sets up the AnalyticsLogger and Analytics_Hooks classes to
+	 * Sets up the Analytics_Logger and Analytics_Hooks classes to
 	 * listen to domain events and persist activity/notification records.
 	 *
 	 * @since    1.2.0
@@ -416,7 +416,7 @@ class STOLMC_Service_Tracker {
 	 * @return void
 	 */
 	public function rebuild_calendar_index(): void {
-		CalendarIndex::rebuild();
+		Calendar_Index::rebuild();
 	}
 
 	/**

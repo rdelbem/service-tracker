@@ -16,7 +16,7 @@ namespace STOLMC_Service_Tracker\includes\DB;
  * @since    1.1.0
  * @package  STOLMC_Service_Tracker\includes\DB
  */
-class CalendarIndex {
+class Calendar_Index {
 
 	/**
 	 * Option key for storing the calendar index.
