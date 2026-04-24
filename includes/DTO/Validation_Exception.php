@@ -1,0 +1,46 @@
+<?php
+namespace STOLMC_Service_Tracker\includes\DTO;
+
+/**
+ * Exception thrown when DTO validation fails.
+ */
+class Validation_Exception extends \Exception {
+
+	/**
+	 * @var array<int, string> Additional validation errors.
+	 */
+	private array $errors = [];
+
+	/**
+	 * Constructor.
+	 *
+	 * @param string            $message  The exception message.
+	 * @param array<int, string> $errors   Additional validation errors.
+	 * @param int               $code     The exception code.
+	 * @param \Throwable|null   $previous The previous exception.
+	 */
+	public function __construct( string $message = '', array $errors = [], int $code = 0, ?\Throwable $previous = null ) {
+		parent::__construct( $message, $code, $previous );
+		$this->errors = $errors;
+	}
+
+	/**
+	 * Get additional validation errors.
+	 *
+	 * @return array<int, string>
+	 */
+	public function getErrors(): array {
+		return $this->errors;
+	}
+
+	/**
+	 * Create a validation exception from multiple errors.
+	 *
+	 * @param array<int, string> $errors List of error messages.
+	 * @return self
+	 */
+	public static function fromErrors( array $errors ): self {
+		$message = count( $errors ) === 1 ? $errors[0] : 'Multiple validation errors occurred';
+		return new self( $message, $errors );
+	}
+}
