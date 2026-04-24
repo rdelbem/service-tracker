@@ -64,7 +64,7 @@ class STOLMC_Service_Tracker_Case_Update_Dto {
 
 		$date = trim( (string) $value );
 		if ( false === strtotime( $date ) ) {
-			throw new Validation_Exception( sprintf( 'Invalid %s format', $field ) );
+			throw new Validation_Exception( 'Invalid datetime format' );
 		}
 
 		$this->update_data[ $field ] = $date;
@@ -87,7 +87,7 @@ class STOLMC_Service_Tracker_Case_Update_Dto {
 
 		$int_value = (int) $value;
 		if ( $int_value <= 0 ) {
-			throw new Validation_Exception( sprintf( 'Invalid %s value', $field ) );
+			throw new Validation_Exception( 'Invalid integer value' );
 		}
 
 		$this->update_data[ $field ] = $int_value;

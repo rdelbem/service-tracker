@@ -81,8 +81,6 @@ jobs:
             --exclude "phpstan.neon" \
             --exclude "phpunit.xml" \
             --exclude "stan.txt" \
-            --exclude "composer.json" \
-            --exclude "composer.lock" \
             --exclude "package.json" \
             --exclude "package-lock.json" \
             --exclude "postcss.config.js" \
@@ -103,16 +101,17 @@ jobs:
           GIT_COMMITTER_NAME: github-actions[bot]
           GIT_COMMITTER_EMAIL: github-actions[bot]@users.noreply.github.com
         run: |
+          TARGET_BRANCH="service-tracker-stolmc"
           STABLE_WORKTREE="/tmp/stable-branch"
           rm -rf "${STABLE_WORKTREE}"
 
-          if git ls-remote --exit-code --heads origin stable > /dev/null; then
-            git fetch origin stable:stable
-            git worktree add "${STABLE_WORKTREE}" stable
+          if git ls-remote --exit-code --heads origin "${TARGET_BRANCH}" > /dev/null; then
+            git fetch origin "${TARGET_BRANCH}:${TARGET_BRANCH}"
+            git worktree add "${STABLE_WORKTREE}" "${TARGET_BRANCH}"
           else
             git worktree add --detach "${STABLE_WORKTREE}"
             cd "${STABLE_WORKTREE}"
-            git checkout --orphan stable
+            git checkout --orphan "${TARGET_BRANCH}"
             cd "${GITHUB_WORKSPACE}"
           fi
 
@@ -128,4 +127,4 @@ jobs:
           fi
 
           git -C "${STABLE_WORKTREE}" commit -m "chore(stable): refresh production snapshot from ${GITHUB_SHA}"
-          git -C "${STABLE_WORKTREE}" push origin stable --force
+          git -C "${STABLE_WORKTREE}" push origin "${TARGET_BRANCH}" --force

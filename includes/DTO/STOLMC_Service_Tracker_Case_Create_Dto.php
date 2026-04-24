@@ -26,9 +26,9 @@ class STOLMC_Service_Tracker_Case_Create_Dto {
 		$this->title       = $title;
 		$this->status      = isset( $data['status'] ) && '' !== trim( (string) $data['status'] ) ? trim( (string) $data['status'] ) : 'open';
 		$this->description = isset( $data['description'] ) ? (string) $data['description'] : '';
-		$this->start_at    = $this->normalize_datetime_or_null( $data['start_at'] ?? null, 'start_at' );
-		$this->due_at      = $this->normalize_datetime_or_null( $data['due_at'] ?? null, 'due_at' );
-		$this->owner_id    = $this->normalize_optional_int( $data['owner_id'] ?? null, 'owner_id' );
+		$this->start_at    = $this->normalize_datetime_or_null( $data['start_at'] ?? null );
+		$this->due_at      = $this->normalize_datetime_or_null( $data['due_at'] ?? null );
+		$this->owner_id    = $this->normalize_optional_int( $data['owner_id'] ?? null );
 
 		if ( null !== $this->start_at && null !== $this->due_at && $this->start_at > $this->due_at ) {
 			throw new Validation_Exception( 'start_at must be before or equal to due_at' );
@@ -50,27 +50,27 @@ class STOLMC_Service_Tracker_Case_Create_Dto {
 		];
 	}
 
-	private function normalize_datetime_or_null( mixed $value, string $field_name ): ?string {
+	private function normalize_datetime_or_null( mixed $value ): ?string {
 		if ( null === $value || '' === trim( (string) $value ) ) {
 			return null;
 		}
 
 		$date = trim( (string) $value );
 		if ( false === strtotime( $date ) ) {
-			throw new Validation_Exception( sprintf( 'Invalid %s format', $field_name ) );
+			throw new Validation_Exception( 'Invalid datetime format' );
 		}
 
 		return $date;
 	}
 
-	private function normalize_optional_int( mixed $value, string $field_name ): ?int {
+	private function normalize_optional_int( mixed $value ): ?int {
 		if ( null === $value || '' === trim( (string) $value ) ) {
 			return null;
 		}
 
 		$int_value = (int) $value;
 		if ( $int_value <= 0 ) {
-			throw new Validation_Exception( sprintf( 'Invalid %s value', $field_name ) );
+			throw new Validation_Exception( 'Invalid integer value' );
 		}
 
 		return $int_value;

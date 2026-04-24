@@ -1,6 +1,8 @@
 <?php
 namespace STOLMC_Service_Tracker\includes\Controller_API;
 
+defined( 'ABSPATH' ) || exit;
+
 use WP_REST_Request;
 use WP_REST_Response;
 use WP_REST_Server;

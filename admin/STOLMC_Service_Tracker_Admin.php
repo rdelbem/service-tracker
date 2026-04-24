@@ -1,6 +1,8 @@
 <?php
 namespace STOLMC_Service_Tracker\admin;
 
+defined( 'ABSPATH' ) || exit;
+
 /**
  * The admin-specific functionality of the plugin.
  *
@@ -280,8 +282,8 @@ class STOLMC_Service_Tracker_Admin {
 			return;
 		}
 
-		// This file has all the texts inside a variable $texts_array.
-		$texts_array = [];
+		// This file has all the texts inside a variable $stolmc_texts_array.
+		$stolmc_texts_array = [];
 		include wp_normalize_path( plugin_dir_path( __FILE__ ) . 'translation/texts_array.php' );
 
 		/**
@@ -289,15 +291,15 @@ class STOLMC_Service_Tracker_Admin {
 		 *
 		 * @since 1.0.0
 		 *
-		 * @param array  $texts_array The texts data array.
+		 * @param array  $stolmc_texts_array The texts data array.
 		 * @param string $hook        The current admin page.
 		 */
-		$texts_array = apply_filters( 'stolmc_service_tracker_admin_localize_script_data', $texts_array, $hook );
+		$stolmc_texts_array = apply_filters( 'stolmc_service_tracker_admin_localize_script_data', $stolmc_texts_array, $hook );
 
 		wp_localize_script(
 			$this->plugin_name,
 			'data',
-			$texts_array
+			$stolmc_texts_array
 		);
 	}
 

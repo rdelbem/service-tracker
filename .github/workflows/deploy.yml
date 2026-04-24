@@ -13,7 +13,7 @@ jobs:
     - name: Checkout stable branch
       uses: actions/checkout@master
       with:
-        ref: stable
+        ref: service-tracker-stolmc
     - name: WordPress Plugin Deploy
       uses: 10up/action-wordpress-plugin-deploy@stable
       env:
