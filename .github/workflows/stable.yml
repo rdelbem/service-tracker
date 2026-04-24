@@ -117,15 +117,15 @@ jobs:
           fi
 
           find "${STABLE_WORKTREE}" -mindepth 1 -maxdepth 1 ! -name ".git" -exec rm -rf {} +
-          rsync -a --delete build/stable/ "${STABLE_WORKTREE}/"
+          # Do not delete .git metadata in the destination worktree.
+          rsync -a --exclude ".git" build/stable/ "${STABLE_WORKTREE}/"
 
-          cd "${STABLE_WORKTREE}"
-          git add -A
+          git -C "${STABLE_WORKTREE}" add -A
 
-          if git diff --cached --quiet; then
+          if git -C "${STABLE_WORKTREE}" diff --cached --quiet; then
             echo "No changes to publish to stable branch."
             exit 0
           fi
 
-          git commit -m "chore(stable): refresh production snapshot from ${GITHUB_SHA}"
-          git push origin stable --force
+          git -C "${STABLE_WORKTREE}" commit -m "chore(stable): refresh production snapshot from ${GITHUB_SHA}"
+          git -C "${STABLE_WORKTREE}" push origin stable --force
