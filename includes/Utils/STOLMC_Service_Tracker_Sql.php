@@ -287,7 +287,7 @@ class STOLMC_Service_Tracker_Sql {
 		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Table, columns and order clause are validated.
 		$sql = 'SELECT ' . $column_sql . ' FROM ' . $table . $this->normalize_order_by_clause( $order_by );
 
-		// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Query is built from validated SQL identifiers.
+		// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Query is built from validated SQL identifiers.
 		return $wpdb->get_results( $sql );
 	}
 
@@ -360,7 +360,7 @@ class STOLMC_Service_Tracker_Sql {
 
 		$sql .= $this->normalize_order_by_clause( $order_by );
 
-		// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Dynamic query with optional ORDER BY.
+		// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Dynamic query with optional ORDER BY.
 		return $wpdb->get_results( $sql );
 	}
 
@@ -451,7 +451,7 @@ class STOLMC_Service_Tracker_Sql {
 			$sql = $wpdb->prepare( $sql, ...$params );
 		}
 
-		// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Dynamic query built above and prepared when params exist.
+		// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Dynamic query built above and prepared when params exist.
 		$results = $wpdb->get_results( $sql );
 
 		/**
@@ -514,7 +514,7 @@ class STOLMC_Service_Tracker_Sql {
 		// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- Placeholder count is built from the same parameter list.
 		$sql = $wpdb->prepare( $sql, ...$params );
 
-		// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Query prepared above.
+		// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Query prepared above.
 		return (int) $wpdb->get_var( $sql );
 	}
 
@@ -534,7 +534,7 @@ class STOLMC_Service_Tracker_Sql {
 		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Table reference validated.
 		$sql = 'SELECT COUNT(*) FROM ' . $table;
 
-		// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- No dynamic values beyond validated table name.
+		// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter -- No dynamic values beyond validated table name.
 		return (int) $wpdb->get_var( $sql );
 	}
 
@@ -569,7 +569,7 @@ class STOLMC_Service_Tracker_Sql {
 			$sql = $wpdb->prepare( $sql, ...$where_parts['params'] );
 		}
 
-		// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Prepared when params exist.
+		// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Prepared when params exist.
 		return (int) $wpdb->get_var( $sql );
 	}
 
@@ -604,7 +604,7 @@ class STOLMC_Service_Tracker_Sql {
 			$sql = $wpdb->prepare( $sql, ...$where_parts['params'] );
 		}
 
-		// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Prepared when params exist.
+		// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Prepared when params exist.
 		$value = $wpdb->get_var( $sql );
 		if ( null === $value || '' === $value ) {
 			return null;
@@ -646,7 +646,7 @@ class STOLMC_Service_Tracker_Sql {
 			$sql = $wpdb->prepare( $sql, ...$where_parts['params'] );
 		}
 
-		// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Prepared when params exist.
+		// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Prepared when params exist.
 		$results = $wpdb->get_col( $sql );
 		if ( ! is_array( $results ) ) {
 			return [];
@@ -689,7 +689,7 @@ class STOLMC_Service_Tracker_Sql {
 		// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- Placeholder count is built from same params list.
 		$sql = $wpdb->prepare( $sql, ...$params );
 
-		// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Query prepared above.
+		// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Query prepared above.
 		$results = $wpdb->get_results( $sql, ARRAY_A );
 
 		return \is_array( $results ) ? $results : [];
@@ -754,7 +754,7 @@ class STOLMC_Service_Tracker_Sql {
 		// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- Placeholder count is built from the same parameter list.
 		$sql = $wpdb->prepare( $sql, ...$params );
 
-		// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Query prepared above.
+		// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Query prepared above.
 		return $wpdb->get_results( $sql );
 	}
 

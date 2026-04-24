@@ -13,9 +13,13 @@
  * Author URI: https://delbem.net/
  * Plugin URI: https://delbem.net/plugins/service-tracker-sto/
  * Text Domain: service-tracker-stolmc
- * Domain Path: languages
+ * Domain Path: /languages
  * Tested up to: 6.9.4
+ * License: GPL-2.0-or-later
+ * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  */
+
+defined( 'ABSPATH' ) || exit;
 
 require_once plugin_dir_path( __FILE__ ) . '/vendor/autoload.php';
 

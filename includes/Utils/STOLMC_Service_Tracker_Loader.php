@@ -1,6 +1,8 @@
 <?php
 namespace STOLMC_Service_Tracker\includes\Utils;
 
+defined( 'ABSPATH' ) || exit;
+
 /**
  * Register all actions and filters for the plugin
  *

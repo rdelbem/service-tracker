@@ -2,6 +2,8 @@
 
 namespace STOLMC_Service_Tracker\includes\Analytics;
 
+defined( 'ABSPATH' ) || exit;
+
 /**
  * Analytics Hook Integrations — listens to plugin domain hooks
  * and logs activity/notification events for analytics.

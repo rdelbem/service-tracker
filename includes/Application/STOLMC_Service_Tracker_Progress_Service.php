@@ -660,7 +660,19 @@ class STOLMC_Service_Tracker_Progress_Service {
 	 * @return bool
 	 */
 	protected function move_uploaded_file_to_destination( string $tmp_name, string $destination ): bool {
-		return move_uploaded_file( $tmp_name, $destination );
+		// phpcs:ignore WordPress.WP.AlternativeFunctions.rename_rename -- Keeps upload atomic on local filesystem.
+		$renamed = rename( $tmp_name, $destination );
+		if ( $renamed ) {
+			return true;
+		}
+
+		$copied = copy( $tmp_name, $destination );
+		if ( ! $copied ) {
+			return false;
+		}
+
+		// phpcs:ignore WordPress.WP.AlternativeFunctions.unlink_unlink -- Cleanup fallback after copy.
+		return unlink( $tmp_name );
 	}
 
 	/**

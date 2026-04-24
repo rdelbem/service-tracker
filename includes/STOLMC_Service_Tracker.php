@@ -1,6 +1,8 @@
 <?php
 namespace STOLMC_Service_Tracker\includes;
 
+defined( 'ABSPATH' ) || exit;
+
 use STOLMC_Service_Tracker\admin\STOLMC_Service_Tracker_Admin;
 use STOLMC_Service_Tracker\includes\Analytics\Analytics_Logger;
 use STOLMC_Service_Tracker\includes\Analytics\Analytics_Hooks;
@@ -214,6 +216,7 @@ class STOLMC_Service_Tracker {
 	 * @return void
 	 */
 	public function register_customer_role(): void {
+		// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- Core WordPress hook name.
 		if ( in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', get_option( 'active_plugins' ) ), true ) ) {
 			return;
 		}
