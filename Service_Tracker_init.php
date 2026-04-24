@@ -7,9 +7,9 @@
  * @package Service Tracker STO
  *
  * Plugin Name: Service Tracker STO
- * Version: 1.0.1
+ * Version: 2.0.0
  * Description: This plugin offers the possibilitie to track the services you provide.
- * Author: Rodrigo Del Bem <servicetracker@delbem.net>
+ * Author: Rodrigo Del Bem <rodrigo@delbem.net>
  * Author URI: https://delbem.net/
  * Plugin URI: https://delbem.net/portfolio/service-tracker-sto/
  * Text Domain: service-tracker-stolmc

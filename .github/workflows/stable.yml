@@ -1,79 +1,131 @@
-name: Build and create stable branch
+name: Build Stable Branch
 
 on:
   push:
     branches:
       - main
+  workflow_dispatch:
+
+permissions:
+  contents: write
 
 jobs:
-  build:
+  build-stable:
     runs-on: ubuntu-latest
+    concurrency:
+      group: stable-branch-build
+      cancel-in-progress: true
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+      - name: Checkout repository
+        uses: actions/checkout@v4
         with:
-          fetch-depth: 0 # Fetch all history so we can check if the stable branch exists
+          fetch-depth: 0
 
       - name: Setup Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
-          node-version: 14
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: package-lock.json
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: "8.0"
+          php-version: "8.2"
+          tools: composer:v2
+          coverage: none
 
-      - name: Install Node Dependencies
-        run: npm install
+      - name: Install Node dependencies
+        run: npm ci
 
-      - name: Install Composer Dependencies
-        run: composer install
-
-      - name: Build
+      - name: Build frontend assets
         run: npm run build
 
-      - name: Remove development files
-        uses: actions/github-script@v5
-        with:
-          script: |
-            const fs = require('fs');
-            const path = require('path');
+      - name: Install Composer production dependencies
+        run: composer install --no-dev --prefer-dist --no-interaction --no-progress --optimize-autoloader
 
-            const filesToRemove = [
-              '.babelrc',
-              'prepare-stable.sh',
-              '.gitignore',
-              'package.json',
-              'package-lock.json',
-              'README.md',
-              'webpack.config.js',
-            ];
-
-            const dirsToRemove = [
-              'react-app',
-              'node_modules',
-              '.github'
-            ];
-
-            filesToRemove.forEach(file => {
-              if (fs.existsSync(file)) {
-                fs.unlinkSync(file);
-                console.log(`Removed file ${file}`);
-              }
-            });
-
-            dirsToRemove.forEach(dir => {
-              fs.rmdirSync(dir, { recursive: true });
-              console.log(`Removed directory ${dir}`);
-            });
-
-      - name: Commit and Push
+      - name: Prepare production snapshot
         run: |
-          git config user.name "rdelbem"
-          git config user.email "rodrigodelbem@gmail.com"
-          git checkout -b stable
-          git add .
-          git commit -m "Removed development files and directories"
-          git push origin stable --force || true
+          rm -rf build/stable
+          mkdir -p build/stable
+
+          rsync -a --delete \
+            --exclude ".git/" \
+            --exclude ".github/" \
+            --exclude "node_modules/" \
+            --exclude "react-app/" \
+            --exclude "tests/" \
+            --exclude "docker/" \
+            --exclude "wordpress/" \
+            --exclude "docs/" \
+            --exclude ".phpunit.cache/" \
+            --exclude ".bin/" \
+            --exclude ".codex" \
+            --exclude ".dockerignore" \
+            --exclude ".editorconfig" \
+            --exclude ".env.example" \
+            --exclude ".gitattributes" \
+            --exclude ".gitignore" \
+            --exclude ".nvmrc" \
+            --exclude "Dockerfile" \
+            --exclude "Makefile" \
+            --exclude "docker-compose.yml" \
+            --exclude "Minimal CI Job" \
+            --exclude "README.md" \
+            --exclude "TRANSACTION_IMPLEMENTATION_SUMMARY.md" \
+            --exclude "RESPONSE_STRATEGY_MATRIX.md" \
+            --exclude "todo_refactor.md" \
+            --exclude "patchwork.json" \
+            --exclude "phpcs.xml.dist" \
+            --exclude "phpstan.neon" \
+            --exclude "phpunit.xml" \
+            --exclude "stan.txt" \
+            --exclude "composer.json" \
+            --exclude "composer.lock" \
+            --exclude "package.json" \
+            --exclude "package-lock.json" \
+            --exclude "postcss.config.js" \
+            --exclude "tailwind.config.js" \
+            --exclude "tsconfig.json" \
+            --exclude "tsconfig.node.json" \
+            --exclude "vite.config.js" \
+            --exclude "vite.config.ts" \
+            --exclude "vitest.config.ts" \
+            --exclude "vitest.setup.ts" \
+            --exclude "move-css.js" \
+            ./ build/stable/
+
+      - name: Publish snapshot to stable branch
+        env:
+          GIT_AUTHOR_NAME: github-actions[bot]
+          GIT_AUTHOR_EMAIL: github-actions[bot]@users.noreply.github.com
+          GIT_COMMITTER_NAME: github-actions[bot]
+          GIT_COMMITTER_EMAIL: github-actions[bot]@users.noreply.github.com
+        run: |
+          STABLE_WORKTREE="/tmp/stable-branch"
+          rm -rf "${STABLE_WORKTREE}"
+
+          if git ls-remote --exit-code --heads origin stable > /dev/null; then
+            git fetch origin stable:stable
+            git worktree add "${STABLE_WORKTREE}" stable
+          else
+            git worktree add --detach "${STABLE_WORKTREE}"
+            cd "${STABLE_WORKTREE}"
+            git checkout --orphan stable
+            cd "${GITHUB_WORKSPACE}"
+          fi
+
+          find "${STABLE_WORKTREE}" -mindepth 1 -maxdepth 1 ! -name ".git" -exec rm -rf {} +
+          rsync -a --delete build/stable/ "${STABLE_WORKTREE}/"
+
+          cd "${STABLE_WORKTREE}"
+          git add -A
+
+          if git diff --cached --quiet; then
+            echo "No changes to publish to stable branch."
+            exit 0
+          fi
+
+          git commit -m "chore(stable): refresh production snapshot from ${GITHUB_SHA}"
+          git push origin stable --force
