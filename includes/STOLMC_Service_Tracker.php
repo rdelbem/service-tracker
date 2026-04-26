@@ -9,7 +9,6 @@ use STOLMC_Service_Tracker\includes\Analytics\Analytics_Hooks;
 use STOLMC_Service_Tracker\includes\CLI\Service_Tracker_Commands;
 use STOLMC_Service_Tracker\includes\DB\Calendar_Index;
 use STOLMC_Service_Tracker\includes\DB\Schema_Manager;
-use STOLMC_Service_Tracker\includes\I18n\STOLMC_Service_Tracker_I18n;
 use STOLMC_Service_Tracker\includes\Utils\STOLMC_Service_Tracker_Loader;
 use STOLMC_Service_Tracker\includes\Utils\STOLMC_Service_Tracker_Permalink_Validator;
 use STOLMC_Service_Tracker\includes\Publics\STOLMC_Service_Tracker_Public;
@@ -181,8 +180,9 @@ class STOLMC_Service_Tracker {
 	/**
 	 * Define the locale for this plugin for internationalization.
 	 *
-	 * Uses the STOLMC_Service_Tracker_I18n class in order to set the domain and to register the hook
-	 * with WordPress.
+	 * WordPress.org loads plugin translations automatically based on
+	 * the plugin headers (`Text Domain` and `Domain Path`), so no
+	 * explicit runtime hook registration is needed here.
 	 *
 	 * @since    1.0.0
 	 * @access   private
@@ -190,8 +190,7 @@ class STOLMC_Service_Tracker {
 	 * @return void
 	 */
 	private function set_locale(): void {
-		$plugin_i18n = new STOLMC_Service_Tracker_I18n();
-		$this->loader->add_action( 'init', $plugin_i18n, 'load_plugin_textdomain' );
+		// No-op by design (WP handles translation loading).
 	}
 
 	/**
