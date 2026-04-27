@@ -4,8 +4,7 @@ import { useClientsStore } from "../../stores/clientsStore";
 import { get as fetchGet } from "../../utils/fetch";
 import Spinner from "./Spinner";
 import type { User } from "../../types";
-
-declare const data: Record<string, any>;
+import { stolmc_text, stolmc_text_array, Text } from "../../i18n";
 
 // Calendar item types
 interface CalendarCase {
@@ -194,13 +193,13 @@ export default function Calendar() {
             {hasEnds && (
               <span
                 className="w-2 h-2 rounded-full bg-error/70"
-                title={`${dayIndex.ends.length} case(s) ending`}
+                title={`${dayIndex.ends.length} ${stolmc_text(Text.CalendarCasesEnding)}`}
               />
             )}
             {hasStarts && (
               <span
                 className="w-2 h-2 rounded-full bg-secondary/70"
-                title={`${dayIndex.starts.length} case(s) starting`}
+                title={`${dayIndex.starts.length} ${stolmc_text(Text.CalendarCasesStarting)}`}
               />
             )}
           </div>
@@ -232,7 +231,7 @@ export default function Calendar() {
 
         {hiddenCount > 0 && (
           <div className="text-xs text-on-surface-variant font-medium px-2 py-1 cursor-pointer hover:text-on-surface">
-            +{hiddenCount} more
+            +{hiddenCount} {stolmc_text(Text.CalendarMore)}
           </div>
         )}
       </div>
@@ -244,10 +243,7 @@ export default function Calendar() {
     return <Fragment></Fragment>;
   }
 
-  const monthNames = [
-    "January", "February", "March", "April", "May", "June",
-    "July", "August", "September", "October", "November", "December"
-  ];
+  const monthNames = stolmc_text_array(Text.CalendarMonths);
 
   return (
     <section className="flex-1 h-full overflow-y-auto">
@@ -255,10 +251,10 @@ export default function Calendar() {
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-black text-on-surface tracking-tight">
-            Calendar
+            {stolmc_text(Text.CalendarHeading)}
           </h1>
           <p className="text-on-surface-variant text-sm mt-2">
-            View cases and progress updates across all clients
+            {stolmc_text(Text.CalendarDescription)}
           </p>
         </div>
 
@@ -294,7 +290,7 @@ export default function Calendar() {
               onChange={(e) => setSelectedClient(e.target.value)}
               className="bg-surface-container-lowest border border-outline-variant/20 rounded-lg py-2 px-3 text-sm focus:ring-2 focus:ring-primary/10"
             >
-              <option value="">All Clients</option>
+              <option value="">{stolmc_text(Text.CalendarAllClients)}</option>
               {clientsState.users.map((user: User) => (
                 <option key={user.id} value={user.id}>
                   {user.name}
@@ -308,9 +304,9 @@ export default function Calendar() {
               onChange={(e) => setSelectedStatus(e.target.value)}
               className="bg-surface-container-lowest border border-outline-variant/20 rounded-lg py-2 px-3 text-sm focus:ring-2 focus:ring-primary/10"
             >
-              <option value="">All Statuses</option>
-              <option value="open">Open</option>
-              <option value="close">Closed</option>
+              <option value="">{stolmc_text(Text.CalendarAllStatuses)}</option>
+              <option value="open">{stolmc_text(Text.StatusActive)}</option>
+              <option value="close">{stolmc_text(Text.StatusClosed)}</option>
             </select>
           </div>
         </div>
@@ -322,7 +318,7 @@ export default function Calendar() {
           <div className="bg-surface-container-low rounded-xl overflow-hidden border border-outline-variant/20">
             {/* Weekday Headers */}
             <div className="grid grid-cols-7 bg-surface-container-high">
-              {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day) => (
+              {stolmc_text_array(Text.CalendarWeekdays).map((day) => (
                 <div
                   key={day}
                   className="p-2 text-xs font-bold text-on-surface-variant uppercase tracking-wider text-center border-b border-outline-variant/20"
@@ -341,11 +337,11 @@ export default function Calendar() {
         <div className="mt-6 flex gap-6 text-xs">
           <div className="flex items-center gap-2">
             <div className="w-2 h-2 rounded-full bg-secondary/70"></div>
-            <span className="text-on-surface-variant">Case Starts</span>
+            <span className="text-on-surface-variant">{stolmc_text(Text.CalendarCaseStarts)}</span>
           </div>
           <div className="flex items-center gap-2">
             <div className="w-2 h-2 rounded-full bg-error/70"></div>
-            <span className="text-on-surface-variant">Case Ends</span>
+            <span className="text-on-surface-variant">{stolmc_text(Text.CalendarCaseEnds)}</span>
           </div>
         </div>
       </div>

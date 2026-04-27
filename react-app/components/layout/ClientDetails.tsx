@@ -6,8 +6,7 @@ import { toast } from "react-toastify";
 import type { User } from "../../types";
 import Spinner from "./Spinner";
 import Case from "./Case";
-
-declare const data: Record<string, any>;
+import { stolmc_text, Text } from "../../i18n";
 
 export default function ClientDetails() {
   const inViewState = useInViewStore((state) => state);
@@ -28,7 +27,7 @@ export default function ClientDetails() {
     (user: User) => String(user.id) === String(inViewState.userId)
   );
 
-  const clientName = selectedClient?.name || inViewState.name || "Client";
+  const clientName = selectedClient?.name || inViewState.name || stolmc_text(Text.ClientLabel);
 
   const createdDate = selectedClient?.created_at
     ? new Date(selectedClient.created_at).toLocaleDateString("en-US", {
@@ -36,7 +35,7 @@ export default function ClientDetails() {
         month: "long",
         day: "numeric",
       })
-    : "N/A";
+    : stolmc_text(Text.Na);
 
   // Initialize form data when client changes
   useEffect(() => {
@@ -65,7 +64,7 @@ export default function ClientDetails() {
   const handleSave = async () => {
     // Basic email validation
     if (formData.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      toast.error("Please enter a valid email address");
+      toast.error(stolmc_text(Text.ClientInvalidEmail));
       return;
     }
 
@@ -76,10 +75,10 @@ export default function ClientDetails() {
         phone: formData.phone,
         cellphone: formData.cellphone,
       });
-      toast.success("Client information updated successfully");
+      toast.success(stolmc_text(Text.ClientUpdateSuccess));
       setIsEditing(false);
     } catch (error) {
-      toast.error("Failed to update client information");
+      toast.error(stolmc_text(Text.ClientUpdateError));
       console.error("Update error:", error);
     } finally {
       setSaving(false);
@@ -109,7 +108,7 @@ export default function ClientDetails() {
               {clientName}
             </h1>
             <p className="text-sm text-on-surface-variant font-medium">
-              {selectedClient?.role || "Customer"}
+              {selectedClient?.role || stolmc_text(Text.ClientLabel)}
             </p>
           </div>
         </div>
@@ -118,13 +117,13 @@ export default function ClientDetails() {
         <div className="bg-surface-container-lowest rounded-2xl border border-outline-variant/20 shadow-sm p-6 mb-8">
           <div className="border-b border-outline-variant pb-4 mb-6">
             <div className="flex items-center justify-between">
-              <h2 className="text-xl font-bold text-on-surface">Contact Information</h2>
+              <h2 className="text-xl font-bold text-on-surface">{stolmc_text(Text.ClientContactHeading)}</h2>
               {!isEditing ? (
                 <button
                   onClick={() => setIsEditing(true)}
                   className="px-4 py-2 bg-primary text-on-primary font-bold rounded-xl shadow-sm hover:bg-primary-container transition-colors text-sm"
                 >
-                  Edit
+                  {stolmc_text(Text.BtnEdit)}
                 </button>
               ) : (
                 <div className="flex gap-2">
@@ -133,14 +132,14 @@ export default function ClientDetails() {
                     disabled={saving}
                     className="px-4 py-2 bg-primary text-on-primary font-bold rounded-xl shadow-sm hover:bg-primary-container transition-colors text-sm disabled:opacity-50"
                   >
-                    {saving ? "Saving..." : "Save"}
+                    {saving ? stolmc_text(Text.ClientsCreating) : stolmc_text(Text.BtnSave)}
                   </button>
                   <button
                     onClick={handleCancel}
                     disabled={saving}
                     className="px-4 py-2 bg-surface-container-high text-on-surface font-bold rounded-xl shadow-sm hover:bg-surface-container transition-colors text-sm disabled:opacity-50"
                   >
-                    Cancel
+                    {stolmc_text(Text.BtnCancel)}
                   </button>
                 </div>
               )}
@@ -150,7 +149,7 @@ export default function ClientDetails() {
           <div className="space-y-6">
             <div>
               <label className="block text-sm font-bold text-on-surface mb-2">
-                Email
+                {stolmc_text(Text.LabelEmail)}
               </label>
               {isEditing ? (
                 <input
@@ -158,18 +157,18 @@ export default function ClientDetails() {
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                   className="w-full p-3 bg-surface-container-low rounded-xl border border-outline-variant focus:outline-none focus:ring-2 focus:ring-primary text-on-surface"
-                  placeholder="Enter email address"
+                  placeholder={stolmc_text(Text.PlaceholderEmail)}
                 />
               ) : (
                 <p className="text-on-surface-variant">
-                  {selectedClient?.email || "No email provided"}
+                  {selectedClient?.email || stolmc_text(Text.Na)}
                 </p>
               )}
             </div>
 
             <div>
               <label className="block text-sm font-bold text-on-surface mb-2">
-                Phone
+                {stolmc_text(Text.LabelPhone)}
               </label>
               {isEditing ? (
                 <input
@@ -177,18 +176,18 @@ export default function ClientDetails() {
                   value={formData.phone}
                   onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                   className="w-full p-3 bg-surface-container-low rounded-xl border border-outline-variant focus:outline-none focus:ring-2 focus:ring-primary text-on-surface"
-                  placeholder="Enter phone number"
+                  placeholder={stolmc_text(Text.PlaceholderPhone)}
                 />
               ) : (
                 <p className="text-on-surface-variant">
-                  {selectedClient?.phone || "No phone number provided"}
+                  {selectedClient?.phone || stolmc_text(Text.Na)}
                 </p>
               )}
             </div>
 
             <div>
               <label className="block text-sm font-bold text-on-surface mb-2">
-                Cellphone
+                {stolmc_text(Text.LabelCellphone)}
               </label>
               {isEditing ? (
                 <input
@@ -196,18 +195,18 @@ export default function ClientDetails() {
                   value={formData.cellphone}
                   onChange={(e) => setFormData({ ...formData, cellphone: e.target.value })}
                   className="w-full p-3 bg-surface-container-low rounded-xl border border-outline-variant focus:outline-none focus:ring-2 focus:ring-primary text-on-surface"
-                  placeholder="Enter cellphone number"
+                  placeholder={stolmc_text(Text.PlaceholderPhone)}
                 />
               ) : (
                 <p className="text-on-surface-variant">
-                  {selectedClient?.cellphone || "No cellphone number provided"}
+                  {selectedClient?.cellphone || stolmc_text(Text.Na)}
                 </p>
               )}
             </div>
 
             <div>
               <label className="block text-sm font-bold text-on-surface mb-2">
-                Client Since
+                {stolmc_text(Text.ClientSince)}
               </label>
               <p className="text-on-surface-variant">{createdDate}</p>
             </div>
@@ -217,9 +216,9 @@ export default function ClientDetails() {
         {/* Client Cases Section */}
         <div className="bg-surface-container-lowest rounded-2xl border border-outline-variant/20 shadow-sm p-6 mb-8">
           <div className="border-b border-outline-variant pb-4 mb-6">
-            <h2 className="text-xl font-bold text-on-surface">Client Cases</h2>
+            <h2 className="text-xl font-bold text-on-surface">{stolmc_text(Text.ClientCasesHeading)}</h2>
             <p className="text-on-surface-variant text-sm mt-1">
-              {total} {total === 1 ? "case" : "cases"} found
+              {total} {stolmc_text(total === 1 ? Text.CaseSingular : Text.CasePlural)} {stolmc_text(Text.Found)}
             </p>
           </div>
 
@@ -248,24 +247,24 @@ export default function ClientDetails() {
                     disabled={page === 1}
                     className="px-4 py-2 bg-surface-container-high text-on-surface rounded-xl disabled:opacity-50"
                   >
-                    Previous
+                    {stolmc_text(Text.BtnPrev)}
                   </button>
                   <span className="text-on-surface-variant">
-                    Page {page} of {totalPages}
+                    {stolmc_text(Text.Page)} {page} {stolmc_text(Text.Of)} {totalPages}
                   </span>
                   <button
                     onClick={() => getCases(inViewState.userId as string, false, page + 1)}
                     disabled={page === totalPages}
                     className="px-4 py-2 bg-surface-container-high text-on-surface rounded-xl disabled:opacity-50"
                   >
-                    Next
+                    {stolmc_text(Text.BtnNext)}
                   </button>
                 </div>
               )}
             </>
           ) : (
             <div className="text-center py-12">
-              <p className="text-on-surface-variant">No cases found for this client</p>
+              <p className="text-on-surface-variant">{stolmc_text(Text.ClientNoCases)}</p>
             </div>
           )}
         </div>
@@ -276,7 +275,7 @@ export default function ClientDetails() {
           className="flex items-center gap-2 px-6 py-3 bg-surface-container-low hover:bg-surface-container-high rounded-xl transition-all text-on-surface-variant hover:text-on-surface font-medium"
         >
           <span className="material-symbols-outlined text-sm">arrow_back</span>
-          Back to Clients List
+          {stolmc_text(Text.ClientBackToList)}
         </button>
       </div>
     </section>

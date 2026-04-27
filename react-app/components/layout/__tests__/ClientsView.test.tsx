@@ -113,7 +113,7 @@ describe("ClientsView component", () => {
 
     mockClientsStore.searchUsers.mockClear();
 
-    const searchInput = screen.getByPlaceholderText(/search clients/i);
+    const searchInput = screen.getByPlaceholderText("clients_search_placeholder");
     fireEvent.change(searchInput, { target: { value: "john" } });
 
     act(() => {
@@ -133,7 +133,7 @@ describe("ClientsView component", () => {
 
     render(<ClientsView />);
 
-    expect(screen.getByText(/no clients found/i)).toBeInTheDocument();
+    expect(screen.getByText("clients_empty")).toBeInTheDocument();
   });
 
   it("navigates when selecting a client", async () => {
@@ -149,24 +149,24 @@ describe("ClientsView component", () => {
     const user = userEvent.setup();
     render(<ClientsView />);
 
-    await user.click(screen.getByRole("button", { name: /add client/i }));
-    expect(screen.getByRole("button", { name: /create client/i })).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: /clients_add_btn/i }));
+    expect(screen.getByRole("button", { name: /clients_create_btn/i })).toBeInTheDocument();
 
     await user.click(screen.getByRole("button", { name: /cancel/i }));
-    expect(screen.queryByRole("button", { name: /create client/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /clients_create_btn/i })).not.toBeInTheDocument();
   });
 
   it("shows validation error when creating without required fields", async () => {
     const user = userEvent.setup();
     render(<ClientsView />);
 
-    await user.click(screen.getByRole("button", { name: /add client/i }));
+    await user.click(screen.getByRole("button", { name: /clients_add_btn/i }));
 
-    const createButton = screen.getByRole("button", { name: /create client/i });
+    const createButton = screen.getByRole("button", { name: /clients_create_btn/i });
     const form = createButton.closest("form")!;
     fireEvent.submit(form);
 
-    expect(mockToastError).toHaveBeenCalledWith("Name and email are required");
+    expect(mockToastError).toHaveBeenCalledWith("clients_name_email_required");
     expect(mockClientsStore.createUser).not.toHaveBeenCalled();
   });
 
@@ -179,11 +179,11 @@ describe("ClientsView component", () => {
 
     render(<ClientsView />);
 
-    await user.click(screen.getByRole("button", { name: /add client/i }));
-    await user.type(screen.getByPlaceholderText(/client name/i), "New Client");
-    await user.type(screen.getByPlaceholderText(/client@example.com/i), "new@client.com");
+    await user.click(screen.getByRole("button", { name: /clients_add_btn/i }));
+    await user.type(screen.getByPlaceholderText(/placeholder_name/i), "New Client");
+    await user.type(screen.getByPlaceholderText(/placeholder_email/i), "new@client.com");
 
-    await user.click(screen.getByRole("button", { name: /create client/i }));
+    await user.click(screen.getByRole("button", { name: /clients_create_btn/i }));
 
     await waitFor(() => {
       expect(mockClientsStore.createUser).toHaveBeenCalledWith({
@@ -195,7 +195,7 @@ describe("ClientsView component", () => {
     });
 
     expect(mockToastSuccess).toHaveBeenCalledWith("Client created");
-    expect(screen.queryByRole("button", { name: /create client/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /clients_create_btn/i })).not.toBeInTheDocument();
   });
 
   it("shows error toast when create client fails", async () => {
@@ -207,10 +207,10 @@ describe("ClientsView component", () => {
 
     render(<ClientsView />);
 
-    await user.click(screen.getByRole("button", { name: /add client/i }));
-    await user.type(screen.getByPlaceholderText(/client name/i), "New Client");
-    await user.type(screen.getByPlaceholderText(/client@example.com/i), "new@client.com");
-    await user.click(screen.getByRole("button", { name: /create client/i }));
+    await user.click(screen.getByRole("button", { name: /clients_add_btn/i }));
+    await user.type(screen.getByPlaceholderText(/placeholder_name/i), "New Client");
+    await user.type(screen.getByPlaceholderText(/placeholder_email/i), "new@client.com");
+    await user.click(screen.getByRole("button", { name: /clients_create_btn/i }));
 
     await waitFor(() => {
       expect(mockToastError).toHaveBeenCalledWith("Duplicate email");

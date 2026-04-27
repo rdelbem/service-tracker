@@ -190,7 +190,13 @@ class STOLMC_Service_Tracker {
 	 * @return void
 	 */
 	private function set_locale(): void {
-		// No-op by design (WP handles translation loading).
+		add_action( 'init', function () {
+			load_plugin_textdomain(
+				'service-tracker-stolmc',
+				false,
+				dirname( plugin_basename( STOLMC_SERVICE_TRACKER_ROOT_FILE ) ) . '/languages'
+			);
+		} );
 	}
 
 	/**

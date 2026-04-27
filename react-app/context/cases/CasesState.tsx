@@ -7,6 +7,7 @@ import { toast } from "react-toastify";
 import { get, post, put, del } from "../../utils/fetch";
 import { GET_CASES } from "../types";
 import type { CasesState as CasesStateType, InViewContextType, Case } from "../types";
+import { stolmc_text, Text } from "../../i18n";
 
 interface CasesStateProps {
   children: ReactNode;
@@ -62,7 +63,7 @@ export default function CasesState({ children }: CasesStateProps) {
 
   const postCase = async (id: string | number, title: string): Promise<void> => {
     if (title === "") {
-      alert("The title can not be blank!");
+      alert(stolmc_text(Text.AlertBlankCaseTitle));
       return;
     }
 
@@ -97,9 +98,9 @@ export default function CasesState({ children }: CasesStateProps) {
         },
       });
 
-      toast.success(data.toast_case_added);
+      toast.success(stolmc_text(Text.ToastCaseAdded));
     } catch (error) {
-      alert(data.alert_error_base + error);
+      alert(stolmc_text(Text.AlertErrorBase) + error);
     }
   };
 
@@ -128,14 +129,14 @@ export default function CasesState({ children }: CasesStateProps) {
         },
       });
 
-      toast.success(data.toast_case_toggled);
+      toast.success(stolmc_text(Text.ToastCaseToggled));
     } catch (error) {
-      alert(data.alert_error_base + error);
+      alert(stolmc_text(Text.AlertErrorBase) + error);
     }
   };
 
-  const deleteCase = async (id: string | number, title: string): Promise<void> => {
-    if (!confirm(`Are you sure you want to delete the case: ${title}?`)) return;
+  const deleteCase = async (id: string | number, _title: string): Promise<void> => {
+    if (!confirm(stolmc_text(Text.ConfirmDeleteCaseMsg))) return;
 
     try {
       await del(`${apiUrlCases}/${id}`, {
@@ -158,15 +159,15 @@ export default function CasesState({ children }: CasesStateProps) {
         },
       });
 
-      toast.success(data.toast_case_deleted);
+      toast.success(stolmc_text(Text.ToastCaseDeleted));
     } catch (error) {
-      alert(data.alert_error_base + error);
+      alert(stolmc_text(Text.AlertErrorBase) + error);
     }
   };
 
   const editCase = async (id: string | number, id_user: string | number, newTitle: string): Promise<void> => {
     if (newTitle === "") {
-      alert(data.alert_blank_case_title);
+      alert(stolmc_text(Text.AlertBlankCaseTitle));
       return;
     }
 
@@ -197,9 +198,9 @@ export default function CasesState({ children }: CasesStateProps) {
         },
       });
 
-      toast.success(data.toast_case_edited);
+      toast.success(stolmc_text(Text.ToastCaseEdited));
     } catch (error) {
-      alert(data.alert_error_base + error);
+      alert(stolmc_text(Text.AlertErrorBase) + error);
     }
   };
 

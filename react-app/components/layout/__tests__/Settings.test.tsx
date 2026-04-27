@@ -109,17 +109,17 @@ describe('Settings Component', () => {
   it('renders correctly with light mode', () => {
     render(<Settings />);
     
-    expect(screen.getByText('Settings')).toBeInTheDocument();
-    expect(screen.getByText('Appearance')).toBeInTheDocument();
-    expect(screen.getByText('Dark Mode')).toBeInTheDocument();
-    expect(screen.getByText('Theme Preview')).toBeInTheDocument();
-    expect(screen.getByText('Current theme: Light')).toBeInTheDocument();
+    expect(screen.getByText('settings_heading')).toBeInTheDocument();
+    expect(screen.getByText('settings_appearance')).toBeInTheDocument();
+    expect(screen.getByText('settings_dark_mode')).toBeInTheDocument();
+    expect(screen.getByText('settings_theme_preview')).toBeInTheDocument();
+    expect(screen.getByText('Current theme: settings_theme_light')).toBeInTheDocument();
   });
 
   it('renders correctly with dark mode', () => {
     document.documentElement.classList.add('dark');
     render(<Settings />);
     
-    expect(screen.getByText('Current theme: Dark')).toBeInTheDocument();
+    expect(screen.getByText('Current theme: settings_theme_dark')).toBeInTheDocument();
   });
 });

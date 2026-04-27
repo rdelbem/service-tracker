@@ -51,24 +51,24 @@ describe("HowToUse component", () => {
   it("renders default title and first accordion content by default", () => {
     render(<HowToUse />);
 
-    expect(screen.getByText("How to Use Service Tracker")).toBeInTheDocument();
-    expect(screen.getByText("1. Getting Started")).toBeInTheDocument();
-    expect(screen.getByText("2. Advanced Features")).toBeInTheDocument();
-    expect(screen.getByText("Select a client from the left sidebar")).toBeInTheDocument();
+    expect(screen.getByText("instructions_page_title")).toBeInTheDocument();
+    expect(screen.getByText("1. accordion_first_title")).toBeInTheDocument();
+    expect(screen.getByText("2. accordion_second_title")).toBeInTheDocument();
+    expect(screen.getByText("first_accordion_first_li_item")).toBeInTheDocument();
   });
 
   it("toggles accordions when headers are clicked", async () => {
     const user = userEvent.setup();
     render(<HowToUse />);
 
-    expect(screen.getByText("Select a client from the left sidebar")).toBeInTheDocument();
+    expect(screen.getByText("first_accordion_first_li_item")).toBeInTheDocument();
 
-    await user.click(screen.getByRole("button", { name: /1\. getting started/i }));
-    expect(screen.queryByText("Select a client from the left sidebar")).not.toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: /1\. accordion_first_title/i }));
+    expect(screen.queryByText("first_accordion_first_li_item")).not.toBeInTheDocument();
 
-    await user.click(screen.getByRole("button", { name: /2\. advanced features/i }));
-    expect(screen.getByText("Toggle case status between open and closed")).toBeInTheDocument();
-    expect(screen.queryByText("Select a client from the left sidebar")).not.toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: /2\. accordion_second_title/i }));
+    expect(screen.getByText("second_accordion_firt_li_item")).toBeInTheDocument();
+    expect(screen.queryByText("first_accordion_first_li_item")).not.toBeInTheDocument();
   });
 
   it("uses translated content from global data when provided", () => {

@@ -7,8 +7,7 @@ import { toast } from "react-toastify";
 import { showConfirm } from "../ui/Modal";
 import Spinner from "./Spinner";
 import type { User } from "../../types";
-
-declare const data: Record<string, any>;
+import { stolmc_text, Text } from "../../i18n";
 
 interface CaseData {
   id: string | number;
@@ -68,7 +67,7 @@ export default function CaseDetails() {
         }
       } catch (error) {
         console.error("Error loading case:", error);
-        toast.error("Failed to load case details");
+        toast.error(stolmc_text(Text.AlertErrorBase));
       } finally {
         setLoading(false);
       }
@@ -79,13 +78,13 @@ export default function CaseDetails() {
 
   const handleSaveCase = async () => {
     if (!caseData || !editTitle.trim()) {
-      toast.error("Case title cannot be empty");
+      toast.error(stolmc_text(Text.AlertBlankCaseTitle));
       return;
     }
 
     // Validate dates if both provided
     if (editStartAt && editDueAt && new Date(editStartAt) > new Date(editDueAt)) {
-      toast.error("Start date must be before due date");
+      toast.error(stolmc_text(Text.AddCaseDateHelp));
       return;
     }
 
@@ -99,7 +98,7 @@ export default function CaseDetails() {
       setIsEditing(false);
     } catch (error) {
       console.error("Error updating case:", error);
-      toast.error("Failed to update case");
+      toast.error(stolmc_text(Text.AlertErrorBase));
     }
   };
 
@@ -117,10 +116,10 @@ export default function CaseDetails() {
 
       const newStatus = caseData.status === "open" ? "close" : "open";
       setCaseData({ ...caseData, status: newStatus });
-      toast.success(`Case is now ${newStatus}`);
+      toast.success(`${stolmc_text(Text.ToastToggleBaseMsg)} ${newStatus}`);
     } catch (error) {
       console.error("Error toggling status:", error);
-      toast.error("Failed to update status");
+      toast.error(stolmc_text(Text.ToastCaseToggled));
     }
   };
 
@@ -128,9 +127,9 @@ export default function CaseDetails() {
     if (!caseData) return;
 
     const confirmed = await showConfirm({
-      title: "Delete Case",
-      message: `Are you sure you want to delete "${caseData.title}"? This will also delete all associated progress updates.`,
-      confirmText: "Delete Case",
+      title: stolmc_text(Text.ConfirmDeleteCaseTitle),
+      message: `${stolmc_text(Text.ConfirmDeleteCaseMsg)} "${caseData.title}"?`,
+      confirmText: stolmc_text(Text.ConfirmDeleteCaseTitle),
     });
 
     if (!confirmed) return;
@@ -142,11 +141,11 @@ export default function CaseDetails() {
         headers: { "X-WP-Nonce": data.nonce },
       });
 
-      toast.success("Case deleted successfully");
+      toast.success(stolmc_text(Text.ToastCaseDeletedSuccess));
       navigate("cases", "", "", "");
     } catch (error) {
       console.error("Error deleting case:", error);
-      toast.error("Failed to delete case");
+      toast.error(stolmc_text(Text.AlertErrorBase));
     }
   };
 
@@ -166,7 +165,7 @@ export default function CaseDetails() {
           <span className="material-symbols-outlined text-6xl text-outline-variant mb-4">
             folder_off
           </span>
-          <p className="text-on-surface-variant text-sm font-medium">Case not found</p>
+          <p className="text-on-surface-variant text-sm font-medium">{stolmc_text(Text.CaseNotFound)}</p>
         </div>
       </section>
     );
@@ -193,7 +192,7 @@ export default function CaseDetails() {
             )}
             {client && (
               <p className="text-on-surface-variant text-sm mt-2">
-                Client: {client.name}
+                {stolmc_text(Text.ClientLabel)}: {client.name}
               </p>
             )}
           </div>
@@ -205,7 +204,7 @@ export default function CaseDetails() {
                   className="flex items-center gap-1 px-4 py-2 bg-primary text-white text-xs font-bold rounded-lg"
                 >
                   <span className="material-symbols-outlined text-sm">check</span>
-                  Save
+                  {stolmc_text(Text.BtnSave)}
                 </button>
                 <button
                   onClick={() => {
@@ -217,7 +216,7 @@ export default function CaseDetails() {
                   className="flex items-center gap-1 px-4 py-2 bg-surface-container-high text-on-surface-variant text-xs font-bold rounded-lg"
                 >
                   <span className="material-symbols-outlined text-sm">close</span>
-                  Cancel
+                  {stolmc_text(Text.BtnCancel)}
                 </button>
               </>
             ) : (
@@ -225,7 +224,7 @@ export default function CaseDetails() {
                 <button
                   onClick={() => setIsEditing(true)}
                   className="flex items-center gap-1 px-4 py-2 bg-surface-container-high text-on-surface-variant text-xs font-bold rounded-lg hover:bg-surface-container"
-                  title="Edit case"
+                  title={stolmc_text(Text.TipEditCase)}
                 >
                   <span className="material-symbols-outlined text-sm">edit</span>
                 </button>
@@ -240,12 +239,12 @@ export default function CaseDetails() {
                   <span className="material-symbols-outlined text-sm">
                     {caseData.status === "open" ? "toggle_off" : "toggle_on"}
                   </span>
-                  {caseData.status === "open" ? "Open" : "Closed"}
+                  {caseData.status === "open" ? stolmc_text(Text.StatusActive) : stolmc_text(Text.StatusClosed)}
                 </button>
                 <button
                   onClick={handleDeleteCase}
                   className="flex items-center gap-1 px-4 py-2 bg-red-100 text-red-700 text-xs font-bold rounded-lg hover:bg-red-200"
-                  title="Delete case"
+                  title={stolmc_text(Text.TipDeleteCase)}
                 >
                   <span className="material-symbols-outlined text-sm">delete</span>
                 </button>
@@ -263,11 +262,11 @@ export default function CaseDetails() {
                 {caseData.status === "open" ? "radio_button_checked" : "check_circle"}
               </span>
               <label className="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">
-                Status
+                {stolmc_text(Text.LabelStatus)}
               </label>
             </div>
             <p className="text-sm font-medium text-on-surface">
-              {caseData.status === "open" ? "Open" : "Closed"}
+              {caseData.status === "open" ? stolmc_text(Text.StatusActive) : stolmc_text(Text.StatusClosed)}
             </p>
           </div>
 
@@ -278,7 +277,7 @@ export default function CaseDetails() {
                 calendar_today
               </span>
               <label className="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">
-                Created
+                {stolmc_text(Text.LabelCreated)}
               </label>
             </div>
             <p className="text-sm text-on-surface">
@@ -288,7 +287,7 @@ export default function CaseDetails() {
                     month: "long",
                     day: "numeric",
                   })
-                : "N/A"}
+                : stolmc_text(Text.Na)}
             </p>
           </div>
 
@@ -299,7 +298,7 @@ export default function CaseDetails() {
                 event_note
               </span>
               <label className="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">
-                Start Date
+                {stolmc_text(Text.LabelStartDate)}
               </label>
             </div>
             {isEditing ? (
@@ -317,7 +316,7 @@ export default function CaseDetails() {
                       month: "long",
                       day: "numeric",
                     })
-                  : "Not set"}
+                  : stolmc_text(Text.NotSet)}
               </p>
             )}
           </div>
@@ -329,7 +328,7 @@ export default function CaseDetails() {
                 event_busy
               </span>
               <label className="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">
-                Due Date
+                {stolmc_text(Text.LabelDueDate)}
               </label>
             </div>
             {isEditing ? (
@@ -347,7 +346,7 @@ export default function CaseDetails() {
                       month: "long",
                       day: "numeric",
                     })
-                  : "Not set"}
+                  : stolmc_text(Text.NotSet)}
               </p>
             )}
           </div>
@@ -360,11 +359,11 @@ export default function CaseDetails() {
               description
             </span>
             <label className="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">
-              Description
+              {stolmc_text(Text.LabelDescription)}
             </label>
           </div>
           <p className="text-sm text-on-surface whitespace-pre-wrap">
-            {caseData.description || "No description provided."}
+            {caseData.description || stolmc_text(Text.NoDescription)}
           </p>
         </div>
 
@@ -374,7 +373,7 @@ export default function CaseDetails() {
           className="mt-8 flex items-center gap-2 px-6 py-3 bg-surface-container-low hover:bg-surface-container-high rounded-xl transition-all text-on-surface-variant hover:text-on-surface font-medium"
         >
           <span className="material-symbols-outlined text-sm">arrow_back</span>
-          Back to Cases List
+          {stolmc_text(Text.BtnBackToCases)}
         </button>
       </div>
     </section>

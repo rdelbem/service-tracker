@@ -4,9 +4,6 @@ export const GET_CASES = "GET_CASES";
 export const IN_VIEW = "IN_VIEW";
 export const GET_STATUS = "GET_STATUS";
 
-// Global data object from WordPress wp_localize_script
-declare const data: Record<string, any>;
-
 // Common types
 export interface User {
   id: string | number;

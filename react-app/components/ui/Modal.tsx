@@ -1,4 +1,5 @@
 import { createRoot } from "react-dom/client";
+import { stolmc_text, Text } from "../../i18n";
 
 interface ModalOptions {
   title?: string;
@@ -75,10 +76,10 @@ export function showConfirm(options: Omit<ModalOptions, "type">): Promise<boolea
 
     root.render(
       <ModalDialog
-        title={options.title || "Confirm Action"}
+        title={options.title || stolmc_text(Text.ModalConfirmTitle)}
         message={options.message}
-        confirmText={options.confirmText || "Confirm"}
-        cancelText={options.cancelText || "Cancel"}
+        confirmText={options.confirmText || stolmc_text(Text.BtnConfirm)}
+        cancelText={options.cancelText || stolmc_text(Text.BtnCancel)}
         type="confirm"
         onConfirm={() => close(true)}
         onCancel={() => close(false)}
@@ -105,9 +106,9 @@ export function showAlert(options: Omit<ModalOptions, "type">): Promise<void> {
 
     root.render(
       <ModalDialog
-        title={options.title || "Notice"}
+        title={options.title || stolmc_text(Text.ModalNoticeTitle)}
         message={options.message}
-        confirmText={options.confirmText || "OK"}
+        confirmText={options.confirmText || stolmc_text(Text.BtnOk)}
         cancelText=""
         type="alert"
         onConfirm={close}

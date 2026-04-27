@@ -3,6 +3,7 @@ import AppReducer from "../AppReducer";
 import { get, post } from "../../utils/fetch";
 import ClientsContext from "./clientsContext";
 import { GET_USERS } from "../types";
+import { stolmc_text, Text } from "../../i18n";
 import type { ClientsState as ClientsStateType, User } from "../types";
 
 interface ClientsStateProps {
@@ -79,14 +80,14 @@ export default function ClientsState({ children }: ClientsStateProps) {
       const payload = res.data;
       return {
         success: Boolean(payload?.success),
-        message: payload?.message ?? (payload?.success ? "User created successfully." : "Failed to create user."),
+        message: payload?.message ?? (payload?.success ? stolmc_text(Text.ToastUserCreated) : stolmc_text(Text.ToastUserCreateFailed)),
         user: payload?.data,
       };
     } catch (error) {
       console.error("Error creating user:", error);
       return {
         success: false,
-        message: "Failed to create user. Please try again.",
+        message: stolmc_text(Text.ToastUserCreateError),
       };
     }
   };

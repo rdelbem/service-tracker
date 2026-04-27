@@ -70,13 +70,6 @@ vi.mock("react-toastify", () => ({
   },
 }));
 
-// Mock global data
-(globalThis as any).data = {
-  root_url: "http://localhost",
-  api_url: "api",
-  nonce: "test-nonce",
-};
-
 describe("Cases component", () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -120,10 +113,10 @@ describe("Cases component", () => {
 
     // Wait for error to appear
     await waitFor(() => {
-      expect(screen.getByText(/failed to load cases/i)).toBeInTheDocument();
+      expect(screen.getByText(/alert_error_base/i)).toBeInTheDocument();
     });
 
-    expect(screen.getByRole("button", { name: /retry/i })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /cases_retry/i })).toBeInTheDocument();
   });
 
   it("renders empty state when no cases", async () => {
@@ -142,10 +135,10 @@ describe("Cases component", () => {
 
     // Wait for empty state
     await waitFor(() => {
-      expect(screen.getByText(/no cases found/i)).toBeInTheDocument();
+      expect(screen.getByText("cases_empty_search")).toBeInTheDocument();
     });
 
-    expect(screen.getByRole("button", { name: /create your first case/i })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /cases_create_first/i })).toBeInTheDocument();
   });
 
   it("renders cases list when data is loaded", async () => {
@@ -182,7 +175,7 @@ describe("Cases component", () => {
       expect(screen.getByText(/Test Case/i)).toBeInTheDocument();
     });
 
-    expect(screen.getByText(/1 case across all clients/i)).toBeInTheDocument();
+    expect(screen.getByText(/cases_count_subtitle/i)).toBeInTheDocument();
   });
 
   it("filters cases based on search query", async () => {
@@ -221,7 +214,7 @@ describe("Cases component", () => {
     });
 
     // Type in search box
-    const searchInput = screen.getByPlaceholderText(/search cases by title or client name/i);
+    const searchInput = screen.getByPlaceholderText("cases_search_placeholder");
     await user.type(searchInput, "Apple");
 
     // Wait for filtering (debounced)
@@ -246,10 +239,10 @@ describe("Cases component", () => {
     render(<Cases />);
 
     await waitFor(() => {
-      expect(screen.getByText(/no cases found/i)).toBeInTheDocument();
+      expect(screen.getByText("cases_empty_search")).toBeInTheDocument();
     });
 
-    const addButton = screen.getByRole("button", { name: /create your first case/i });
+    const addButton = screen.getByRole("button", { name: /cases_create_first/i });
     await user.click(addButton);
 
     expect(mockInViewStoreState.navigate).toHaveBeenCalledWith("casesAddNew", "", "", "");

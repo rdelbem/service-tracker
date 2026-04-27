@@ -51,7 +51,7 @@ describe("Status component", () => {
   it("renders status text and formatted date", () => {
     render(<Status {...baseStatus} />);
 
-    expect(screen.getByText("Progress Update")).toBeInTheDocument();
+    expect(screen.getByText("progress_heading")).toBeInTheDocument();
     expect(screen.getByText("Initial status text")).toBeInTheDocument();
     expect(screen.getByText(dateformat(baseStatus.created_at, "mmm dd, yyyy, hh:MM TT"))).toBeInTheDocument();
   });

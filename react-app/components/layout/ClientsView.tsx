@@ -4,6 +4,7 @@ import { useInViewStore } from "../../stores/inViewStore";
 import { useClientsStore } from "../../stores/clientsStore";
 import Spinner from "./Spinner";
 import type { User } from "../../types";
+import { stolmc_text, Text } from "../../i18n";
 
 export default function ClientsView() {
   const inViewState = useInViewStore((state) => state);
@@ -56,7 +57,7 @@ export default function ClientsView() {
     e.preventDefault();
 
     if (!newClientName.trim() || !newClientEmail.trim()) {
-      toast.error("Name and email are required");
+      toast.error(stolmc_text(Text.ClientsNameEmailRequired));
       return;
     }
 
@@ -91,13 +92,13 @@ export default function ClientsView() {
         <div className="flex items-center justify-between mb-6">
           <div>
             <h2 className="text-2xl font-black text-on-surface tracking-tighter">
-              Clients
+              {stolmc_text(Text.ClientsHeading)}
             </h2>
             {total > 0 && (
               <p className="text-xs text-on-surface-variant mt-0.5">
                 {searchQuery.trim() !== ""
-                  ? `${total} result${total !== 1 ? "s" : ""} for "${searchQuery}"`
-                  : `${total} client${total !== 1 ? "s" : ""} total`}
+                  ? stolmc_text(Text.ClientsResultsFor).replace('%d', String(total)).replace('%s', searchQuery)
+                  : stolmc_text(Text.ClientsTotal).replace('%d', String(total))}
               </p>
             )}
           </div>
@@ -108,7 +109,7 @@ export default function ClientsView() {
             <span className="material-symbols-outlined text-sm">
               {showAddForm ? "close" : "person_add"}
             </span>
-            {showAddForm ? "Cancel" : "Add Client"}
+            {showAddForm ? stolmc_text(Text.BtnCancel) : stolmc_text(Text.ClientsAddBtn)}
           </button>
         </div>
 
@@ -120,13 +121,13 @@ export default function ClientsView() {
           >
             <div>
               <label className="block text-xs font-bold text-on-surface-variant mb-1 uppercase tracking-wider">
-                Name *
+                {stolmc_text(Text.LabelName)} *
               </label>
               <input
                 type="text"
                 value={newClientName}
                 onChange={(e) => setNewClientName(e.target.value)}
-                placeholder="Client name..."
+                placeholder={stolmc_text(Text.PlaceholderName)}
                 className="w-full bg-surface-container-low border border-outline-variant/20 rounded-lg py-2 px-3 text-sm focus:ring-2 focus:ring-primary/10 transition-all placeholder:text-outline-variant"
                 required
                 disabled={isCreating}
@@ -134,13 +135,13 @@ export default function ClientsView() {
             </div>
             <div>
               <label className="block text-xs font-bold text-on-surface-variant mb-1 uppercase tracking-wider">
-                Email *
+                {stolmc_text(Text.LabelEmail)} *
               </label>
               <input
                 type="email"
                 value={newClientEmail}
                 onChange={(e) => setNewClientEmail(e.target.value)}
-                placeholder="client@example.com"
+                placeholder={stolmc_text(Text.PlaceholderEmail)}
                 className="w-full bg-surface-container-low border border-outline-variant/20 rounded-lg py-2 px-3 text-sm focus:ring-2 focus:ring-primary/10 transition-all placeholder:text-outline-variant"
                 required
                 disabled={isCreating}
@@ -148,26 +149,26 @@ export default function ClientsView() {
             </div>
             <div>
               <label className="block text-xs font-bold text-on-surface-variant mb-1 uppercase tracking-wider">
-                Phone
+                {stolmc_text(Text.LabelPhone)}
               </label>
               <input
                 type="tel"
                 value={newClientPhone}
                 onChange={(e) => setNewClientPhone(e.target.value)}
-                placeholder="(123) 456-7890"
+                placeholder={stolmc_text(Text.PlaceholderPhone)}
                 className="w-full bg-surface-container-low border border-outline-variant/20 rounded-lg py-2 px-3 text-sm focus:ring-2 focus:ring-primary/10 transition-all placeholder:text-outline-variant"
                 disabled={isCreating}
               />
             </div>
             <div>
               <label className="block text-xs font-bold text-on-surface-variant mb-1 uppercase tracking-wider">
-                Cellphone
+                {stolmc_text(Text.LabelCellphone)}
               </label>
               <input
                 type="tel"
                 value={newClientCellphone}
                 onChange={(e) => setNewClientCellphone(e.target.value)}
-                placeholder="(123) 456-7890"
+                placeholder={stolmc_text(Text.PlaceholderPhone)}
                 className="w-full bg-surface-container-low border border-outline-variant/20 rounded-lg py-2 px-3 text-sm focus:ring-2 focus:ring-primary/10 transition-all placeholder:text-outline-variant"
                 disabled={isCreating}
               />
@@ -180,7 +181,7 @@ export default function ClientsView() {
               <span className="material-symbols-outlined text-sm">
                 {isCreating ? "progress_activity" : "person_add"}
               </span>
-              {isCreating ? "Creating..." : "Create Client"}
+              {isCreating ? stolmc_text(Text.ClientsCreating) : stolmc_text(Text.ClientsCreateBtn)}
             </button>
           </form>
         )}
@@ -195,7 +196,7 @@ export default function ClientsView() {
             type="text"
             value={localQuery}
             onChange={(e) => setLocalQuery(e.target.value)}
-            placeholder="Search clients..."
+            placeholder={stolmc_text(Text.ClientsSearchPlaceholder)}
             className="w-full bg-surface-container-lowest border border-outline-variant/20 rounded-xl py-2.5 pl-10 pr-10 text-sm focus:ring-2 focus:ring-primary/10 transition-all placeholder:text-outline-variant"
           />
           {localQuery && (
@@ -219,12 +220,12 @@ export default function ClientsView() {
             </span>
             <p className="text-on-surface-variant text-sm font-medium">
               {localQuery
-                ? `No clients found for "${localQuery}"`
-                : "No clients found"}
+                ? stolmc_text(Text.ClientsEmptySearch)
+                : stolmc_text(Text.ClientsEmpty)}
             </p>
             {!localQuery && (
               <p className="text-on-surface-variant/60 text-xs mt-1">
-                Add your first client to get started
+                {stolmc_text(Text.ClientsAddFirst)}
               </p>
             )}
           </div>
@@ -287,7 +288,7 @@ export default function ClientsView() {
               <span className="material-symbols-outlined text-sm">
                 chevron_left
               </span>
-              Prev
+              {stolmc_text(Text.BtnPrev)}
             </button>
 
             {/* Page indicators */}
@@ -313,7 +314,7 @@ export default function ClientsView() {
               disabled={page >= totalPages}
               className="flex items-center gap-1 px-3 py-2 rounded-lg text-xs font-bold text-on-surface-variant hover:bg-surface-container-high disabled:opacity-30 disabled:cursor-not-allowed transition-all"
             >
-              Next
+              {stolmc_text(Text.BtnNext)}
               <span className="material-symbols-outlined text-sm">
                 chevron_right
               </span>

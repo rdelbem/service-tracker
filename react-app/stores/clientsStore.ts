@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { get as fetchGet, post, put } from "../utils/fetch";
 import { normalizeUsers } from "../utils/users";
+import { stolmc_text, Text } from "../i18n";
 import type { User } from "../types";
 
 declare const data: Record<string, any>;
@@ -159,12 +160,12 @@ export const useClientsStore = create<ClientsStore>((set, get) => {
         const payload = res.data;
         return {
           success: Boolean(payload?.success),
-          message: payload?.message ?? (payload?.success ? "User created successfully." : "Failed to create user."),
+          message: payload?.message ?? (payload?.success ? stolmc_text(Text.ToastUserCreated) : stolmc_text(Text.ToastUserCreateFailed)),
           user: payload?.data,
         };
       } catch (error) {
         console.error("Error creating user:", error);
-        return { success: false, message: "Failed to create user. Please try again." };
+        return { success: false, message: stolmc_text(Text.ToastUserCreateError) };
       }
     },
 

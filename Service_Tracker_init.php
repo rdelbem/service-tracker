@@ -21,6 +21,8 @@
 
 defined( 'ABSPATH' ) || exit;
 
+define( 'STOLMC_SERVICE_TRACKER_ROOT_FILE', __FILE__ );
+
 require_once plugin_dir_path( __FILE__ ) . '/vendor/autoload.php';
 
 /**

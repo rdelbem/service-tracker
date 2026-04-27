@@ -4,9 +4,8 @@ import { useInViewStore } from "../../stores/inViewStore";
 import { useProgressStore } from "../../stores/progressStore";
 import dateformat from "dateformat";
 import { showConfirm } from "../ui/Modal";
+import { stolmc_text, Text } from "../../i18n";
 import type { Case as CaseType } from "../../types";
-
-declare const data: Record<string, any>;
 
 export default function Case({ id, id_user, status, created_at, title, onToggle }: CaseType & { onToggle?: (id: string | number) => void }) {
   const { deleteCase, toggleCase, editCase } = useCasesStore();
@@ -47,9 +46,9 @@ export default function Case({ id, id_user, status, created_at, title, onToggle 
 
   const handleDelete = async () => {
     const confirmed = await showConfirm({
-      title: "Delete Case",
-      message: `Are you sure you want to delete "${title}"? This action cannot be undone.`,
-      confirmText: "Delete",
+      title: stolmc_text(Text.ConfirmDeleteCaseTitle),
+      message: `${stolmc_text(Text.ConfirmDeleteCaseMsg)}`,
+      confirmText: stolmc_text(Text.BtnDelete),
     });
 
     if (confirmed) {
@@ -64,9 +63,9 @@ export default function Case({ id, id_user, status, created_at, title, onToggle 
   };
 
   const getStatusLabel = () => {
-    if (localStatus === "open") return "Active";
-    if (localStatus === "close") return "Closed";
-    return "Unknown";
+    if (localStatus === "open") return stolmc_text(Text.StatusActive);
+    if (localStatus === "close") return stolmc_text(Text.StatusClosed);
+    return stolmc_text(Text.StatusUnknown);
   };
 
   return (
@@ -89,7 +88,7 @@ export default function Case({ id, id_user, status, created_at, title, onToggle 
               </span>
             </div>
             <p className="text-xs text-outline">
-              Created: {dateformat(created_at, "mmm dd, yyyy, hh:MM TT")}
+              {stolmc_text(Text.CaseCreatedPrefix)} {dateformat(created_at, "mmm dd, yyyy, hh:MM TT")}
             </p>
           </div>
 
@@ -102,7 +101,7 @@ export default function Case({ id, id_user, status, created_at, title, onToggle 
               }}
               className="p-2 rounded-lg hover:bg-surface-container-highest transition-colors text-on-surface-variant hover:text-primary"
               data-tooltip-id="service-tracker"
-              data-tooltip-content="View Progress"
+              data-tooltip-content={stolmc_text(Text.TipViewProgress)}
             >
               <span className="material-symbols-outlined text-sm">visibility</span>
             </button>
@@ -111,7 +110,7 @@ export default function Case({ id, id_user, status, created_at, title, onToggle 
               onClick={() => setEditing(!editing)}
               className="p-2 rounded-lg hover:bg-surface-container-highest transition-colors text-on-surface-variant hover:text-primary"
               data-tooltip-id="service-tracker"
-              data-tooltip-content={data.tip_edit_case || "Edit Case"}
+              data-tooltip-content={stolmc_text(Text.TipEditCase)}
             >
               <span className="material-symbols-outlined text-sm">edit</span>
             </button>
@@ -125,8 +124,8 @@ export default function Case({ id, id_user, status, created_at, title, onToggle 
                   : "hover:bg-primary-container/30 text-on-surface-variant hover:text-primary"
               } disabled:opacity-50`}
               data-tooltip-id="service-tracker"
-              data-tooltip-content={localStatus === "open" ? data.tip_toggle_case_open || "Close Case" : data.tip_toggle_case_close || "Open Case"}
-              title={localStatus === "open" ? "Close Case" : "Open Case"}
+              data-tooltip-content={localStatus === "open" ? stolmc_text(Text.TipToggleCaseOpen) : stolmc_text(Text.TipToggleCaseClose)}
+              title={localStatus === "open" ? stolmc_text(Text.TipToggleCaseClose) : stolmc_text(Text.TipToggleCaseOpen)}
             >
               <span className="material-symbols-outlined text-sm">
                 {toggling ? "hourglass_empty" : localStatus === "open" ? "toggle_on" : "toggle_off"}
@@ -137,7 +136,7 @@ export default function Case({ id, id_user, status, created_at, title, onToggle 
               onClick={handleDelete}
               className="p-2 rounded-lg hover:bg-error-container/30 transition-colors text-on-surface-variant hover:text-error"
               data-tooltip-id="service-tracker"
-              data-tooltip-content={data.tip_delete_case || "Delete Case"}
+              data-tooltip-content={stolmc_text(Text.TipDeleteCase)}
             >
               <span className="material-symbols-outlined text-sm">delete</span>
             </button>
@@ -154,7 +153,7 @@ export default function Case({ id, id_user, status, created_at, title, onToggle 
                 onChange={(e) => setNewTitle(e.target.value)}
                 className="flex-1 bg-surface-container-lowest border-0 rounded-xl py-3 px-4 text-sm focus:ring-2 focus:ring-primary/10 transition-all placeholder:text-outline-variant"
                 type="text"
-                placeholder="Enter new title..."
+                placeholder={stolmc_text(Text.CaseEditPlaceholder)}
                 defaultValue={title}
               />
               <button
@@ -165,7 +164,7 @@ export default function Case({ id, id_user, status, created_at, title, onToggle 
                 }}
                 className="px-6 py-3 bg-primary text-on-primary text-sm font-bold rounded-xl shadow-sm active:scale-95 transition-all hover:bg-primary-container"
               >
-                {data.btn_save_case || "Save"}
+                {stolmc_text(Text.BtnSaveCase)}
               </button>
               <button
                 onClick={(e) => {
@@ -174,7 +173,7 @@ export default function Case({ id, id_user, status, created_at, title, onToggle 
                 }}
                 className="px-6 py-3 bg-surface-container-highest text-on-surface text-sm font-bold rounded-xl shadow-sm active:scale-95 transition-all hover:bg-surface-container-high"
               >
-                {data.btn_dismiss_edit || "Dismiss"}
+                {stolmc_text(Text.BtnDismissEdit)}
               </button>
             </div>
           </form>

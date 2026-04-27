@@ -7,8 +7,7 @@ import type { Case as CaseType } from "../../types";
 import { get as fetchGet, post } from "../../utils/fetch";
 import { normalizeUsers } from "../../utils/users";
 import { toast } from "react-toastify";
-
-declare const data: Record<string, any>;
+import { stolmc_text, Text } from "../../i18n";
 
 const CASES_PER_PAGE = 10;
 
@@ -110,7 +109,7 @@ export default function Cases() {
         setFilteredCases(casesList);
       } catch (err) {
         console.error("Error loading cases:", err);
-        setError("Failed to load cases. Please try again.");
+        setError(stolmc_text(Text.AlertErrorBase));
       } finally {
         setLoading(false);
       }
@@ -167,10 +166,10 @@ export default function Cases() {
 
         setAllCases(update);
         setFilteredCases(update);
-        toast.success(`Case is now ${targetStatus === "open" ? "open" : "closed"}`);
+        toast.success(`${stolmc_text(Text.ToastToggleBaseMsg)} ${targetStatus === "open" ? stolmc_text(Text.ToastToggleStateOpenMsg) : stolmc_text(Text.ToastToggleStateCloseMsg)}`);
       } catch (err) {
         console.error("Error toggling case:", err);
-        toast.error("Failed to update case status");
+        toast.error(stolmc_text(Text.ToastCaseToggled));
       }
     },
     [allCases]
@@ -190,7 +189,7 @@ export default function Cases() {
             onClick={() => setError(null)}
             className="mt-4 px-6 py-3 bg-primary text-on-primary text-sm font-bold rounded-xl hover:bg-primary-container transition-colors"
           >
-            Retry
+            {stolmc_text(Text.CasesRetry)}
           </button>
         </div>
       </section>
@@ -203,11 +202,11 @@ export default function Cases() {
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h1 className="text-3xl font-black text-on-surface tracking-tight">Cases</h1>
+            <h1 className="text-3xl font-black text-on-surface tracking-tight">{stolmc_text(Text.CasesHeading)}</h1>
             <p className="text-on-surface-variant text-sm mt-1">
               {allCases.length > 0
-                ? `${allCases.length} case${allCases.length !== 1 ? "s" : ""} across all clients`
-                : "Search and manage all service cases"}
+                ? stolmc_text(Text.CasesCountSubtitle).replace('%d', String(allCases.length))
+                : stolmc_text(Text.CasesSearchPlaceholder)}
             </p>
           </div>
         </div>
@@ -221,7 +220,7 @@ export default function Cases() {
             type="text"
             value={localQuery}
             onChange={(e) => setLocalQuery(e.target.value)}
-            placeholder="Search cases by title or client name..."
+            placeholder={stolmc_text(Text.CasesSearchPlaceholder)}
             className="w-full bg-surface-container-low border-0 rounded-xl py-4 pl-12 pr-10 text-sm focus:ring-2 focus:ring-primary/10 transition-all placeholder:text-outline-variant"
           />
           {localQuery && (
@@ -241,7 +240,7 @@ export default function Cases() {
               {localQuery ? "search_off" : "folder_open"}
             </span>
             <p className="text-on-surface-variant text-sm font-medium">
-              {localQuery ? `No cases match "${localQuery}"` : "No cases found"}
+              {localQuery ? stolmc_text(Text.CasesEmptySearch) : stolmc_text(Text.CasesEmptySearch)}
             </p>
             {!localQuery && (
               <button
@@ -249,7 +248,7 @@ export default function Cases() {
                 className="mt-4 flex items-center gap-2 px-6 py-3 bg-primary text-on-primary text-sm font-bold rounded-xl shadow-sm active:scale-95 transition-all hover:bg-primary-container mx-auto"
               >
                 <span className="material-symbols-outlined text-sm">add_circle</span>
-                Create your first case
+                {stolmc_text(Text.CasesCreateFirst)}
               </button>
             )}
           </div>
@@ -271,7 +270,7 @@ export default function Cases() {
                   className="flex items-center gap-1 px-3 py-2 rounded-lg text-xs font-bold text-on-surface-variant hover:bg-surface-container-high disabled:opacity-30 disabled:cursor-not-allowed transition-all"
                 >
                   <span className="material-symbols-outlined text-sm">chevron_left</span>
-                  Prev
+                  {stolmc_text(Text.BtnPrev)}
                 </button>
 
                 <div className="flex items-center gap-1">
@@ -306,7 +305,7 @@ export default function Cases() {
                   disabled={page >= totalPages}
                   className="flex items-center gap-1 px-3 py-2 rounded-lg text-xs font-bold text-on-surface-variant hover:bg-surface-container-high disabled:opacity-30 disabled:cursor-not-allowed transition-all"
                 >
-                  Next
+                  {stolmc_text(Text.BtnNext)}
                   <span className="material-symbols-outlined text-sm">chevron_right</span>
                 </button>
               </div>
@@ -319,7 +318,7 @@ export default function Cases() {
       <button
         onClick={handleAddCase}
         className="fixed bottom-10 right-10 w-16 h-16 rounded-full bg-primary text-on-primary shadow-lg flex items-center justify-center active:scale-90 transition-all hover:bg-primary-container z-30"
-        title="Add new case"
+        title={stolmc_text(Text.CasesAddNew)}
       >
         <span className="material-symbols-outlined text-3xl">add</span>
       </button>

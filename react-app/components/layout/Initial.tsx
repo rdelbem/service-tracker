@@ -1,6 +1,5 @@
 import { useInViewStore } from "../../stores/inViewStore";
-
-declare const data: Record<string, any>;
+import { stolmc_text, Text } from "../../i18n";
 
 export default function Initial() {
   const inViewState = useInViewStore((state) => state);
@@ -17,10 +16,10 @@ export default function Initial() {
           dashboard
         </span>
         <h1 className="text-4xl font-black text-on-surface tracking-tighter mb-4">
-          Welcome to Service Tracker
+          {stolmc_text(Text.BrandName)}
         </h1>
         <p className="text-on-surface-variant text-lg leading-relaxed">
-          {data.home_screen || "Select a client from the sidebar to get started"}
+          {stolmc_text(Text.HomeScreen)}
         </p>
       </div>
     </section>

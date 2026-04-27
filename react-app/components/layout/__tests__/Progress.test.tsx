@@ -230,12 +230,12 @@ describe("Progress component", () => {
 
     await waitFor(() => expect(mockProgressStore.getStatus).toHaveBeenCalled());
 
-    await user.click(screen.getByRole("button", { name: /add status update/i }));
+    await user.click(screen.getByRole("button", { name: /new_status_btn/i }));
     await user.type(
-      screen.getByPlaceholderText(/type progress details here/i),
+      screen.getByPlaceholderText("progress_placeholder"),
       "  New status update  "
     );
-    await user.click(screen.getByRole("button", { name: /post update/i }));
+    await user.click(screen.getByRole("button", { name: /progress_post_btn/i }));
 
     await waitFor(() => {
       expect(mockProgressStore.postStatus).toHaveBeenCalledWith(
@@ -246,7 +246,7 @@ describe("Progress component", () => {
       );
     });
 
-    expect(screen.getByRole("button", { name: /add status update/i })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /new_status_btn/i })).toBeInTheDocument();
   });
 
   it("shows error toast when posting status fails", async () => {
@@ -256,12 +256,12 @@ describe("Progress component", () => {
     render(<Progress />);
     await waitFor(() => expect(mockProgressStore.getStatus).toHaveBeenCalled());
 
-    await user.click(screen.getByRole("button", { name: /add status update/i }));
-    await user.type(screen.getByPlaceholderText(/type progress details here/i), "Failed post");
-    await user.click(screen.getByRole("button", { name: /post update/i }));
+    await user.click(screen.getByRole("button", { name: /new_status_btn/i }));
+    await user.type(screen.getByPlaceholderText("progress_placeholder"), "Failed post");
+    await user.click(screen.getByRole("button", { name: /progress_post_btn/i }));
 
     await waitFor(() => {
-      expect(mockToastError).toHaveBeenCalledWith("Failed to post status update");
+      expect(mockToastError).toHaveBeenCalledWith("toast_status_post_failed");
     });
   });
 
@@ -289,7 +289,7 @@ describe("Progress component", () => {
         expect.anything()
       );
     });
-    expect(mockToastSuccess).toHaveBeenCalledWith("Case is now closed");
+    expect(mockToastSuccess).toHaveBeenCalledWith("toast_toggle_base_msg toast_toggle_state_close_msg");
   });
 
   it("deletes case only when confirmation is accepted", async () => {
@@ -299,12 +299,12 @@ describe("Progress component", () => {
     render(<Progress />);
     await waitFor(() => expect(mockProgressStore.getStatus).toHaveBeenCalled());
 
-    await user.click(screen.getByTitle("Delete Case"));
+    await user.click(screen.getByTitle("confirm_delete_case_title"));
     await waitFor(() => expect(mockShowConfirm).toHaveBeenCalled());
     expect(mockDel).not.toHaveBeenCalled();
 
     mockShowConfirm.mockResolvedValueOnce(true);
-    await user.click(screen.getByTitle("Delete Case"));
+    await user.click(screen.getByTitle("confirm_delete_case_title"));
 
     await waitFor(() => {
       expect(mockDel).toHaveBeenCalledWith(
@@ -312,7 +312,7 @@ describe("Progress component", () => {
         expect.anything()
       );
     });
-    expect(mockToastSuccess).toHaveBeenCalledWith("Case deleted successfully");
+    expect(mockToastSuccess).toHaveBeenCalledWith("toast_case_deleted_success");
     expect(mockInViewState.navigate).toHaveBeenCalledWith("cases", "", "", "");
   });
 
@@ -322,11 +322,11 @@ describe("Progress component", () => {
 
     await waitFor(() => expect(mockProgressStore.getStatus).toHaveBeenCalled());
 
-    await user.click(screen.getByTitle("Edit title"));
-    const input = screen.getByPlaceholderText("Enter case title...");
+    await user.click(screen.getByTitle("tip_edit_case"));
+    const input = screen.getByPlaceholderText("case_edit_placeholder");
     await user.clear(input);
     await user.type(input, "Updated Case Title");
-    await user.click(screen.getByTitle("Save title"));
+    await user.click(screen.getByTitle("btn_save_case"));
 
     await waitFor(() => {
       expect(mockPut).toHaveBeenCalledWith(
@@ -335,12 +335,12 @@ describe("Progress component", () => {
         expect.anything()
       );
     });
-    expect(mockToastSuccess).toHaveBeenCalledWith("Case title updated successfully");
+    expect(mockToastSuccess).toHaveBeenCalledWith("toast_case_title_updated");
 
     mockPut.mockClear();
-    await user.click(screen.getByTitle("Edit title"));
-    await user.click(screen.getByTitle("Cancel"));
-    expect(screen.queryByPlaceholderText("Enter case title...")).not.toBeInTheDocument();
+    await user.click(screen.getByTitle("tip_edit_case"));
+    await user.click(screen.getByTitle("btn_cancel"));
+    expect(screen.queryByPlaceholderText("case_edit_placeholder")).not.toBeInTheDocument();
     expect(mockPut).not.toHaveBeenCalled();
   });
 
@@ -350,7 +350,7 @@ describe("Progress component", () => {
 
     await waitFor(() => expect(mockProgressStore.getStatus).toHaveBeenCalled());
 
-    const startLabel = screen.getByText("Start Date");
+    const startLabel = screen.getByText("label_start_date");
     const startHeader = startLabel.parentElement as HTMLElement;
     const startCard = startHeader.parentElement as HTMLElement;
 
@@ -370,7 +370,7 @@ describe("Progress component", () => {
 
     mockPut.mockClear();
 
-    const dueLabel = screen.getByText("Due Date");
+    const dueLabel = screen.getByText("label_due_date");
     const dueHeader = dueLabel.parentElement as HTMLElement;
     const dueCard = dueHeader.parentElement as HTMLElement;
 
@@ -395,13 +395,13 @@ describe("Progress component", () => {
         expect.anything()
       );
     });
-    expect(mockToastSuccess).toHaveBeenCalledWith("Case owner changed to Bob");
+    expect(mockToastSuccess).toHaveBeenCalledWith("toast_owner_changed");
 
     mockPut.mockRejectedValueOnce(new Error("owner update failed"));
     fireEvent.change(ownerSelect, { target: { value: "2" } });
 
     await waitFor(() => {
-      expect(mockToastError).toHaveBeenCalledWith("Failed to update case owner");
+      expect(mockToastError).toHaveBeenCalledWith("toast_owner_update_failed");
     });
     expect(ownerSelect.value).toBe("2");
   });

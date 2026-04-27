@@ -1,6 +1,8 @@
 <?php
 namespace STOLMC_Service_Tracker\admin;
 
+use STOLMC_Service_Tracker\admin\I18n\UI_Copy;
+
 defined( 'ABSPATH' ) || exit;
 
 /**
@@ -271,7 +273,11 @@ class STOLMC_Service_Tracker_Admin {
 	/**
 	 * Localize scripts with plugin data.
 	 *
+	 * Loads all UI copy from the aggregated translation file via UI_Copy
+	 * and exposes it to the React app as `window.data`.
+	 *
 	 * @since    1.0.0
+	 * @since    2.1.0 Refactored to use UI_Copy for centralised i18n.
 	 *
 	 * @param string $hook The current admin page.
 	 *
@@ -282,24 +288,26 @@ class STOLMC_Service_Tracker_Admin {
 			return;
 		}
 
-		// This file has all the texts inside a variable $stolmc_texts_array.
-		$stolmc_texts_array = [];
-		include wp_normalize_path( plugin_dir_path( __FILE__ ) . 'translation/texts_array.php' );
+		$ui_copy = new UI_Copy(
+			wp_normalize_path( plugin_dir_path( __FILE__ ) . 'translation/ui_copy.php' )
+		);
+
+		$localize_data = $ui_copy->get_localize_data();
 
 		/**
 		 * Filters the data passed to the admin JavaScript.
 		 *
 		 * @since 1.0.0
 		 *
-		 * @param array  $stolmc_texts_array The texts data array.
-		 * @param string $hook        The current admin page.
+		 * @param array  $localize_data The localization data array.
+		 * @param string $hook          The current admin page.
 		 */
-		$stolmc_texts_array = apply_filters( 'stolmc_service_tracker_admin_localize_script_data', $stolmc_texts_array, $hook );
+		$localize_data = apply_filters( 'stolmc_service_tracker_admin_localize_script_data', $localize_data, $hook );
 
 		wp_localize_script(
 			$this->plugin_name,
 			'data',
-			$stolmc_texts_array
+			$localize_data
 		);
 	}
 

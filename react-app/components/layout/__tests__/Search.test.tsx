@@ -27,7 +27,7 @@ describe("Search component", () => {
   it("renders default placeholder when localized text is not provided", () => {
     render(<Search />);
 
-    expect(screen.getByPlaceholderText("Search accounts...")).toBeInTheDocument();
+    expect(screen.getByPlaceholderText("search_bar")).toBeInTheDocument();
   });
 
   it("renders localized placeholder when provided", () => {

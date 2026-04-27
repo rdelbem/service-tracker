@@ -1,19 +1,20 @@
 import { useInViewStore } from "../../stores/inViewStore";
+import { stolmc_text, Text } from "../../i18n";
 
 export default function Sidebar() {
   const inViewState = useInViewStore((state) => state);
   const { navigate } = useInViewStore();
 
   const navItems = [
-    { icon: "dashboard", label: "Dashboard", view: "init" },
-    { icon: "group", label: "Clients", view: "clients" },
-    { icon: "folder_open", label: "Cases", view: "cases" },
-    { icon: "event", label: "Calendar", view: "calendar" },
-    { icon: "analytics", label: "Analytics", view: "analytics" },
+    { icon: "dashboard", label: stolmc_text(Text.NavDashboard), view: "init" },
+    { icon: "group", label: stolmc_text(Text.NavClients), view: "clients" },
+    { icon: "folder_open", label: stolmc_text(Text.NavCases), view: "cases" },
+    { icon: "event", label: stolmc_text(Text.NavCalendar), view: "calendar" },
+    { icon: "analytics", label: stolmc_text(Text.NavAnalytics), view: "analytics" },
   ];
 
   const bottomNavItems = [
-    { icon: "settings", label: "Settings", view: "settings" },
+    { icon: "settings", label: stolmc_text(Text.NavSettings), view: "settings" },
   ];
 
   return (
@@ -21,10 +22,10 @@ export default function Sidebar() {
       {/* Brand Header */}
       <div className="mb-10 px-4">
         <h1 className="text-xl font-black text-on-surface tracking-tighter uppercase">
-          Service Tracker
+          {stolmc_text(Text.BrandName)}
         </h1>
         <p className="font-['Manrope'] font-semibold tracking-tight text-xs text-on-surface-variant uppercase mt-1">
-          Administrator
+          {stolmc_text(Text.RoleAdmin)}
         </p>
       </div>
 
@@ -85,10 +86,10 @@ export default function Sidebar() {
           </div>
           <div className="overflow-hidden">
             <p className="text-sm font-bold text-on-surface truncate">
-              {inViewState.name || "Admin User"}
+              {inViewState.name || stolmc_text(Text.FallbackAdminUser)}
             </p>
             <p className="text-[10px] text-on-surface-variant uppercase tracking-widest">
-              Master Admin
+              {stolmc_text(Text.RoleMaster)}
             </p>
           </div>
         </div>

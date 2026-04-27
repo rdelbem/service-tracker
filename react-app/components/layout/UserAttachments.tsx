@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { get as fetchGet } from "../../utils/fetch";
 import dateformat from "dateformat";
+import { stolmc_text, Text } from "../../i18n";
 
 declare const data: Record<string, any>;
 
@@ -61,7 +62,7 @@ export default function UserAttachments({ idUser }: UserAttachmentsProps) {
         <span className="material-symbols-outlined text-sm animate-spin">
           progress_activity
         </span>
-        <span className="text-sm">Loading attachments...</span>
+        <span className="text-sm">{stolmc_text(Text.AttachmentsLoading)}</span>
       </div>
     );
   }
@@ -73,7 +74,7 @@ export default function UserAttachments({ idUser }: UserAttachmentsProps) {
           folder_open
         </span>
         <p className="text-sm text-on-surface-variant font-medium">
-          No attachments found for this client
+          {stolmc_text(Text.AttachmentsEmpty)}
         </p>
       </div>
     );
@@ -95,14 +96,14 @@ export default function UserAttachments({ idUser }: UserAttachmentsProps) {
       {caseOptions.length > 1 && (
         <div className="flex items-center gap-3 mb-6">
           <span className="text-xs font-bold text-on-surface-variant uppercase tracking-wider">
-            Filter by case:
+            {stolmc_text(Text.AttachmentsFilterLabel)}
           </span>
           <select
             value={filterCase}
             onChange={(e) => setFilterCase(e.target.value)}
             className="bg-surface-container-lowest border border-outline-variant/20 rounded-lg py-1.5 px-3 text-sm focus:ring-2 focus:ring-primary/10"
           >
-            <option value="all">All Cases</option>
+            <option value="all">{stolmc_text(Text.AttachmentsAllCases)}</option>
             {caseOptions.map(([id, title]) => (
               <option key={id} value={id}>
                 {title}
@@ -110,7 +111,7 @@ export default function UserAttachments({ idUser }: UserAttachmentsProps) {
             ))}
           </select>
           <span className="text-xs text-on-surface-variant ml-auto">
-            {filtered.length} attachment{filtered.length !== 1 ? "s" : ""}
+            {filtered.length} {filtered.length !== 1 ? stolmc_text(Text.AttachmentPlural) : stolmc_text(Text.AttachmentSingular)}
           </span>
         </div>
       )}

@@ -34,19 +34,19 @@ describe("Sidebar component", () => {
   it("renders sidebar with brand header", () => {
     render(<Sidebar />);
 
-    expect(screen.getByText("Service Tracker")).toBeInTheDocument();
-    expect(screen.getByText("Administrator")).toBeInTheDocument();
+    expect(screen.getByText("brand_name")).toBeInTheDocument();
+    expect(screen.getByText("role_admin")).toBeInTheDocument();
   });
 
   it("renders all navigation items", () => {
     render(<Sidebar />);
 
-    expect(screen.getByText("Dashboard")).toBeInTheDocument();
-    expect(screen.getByText("Clients")).toBeInTheDocument();
-    expect(screen.getByText("Cases")).toBeInTheDocument();
-    expect(screen.getByText("Calendar")).toBeInTheDocument();
-    expect(screen.getByText("Analytics")).toBeInTheDocument();
-    expect(screen.getByText("Settings")).toBeInTheDocument();
+    expect(screen.getByText("nav_dashboard")).toBeInTheDocument();
+    expect(screen.getByText("nav_clients")).toBeInTheDocument();
+    expect(screen.getByText("nav_cases")).toBeInTheDocument();
+    expect(screen.getByText("nav_calendar")).toBeInTheDocument();
+    expect(screen.getByText("nav_analytics")).toBeInTheDocument();
+    expect(screen.getByText("nav_settings")).toBeInTheDocument();
   });
 
   it("highlights active navigation item based on current view", () => {
@@ -54,7 +54,7 @@ describe("Sidebar component", () => {
     render(<Sidebar />);
 
     // The Cases nav item should have active styling
-    const casesItem = screen.getByText("Cases");
+    const casesItem = screen.getByText("nav_cases");
     // We can't directly test CSS classes but we can check parent element
     // The active item should have different styling
     expect(casesItem).toBeInTheDocument();
@@ -64,7 +64,7 @@ describe("Sidebar component", () => {
     const user = userEvent.setup();
     render(<Sidebar />);
 
-    const clientsItem = screen.getByText("Clients");
+    const clientsItem = screen.getByText("nav_clients");
     await user.click(clientsItem);
 
     expect(mockInViewStoreState.navigate).toHaveBeenCalledWith("clients", "", "", "");
@@ -74,7 +74,7 @@ describe("Sidebar component", () => {
     const user = userEvent.setup();
     render(<Sidebar />);
 
-    const settingsItem = screen.getByText("Settings");
+    const settingsItem = screen.getByText("nav_settings");
     await user.click(settingsItem);
 
     expect(mockInViewStoreState.navigate).toHaveBeenCalledWith("settings", "", "", "");
@@ -85,14 +85,14 @@ describe("Sidebar component", () => {
     render(<Sidebar />);
 
     expect(screen.getByText("John Doe")).toBeInTheDocument();
-    expect(screen.getByText("Master Admin")).toBeInTheDocument();
+    expect(screen.getByText("role_master")).toBeInTheDocument();
   });
 
   it("displays default admin user when name is empty", () => {
     mockInViewStoreState.name = "";
     render(<Sidebar />);
 
-    expect(screen.getByText("Admin User")).toBeInTheDocument();
+    expect(screen.getByText("fallback_admin_user")).toBeInTheDocument();
   });
 
   it("shows user initial avatar", () => {

@@ -159,14 +159,14 @@ describe("CaseDetails component", () => {
 
     render(<CaseDetails />);
 
-    expect(await screen.findByText(/case not found/i)).toBeInTheDocument();
+    expect(await screen.findByText(/case_not_found/i)).toBeInTheDocument();
   });
 
   it("loads and renders case details", async () => {
     render(<CaseDetails />);
 
     expect(await screen.findByText("Main Case")).toBeInTheDocument();
-    expect(screen.getByText("Client: John Client")).toBeInTheDocument();
+    expect(screen.getByText("client_label: John Client")).toBeInTheDocument();
     expect(screen.getByText("Case description")).toBeInTheDocument();
   });
 
@@ -176,12 +176,12 @@ describe("CaseDetails component", () => {
 
     await screen.findByText("Main Case");
 
-    await user.click(screen.getByTitle(/edit case/i));
+    await user.click(screen.getByTitle(/tip_edit_case/i));
     const titleInput = screen.getByRole("textbox");
     await user.clear(titleInput);
     await user.click(screen.getByRole("button", { name: /save/i }));
 
-    expect(mockToastError).toHaveBeenCalledWith("Case title cannot be empty");
+    expect(mockToastError).toHaveBeenCalledWith("alert_blank_case_title");
     expect(mockEditCase).not.toHaveBeenCalled();
   });
 
@@ -191,7 +191,7 @@ describe("CaseDetails component", () => {
 
     await screen.findByText("Main Case");
 
-    await user.click(screen.getByTitle(/edit case/i));
+    await user.click(screen.getByTitle(/tip_edit_case/i));
     const dateInputs = screen.getAllByDisplayValue(/2024-01-0[25]T10:00/);
     await user.clear(dateInputs[0]);
     await user.type(dateInputs[0], "2024-01-06T10:00");
@@ -199,7 +199,7 @@ describe("CaseDetails component", () => {
     await user.type(dateInputs[1], "2024-01-05T10:00");
     await user.click(screen.getByRole("button", { name: /save/i }));
 
-    expect(mockToastError).toHaveBeenCalledWith("Start date must be before due date");
+    expect(mockToastError).toHaveBeenCalledWith("add_case_date_help");
     expect(mockEditCase).not.toHaveBeenCalled();
   });
 
@@ -209,7 +209,7 @@ describe("CaseDetails component", () => {
 
     await screen.findByText("Main Case");
 
-    await user.click(screen.getByTitle(/edit case/i));
+    await user.click(screen.getByTitle(/tip_edit_case/i));
     const titleInput = screen.getByRole("textbox");
     await user.clear(titleInput);
     await user.type(titleInput, "Updated Case");
@@ -234,7 +234,7 @@ describe("CaseDetails component", () => {
 
     await screen.findByText("Main Case");
 
-    await user.click(screen.getByRole("button", { name: /open/i }));
+    await user.click(screen.getByRole("button", { name: /status_active/i }));
 
     await waitFor(() => {
       expect(mockPost).toHaveBeenCalledWith(
@@ -243,12 +243,12 @@ describe("CaseDetails component", () => {
         expect.anything()
       );
     });
-    expect(mockToastSuccess).toHaveBeenCalledWith("Case is now close");
+    expect(mockToastSuccess).toHaveBeenCalledWith("toast_toggle_base_msg close");
 
     mockPost.mockRejectedValueOnce(new Error("fail"));
     await user.click(screen.getByRole("button", { name: /closed/i }));
     await waitFor(() => {
-      expect(mockToastError).toHaveBeenCalledWith("Failed to update status");
+      expect(mockToastError).toHaveBeenCalledWith("toast_case_toggled");
     });
   });
 
@@ -259,7 +259,7 @@ describe("CaseDetails component", () => {
     render(<CaseDetails />);
     await screen.findByText("Main Case");
 
-    await user.click(screen.getByTitle(/delete case/i));
+    await user.click(screen.getByTitle(/tip_delete_case/i));
 
     await waitFor(() => {
       expect(mockShowConfirm).toHaveBeenCalled();
@@ -274,7 +274,7 @@ describe("CaseDetails component", () => {
     render(<CaseDetails />);
     await screen.findByText("Main Case");
 
-    await user.click(screen.getByTitle(/delete case/i));
+    await user.click(screen.getByTitle(/tip_delete_case/i));
 
     await waitFor(() => {
       expect(mockDel).toHaveBeenCalledWith(
@@ -282,7 +282,7 @@ describe("CaseDetails component", () => {
         expect.anything()
       );
     });
-    expect(mockToastSuccess).toHaveBeenCalledWith("Case deleted successfully");
+    expect(mockToastSuccess).toHaveBeenCalledWith("toast_case_deleted_success");
     expect(mockInViewState.navigate).toHaveBeenCalledWith("cases", "", "", "");
   });
 
@@ -291,7 +291,7 @@ describe("CaseDetails component", () => {
     render(<CaseDetails />);
 
     await screen.findByText("Main Case");
-    await user.click(screen.getByRole("button", { name: /back to cases list/i }));
+    await user.click(screen.getByRole("button", { name: /btn_back_to_cases/i }));
 
     expect(mockInViewState.navigate).toHaveBeenCalledWith("cases", "", "", "");
   });
