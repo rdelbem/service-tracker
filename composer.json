@@ -13,7 +13,7 @@
     }
   },
   "require": {
-    "fightbulc/moment": "1.33",
+    "fightbulc/moment": "1.35.0",
     "rdelbem/wp-mailer-class": "1.0.2"
   }
 }
