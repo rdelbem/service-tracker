@@ -229,6 +229,9 @@ describe("Progress component", () => {
     render(<Progress />);
 
     await waitFor(() => expect(mockProgressStore.getStatus).toHaveBeenCalled());
+    await waitFor(() => {
+      expect(screen.queryByTestId("spinner")).not.toBeInTheDocument();
+    });
 
     await user.click(screen.getByRole("button", { name: /new_status_btn/i }));
     await user.type(
@@ -255,6 +258,9 @@ describe("Progress component", () => {
 
     render(<Progress />);
     await waitFor(() => expect(mockProgressStore.getStatus).toHaveBeenCalled());
+    await waitFor(() => {
+      expect(screen.queryByTestId("spinner")).not.toBeInTheDocument();
+    });
 
     await user.click(screen.getByRole("button", { name: /new_status_btn/i }));
     await user.type(screen.getByPlaceholderText("progress_placeholder"), "Failed post");
@@ -271,6 +277,9 @@ describe("Progress component", () => {
 
     render(<Progress />);
     await waitFor(() => expect(mockProgressStore.getStatus).toHaveBeenCalled());
+    await waitFor(() => {
+      expect(screen.queryByTestId("spinner")).not.toBeInTheDocument();
+    });
 
     await user.click(screen.getByRole("button", { name: /active/i }));
 
@@ -298,6 +307,9 @@ describe("Progress component", () => {
 
     render(<Progress />);
     await waitFor(() => expect(mockProgressStore.getStatus).toHaveBeenCalled());
+    await waitFor(() => {
+      expect(screen.queryByTestId("spinner")).not.toBeInTheDocument();
+    });
 
     await user.click(screen.getByTitle("confirm_delete_case_title"));
     await waitFor(() => expect(mockShowConfirm).toHaveBeenCalled());
@@ -321,6 +333,9 @@ describe("Progress component", () => {
     render(<Progress />);
 
     await waitFor(() => expect(mockProgressStore.getStatus).toHaveBeenCalled());
+    await waitFor(() => {
+      expect(screen.queryByTestId("spinner")).not.toBeInTheDocument();
+    });
 
     await user.click(screen.getByTitle("tip_edit_case"));
     const input = screen.getByPlaceholderText("case_edit_placeholder");
@@ -349,6 +364,9 @@ describe("Progress component", () => {
     render(<Progress />);
 
     await waitFor(() => expect(mockProgressStore.getStatus).toHaveBeenCalled());
+    await waitFor(() => {
+      expect(screen.queryByTestId("spinner")).not.toBeInTheDocument();
+    });
 
     const startLabel = screen.getByText("label_start_date");
     const startHeader = startLabel.parentElement as HTMLElement;
@@ -384,6 +402,9 @@ describe("Progress component", () => {
     render(<Progress />);
 
     await waitFor(() => expect(mockProgressStore.getStatus).toHaveBeenCalled());
+    await waitFor(() => {
+      expect(screen.queryByTestId("spinner")).not.toBeInTheDocument();
+    });
 
     const ownerSelect = screen.getByRole("combobox") as HTMLSelectElement;
 
