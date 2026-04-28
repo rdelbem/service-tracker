@@ -1,0 +1,1027 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Service Tracker\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-04-27 00:00+0000\n"
+"PO-Revision-Date: 2026-04-27 00:00+0000\n"
+"Language-Team: \n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 2.4.2\n"
+"X-Domain: service-tracker-stolmc\n"
+"Last-Translator: \n"
+"Language: pt_BR\n"
+
+#. Name of the plugin
+msgid "Service Tracker"
+msgstr ""
+
+#. Description of the plugin
+msgid "This plugin offers the possibilitie to track the services you provide."
+msgstr "Esse plugin oferece a possibilidade de monitorar o andamento de serviços prestados."
+
+#. Author of the plugin
+msgid "Rodrigo Del Bem <servicetracker@delbem.net>"
+msgstr ""
+
+#. URI of the plugin
+msgid "https://delbem.net/services-tracker"
+msgstr ""
+
+#. Author URI of the plugin
+msgid "https://delbem.net"
+msgstr ""
+
+#: includes/STOLMC_Service_Tracker.php:232 admin/translation/ui_copy.php:271
+msgid "Service Tracker Client"
+msgstr "Cliente Service Tracker"
+
+#: includes/STOLMC_Service_Tracker.php:269
+msgid "Staff"
+msgstr "Equipe"
+
+#: includes/Controller_API/STOLMC_Service_Tracker_Api.php:47
+msgid "Sorry, you are not allowed to access this endpoint."
+msgstr "Desculpe, você não tem permissão para acessar este endpoint."
+
+#: includes/Controller_API/STOLMC_Service_Tracker_Api.php:58
+msgid "Sorry, invalid credentials."
+msgstr "Acesso negado"
+
+#: includes/Application/STOLMC_Service_Tracker_Toggle_Service.php:234
+msgid "Your case was closed!"
+msgstr "Seu caso foi encerrado!"
+
+#: includes/Application/STOLMC_Service_Tracker_Toggle_Service.php:235
+msgid "is now closed!"
+msgstr "está encerrado!"
+
+#: includes/Application/STOLMC_Service_Tracker_Toggle_Service.php:255
+msgid "Your case was opened!"
+msgstr "Seu caso foi aberto!"
+
+#: includes/Application/STOLMC_Service_Tracker_Toggle_Service.php:256
+msgid "is now opened!"
+msgstr "está aberto!"
+
+#: admin/translation/ui_copy.php:26
+msgid "Search for a client"
+msgstr "Buscar um cliente"
+
+#: admin/translation/ui_copy.php:27
+msgid "Click on a client name, to se hers/his cases!"
+msgstr "Clique no nome de um cliente para ver seus casos!"
+
+#: admin/translation/ui_copy.php:32
+msgid "Dashboard"
+msgstr "Painel"
+
+#: admin/translation/ui_copy.php:33 admin/translation/ui_copy.php:158
+msgid "Clients"
+msgstr "Clientes"
+
+#: admin/translation/ui_copy.php:34 admin/translation/ui_copy.php:49
+msgid "Cases"
+msgstr "Casos"
+
+#: admin/translation/ui_copy.php:35 admin/translation/ui_copy.php:215
+msgid "Calendar"
+msgstr "Calendário"
+
+#: admin/translation/ui_copy.php:36 admin/translation/ui_copy.php:249
+msgid "Analytics"
+msgstr "Análises"
+
+#: admin/translation/ui_copy.php:37 admin/translation/ui_copy.php:291
+msgid "Settings"
+msgstr "Configurações"
+
+#: admin/translation/ui_copy.php:39
+msgid "Administrator"
+msgstr "Administrador"
+
+#: admin/translation/ui_copy.php:40
+msgid "Master Admin"
+msgstr "Admin Master"
+
+#: admin/translation/ui_copy.php:41
+msgid "Admin User"
+msgstr "Usuário Admin"
+
+#: admin/translation/ui_copy.php:46
+msgid "Add case"
+msgstr "Adicionar caso"
+
+#: admin/translation/ui_copy.php:47
+msgid "No cases yet! Include a new one!"
+msgstr "Não há casos ainda! Inclua um novo!"
+
+#: admin/translation/ui_copy.php:48
+msgid "Case name"
+msgstr "Nome do caso"
+
+#: admin/translation/ui_copy.php:50
+msgid "Search cases by title or client name..."
+msgstr "Buscar casos por título ou nome do cliente..."
+
+#: admin/translation/ui_copy.php:51
+msgid "No cases found"
+msgstr "Nenhum caso encontrado"
+
+#: admin/translation/ui_copy.php:52 admin/translation/ui_copy.php:342
+msgid "Retry"
+msgstr "Tentar novamente"
+
+#: admin/translation/ui_copy.php:53
+msgid "Create your first case"
+msgstr "Crie seu primeiro caso"
+
+#: admin/translation/ui_copy.php:54
+msgid "Add new case"
+msgstr "Adicionar novo caso"
+
+#: admin/translation/ui_copy.php:59
+msgid "Edit the name of this case"
+msgstr "Edite o nome deste caso"
+
+#: admin/translation/ui_copy.php:60
+msgid "This case is open! Click to close it."
+msgstr "Esse caso está aberto! Clique para encerra-lo."
+
+#: admin/translation/ui_copy.php:61
+msgid "This case is closed! Click to open it."
+msgstr "Esse caso está encerrado! Clique para abri-lo."
+
+#: admin/translation/ui_copy.php:62
+msgid "Delete this case"
+msgstr "Delete esse caso"
+
+#: admin/translation/ui_copy.php:63 admin/translation/ui_copy.php:332
+msgid "Save"
+msgstr "Salvar"
+
+#: admin/translation/ui_copy.php:64
+msgid "Dismiss"
+msgstr "Fechar"
+
+#: admin/translation/ui_copy.php:65
+msgid "Active"
+msgstr "Ativo"
+
+#: admin/translation/ui_copy.php:66 admin/translation/ui_copy.php:274
+msgid "Closed"
+msgstr "Fechado"
+
+#: admin/translation/ui_copy.php:67
+msgid "Unknown"
+msgstr "Desconhecido"
+
+#: admin/translation/ui_copy.php:68
+msgid "Created:"
+msgstr "Criado:"
+
+#: admin/translation/ui_copy.php:69
+msgid "View Progress"
+msgstr "Ver Progresso"
+
+#: admin/translation/ui_copy.php:70
+msgid "Enter new title..."
+msgstr "Digite o novo título..."
+
+#: admin/translation/ui_copy.php:71
+msgid "Case not found"
+msgstr "Caso não encontrado"
+
+#: admin/translation/ui_copy.php:76 admin/translation/ui_copy.php:199
+msgid "Status"
+msgstr "Status"
+
+#: admin/translation/ui_copy.php:77
+msgid "Created"
+msgstr "Criado"
+
+#: admin/translation/ui_copy.php:78 admin/translation/ui_copy.php:203
+msgid "Start Date"
+msgstr "Data de Início"
+
+#: admin/translation/ui_copy.php:79 admin/translation/ui_copy.php:204
+msgid "Due Date"
+msgstr "Data de Vencimento"
+
+#: admin/translation/ui_copy.php:80 admin/translation/ui_copy.php:200
+msgid "Description"
+msgstr "Descrição"
+
+#: admin/translation/ui_copy.php:81
+msgid "Not set"
+msgstr "Não definido"
+
+#: admin/translation/ui_copy.php:82
+msgid "No description provided."
+msgstr "Nenhuma descrição fornecida."
+
+#: admin/translation/ui_copy.php:83
+msgid "Back to Cases List"
+msgstr "Voltar para a Lista de Casos"
+
+#: admin/translation/ui_copy.php:84
+msgid "Case Owner"
+msgstr "Responsável pelo Caso"
+
+#: admin/translation/ui_copy.php:85
+msgid "Unassigned"
+msgstr "Não atribuído"
+
+#: admin/translation/ui_copy.php:86
+msgid "(Admin)"
+msgstr "(Admin)"
+
+#: admin/translation/ui_copy.php:91
+msgid "Do you want to delete the case under the name"
+msgstr "Você gostaria de deletar o caso "
+
+#: admin/translation/ui_copy.php:92
+msgid "Delete Case"
+msgstr "Deletar Caso"
+
+#: admin/translation/ui_copy.php:93
+msgid "Are you sure you want to delete this case? This will also delete all associated progress updates."
+msgstr "Tem certeza que deseja deletar este caso? Isso também deletará todas as atualizações de progresso associadas."
+
+#: admin/translation/ui_copy.php:94
+msgid "Close Case"
+msgstr "Fechar Caso"
+
+#: admin/translation/ui_copy.php:95
+msgid "Reopen Case"
+msgstr "Reabrir Caso"
+
+#: admin/translation/ui_copy.php:96
+msgid "Are you sure you want to close this case?"
+msgstr "Tem certeza que deseja fechar este caso?"
+
+#: admin/translation/ui_copy.php:97
+msgid "Are you sure you want to reopen this case?"
+msgstr "Tem certeza que deseja reabrir este caso?"
+
+#: admin/translation/ui_copy.php:102
+msgid "Progress for case"
+msgstr "Progresso para o caso"
+
+#: admin/translation/ui_copy.php:103
+msgid "New Status"
+msgstr "Novo status"
+
+#: admin/translation/ui_copy.php:104
+msgid "Close box"
+msgstr "Fechar"
+
+#: admin/translation/ui_copy.php:105
+msgid "Add this status"
+msgstr "Adicionar status"
+
+#: admin/translation/ui_copy.php:106
+msgid "Edit this status"
+msgstr "Edite esse status"
+
+#: admin/translation/ui_copy.php:107
+msgid "Delete this status"
+msgstr "Delete esse status"
+
+#: admin/translation/ui_copy.php:108
+msgid "Save changes"
+msgstr "Salvar mudanças"
+
+#: admin/translation/ui_copy.php:109
+msgid "No progress is registered for this case."
+msgstr "Nenhum progresso foi registrado para esse caso."
+
+#: admin/translation/ui_copy.php:110
+msgid "Progress Update"
+msgstr "Atualização de Progresso"
+
+#: admin/translation/ui_copy.php:111
+msgid "Type progress details here..."
+msgstr "Digite os detalhes do progresso aqui..."
+
+#: admin/translation/ui_copy.php:112
+msgid "Files to Attach:"
+msgstr "Arquivos para Anexar:"
+
+#: admin/translation/ui_copy.php:113
+msgid "Attach Files"
+msgstr "Anexar Arquivos"
+
+#: admin/translation/ui_copy.php:114
+msgid "Add Image"
+msgstr "Adicionar Imagem"
+
+#: admin/translation/ui_copy.php:115
+msgid "Uploading..."
+msgstr "Enviando..."
+
+#: admin/translation/ui_copy.php:116
+msgid "Post Update"
+msgstr "Publicar Atualização"
+
+#: admin/translation/ui_copy.php:117
+msgid "Client will be notified"
+msgstr "O cliente será notificado"
+
+#: admin/translation/ui_copy.php:118
+msgid "Activity Log"
+msgstr "Registro de Atividades"
+
+#: admin/translation/ui_copy.php:119
+msgid "Add your first status update to get started"
+msgstr "Adicione sua primeira atualização de status para começar"
+
+#: admin/translation/ui_copy.php:120
+msgid "Client Attachments"
+msgstr "Anexos do Cliente"
+
+#: admin/translation/ui_copy.php:121 admin/translation/ui_copy.php:275
+msgid "Progress"
+msgstr "Progresso"
+
+#: admin/translation/ui_copy.php:122
+msgid "All Attachments"
+msgstr "Todos os Anexos"
+
+#: admin/translation/ui_copy.php:127
+msgid "Do you want to delete the status created in"
+msgstr "Você gostaria de deletar o status criado em"
+
+#: admin/translation/ui_copy.php:128
+msgid "Delete Progress Update"
+msgstr "Deletar Atualização de Progresso"
+
+#: admin/translation/ui_copy.php:129
+msgid "Are you sure you want to delete this progress update?"
+msgstr "Tem certeza que deseja deletar esta atualização de progresso?"
+
+#: admin/translation/ui_copy.php:134
+msgid "Case added!"
+msgstr "Caso adicionado!"
+
+#: admin/translation/ui_copy.php:135
+msgid "Case deleted!"
+msgstr "Caso deletado!"
+
+#: admin/translation/ui_copy.php:136
+msgid "Case edited!"
+msgstr "Caso editado!"
+
+#: admin/translation/ui_copy.php:137
+msgid "Case status updated!"
+msgstr "Status do caso atualizado!"
+
+#: admin/translation/ui_copy.php:138
+msgid "Case is now"
+msgstr "O caso está"
+
+#: admin/translation/ui_copy.php:139
+msgid "open"
+msgstr "aberto"
+
+#: admin/translation/ui_copy.php:140
+msgid "closed"
+msgstr "fechado"
+
+#: admin/translation/ui_copy.php:141
+msgid "Status added!"
+msgstr "Status adicionado!"
+
+#: admin/translation/ui_copy.php:142
+msgid "Status deleted!"
+msgstr "Status deletado!"
+
+#: admin/translation/ui_copy.php:143
+msgid "Status edited!"
+msgstr "Status editado!"
+
+#: admin/translation/ui_copy.php:144
+msgid "Case deleted successfully"
+msgstr "Caso deletado com sucesso"
+
+#: admin/translation/ui_copy.php:145
+msgid "Case title updated successfully"
+msgstr "Título do caso atualizado com sucesso"
+
+#: admin/translation/ui_copy.php:146
+msgid "Case owner changed"
+msgstr "Responsável pelo caso alterado"
+
+#: admin/translation/ui_copy.php:151
+msgid "Case title can not be blank"
+msgstr "O título de um caso não pode ser vazio"
+
+#: admin/translation/ui_copy.php:152
+msgid "Status text can not be blank"
+msgstr "O texto de um status não pode ser vazio"
+
+#: admin/translation/ui_copy.php:153
+msgid "It was impossible to complete this task. We had an error"
+msgstr "Foi impossível completar essa tarefa. Ocorreu o seguinte erro"
+
+#: admin/translation/ui_copy.php:159
+msgid "Search clients..."
+msgstr "Buscar clientes..."
+
+#: admin/translation/ui_copy.php:160
+msgid "No clients found"
+msgstr "Nenhum cliente encontrado"
+
+#: admin/translation/ui_copy.php:161
+msgid "No clients found for this search"
+msgstr "Nenhum cliente encontrado para esta busca"
+
+#: admin/translation/ui_copy.php:162
+msgid "Add your first client to get started"
+msgstr "Adicione seu primeiro cliente para começar"
+
+#: admin/translation/ui_copy.php:163
+msgid "Add Client"
+msgstr "Adicionar Cliente"
+
+#: admin/translation/ui_copy.php:164 admin/translation/ui_copy.php:206
+msgid "Creating..."
+msgstr "Criando..."
+
+#: admin/translation/ui_copy.php:165
+msgid "Create Client"
+msgstr "Criar Cliente"
+
+#: admin/translation/ui_copy.php:166
+msgid "Name"
+msgstr "Nome"
+
+#: admin/translation/ui_copy.php:167
+msgid "Email"
+msgstr "Email"
+
+#: admin/translation/ui_copy.php:168
+msgid "Phone"
+msgstr "Telefone"
+
+#: admin/translation/ui_copy.php:169
+msgid "Cellphone"
+msgstr "Celular"
+
+#: admin/translation/ui_copy.php:170
+msgid "Client name..."
+msgstr "Nome do cliente..."
+
+#: admin/translation/ui_copy.php:171
+msgid "client@example.com"
+msgstr "cliente@exemplo.com"
+
+#: admin/translation/ui_copy.php:172
+msgid "(123) 456-7890"
+msgstr "(123) 456-7890"
+
+#: admin/translation/ui_copy.php:173
+msgid "Name and email are required"
+msgstr "Nome e email são obrigatórios"
+
+#: admin/translation/ui_copy.php:174
+msgid "%d result(s) for \"%s\""
+msgstr "%d resultado(s) para \"%s\""
+
+#: admin/translation/ui_copy.php:175
+msgid "%d client(s) total"
+msgstr "%d cliente(s) no total"
+
+#: admin/translation/ui_copy.php:180 admin/translation/ui_copy.php:195
+msgid "Client"
+msgstr "Cliente"
+
+#: admin/translation/ui_copy.php:181
+msgid "Client Since"
+msgstr "Cliente Desde"
+
+#: admin/translation/ui_copy.php:182
+msgid "Contact Information"
+msgstr "Informações de Contato"
+
+#: admin/translation/ui_copy.php:183
+msgid "Client Cases"
+msgstr "Casos do Cliente"
+
+#: admin/translation/ui_copy.php:184
+msgid "No cases found for this client"
+msgstr "Nenhum caso encontrado para este cliente"
+
+#: admin/translation/ui_copy.php:185
+msgid "Back to Clients List"
+msgstr "Voltar para a Lista de Clientes"
+
+#: admin/translation/ui_copy.php:186
+msgid "Client information updated successfully"
+msgstr "Informações do cliente atualizadas com sucesso"
+
+#: admin/translation/ui_copy.php:187
+msgid "Failed to update client information"
+msgstr "Falha ao atualizar informações do cliente"
+
+#: admin/translation/ui_copy.php:188
+msgid "Please enter a valid email address"
+msgstr "Por favor, insira um endereço de email válido"
+
+#: admin/translation/ui_copy.php:193
+msgid "Add New Case"
+msgstr "Adicionar Novo Caso"
+
+#: admin/translation/ui_copy.php:194
+msgid "Create a new service case for a client"
+msgstr "Criar um novo caso de serviço para um cliente"
+
+#: admin/translation/ui_copy.php:196 admin/translation/ui_copy.php:26
+msgid "Search for a client..."
+msgstr "Buscar um cliente..."
+
+#: admin/translation/ui_copy.php:197
+msgid "Case Title"
+msgstr "Título do Caso"
+
+#: admin/translation/ui_copy.php:198
+msgid "Enter case title..."
+msgstr "Digite o título do caso..."
+
+#: admin/translation/ui_copy.php:201
+msgid "Enter case description..."
+msgstr "Digite a descrição do caso..."
+
+#: admin/translation/ui_copy.php:202
+msgid "Date Range (Optional)"
+msgstr "Período (Opcional)"
+
+#: admin/translation/ui_copy.php:205
+msgid "Leave blank if no specific dates are needed."
+msgstr "Deixe em branco se não houver datas específicas."
+
+#: admin/translation/ui_copy.php:207
+msgid "Create Case"
+msgstr "Criar Caso"
+
+#: admin/translation/ui_copy.php:208
+msgid "Please select a client"
+msgstr "Por favor, selecione um cliente"
+
+#: admin/translation/ui_copy.php:209
+msgid "Please enter a case title"
+msgstr "Por favor, insira um título para o caso"
+
+#: admin/translation/ui_copy.php:210
+msgid "Failed to create case. Please try again."
+msgstr "Falha ao criar caso. Por favor, tente novamente."
+
+#: admin/translation/ui_copy.php:216
+msgid "View cases and progress updates across all clients"
+msgstr "Veja casos e atualizações de progresso de todos os clientes"
+
+#: admin/translation/ui_copy.php:217
+msgid "All Clients"
+msgstr "Todos os Clientes"
+
+#: admin/translation/ui_copy.php:218
+msgid "All Statuses"
+msgstr "Todos os Status"
+
+#: admin/translation/ui_copy.php:219
+msgid "Case Starts"
+msgstr "Início do Caso"
+
+#: admin/translation/ui_copy.php:220
+msgid "Case Ends"
+msgstr "Fim do Caso"
+
+#: admin/translation/ui_copy.php:221
+msgid "more"
+msgstr "mais"
+
+#: admin/translation/ui_copy.php:223
+msgid "Sun"
+msgstr "Dom"
+
+#: admin/translation/ui_copy.php:224
+msgid "Mon"
+msgstr "Seg"
+
+#: admin/translation/ui_copy.php:225
+msgid "Tue"
+msgstr "Ter"
+
+#: admin/translation/ui_copy.php:226
+msgid "Wed"
+msgstr "Qua"
+
+#: admin/translation/ui_copy.php:227
+msgid "Thu"
+msgstr "Qui"
+
+#: admin/translation/ui_copy.php:228
+msgid "Fri"
+msgstr "Sex"
+
+#: admin/translation/ui_copy.php:229
+msgid "Sat"
+msgstr "Sáb"
+
+#: admin/translation/ui_copy.php:232
+msgid "January"
+msgstr "Janeiro"
+
+#: admin/translation/ui_copy.php:233
+msgid "February"
+msgstr "Fevereiro"
+
+#: admin/translation/ui_copy.php:234
+msgid "March"
+msgstr "Março"
+
+#: admin/translation/ui_copy.php:235
+msgid "April"
+msgstr "Abril"
+
+#: admin/translation/ui_copy.php:236
+msgid "May"
+msgstr "Maio"
+
+#: admin/translation/ui_copy.php:237
+msgid "June"
+msgstr "Junho"
+
+#: admin/translation/ui_copy.php:238
+msgid "July"
+msgstr "Julho"
+
+#: admin/translation/ui_copy.php:239
+msgid "August"
+msgstr "Agosto"
+
+#: admin/translation/ui_copy.php:240
+msgid "September"
+msgstr "Setembro"
+
+#: admin/translation/ui_copy.php:241
+msgid "October"
+msgstr "Outubro"
+
+#: admin/translation/ui_copy.php:242
+msgid "November"
+msgstr "Novembro"
+
+#: admin/translation/ui_copy.php:243
+msgid "December"
+msgstr "Dezembro"
+
+#: admin/translation/ui_copy.php:250
+msgid "Operational metrics and activity insights"
+msgstr "Métricas operacionais e insights de atividade"
+
+#: admin/translation/ui_copy.php:251
+msgid "Time Period:"
+msgstr "Período:"
+
+#: admin/translation/ui_copy.php:252
+msgid "Summary"
+msgstr "Resumo"
+
+#: admin/translation/ui_copy.php:253
+msgid "Customers"
+msgstr "Clientes"
+
+#: admin/translation/ui_copy.php:254
+msgid "Admins"
+msgstr "Admins"
+
+#: admin/translation/ui_copy.php:255
+msgid "Trends"
+msgstr "Tendências"
+
+#: admin/translation/ui_copy.php:256
+msgid "Total Customers"
+msgstr "Total de Clientes"
+
+#: admin/translation/ui_copy.php:257 admin/translation/ui_copy.php:272
+msgid "Total Cases"
+msgstr "Total de Casos"
+
+#: admin/translation/ui_copy.php:258
+msgid "Open Cases"
+msgstr "Casos Abertos"
+
+#: admin/translation/ui_copy.php:259
+msgid "Closed Cases"
+msgstr "Casos Fechados"
+
+#: admin/translation/ui_copy.php:260 admin/translation/ui_copy.php:390
+msgid "Progress Updates"
+msgstr "Atualizações de Progresso"
+
+#: admin/translation/ui_copy.php:261
+msgid "Emails Sent"
+msgstr "Emails Enviados"
+
+#: admin/translation/ui_copy.php:262
+msgid "attempted"
+msgstr "tentados"
+
+#: admin/translation/ui_copy.php:263
+msgid "Failed Emails"
+msgstr "Emails com Falha"
+
+#: admin/translation/ui_copy.php:264
+msgid "Active Admins (30d)"
+msgstr "Admins Ativos (30d)"
+
+#: admin/translation/ui_copy.php:265
+msgid "No analytics data available"
+msgstr "Nenhum dado de análise disponível"
+
+#: admin/translation/ui_copy.php:266
+msgid "Never"
+msgstr "Nunca"
+
+#: admin/translation/ui_copy.php:273
+msgid "Open"
+msgstr "Aberto"
+
+#: admin/translation/ui_copy.php:276
+msgid "Emails"
+msgstr "Emails"
+
+#: admin/translation/ui_copy.php:277
+msgid "Last Activity"
+msgstr "Última Atividade"
+
+#: admin/translation/ui_copy.php:278
+msgid "Admin/Staff"
+msgstr "Admin/Equipe"
+
+#: admin/translation/ui_copy.php:279 admin/translation/ui_copy.php:389
+msgid "Cases Created"
+msgstr "Casos Criados"
+
+#: admin/translation/ui_copy.php:280
+msgid "Cases Updated"
+msgstr "Casos Atualizados"
+
+#: admin/translation/ui_copy.php:281
+msgid "Cases Deleted"
+msgstr "Casos Deletados"
+
+#: admin/translation/ui_copy.php:282
+msgid "Progress Added"
+msgstr "Progresso Adicionado"
+
+#: admin/translation/ui_copy.php:283
+msgid "Emails Triggered"
+msgstr "Emails Disparados"
+
+#: admin/translation/ui_copy.php:284
+msgid "No customer data available"
+msgstr "Nenhum dado de cliente disponível"
+
+#: admin/translation/ui_copy.php:285
+msgid "No admin activity recorded"
+msgstr "Nenhuma atividade de admin registrada"
+
+#: admin/translation/ui_copy.php:286
+msgid "No data available"
+msgstr "Nenhum dado disponível"
+
+#: admin/translation/ui_copy.php:292
+msgid "Manage your preferences and application settings"
+msgstr "Gerencie suas preferências e configurações do aplicativo"
+
+#: admin/translation/ui_copy.php:293
+msgid "Appearance"
+msgstr "Aparência"
+
+#: admin/translation/ui_copy.php:294
+msgid "Dark Mode"
+msgstr "Modo Escuro"
+
+#: admin/translation/ui_copy.php:295
+msgid "Toggle between light and dark themes"
+msgstr "Alternar entre temas claro e escuro"
+
+#: admin/translation/ui_copy.php:296
+msgid "Theme Preview"
+msgstr "Prévia do Tema"
+
+#: admin/translation/ui_copy.php:297
+msgid "Dark"
+msgstr "Escuro"
+
+#: admin/translation/ui_copy.php:298
+msgid "Light"
+msgstr "Claro"
+
+#: admin/translation/ui_copy.php:299
+msgid "Account"
+msgstr "Conta"
+
+#: admin/translation/ui_copy.php:300
+msgid "User Information"
+msgstr "Informações do Usuário"
+
+#: admin/translation/ui_copy.php:305
+msgid "How to use this plugin"
+msgstr "Como usar esse plugin"
+
+#: admin/translation/ui_copy.php:306
+msgid "Display info for customers access"
+msgstr "Mostrar informações para clientes"
+
+#: admin/translation/ui_copy.php:308
+msgid "Create a secured page, one that is only available after login. (there are some approaches in order to achieve this result, find one that suits you website better)"
+msgstr "Crie uma página protegida, uma que seja acessível apenas depois de se fazer login. (Existem algumas formas para se criar uma página protegida, encontre uma que se adeque melhor ao seu site)"
+
+#: admin/translation/ui_copy.php:311
+msgid "Copy and paste the following short code to the restricted page, [service-tracker-stolmc-cases-progress]"
+msgstr "Copie e cole o short code em uma página protegida, [service-tracker-stolmc-cases-progress]"
+
+#: admin/translation/ui_copy.php:312
+msgid "Now, every new status registered in a case/service will be displayed for that respective customer."
+msgstr "Agora, todo novo status registrado em um caso ou serviço será mostrado para seu respectivo cliente."
+
+#: admin/translation/ui_copy.php:313
+msgid "If you do not want to have a restricted customer page that is perfectly fine. Every new status triggers a email send which contains such status."
+msgstr "Se você optar por não ter uma página restrita para os clientes, não há problema algum. Um novo status sempre aciona o envio de um email, que contém o conteúdo do status, para o cliente."
+
+#: admin/translation/ui_copy.php:317
+msgid "Customers' notifications"
+msgstr "Notificações para os consumidores"
+
+#: admin/translation/ui_copy.php:318
+msgid "Everytime a new status is registered for a case, an email is sent to its respective customer."
+msgstr "Sempre que um status é registrado para um caso, um email é enviado para seu respectivo cliente."
+
+#: admin/translation/ui_copy.php:319
+msgid "This plugin uses the default wp_mail function to send its emails. So, it is highly recomended to use WP Mail SMTP OR other smtp plugin alongside Service Tracker, in order to avoid lost emails."
+msgstr "Esse plugin usa a função básica wp_mail para enviar seus e-mails. Assim, recomenda-se altamente o uso do plugin WP Mail SMTP OU outro plugin de SMTP em conjunto com o Service Tracker, pois assim evita-se que e-mails caiam na lixeira ou no spam."
+
+#: admin/translation/ui_copy.php:324
+msgid "Loading attachments..."
+msgstr "Carregando anexos..."
+
+#: admin/translation/ui_copy.php:325
+msgid "No attachments found for this client"
+msgstr "Nenhum anexo encontrado para este cliente"
+
+#: admin/translation/ui_copy.php:326
+msgid "Filter by case:"
+msgstr "Filtrar por caso:"
+
+#: admin/translation/ui_copy.php:327
+msgid "All Cases"
+msgstr "Todos os Casos"
+
+#: admin/translation/ui_copy.php:333
+msgid "Cancel"
+msgstr "Cancelar"
+
+#: admin/translation/ui_copy.php:334
+msgid "Delete"
+msgstr "Deletar"
+
+#: admin/translation/ui_copy.php:335
+msgid "Confirm"
+msgstr "Confirmar"
+
+#: admin/translation/ui_copy.php:336
+msgid "OK"
+msgstr "OK"
+
+#: admin/translation/ui_copy.php:337
+msgid "Close"
+msgstr "Fechar"
+
+#: admin/translation/ui_copy.php:338
+msgid "Edit"
+msgstr "Editar"
+
+#: admin/translation/ui_copy.php:339
+msgid "Back"
+msgstr "Voltar"
+
+#: admin/translation/ui_copy.php:340
+msgid "Prev"
+msgstr "Anterior"
+
+#: admin/translation/ui_copy.php:341
+msgid "Next"
+msgstr "Próximo"
+
+#: admin/translation/ui_copy.php:343
+msgid "Confirm Action"
+msgstr "Confirmar Ação"
+
+#: admin/translation/ui_copy.php:344
+msgid "Notice"
+msgstr "Aviso"
+
+#: admin/translation/ui_copy.php:345
+msgid "N/A"
+msgstr "N/A"
+
+#: admin/translation/ui_copy.php:346
+msgid "close"
+msgstr "fechado"
+
+#: admin/translation/ui_copy.php:351
+msgid "case"
+msgstr "caso"
+
+#: admin/translation/ui_copy.php:352
+msgid "cases"
+msgstr "casos"
+
+#: admin/translation/ui_copy.php:353
+msgid "found"
+msgstr "encontrado(s)"
+
+#: admin/translation/ui_copy.php:354
+msgid "Page"
+msgstr "Página"
+
+#: admin/translation/ui_copy.php:355
+msgid "of"
+msgstr "de"
+
+#: admin/translation/ui_copy.php:356
+msgid "attachment"
+msgstr "anexo"
+
+#: admin/translation/ui_copy.php:357
+msgid "attachments"
+msgstr "anexos"
+
+#: admin/translation/ui_copy.php:358
+msgid "Days"
+msgstr "Dias"
+
+#: admin/translation/ui_copy.php:359
+msgid "case(s) ending"
+msgstr "caso(s) terminando"
+
+#: admin/translation/ui_copy.php:360
+msgid "case(s) starting"
+msgstr "caso(s) começando"
+
+#: admin/translation/ui_copy.php:367
+msgid "Client #"
+msgstr "Cliente #"
+
+#: admin/translation/ui_copy.php:372
+msgid "Active Since %d"
+msgstr "Ativo Desde %d"
+
+#: admin/translation/ui_copy.php:377
+msgid "Failed to update date"
+msgstr "Falha ao atualizar data"
+
+#: admin/translation/ui_copy.php:378
+msgid "Failed to update case owner"
+msgstr "Falha ao atualizar responsável pelo caso"
+
+#: admin/translation/ui_copy.php:379
+msgid "Failed to update case title"
+msgstr "Falha ao atualizar título do caso"
+
+#: admin/translation/ui_copy.php:380
+msgid "Failed to post status update"
+msgstr "Falha ao publicar atualização de status"
+
+#: admin/translation/ui_copy.php:381
+msgid "Upload failed"
+msgstr "Falha no upload"
+
+#: admin/translation/ui_copy.php:382
+msgid "User created successfully."
+msgstr "Usuário criado com sucesso."
+
+#: admin/translation/ui_copy.php:383
+msgid "Failed to create user."
+msgstr "Falha ao criar usuário."
+
+#: admin/translation/ui_copy.php:384
+msgid "Failed to create user. Please try again."
+msgstr "Falha ao criar usuário. Por favor, tente novamente."
+
+#: admin/translation/ui_copy.php:391
+msgid "Email Notifications"
+msgstr "Notificações por Email"
+
+#: admin/translation/ui_copy.php:392
+msgid "Admin Actions"
+msgstr "Ações de Admin"
+
+#: admin/translation/ui_copy.php:397
+msgid "%d case(s) across all clients"
+msgstr "%d caso(s) em todos os clientes"
