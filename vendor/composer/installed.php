@@ -3,7 +3,7 @@
         'name' => 'delbem/service-tracker',
         'pretty_version' => 'dev-main',
         'version' => 'dev-main',
-        'reference' => '48f0eecb86217296ffbf290d50e81612bb38202f',
+        'reference' => '24f3633690f6060e384f73ccc8143dfae0b091c1',
         'type' => 'wordpress-plugin',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -13,7 +13,7 @@
         'delbem/service-tracker' => array(
             'pretty_version' => 'dev-main',
             'version' => 'dev-main',
-            'reference' => '48f0eecb86217296ffbf290d50e81612bb38202f',
+            'reference' => '24f3633690f6060e384f73ccc8143dfae0b091c1',
             'type' => 'wordpress-plugin',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
