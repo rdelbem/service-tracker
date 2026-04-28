@@ -16,8 +16,8 @@ describe('clientsStore', () => {
   beforeEach(() => {
     vi.resetModules();
     vi.clearAllMocks();
-    (globalThis as any).data = {
-      ...(globalThis as any).data,
+    (globalThis as any).stolmcData = {
+      ...(globalThis as any).stolmcData,
       users_api_url: 'http://localhost/wp-json/service-tracker-stolmc/v1/users',
       create_user_api_url: 'http://localhost/wp-json/service-tracker-stolmc/v1/users/create',
       root_url: 'http://localhost',

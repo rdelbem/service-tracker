@@ -11,4 +11,4 @@
  * @see admin/translation/ui_copy.php — canonical source of strings
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-declare const data: Record<string, any>;
+declare const stolmcData: Record<string, any>;

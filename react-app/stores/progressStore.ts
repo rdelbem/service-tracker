@@ -4,7 +4,7 @@ import { toast } from "react-toastify";
 import { stolmc_text, Text } from "../i18n";
 import type { Status, Attachment } from "../types";
 
-declare const data: Record<string, any>;
+declare const stolmcData: Record<string, any>;
 
 export interface ProgressState {
   status: Status[];
@@ -23,7 +23,7 @@ export interface ProgressActions {
 export interface ProgressStore extends ProgressState, ProgressActions {}
 
 export const useProgressStore = create<ProgressStore>((set, get) => {
-  const apiUrlProgress = `${data.root_url}/wp-json/${data.api_url}/progress`;
+  const apiUrlProgress = `${stolmcData.root_url}/wp-json/${stolmcData.api_url}/progress`;
 
   return {
     status: [],
@@ -36,7 +36,7 @@ export const useProgressStore = create<ProgressStore>((set, get) => {
         }
 
         const res = await fetchGet(`${apiUrlProgress}/${id}`, {
-          headers: { "X-WP-Nonce": data.nonce },
+          headers: { "X-WP-Nonce": stolmcData.nonce },
         });
 
         const statusData = Array.isArray(res.data.data) ? res.data.data : [];
@@ -59,7 +59,7 @@ export const useProgressStore = create<ProgressStore>((set, get) => {
       try {
         await post(`${apiUrlProgress}/${id_case}`, dataToPost, {
           headers: {
-            "X-WP-Nonce": data.nonce,
+            "X-WP-Nonce": stolmcData.nonce,
             "Content-type": "application/json",
           },
         });
@@ -81,7 +81,7 @@ export const useProgressStore = create<ProgressStore>((set, get) => {
 
       try {
         await del(`${apiUrlProgress}/${id}`, {
-          headers: { "X-WP-Nonce": data.nonce },
+          headers: { "X-WP-Nonce": stolmcData.nonce },
         });
 
         const filteredStatuses = status.filter((status: Status) => {
@@ -104,7 +104,7 @@ export const useProgressStore = create<ProgressStore>((set, get) => {
       try {
         await put(`${apiUrlProgress}/${id}`, { text: newText }, {
           headers: {
-            "X-WP-Nonce": data.nonce,
+            "X-WP-Nonce": stolmcData.nonce,
             "Content-type": "application/json",
           },
         });
@@ -133,9 +133,9 @@ export const useProgressStore = create<ProgressStore>((set, get) => {
       }
 
       try {
-        const apiUrlUpload = `${data.root_url}/wp-json/${data.api_url}/progress/upload`;
+        const apiUrlUpload = `${stolmcData.root_url}/wp-json/${stolmcData.api_url}/progress/upload`;
         const res = await postMultipart(apiUrlUpload, formData, {
-          headers: { "X-WP-Nonce": data.nonce },
+          headers: { "X-WP-Nonce": stolmcData.nonce },
         });
 
         if (res.data.success) {

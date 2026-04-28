@@ -1,7 +1,7 @@
 /**
  * Enum of all UI text keys exposed by the PHP backend via wp_localize_script.
  *
- * Each value corresponds to a key in `window.data` populated from
+ * Each value corresponds to a key in `window.stolmcData` populated from
  * `admin/translation/ui_copy.php`. Use with {@link stolmec_text}.
  *
  * When adding a new string, add it to BOTH this enum AND `ui_copy.php`.

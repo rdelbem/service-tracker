@@ -3,7 +3,7 @@ import { get as fetchGet } from "../../utils/fetch";
 import dateformat from "dateformat";
 import { stolmc_text, Text } from "../../i18n";
 
-declare const data: Record<string, any>;
+declare const stolmcData: Record<string, any>;
 
 interface UserAttachment {
   url: string;
@@ -40,9 +40,9 @@ export default function UserAttachments({ idUser }: UserAttachmentsProps) {
     const fetchAttachments = async () => {
       setLoading(true);
       try {
-        const apiUrl = `${data.root_url}/wp-json/service-tracker-stolmc/v1/progress/user-attachments/${idUser}`;
+        const apiUrl = `${stolmcData.root_url}/wp-json/service-tracker-stolmc/v1/progress/user-attachments/${idUser}`;
         const res = await fetchGet(apiUrl, {
-          headers: { "X-WP-Nonce": data.nonce },
+          headers: { "X-WP-Nonce": stolmcData.nonce },
         });
         setAttachments(Array.isArray(res.data?.data) ? res.data.data : []);
       } catch (error) {

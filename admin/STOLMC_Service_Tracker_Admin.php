@@ -1,7 +1,7 @@
 <?php
 namespace STOLMC_Service_Tracker\admin;
 
-use STOLMC_Service_Tracker\admin\I18n\UI_Copy;
+use STOLMC_Service_Tracker\admin\I18n\STOLMC_UI_Copy;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -11,8 +11,7 @@ defined( 'ABSPATH' ) || exit;
  * @link       https://delbem.net/portfolio/service-tracker-sto/
  * @since      1.0.0
  *
- * @package    Service_Tracker
- * @subpackage Service_Tracker/admin
+ * @package    STOLMC_Service_Tracker
  */
 
 /**
@@ -21,8 +20,7 @@ defined( 'ABSPATH' ) || exit;
  * Defines the plugin name, version, and two examples hooks for how to
  * enqueue the admin-specific stylesheet and JavaScript.
  *
- * @package    Service_Tracker
- * @subpackage Service_Tracker/admin
+ * @package    STOLMC_Service_Tracker
  * @author     Rodrigo Del Bem <rodrigodelbem@gmail.com>
  */
 class STOLMC_Service_Tracker_Admin {
@@ -81,26 +79,28 @@ class STOLMC_Service_Tracker_Admin {
 	 */
 	public function remove_wp_admin_elements(): void {
 
-		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Non-admin data check for page identification.
-		if ( isset( $_GET['page'] ) && 'service_tracker' === $_GET['page'] ) {
+		$screen = get_current_screen();
 
-			/**
-			 * Fires when the admin page is initialized.
-			 *
-			 * @since 1.0.0
-			 */
-			do_action( 'stolmc_service_tracker_admin_page_init' );
-
-			// Remove footer text.
-			add_filter( 'admin_footer_text', '__return_empty_string', 9999 );
-			add_filter( 'update_footer', '__return_empty_string', 9999 );
-
-			// Remove help tabs.
-			add_action( 'admin_head', [ $this, 'remove_help_tabs' ] );
-
-			// Add custom CSS to hide remaining elements.
-			add_action( 'admin_head', [ $this, 'hide_wp_elements' ] );
+		if ( null === $screen || 'toplevel_page_service_tracker' !== $screen->id ) {
+			return;
 		}
+
+		/**
+		 * Fires when the admin page is initialized.
+		 *
+		 * @since 1.0.0
+		 */
+		do_action( 'stolmc_service_tracker_admin_page_init' );
+
+		// Remove footer text.
+		add_filter( 'admin_footer_text', '__return_empty_string', 9999 );
+		add_filter( 'update_footer', '__return_empty_string', 9999 );
+
+		// Remove help tabs.
+		add_action( 'admin_head', [ $this, 'remove_help_tabs' ] );
+
+		// Add custom CSS to hide remaining elements.
+		add_action( 'admin_head', [ $this, 'hide_wp_elements' ] );
 	}
 
 	/**
@@ -125,7 +125,7 @@ class STOLMC_Service_Tracker_Admin {
 	 * @return void
 	 */
 	public function hide_wp_elements(): void {
-		echo '<style>
+		$custom_css = '
 			#wpfooter,
 			#screen-meta-links,
 			#contextual-help-link-wrap,
@@ -134,8 +134,19 @@ class STOLMC_Service_Tracker_Admin {
 			}
 			#wpbody-content {
 				padding-bottom: 0 !important;
+			}';
+
+		$handle = $this->plugin_name . '-tailwind';
+		$styles = wp_styles();
+
+		if ( $styles->query( $handle, 'enqueued' ) ) {
+			wp_add_inline_style( $handle, $custom_css );
+		} else {
+			$handle = $this->plugin_name;
+			if ( $styles->query( $handle, 'enqueued' ) ) {
+				wp_add_inline_style( $handle, $custom_css );
 			}
-		</style>';
+		}
 	}
 
 	/**
@@ -273,11 +284,11 @@ class STOLMC_Service_Tracker_Admin {
 	/**
 	 * Localize scripts with plugin data.
 	 *
-	 * Loads all UI copy from the aggregated translation file via UI_Copy
+	 * Loads all UI copy from the aggregated translation file via STOLMC_UI_Copy
 	 * and exposes it to the React app as `window.data`.
 	 *
 	 * @since    1.0.0
-	 * @since    2.1.0 Refactored to use UI_Copy for centralised i18n.
+	 * @since    2.1.0 Refactored to use STOLMC_UI_Copy for centralised i18n.
 	 *
 	 * @param string $hook The current admin page.
 	 *
@@ -288,7 +299,7 @@ class STOLMC_Service_Tracker_Admin {
 			return;
 		}
 
-		$ui_copy = new UI_Copy(
+		$ui_copy = new STOLMC_UI_Copy(
 			wp_normalize_path( plugin_dir_path( __FILE__ ) . 'translation/ui_copy.php' )
 		);
 
@@ -306,7 +317,7 @@ class STOLMC_Service_Tracker_Admin {
 
 		wp_localize_script(
 			$this->plugin_name,
-			'data',
+			'stolmcData',
 			$localize_data
 		);
 	}

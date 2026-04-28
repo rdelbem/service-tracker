@@ -6,7 +6,7 @@ import { Text } from './i18n';
 // Mock global data object with config and all i18n text keys.
 // Text values default to their enum key so stolmc_text() returns
 // predictable strings in tests.
-(globalThis as Record<string, any>).data = {
+(globalThis as Record<string, any>).stolmcData = {
   root_url: 'http://localhost',
   api_url: 'api',
   users_api_url: 'http://localhost/api/users',

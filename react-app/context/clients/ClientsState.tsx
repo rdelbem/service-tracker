@@ -11,8 +11,8 @@ interface ClientsStateProps {
 }
 
 export default function ClientsState({ children }: ClientsStateProps) {
-  const api_url_users = data.users_api_url;
-  const create_user_api_url = data.create_user_api_url;
+  const api_url_users = stolmcData.users_api_url;
+  const create_user_api_url = stolmcData.create_user_api_url;
 
   const initialState: ClientsStateType = {
     users: [],
@@ -50,7 +50,7 @@ export default function ClientsState({ children }: ClientsStateProps) {
   const getUsers = async () => {
     const res = await get(api_url_users, {
       headers: {
-        "X-WP-Nonce": data.nonce,
+        "X-WP-Nonce": stolmcData.nonce,
       },
     });
 
@@ -67,7 +67,7 @@ export default function ClientsState({ children }: ClientsStateProps) {
         userData,
         {
           headers: {
-            "X-WP-Nonce": data.nonce,
+            "X-WP-Nonce": stolmcData.nonce,
           },
         }
       );

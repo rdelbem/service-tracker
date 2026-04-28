@@ -21,7 +21,7 @@ export default function ProgressState({ children }: ProgressStateProps) {
   };
 
   const [state, dispatch] = useReducer(AppReducer, initialState);
-  const apiUrlProgress = `${data.root_url}/wp-json/${data.api_url}/progress`;
+  const apiUrlProgress = `${stolmcData.root_url}/wp-json/${stolmcData.api_url}/progress`;
 
   //onlyFetch means this function will retrieve plain data from api, without state update
   const getStatus = async (id: string | number, onlyFetch: boolean, caseTitle?: string): Promise<Status[] | void> => {
@@ -39,7 +39,7 @@ export default function ProgressState({ children }: ProgressStateProps) {
 
       const res = await get(`${apiUrlProgress}/${id}`, {
         headers: {
-          "X-WP-Nonce": data.nonce,
+          "X-WP-Nonce": stolmcData.nonce,
         },
       });
 
@@ -73,7 +73,7 @@ export default function ProgressState({ children }: ProgressStateProps) {
         dataToPost,
         {
           headers: {
-            "X-WP-Nonce": data.nonce,
+            "X-WP-Nonce": stolmcData.nonce,
             "Content-type": "application/json",
           },
         }
@@ -121,7 +121,7 @@ export default function ProgressState({ children }: ProgressStateProps) {
     try {
       await del(`${apiUrlProgress}/${id}`, {
         headers: {
-          "X-WP-Nonce": data.nonce,
+          "X-WP-Nonce": stolmcData.nonce,
         },
       });
 
@@ -155,7 +155,7 @@ export default function ProgressState({ children }: ProgressStateProps) {
     try {
       await put(`${apiUrlProgress}/${id}`, editedObj, {
         headers: {
-          "X-WP-Nonce": data.nonce,
+          "X-WP-Nonce": stolmcData.nonce,
           "Content-type": "application/json",
         },
       });

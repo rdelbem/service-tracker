@@ -2,29 +2,34 @@
 
 namespace STOLMC_Service_Tracker\includes\DB;
 
+defined( 'ABSPATH' ) || exit;
+
 /**
  * Schema Manager — reconciles the actual database state against the
  * declarative schema definition and applies incremental migrations.
  *
  * Lifecycle:
  *   1. On every `init` hook the manager checks whether the stored
- *      DB version (wp_options) matches Schema::VERSION.
- *   2. If they match, nothing happens (fast path).
- *   3. If the stored version is lower, the manager compares the
+ *      plugin version (wp_options) matches STOLMC_SERVICE_TRACKER_VERSION.
+ *   2. In production, if the versions match, nothing happens — not even
+ *      an option read for the DB schema version.
+ *   3. In development (WP_DEBUG enabled), the sync always runs so that
+ *      schema changes take effect immediately.
+ *   4. If the stored version is lower, the manager compares the
  *      current DB against the declarative schema and applies only
  *      the necessary ALTER TABLE statements (add columns, remove
  *      columns, add/drop indexes).
- *   4. After all migrations succeed the option is updated to the
+ *   5. After all migrations succeed the option is updated to the
  *      new version.
  *
  * Activation creates tables via maybe_create_table() using the
- * declarative schema.  Deactivation drops them entirely.  This class
+ * declarative schema.  Only uninstall should drop them.  This class
  * handles *updates* to the schema between versions.
  *
  * @since    1.1.0
- * @package  STOLMC_Service_Tracker\includes\DB
+ * @package  STOLMC_Service_Tracker
  */
-class Schema_Manager {
+class STOLMC_Schema_Manager {
 
 	/**
 	 * Option key for storing the applied migrations log.
@@ -35,29 +40,61 @@ class Schema_Manager {
 	public const MIGRATIONS_LOG_OPTION = 'stolmc_service_tracker_migrations_log';
 
 	/**
+	 * Option key for storing the last plugin version that ran schema sync.
+	 *
+	 * In production the schema sync is skipped entirely when the stored
+	 * version matches STOLMC_SERVICE_TRACKER_VERSION, avoiding even a
+	 * single option read on every page load.  In development (WP_DEBUG)
+	 * the sync always runs regardless of this value.
+	 *
+	 * @since 1.2.0
+	 * @var   string
+	 */
+	public const PLUGIN_VERSION_OPTION = 'stolmc_service_tracker_plugin_version';
+
+	/**
 	 * Run the schema reconciliation.
 	 *
-	 * Should be called on the `init` hook.  Returns early if the
-	 * database is already up-to-date.
+	 * Should be called on the `init` hook.
+	 *
+	 * In production the sync is skipped entirely when the stored plugin
+	 * version matches the current one — not even a single option read
+	 * for the DB schema version occurs.  After a plugin update the
+	 * version mismatch triggers a one-time sync.
+	 *
+	 * In development (WP_DEBUG enabled) the sync always runs so that
+	 * schema changes take effect immediately.
 	 *
 	 * @since 1.1.0
 	 *
 	 * @return void
 	 */
 	public function sync(): void {
-		$stored_version = (int) get_option( Schema::VERSION_OPTION, 0 );
-		$target_version = Schema::VERSION;
+		$is_dev = defined( 'WP_DEBUG' ) && WP_DEBUG;
+
+		if ( ! $is_dev ) {
+			$last_synced = get_option( self::PLUGIN_VERSION_OPTION, '' );
+			if ( $last_synced === STOLMC_SERVICE_TRACKER_VERSION ) {
+				return;
+			}
+		}
+
+		$stored_version = (int) get_option( STOLMC_Schema::VERSION_OPTION, 0 );
+		$target_version = STOLMC_Schema::VERSION;
 
 		if ( $stored_version >= $target_version ) {
+			update_option( self::PLUGIN_VERSION_OPTION, STOLMC_SERVICE_TRACKER_VERSION, false );
 			return;
 		}
 
 		$applied = $this->apply_migrations();
 
 		if ( $applied ) {
-			update_option( Schema::VERSION_OPTION, $target_version, true );
+			update_option( STOLMC_Schema::VERSION_OPTION, $target_version, true );
 			$this->log_migration( $stored_version, $target_version );
 		}
+
+		update_option( self::PLUGIN_VERSION_OPTION, STOLMC_SERVICE_TRACKER_VERSION, false );
 	}
 
 	/**
@@ -74,10 +111,10 @@ class Schema_Manager {
 	public function create_tables(): void {
 		require_once ABSPATH . 'wp-admin/includes/upgrade.php';
 
-		$tables = Schema::get_all_tables();
+		$tables = STOLMC_Schema::get_all_tables();
 
 		foreach ( $tables as $key => $table_def ) {
-			$sql = Schema::build_create_table_sql( $table_def );
+			$sql = STOLMC_Schema::build_create_table_sql( $table_def );
 
 			/**
 			 * Filters the CREATE TABLE SQL for a specific table before creation.
@@ -107,7 +144,9 @@ class Schema_Manager {
 	/**
 	 * Drop all plugin tables.
 	 *
-	 * Used on plugin deactivation.
+	 * Used on plugin uninstall only.  Deactivation must NOT call
+	 * this method — WordPress.org guidelines require deactivation
+	 * to be non-destructive.
 	 *
 	 * @since 1.1.0
 	 *
@@ -116,7 +155,7 @@ class Schema_Manager {
 	public function drop_tables(): void {
 		global $wpdb;
 
-		$tables = Schema::get_all_tables();
+		$tables = STOLMC_Schema::get_all_tables();
 
 		foreach ( $tables as $table_def ) {
 			$table_name = $table_def['table_name'];
@@ -127,7 +166,7 @@ class Schema_Manager {
 			// phpcs:enable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange, PluginCheck.Security.DirectDB.UnescapedDBParameter
 			// phpcs:enable WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 
-			$plain_name = Schema::get_plain_table_name( $table_def );
+			$plain_name = STOLMC_Schema::get_plain_table_name( $table_def );
 
 			/**
 			 * Fires after a table has been dropped.
@@ -153,7 +192,7 @@ class Schema_Manager {
 
 		require_once ABSPATH . 'wp-admin/includes/upgrade.php';
 
-		$tables = Schema::get_all_tables();
+		$tables = STOLMC_Schema::get_all_tables();
 		$did_migrate = false;
 
 		foreach ( $tables as $key => $table_def ) {
@@ -161,7 +200,7 @@ class Schema_Manager {
 
 			// If the table doesn't exist yet, create it during migration.
 			if ( $this->table_exists( $table_name ) === false ) {
-				$sql = Schema::build_create_table_sql( $table_def );
+				$sql = STOLMC_Schema::build_create_table_sql( $table_def );
 				$sql = apply_filters(
 					"stolmc_service_tracker_{$key}_table_schema",
 					$sql
@@ -187,14 +226,14 @@ class Schema_Manager {
 	 *
 	 * @since 1.1.0
 	 *
-	 * @param array<string, mixed> $table_def A single table definition from Schema::get_all_tables().
+	 * @param array<string, mixed> $table_def A single table definition from STOLMC_Schema::get_all_tables().
 	 * @return bool
 	 */
 	private function sync_table( array $table_def ): bool {
 		global $wpdb;
 
 		$table_name   = $table_def['table_name'];
-		$plain_name   = Schema::get_plain_table_name( $table_def );
+		$plain_name   = STOLMC_Schema::get_plain_table_name( $table_def );
 		$desired_cols = $table_def['columns'];
 		$desired_idx  = $table_def['indexes'] ?? [];
 

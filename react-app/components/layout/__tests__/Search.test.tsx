@@ -19,7 +19,7 @@ vi.mock("../../../stores/clientsStore", () => ({
 describe("Search component", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    Object.assign(globalThis.data, {
+    Object.assign(globalThis.stolmcData, {
       search_bar: undefined,
     });
   });
@@ -31,7 +31,7 @@ describe("Search component", () => {
   });
 
   it("renders localized placeholder when provided", () => {
-    Object.assign(globalThis.data, {
+    Object.assign(globalThis.stolmcData, {
       search_bar: "Buscar clientes...",
     });
 

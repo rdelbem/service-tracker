@@ -40,7 +40,7 @@ describe("Status component", () => {
     vi.clearAllMocks();
     mockShowConfirm.mockResolvedValue(true);
 
-    Object.assign(globalThis.data, {
+    Object.assign(globalThis.stolmcData, {
       tip_edit_status: "Edit Status",
       tip_delete_status: "Delete Status",
       btn_save_changes_status: "Save",

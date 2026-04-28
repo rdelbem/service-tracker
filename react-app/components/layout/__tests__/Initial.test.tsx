@@ -26,7 +26,7 @@ describe("Initial component", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockInViewState.view = "init";
-    (globalThis as any).data = {
+    (globalThis as any).stolmcData = {
       home_screen: undefined,
       brand_name: "Service Tracker",
     };
@@ -47,7 +47,7 @@ describe("Initial component", () => {
   });
 
   it("renders translated home screen message when provided", () => {
-    (globalThis as any).data.home_screen = "Escolha um cliente para começar";
+    (globalThis as any).stolmcData.home_screen = "Escolha um cliente para começar";
 
     render(<Initial />);
 

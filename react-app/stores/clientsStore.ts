@@ -4,7 +4,7 @@ import { normalizeUsers } from "../utils/users";
 import { stolmc_text, Text } from "../i18n";
 import type { User } from "../types";
 
-declare const data: Record<string, any>;
+declare const stolmcData: Record<string, any>;
 
 export interface ClientsState {
   users: User[];
@@ -28,10 +28,10 @@ export interface ClientsActions {
 export interface ClientsStore extends ClientsState, ClientsActions {}
 
 export const useClientsStore = create<ClientsStore>((set, get) => {
-  const api_url_users = data.users_api_url;
-  const create_user_api_url = data.create_user_api_url;
-  const search_url = `${data.root_url}/wp-json/service-tracker-stolmc/v1/users/search`;
-  const update_user_api_url = `${data.root_url}/wp-json/service-tracker-stolmc/v1/users`;
+  const api_url_users = stolmcData.users_api_url;
+  const create_user_api_url = stolmcData.create_user_api_url;
+  const search_url = `${stolmcData.root_url}/wp-json/service-tracker-stolmc/v1/users/search`;
+  const update_user_api_url = `${stolmcData.root_url}/wp-json/service-tracker-stolmc/v1/users`;
 
   return {
     users: [],
@@ -52,7 +52,7 @@ export const useClientsStore = create<ClientsStore>((set, get) => {
 
         const url = `${api_url_users}?page=${currentPage}&per_page=${perPage}`;
         const res = await fetchGet(url, {
-          headers: { "X-WP-Nonce": data.nonce },
+          headers: { "X-WP-Nonce": stolmcData.nonce },
         });
 
         const envelope = res.data;
@@ -87,7 +87,7 @@ export const useClientsStore = create<ClientsStore>((set, get) => {
 
         const url = `${search_url}?q=${encodeURIComponent(query.trim())}&page=1&per_page=${perPage}`;
         const res = await fetchGet(url, {
-          headers: { "X-WP-Nonce": data.nonce },
+          headers: { "X-WP-Nonce": stolmcData.nonce },
         });
 
         const envelope = res.data;
@@ -120,7 +120,7 @@ export const useClientsStore = create<ClientsStore>((set, get) => {
 
           const url = `${search_url}?q=${encodeURIComponent(searchQuery.trim())}&page=${clamped}&per_page=${perPage}`;
           const res = await fetchGet(url, {
-            headers: { "X-WP-Nonce": data.nonce },
+            headers: { "X-WP-Nonce": stolmcData.nonce },
           });
 
           const envelope = res.data;
@@ -148,7 +148,7 @@ export const useClientsStore = create<ClientsStore>((set, get) => {
     createUser: async (userData) => {
       try {
         const res = await post(create_user_api_url, userData, {
-          headers: { "X-WP-Nonce": data.nonce },
+          headers: { "X-WP-Nonce": stolmcData.nonce },
         });
 
         if (res.data.success) {
@@ -174,7 +174,7 @@ export const useClientsStore = create<ClientsStore>((set, get) => {
       try {
         const url = `${update_user_api_url}/${id}`;
         const res = await put(url, userData, {
-          headers: { "X-WP-Nonce": data.nonce },
+          headers: { "X-WP-Nonce": stolmcData.nonce },
         });
 
         if (res.data.success) {

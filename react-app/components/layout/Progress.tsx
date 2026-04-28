@@ -50,7 +50,7 @@ export default function Progress() {
 
     const fetchCaseData = async () => {
       setLoadingCase(true);
-      const apiUrlCases = `${data.root_url}/wp-json/${data.api_url}/cases`;
+      const apiUrlCases = `${stolmcData.root_url}/wp-json/${stolmcData.api_url}/cases`;
       try {
         let found: any = null;
         let casesPage = 1;
@@ -59,7 +59,7 @@ export default function Progress() {
         do {
           const res = await fetchGet(
             `${apiUrlCases}/${idUser}?page=${casesPage}&per_page=6`,
-            { headers: { "X-WP-Nonce": data.nonce } }
+            { headers: { "X-WP-Nonce": stolmcData.nonce } }
           );
           const envelope = res.data;
           const cases: any[] = envelope.data ?? [];
@@ -74,11 +74,11 @@ export default function Progress() {
         setSelectedOwner(found?.owner_id || "");
 
         if (found?.id_user) {
-          const apiUrlUsers = `${data.root_url}/wp-json/service-tracker-stolmc/v1/users`;
+          const apiUrlUsers = `${stolmcData.root_url}/wp-json/service-tracker-stolmc/v1/users`;
           try {
             const usersRes = await fetchGet(
               `${apiUrlUsers}?page=1&per_page=100`,
-              { headers: { "X-WP-Nonce": data.nonce } }
+              { headers: { "X-WP-Nonce": stolmcData.nonce } }
             );
             const userList = normalizeUsers(usersRes.data?.data);
             const client = userList.find(
@@ -101,10 +101,10 @@ export default function Progress() {
 
   useEffect(() => {
     const fetchStaffUsers = async () => {
-      const apiUrlStaff = `${data.root_url}/wp-json/service-tracker-stolmc/v1/users/staff`;
+      const apiUrlStaff = `${stolmcData.root_url}/wp-json/service-tracker-stolmc/v1/users/staff`;
       try {
         const res = await fetchGet(apiUrlStaff, {
-          headers: { "X-WP-Nonce": data.nonce },
+          headers: { "X-WP-Nonce": stolmcData.nonce },
         });
         setStaffUsers(normalizeUsers(res.data?.data));
       } catch (error) {
@@ -130,7 +130,7 @@ export default function Progress() {
     if (!editingDate || !caseData) return;
 
     const field = editingDate === "start" ? "start_at" : "due_at";
-    const apiUrlCases = `${data.root_url}/wp-json/${data.api_url}/cases`;
+    const apiUrlCases = `${stolmcData.root_url}/wp-json/${stolmcData.api_url}/cases`;
 
     try {
       await put(`${apiUrlCases}/${idCase}`, {
@@ -138,7 +138,7 @@ export default function Progress() {
         [field]: tempDate || null,
       }, {
         headers: {
-          "X-WP-Nonce": data.nonce,
+          "X-WP-Nonce": stolmcData.nonce,
           "Content-type": "application/json",
         },
       });
@@ -159,7 +159,7 @@ export default function Progress() {
   const handleOwnerChange = async (newOwnerId: string | number) => {
     setSelectedOwner(newOwnerId);
     setSavingOwner(true);
-    const apiUrlCases = `${data.root_url}/wp-json/${data.api_url}/cases`;
+    const apiUrlCases = `${stolmcData.root_url}/wp-json/${stolmcData.api_url}/cases`;
 
     try {
       await put(`${apiUrlCases}/${idCase}`, {
@@ -167,7 +167,7 @@ export default function Progress() {
         owner_id: newOwnerId || null,
       }, {
         headers: {
-          "X-WP-Nonce": data.nonce,
+          "X-WP-Nonce": stolmcData.nonce,
           "Content-type": "application/json",
         },
       });
@@ -195,11 +195,11 @@ export default function Progress() {
 
     if (!confirmed) return;
 
-    const apiUrlToggle = `${data.root_url}/wp-json/${data.api_url}/cases-status`;
+    const apiUrlToggle = `${stolmcData.root_url}/wp-json/${stolmcData.api_url}/cases-status`;
 
     try {
       await post(`${apiUrlToggle}/${idCase}`, null, {
-        headers: { "X-WP-Nonce": data.nonce },
+        headers: { "X-WP-Nonce": stolmcData.nonce },
       });
 
       setCaseData((prev: any) => ({ ...prev, status: newStatus }));
@@ -219,11 +219,11 @@ export default function Progress() {
 
     if (!confirmed) return;
 
-    const apiUrlCases = `${data.root_url}/wp-json/${data.api_url}/cases`;
+    const apiUrlCases = `${stolmcData.root_url}/wp-json/${stolmcData.api_url}/cases`;
 
     try {
       await del(`${apiUrlCases}/${idCase}`, {
-        headers: { "X-WP-Nonce": data.nonce },
+        headers: { "X-WP-Nonce": stolmcData.nonce },
       });
 
       toast.success(stolmc_text(Text.ToastCaseDeletedSuccess));
@@ -240,7 +240,7 @@ export default function Progress() {
       return;
     }
 
-    const apiUrlCases = `${data.root_url}/wp-json/${data.api_url}/cases`;
+    const apiUrlCases = `${stolmcData.root_url}/wp-json/${stolmcData.api_url}/cases`;
 
     try {
       await put(`${apiUrlCases}/${idCase}`, {
@@ -248,7 +248,7 @@ export default function Progress() {
         title: newTitle.trim(),
       }, {
         headers: {
-          "X-WP-Nonce": data.nonce,
+          "X-WP-Nonce": stolmcData.nonce,
           "Content-type": "application/json",
         },
       });

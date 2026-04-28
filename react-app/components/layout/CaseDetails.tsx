@@ -41,7 +41,7 @@ export default function CaseDetails() {
 
     const loadCase = async () => {
       setLoading(true);
-      const apiUrlCases = `${data.root_url}/wp-json/${data.api_url}/cases`;
+      const apiUrlCases = `${stolmcData.root_url}/wp-json/${stolmcData.api_url}/cases`;
 
       try {
         // Get the client's cases from the clients store
@@ -50,7 +50,7 @@ export default function CaseDetails() {
         // Find the case by searching through each user's cases
         for (const user of users) {
           const casesRes = await fetchGet(`${apiUrlCases}/${user.id}`, {
-            headers: { "X-WP-Nonce": data.nonce },
+            headers: { "X-WP-Nonce": stolmcData.nonce },
           });
 
           if (Array.isArray(casesRes.data?.data)) {
@@ -105,13 +105,13 @@ export default function CaseDetails() {
   const handleToggleStatus = async () => {
     if (!caseData) return;
 
-    const apiUrlCases = `${data.root_url}/wp-json/${data.api_url}/cases-status`;
+    const apiUrlCases = `${stolmcData.root_url}/wp-json/${stolmcData.api_url}/cases-status`;
 
     try {
       await post(
         `${apiUrlCases}/${caseData.id}`,
         null,
-        { headers: { "X-WP-Nonce": data.nonce } }
+        { headers: { "X-WP-Nonce": stolmcData.nonce } }
       );
 
       const newStatus = caseData.status === "open" ? "close" : "open";
@@ -134,11 +134,11 @@ export default function CaseDetails() {
 
     if (!confirmed) return;
 
-    const apiUrlCases = `${data.root_url}/wp-json/${data.api_url}/cases`;
+    const apiUrlCases = `${stolmcData.root_url}/wp-json/${stolmcData.api_url}/cases`;
 
     try {
       await del(`${apiUrlCases}/${caseData.id}`, {
-        headers: { "X-WP-Nonce": data.nonce },
+        headers: { "X-WP-Nonce": stolmcData.nonce },
       });
 
       toast.success(stolmc_text(Text.ToastCaseDeletedSuccess));

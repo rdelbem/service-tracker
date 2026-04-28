@@ -23,7 +23,7 @@ export default function CasesState({ children }: CasesStateProps) {
     loadingCases: false,
   };
   const [state, dispatch] = useReducer(AppReducer, initialState);
-  const apiUrlCases = `${data.root_url}/wp-json/${data.api_url}/cases`;
+  const apiUrlCases = `${stolmcData.root_url}/wp-json/${stolmcData.api_url}/cases`;
 
   const getCases = async (id: string | number, onlyFetch: boolean): Promise<Case[] | void> => {
     try {
@@ -40,7 +40,7 @@ export default function CasesState({ children }: CasesStateProps) {
 
       const res = await get(`${apiUrlCases}/${id}`, {
         headers: {
-          "X-WP-Nonce": data.nonce,
+          "X-WP-Nonce": stolmcData.nonce,
         },
       });
 
@@ -72,7 +72,7 @@ export default function CasesState({ children }: CasesStateProps) {
     try {
       await post(`${apiUrlCases}/${id}`, dataToPost, {
         headers: {
-          "X-WP-Nonce": data.nonce,
+          "X-WP-Nonce": stolmcData.nonce,
           "Content-type": "application/json",
         },
       });
@@ -108,7 +108,7 @@ export default function CasesState({ children }: CasesStateProps) {
     try {
       await post(`${apiUrlCases}-status/${id}`, null, {
         headers: {
-          "X-WP-Nonce": data.nonce,
+          "X-WP-Nonce": stolmcData.nonce,
         },
       });
 
@@ -141,7 +141,7 @@ export default function CasesState({ children }: CasesStateProps) {
     try {
       await del(`${apiUrlCases}/${id}`, {
         headers: {
-          "X-WP-Nonce": data.nonce,
+          "X-WP-Nonce": stolmcData.nonce,
         },
       });
 
@@ -176,7 +176,7 @@ export default function CasesState({ children }: CasesStateProps) {
     try {
       await put(`${apiUrlCases}/${id}`, idTitleObj, {
         headers: {
-          "X-WP-Nonce": data.nonce,
+          "X-WP-Nonce": stolmcData.nonce,
           "Content-type": "application/json",
         },
       });

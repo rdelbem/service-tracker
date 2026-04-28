@@ -12,10 +12,9 @@ defined( 'ABSPATH' ) || exit;
  * combined array to {@see wp_localize_script()}.
  *
  * @since    2.1.0
- * @package  Service_Tracker
- * @subpackage Service_Tracker/admin/I18n
+ * @package  STOLMC_Service_Tracker
  */
-class UI_Copy {
+class STOLMC_UI_Copy {
 
 	/**
 	 * Absolute path to the aggregated copy file.

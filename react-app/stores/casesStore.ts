@@ -4,7 +4,7 @@ import { toast } from "react-toastify";
 import { stolmc_text, Text } from "../i18n";
 import type { Case } from "../types";
 
-declare const data: Record<string, any>;
+declare const stolmcData: Record<string, any>;
 
 export interface CasesState {
   user: string | number;
@@ -36,8 +36,8 @@ export interface CasesActions {
 export interface CasesStore extends CasesState, CasesActions {}
 
 export const useCasesStore = create<CasesStore>((set, get) => {
-  const apiUrlCases  = `${data.root_url}/wp-json/${data.api_url}/cases`;
-  const searchUrl    = `${data.root_url}/wp-json/service-tracker-stolmc/v1/cases/search`;
+  const apiUrlCases  = `${stolmcData.root_url}/wp-json/${stolmcData.api_url}/cases`;
+  const searchUrl    = `${stolmcData.root_url}/wp-json/service-tracker-stolmc/v1/cases/search`;
   const isInvalidId = (id: unknown): boolean => {
     if (id === undefined || id === null) return true;
     const value = String(id).trim();
@@ -72,7 +72,7 @@ export const useCasesStore = create<CasesStore>((set, get) => {
 
         const url = `${apiUrlCases}/${id}?page=${currentPage}&per_page=${perPage}`;
         const res = await fetchGet(url, {
-          headers: { "X-WP-Nonce": data.nonce },
+          headers: { "X-WP-Nonce": stolmcData.nonce },
         });
 
         const envelope = res.data;
@@ -123,7 +123,7 @@ export const useCasesStore = create<CasesStore>((set, get) => {
         }
 
         const res      = await fetchGet(url, {
-          headers: { "X-WP-Nonce": data.nonce },
+          headers: { "X-WP-Nonce": stolmcData.nonce },
         });
         const envelope = res.data;
         const pagination = envelope.meta?.pagination ?? {};
@@ -160,7 +160,7 @@ export const useCasesStore = create<CasesStore>((set, get) => {
           }
 
           const res      = await fetchGet(url, {
-            headers: { "X-WP-Nonce": data.nonce },
+            headers: { "X-WP-Nonce": stolmcData.nonce },
           });
           const envelope = res.data;
           const pagination = envelope.meta?.pagination ?? {};
@@ -200,7 +200,7 @@ export const useCasesStore = create<CasesStore>((set, get) => {
       try {
         await post(`${apiUrlCases}/${id}`, dataToPost, {
           headers: {
-            "X-WP-Nonce": data.nonce,
+            "X-WP-Nonce": stolmcData.nonce,
             "Content-type": "application/json",
           },
         });
@@ -221,7 +221,7 @@ export const useCasesStore = create<CasesStore>((set, get) => {
 
       try {
         await post(`${apiUrlCases}-status/${id}`, null, {
-          headers: { "X-WP-Nonce": data.nonce },
+          headers: { "X-WP-Nonce": stolmcData.nonce },
         });
 
         const updatedCases = currentCases.map((c: Case) =>
@@ -239,7 +239,7 @@ export const useCasesStore = create<CasesStore>((set, get) => {
     deleteCase: async (id: string | number): Promise<void> => {
       try {
         await del(`${apiUrlCases}/${id}`, {
-          headers: { "X-WP-Nonce": data.nonce },
+          headers: { "X-WP-Nonce": stolmcData.nonce },
         });
 
         const newCases = get().cases.filter(
@@ -272,7 +272,7 @@ export const useCasesStore = create<CasesStore>((set, get) => {
       try {
         await put(`${apiUrlCases}/${id}`, idTitleObj, {
           headers: {
-            "X-WP-Nonce": data.nonce,
+            "X-WP-Nonce": stolmcData.nonce,
             "Content-type": "application/json",
           },
         });

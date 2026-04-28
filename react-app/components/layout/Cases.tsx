@@ -46,8 +46,8 @@ export default function Cases() {
       setLocalQuery("");
 
       try {
-        const apiUrlCases = `${data.root_url}/wp-json/${data.api_url}/cases`;
-        const apiUrlUsers = `${data.root_url}/wp-json/service-tracker-stolmc/v1/users`;
+        const apiUrlCases = `${stolmcData.root_url}/wp-json/${stolmcData.api_url}/cases`;
+        const apiUrlUsers = `${stolmcData.root_url}/wp-json/service-tracker-stolmc/v1/users`;
 
         // Step 1: Fetch all users across all pages.
         let allUsers: any[]  = [];
@@ -57,7 +57,7 @@ export default function Cases() {
         do {
           const usersRes = await fetchGet(
             `${apiUrlUsers}?page=${usersPage}&per_page=6`,
-            { headers: { "X-WP-Nonce": data.nonce } }
+            { headers: { "X-WP-Nonce": stolmcData.nonce } }
           );
           const body = usersRes.data;
           const pagination = body?.meta?.pagination ?? {};
@@ -84,7 +84,7 @@ export default function Cases() {
           do {
             const casesRes = await fetchGet(
               `${apiUrlCases}/${user.id}?page=${casesPage}&per_page=6`,
-              { headers: { "X-WP-Nonce": data.nonce } }
+              { headers: { "X-WP-Nonce": stolmcData.nonce } }
             );
             const casesBody = casesRes.data;
             const casesPagination = casesBody?.meta?.pagination ?? {};
@@ -154,9 +154,9 @@ export default function Cases() {
 
       try {
         await post(
-          `${data.root_url}/wp-json/${data.api_url}/cases-status/${caseId}`,
+          `${stolmcData.root_url}/wp-json/${stolmcData.api_url}/cases-status/${caseId}`,
           null,
-          { headers: { "X-WP-Nonce": data.nonce } }
+          { headers: { "X-WP-Nonce": stolmcData.nonce } }
         );
 
         const update = (prev: CaseType[]) =>

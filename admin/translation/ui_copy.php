@@ -9,8 +9,7 @@
  *   1. Add it to the appropriate section below.
  *   2. Reference it in React via `data.your_key`.
  *
- * @package    Service_Tracker
- * @subpackage Service_Tracker/admin/translation
+ * @package    STOLMC_Service_Tracker
  * @since      2.1.0
  */
 
@@ -171,7 +170,9 @@ return [
 	'placeholder_email'                => __( 'client@example.com', 'service-tracker-stolmc' ),
 	'placeholder_phone'                => __( '(123) 456-7890', 'service-tracker-stolmc' ),
 	'clients_name_email_required'      => __( 'Name and email are required', 'service-tracker-stolmc' ),
-	'clients_results_for'              => __( '%d result(s) for "%s"', 'service-tracker-stolmc' ),
+	// translators: %1$d: number of results, %2$s: search term.
+	'clients_results_for'              => __( '%1$d result(s) for "%2$s"', 'service-tracker-stolmc' ),
+	// translators: %d: total number of clients.
 	'clients_total'                    => __( '%d client(s) total', 'service-tracker-stolmc' ),
 
 	// -------------------------------------------------------------------------
@@ -358,8 +359,6 @@ return [
 	'analytics_days'                   => __( 'Days', 'service-tracker-stolmc' ),
 	'calendar_cases_ending'            => __( 'case(s) ending', 'service-tracker-stolmc' ),
 	'calendar_cases_starting'          => __( 'case(s) starting', 'service-tracker-stolmc' ),
-	'clients_results_for'              => __( '%d result(s) for "%s"', 'service-tracker-stolmc' ),
-	'clients_total'                    => __( '%d client(s) total', 'service-tracker-stolmc' ),
 
 	// -------------------------------------------------------------------------
 	// Progress – client fallback
@@ -369,6 +368,7 @@ return [
 	// -------------------------------------------------------------------------
 	// Client details – fallback
 	// -------------------------------------------------------------------------
+	// translators: %d: year the client became active.
 	'client_active_since'              => __( 'Active Since %d', 'service-tracker-stolmc' ),
 
 	// -------------------------------------------------------------------------
@@ -394,5 +394,6 @@ return [
 	// -------------------------------------------------------------------------
 	// Cases – count subtitle
 	// -------------------------------------------------------------------------
+	// translators: %d: number of cases.
 	'cases_count_subtitle'             => __( '%d case(s) across all clients', 'service-tracker-stolmc' ),
 ];

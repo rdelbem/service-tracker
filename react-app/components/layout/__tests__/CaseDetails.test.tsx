@@ -120,8 +120,8 @@ describe("CaseDetails component", () => {
 
     vi.spyOn(console, "error").mockImplementation(() => {});
 
-    (globalThis as any).data = {
-      ...(globalThis as any).data,
+    (globalThis as any).stolmcData = {
+      ...(globalThis as any).stolmcData,
       root_url: "http://localhost",
       api_url: "service-tracker-stolmc/v1",
       nonce: "nonce",

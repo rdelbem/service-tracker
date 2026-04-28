@@ -35,8 +35,8 @@ msgid "https://delbem.net"
 msgstr ""
 
 #: includes/STOLMC_Service_Tracker.php:232 admin/translation/ui_copy.php:271
-msgid "Customer"
-msgstr "Cliente"
+msgid "Service Tracker Client"
+msgstr "Cliente Service Tracker"
 
 #: includes/STOLMC_Service_Tracker.php:269
 msgid "Staff"

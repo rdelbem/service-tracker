@@ -2,12 +2,14 @@
 
 namespace STOLMC_Service_Tracker\includes\DB;
 
+defined( 'ABSPATH' ) || exit;
+
 /**
  * Declarative schema definition for all Service Tracker tables.
  *
  * This class is the single source of truth for the database schema.
  * Every column, type, and index for every table managed by this plugin
- * is described here. The Schema_Manager reads this definition and
+ * is described here. The STOLMC_Schema_Manager reads this definition and
  * reconciles the actual database state against it.
  *
  * To add a new column in a future version:
@@ -17,16 +19,16 @@ namespace STOLMC_Service_Tracker\includes\DB;
  * To remove a column: remove it from the definition.
  *
  * @since    1.1.0
- * @package  STOLMC_Service_Tracker\includes\DB
+ * @package  STOLMC_Service_Tracker
  */
-class Schema {
+class STOLMC_Schema {
 
 	/**
 	 * Current database schema version.
 	 *
 	 * Increment this constant whenever the schema definition changes
 	 * (new columns, removed columns, index changes, etc.). The
-	 * Schema_Manager compares this value against the stored
+	 * STOLMC_Schema_Manager compares this value against the stored
 	 * `stolmc_service_tracker_db_version` option and runs migrations
 	 * when the stored version is lower.
 	 *

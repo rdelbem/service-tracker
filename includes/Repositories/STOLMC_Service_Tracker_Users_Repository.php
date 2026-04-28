@@ -14,7 +14,7 @@ class STOLMC_Service_Tracker_Users_Repository {
 	 *
 	 * @var string
 	 */
-	private const DEFAULT_ROLE = 'customer';
+	private const DEFAULT_ROLE = 'stolmc_customer';
 
 	/**
 	 * Default ordering for user list/search.
@@ -362,7 +362,7 @@ class STOLMC_Service_Tracker_Users_Repository {
 	public function find_staff(): array {
 		$users = get_users(
 			[
-				'role__in' => [ 'administrator', 'staff' ],
+				'role__in' => [ 'administrator', 'stolmc_staff' ],
 				'orderby'  => self::DEFAULT_ORDERBY,
 				'order'    => self::DEFAULT_ORDER,
 			]

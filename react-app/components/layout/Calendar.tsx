@@ -67,7 +67,7 @@ export default function Calendar() {
   // Fetch calendar data
   const fetchCalendarData = useCallback(async () => {
     setLoading(true);
-    const apiUrlCalendar = `${data.root_url}/wp-json/${data.api_url}/calendar`;
+    const apiUrlCalendar = `${stolmcData.root_url}/wp-json/${stolmcData.api_url}/calendar`;
 
     const startDate = formatDate(new Date(year, month, 1));
     const endDate = formatDate(new Date(year, month + 1, 0));
@@ -87,7 +87,7 @@ export default function Calendar() {
       }
 
       const response = await fetchGet(`${apiUrlCalendar}?${params.toString()}`, {
-        headers: { "X-WP-Nonce": data.nonce },
+        headers: { "X-WP-Nonce": stolmcData.nonce },
       });
 
       setCalendarData(response.data?.data || { cases: [], progress: [], date_index: {} });

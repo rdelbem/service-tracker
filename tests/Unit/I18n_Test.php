@@ -2,7 +2,7 @@
 /**
  * I18n Test
  *
- * Tests for the centralised UI_Copy i18n class.
+ * Tests for the centralised STOLMC_UI_Copy i18n class.
  *
  * @package Service_Tracker
  */
@@ -10,7 +10,7 @@
 namespace STOLMC_Service_Tracker\Tests\Unit;
 
 use Brain\Monkey;
-use STOLMC_Service_Tracker\admin\I18n\UI_Copy;
+use STOLMC_Service_Tracker\admin\I18n\STOLMC_UI_Copy;
 
 /**
  * I18n Test Class.
@@ -28,10 +28,10 @@ class I18n_Test extends Unit_TestCase {
 	}
 
 	/**
-	 * Ensure the UI_Copy class exists and is instantiable.
+	 * Ensure the STOLMC_UI_Copy class exists and is instantiable.
 	 */
 	public function test_ui_copy_class_exists(): void {
-		$this->assertTrue( class_exists( UI_Copy::class ) );
+		$this->assertTrue( class_exists( STOLMC_UI_Copy::class ) );
 	}
 
 	/**
@@ -48,7 +48,7 @@ class I18n_Test extends Unit_TestCase {
 			]
 		);
 
-		$ui_copy = new UI_Copy( $copy_file );
+		$ui_copy = new STOLMC_UI_Copy( $copy_file );
 		$texts   = $ui_copy->get_texts();
 
 		$this->assertIsArray( $texts );
@@ -69,7 +69,7 @@ class I18n_Test extends Unit_TestCase {
 			]
 		);
 
-		$ui_copy = new UI_Copy( $copy_file );
+		$ui_copy = new STOLMC_UI_Copy( $copy_file );
 		$texts   = $ui_copy->get_texts();
 
 		$expected_keys = [
@@ -112,7 +112,7 @@ class I18n_Test extends Unit_TestCase {
 			]
 		);
 
-		$ui_copy     = new UI_Copy( $copy_file );
+		$ui_copy     = new STOLMC_UI_Copy( $copy_file );
 		$localize    = $ui_copy->get_localize_data();
 
 		$this->assertIsArray( $localize );
@@ -136,7 +136,7 @@ class I18n_Test extends Unit_TestCase {
 			]
 		);
 
-		$ui_copy = new UI_Copy( $copy_file );
+		$ui_copy = new STOLMC_UI_Copy( $copy_file );
 		$first  = $ui_copy->get_texts();
 		$second = $ui_copy->get_texts();
 
@@ -147,7 +147,7 @@ class I18n_Test extends Unit_TestCase {
 	 * Ensure a missing copy file returns an empty array.
 	 */
 	public function test_missing_copy_file_returns_empty_array(): void {
-		$ui_copy = new UI_Copy( '/nonexistent/path/ui_copy.php' );
+		$ui_copy = new STOLMC_UI_Copy( '/nonexistent/path/ui_copy.php' );
 		$texts   = $ui_copy->get_texts();
 
 		$this->assertIsArray( $texts );

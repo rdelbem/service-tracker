@@ -28,7 +28,7 @@ describe("HowToUse component", () => {
     vi.clearAllMocks();
     mockInViewState.view = "howToUse";
 
-    Object.assign(globalThis.data, {
+    Object.assign(globalThis.stolmcData, {
       instructions_page_title: undefined,
       accordion_first_title: undefined,
       accordion_second_title: undefined,
@@ -72,7 +72,7 @@ describe("HowToUse component", () => {
   });
 
   it("uses translated content from global data when provided", () => {
-    Object.assign(globalThis.data, {
+    Object.assign(globalThis.stolmcData, {
       instructions_page_title: "Manual",
       accordion_first_title: "Primeira",
       first_accordion_first_li_item: "Passo A",

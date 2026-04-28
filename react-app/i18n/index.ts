@@ -1,17 +1,17 @@
 import { Text } from "./Text";
 
 /**
- * Return a translated UI string from the backend-localised `window.data`.
+ * Return a translated UI string from the backend-localised `window.stolmcData`.
  *
  * @example
  *   stolmec_text(Text.AccordionFirstTitle)
  *   // → "Display info for customers access"
  *
- * @param key - A {@link Text} enum value (the raw `window.data` key).
+ * @param key - A {@link Text} enum value (the raw `window.stolmcData` key).
  * @returns The translated string, or the key itself as a fallback.
  */
 export function stolmc_text(key: Text): string {
-  return data[key] ?? key;
+  return stolmcData[key] ?? key;
 }
 
 /**
@@ -25,7 +25,7 @@ export function stolmc_text(key: Text): string {
  * @returns The array, or an empty array as a fallback.
  */
 export function stolmc_text_array(key: Text): string[] {
-  const value = data[key];
+  const value = stolmcData[key];
   return Array.isArray(value) ? value : [];
 }
 

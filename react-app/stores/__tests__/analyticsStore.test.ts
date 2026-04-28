@@ -10,8 +10,8 @@ describe('analyticsStore', () => {
   beforeEach(() => {
     vi.resetModules();
     vi.clearAllMocks();
-    (globalThis as any).data = {
-      ...(globalThis as any).data,
+    (globalThis as any).stolmcData = {
+      ...(globalThis as any).stolmcData,
       root_url: 'http://localhost',
       api_url: 'service-tracker-stolmc/v1',
       nonce: 'nonce',
