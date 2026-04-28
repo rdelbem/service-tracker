@@ -4,7 +4,7 @@ namespace STOLMC_Service_Tracker\includes\Controller_API;
 use STOLMC_Service_Tracker\includes\Application\STOLMC_Service_Tracker_Toggle_Service;
 use STOLMC_Service_Tracker\includes\Application\STOLMC_Service_Tracker_Service_Factory;
 use STOLMC_Service_Tracker\includes\DTO\STOLMC_Service_Tracker_Dto_Factory;
-use STOLMC_Service_Tracker\includes\DTO\Validation_Exception;
+use STOLMC_Service_Tracker\includes\DTO\STOLMC_Validation_Exception;
 use WP_REST_Request;
 use WP_REST_Response;
 use WP_REST_Server;
@@ -58,7 +58,7 @@ class STOLMC_Service_Tracker_Api_Toggle extends STOLMC_Service_Tracker_Api {
 	public function toggle_status( WP_REST_Request $data ): WP_REST_Response {
 		try {
 			$toggle_dto = STOLMC_Service_Tracker_Dto_Factory::create_toggle_request_dto( $data );
-		} catch ( Validation_Exception $exception ) {
+		} catch ( STOLMC_Validation_Exception $exception ) {
 			return STOLMC_Service_Tracker_Api_Response_Mapper::to_default_response(
 				[],
 				false,

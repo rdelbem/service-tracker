@@ -70,12 +70,7 @@ vi.mock("react-toastify", () => ({
   },
 }));
 
-// Mock global data
-(globalThis as any).data = {
-  root_url: "http://localhost",
-  api_url: "api",
-  nonce: "test-nonce",
-};
+
 
 describe("AddCase component", () => {
   beforeEach(() => {
@@ -99,12 +94,12 @@ describe("AddCase component", () => {
   it("renders add case form when view is 'casesAddNew'", () => {
     render(<AddCase />);
 
-    expect(screen.getByText("Add New Case")).toBeInTheDocument();
-    expect(screen.getByText("Create a new service case for a client")).toBeInTheDocument();
-    expect(screen.getByPlaceholderText("Search for a client...")).toBeInTheDocument();
-    expect(screen.getByPlaceholderText("Enter case title...")).toBeInTheDocument();
-    expect(screen.getByText("Create Case")).toBeInTheDocument();
-    expect(screen.getByText("Cancel")).toBeInTheDocument();
+    expect(screen.getByText("add_case_heading")).toBeInTheDocument();
+    expect(screen.getByText("add_case_description")).toBeInTheDocument();
+    expect(screen.getByPlaceholderText("add_case_client_placeholder")).toBeInTheDocument();
+    expect(screen.getByPlaceholderText("add_case_title_placeholder")).toBeInTheDocument();
+    expect(screen.getByText("add_case_create_btn")).toBeInTheDocument();
+    expect(screen.getByText("btn_cancel")).toBeInTheDocument();
   });
 
   it("does not render when view is not 'casesAddNew'", () => {
@@ -118,7 +113,7 @@ describe("AddCase component", () => {
     const user = userEvent.setup();
     render(<AddCase />);
 
-    const searchInput = screen.getByPlaceholderText("Search for a client...");
+    const searchInput = screen.getByPlaceholderText("add_case_client_placeholder");
     await user.type(searchInput, "John");
 
     // Wait for filtered users to appear
@@ -132,7 +127,7 @@ describe("AddCase component", () => {
     const user = userEvent.setup();
     render(<AddCase />);
 
-    const searchInput = screen.getByPlaceholderText("Search for a client...");
+    const searchInput = screen.getByPlaceholderText("add_case_client_placeholder");
     await user.type(searchInput, "John");
 
     await waitFor(() => {
@@ -142,18 +137,18 @@ describe("AddCase component", () => {
     const userItem = screen.getByText("John Doe");
     await user.click(userItem);
 
-    expect(screen.getByText("Selected: John Doe")).toBeInTheDocument();
+    expect(screen.getByText("add_case_client_label: John Doe")).toBeInTheDocument();
   });
 
   it("shows error when submitting without selecting a client", async () => {
     const user = userEvent.setup();
     render(<AddCase />);
 
-    const submitButton = screen.getByText("Create Case");
+    const submitButton = screen.getByText("add_case_create_btn");
     await user.click(submitButton);
 
     await waitFor(() => {
-      expect(mockToastError).toHaveBeenCalledWith("Please select a client");
+      expect(mockToastError).toHaveBeenCalledWith("add_case_select_client");
     });
   });
 
@@ -162,7 +157,7 @@ describe("AddCase component", () => {
     render(<AddCase />);
 
     // Select a user first
-    const searchInput = screen.getByPlaceholderText("Search for a client...");
+    const searchInput = screen.getByPlaceholderText("add_case_client_placeholder");
     await user.type(searchInput, "John");
 
     await waitFor(() => {
@@ -173,11 +168,11 @@ describe("AddCase component", () => {
     await user.click(userItem);
 
     // Try to submit without title
-    const submitButton = screen.getByText("Create Case");
+    const submitButton = screen.getByText("add_case_create_btn");
     await user.click(submitButton);
 
     await waitFor(() => {
-      expect(mockToastError).toHaveBeenCalledWith("Please enter a case title");
+      expect(mockToastError).toHaveBeenCalledWith("add_case_enter_title");
     });
   });
 
@@ -189,7 +184,7 @@ describe("AddCase component", () => {
     render(<AddCase />);
 
     // Select a user
-    const searchInput = screen.getByPlaceholderText("Search for a client...");
+    const searchInput = screen.getByPlaceholderText("add_case_client_placeholder");
     await user.type(searchInput, "John");
 
     await waitFor(() => {
@@ -200,15 +195,15 @@ describe("AddCase component", () => {
     await user.click(userItem);
 
     // Enter case title
-    const titleInput = screen.getByPlaceholderText("Enter case title...");
+    const titleInput = screen.getByPlaceholderText("add_case_title_placeholder");
     await user.type(titleInput, "Test Case Title");
 
     // Enter description
-    const descriptionInput = screen.getByPlaceholderText("Enter case description...");
+    const descriptionInput = screen.getByPlaceholderText("add_case_description_placeholder");
     await user.type(descriptionInput, "Test description");
 
     // Submit form
-    const submitButton = screen.getByText("Create Case");
+    const submitButton = screen.getByText("add_case_create_btn");
     await user.click(submitButton);
 
     // Wait for submission
@@ -226,7 +221,7 @@ describe("AddCase component", () => {
     render(<AddCase />);
 
     // Select a user
-    const searchInput = screen.getByPlaceholderText("Search for a client...");
+    const searchInput = screen.getByPlaceholderText("add_case_client_placeholder");
     await user.type(searchInput, "John");
 
     await waitFor(() => {
@@ -237,11 +232,11 @@ describe("AddCase component", () => {
     await user.click(userItem);
 
     // Enter case title
-    const titleInput = screen.getByPlaceholderText("Enter case title...");
+    const titleInput = screen.getByPlaceholderText("add_case_title_placeholder");
     await user.type(titleInput, "Test Case Title");
 
     // Submit form
-    const submitButton = screen.getByText("Create Case");
+    const submitButton = screen.getByText("add_case_create_btn");
     await user.click(submitButton);
 
     await waitFor(() => {
@@ -253,7 +248,7 @@ describe("AddCase component", () => {
     const user = userEvent.setup();
     render(<AddCase />);
 
-    const cancelButton = screen.getByText("Cancel");
+    const cancelButton = screen.getByText("btn_cancel");
     await user.click(cancelButton);
 
     expect(mockInViewStoreState.navigate).toHaveBeenCalledWith("cases", "", "", "");

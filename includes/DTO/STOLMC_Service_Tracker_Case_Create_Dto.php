@@ -19,7 +19,7 @@ class STOLMC_Service_Tracker_Case_Create_Dto {
 		$title   = isset( $data['title'] ) ? trim( (string) $data['title'] ) : '';
 
 		if ( $id_user <= 0 || '' === $title ) {
-			throw new Validation_Exception( 'id_user and title are required fields' );
+			throw new STOLMC_Validation_Exception( 'id_user and title are required fields' );
 		}
 
 		$this->id_user     = $id_user;
@@ -31,7 +31,7 @@ class STOLMC_Service_Tracker_Case_Create_Dto {
 		$this->owner_id    = $this->normalize_optional_int( $data['owner_id'] ?? null );
 
 		if ( null !== $this->start_at && null !== $this->due_at && $this->start_at > $this->due_at ) {
-			throw new Validation_Exception( 'start_at must be before or equal to due_at' );
+			throw new STOLMC_Validation_Exception( 'start_at must be before or equal to due_at' );
 		}
 	}
 
@@ -57,7 +57,7 @@ class STOLMC_Service_Tracker_Case_Create_Dto {
 
 		$date = trim( (string) $value );
 		if ( false === strtotime( $date ) ) {
-			throw new Validation_Exception( 'Invalid datetime format' );
+			throw new STOLMC_Validation_Exception( 'Invalid datetime format' );
 		}
 
 		return $date;
@@ -70,7 +70,7 @@ class STOLMC_Service_Tracker_Case_Create_Dto {
 
 		$int_value = (int) $value;
 		if ( $int_value <= 0 ) {
-			throw new Validation_Exception( 'Invalid integer value' );
+			throw new STOLMC_Validation_Exception( 'Invalid integer value' );
 		}
 
 		return $int_value;

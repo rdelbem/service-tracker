@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { buildHash, parseHash } from "../utils/router";
 
-declare const data: Record<string, any>;
+declare const stolmcData: Record<string, any>;
 
 export interface InViewState {
   view: string;

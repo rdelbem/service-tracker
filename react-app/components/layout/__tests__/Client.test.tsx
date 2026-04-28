@@ -46,16 +46,16 @@ describe("Client component", () => {
 
     expect(screen.getByText("john")).toBeInTheDocument();
     expect(screen.getByText("J")).toBeInTheDocument();
-    expect(screen.getByText(String(new Date().getFullYear()), { exact: false })).toBeInTheDocument();
+    expect(screen.getByText(/client_active_since/i)).toBeInTheDocument();
     expect(screen.getByText("0")).toBeInTheDocument();
-    expect(screen.getByText("Cases")).toBeInTheDocument();
+    expect(screen.getByText("case_plural")).toBeInTheDocument();
   });
 
   it("shows singular case label when caseCount is one", () => {
     render(<Client id="123" name="John Doe" caseCount={1} />);
 
     expect(screen.getByText("1")).toBeInTheDocument();
-    expect(screen.getByText("Case")).toBeInTheDocument();
+    expect(screen.getByText("case_singular")).toBeInTheDocument();
   });
 
   it("applies active styles when selected client id matches current user", () => {

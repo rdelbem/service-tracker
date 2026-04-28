@@ -53,8 +53,6 @@ describe("Case component", () => {
     useCasesStoreMock.mockClear();
     useInViewStoreMock.mockClear();
     useProgressStoreMock.mockClear();
-
-    (globalThis as any).data = {};
   });
 
   afterEach(() => {
@@ -73,7 +71,7 @@ describe("Case component", () => {
     );
 
     expect(screen.getByText("Sample Case")).toBeInTheDocument();
-    expect(screen.getByText("Active")).toBeInTheDocument();
+    expect(screen.getByText("status_active")).toBeInTheDocument();
   });
 
   it("calls onToggle and updates the status label when the toggle button is clicked", async () => {
@@ -91,14 +89,14 @@ describe("Case component", () => {
       />
     );
 
-    expect(screen.getByText("Active")).toBeInTheDocument();
+    expect(screen.getByText("status_active")).toBeInTheDocument();
 
-    const toggleButton = screen.getByTitle("Close Case");
+    const toggleButton = screen.getByTitle("tip_toggle_case_close");
     await user.click(toggleButton);
 
     await waitFor(() => expect(onToggle).toHaveBeenCalledWith("case-123"));
     expect(mockCasesStore.toggleCase).not.toHaveBeenCalled();
-    expect(await screen.findByText("Closed")).toBeInTheDocument();
+    expect(await screen.findByText("status_closed")).toBeInTheDocument();
   });
 
   it("falls back to store toggleCase when onToggle is not provided", async () => {
@@ -115,11 +113,11 @@ describe("Case component", () => {
       />
     );
 
-    const toggleButton = screen.getByTitle("Close Case");
+    const toggleButton = screen.getByTitle("tip_toggle_case_close");
     await user.click(toggleButton);
 
     await waitFor(() => expect(mockCasesStore.toggleCase).toHaveBeenCalledWith("case-123"));
-    expect(await screen.findByText("Closed")).toBeInTheDocument();
+    expect(await screen.findByText("status_closed")).toBeInTheDocument();
   });
 
   it("opens edit mode when edit button is clicked", async () => {
@@ -143,7 +141,7 @@ describe("Case component", () => {
     }
     await user.click(editButton);
 
-    expect(screen.getByPlaceholderText("Enter new title...")).toBeInTheDocument();
-    expect(screen.getByText("Save")).toBeInTheDocument();
+    expect(screen.getByPlaceholderText("case_edit_placeholder")).toBeInTheDocument();
+    expect(screen.getByText("btn_save_case")).toBeInTheDocument();
   });
 });

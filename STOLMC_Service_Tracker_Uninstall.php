@@ -1,18 +1,26 @@
 <?php
+
 namespace STOLMC_Service_Tracker;
+
+defined( 'ABSPATH' ) || exit;
+
+use STOLMC_Service_Tracker\includes\DB\STOLMC_Schema;
+use STOLMC_Service_Tracker\includes\DB\STOLMC_Schema_Manager;
 
 /**
  * Handles plugin uninstallation and cleanup.
  *
  * This class is responsible for removing all plugin data
  * from the database when the plugin is uninstalled.
+ * Table definitions are consumed from STOLMC_Schema — the single
+ * source of truth for all plugin tables.
  */
 class STOLMC_Service_Tracker_Uninstall {
 
 	/**
 	 * Uninstall the plugin and remove database tables.
 	 *
-	 * Drops all Service Tracker custom tables from the database.
+	 * Drops all Service Tracker custom tables defined in Schema.
 	 *
 	 * @since    1.0.0
 	 * @access   public
@@ -20,38 +28,18 @@ class STOLMC_Service_Tracker_Uninstall {
 	 * @return void
 	 */
 	public static function uninstall(): void {
-		global $wpdb;
-
-		$table_array = [
-			'servicetracker_cases',
-			'servicetracker_progress',
-			'servicetracker_uploads',
-		];
+		$table_names = array_column( STOLMC_Schema::get_all_tables(), 'table_name' );
 
 		/**
 		 * Fires before database tables are dropped.
 		 *
 		 * @since 1.0.0
 		 *
-		 * @param array $table_array Array of table names to be dropped.
+		 * @param array $table_names Array of full table names to be dropped.
 		 */
-		do_action( 'stolmc_service_tracker_before_drop_tables', $table_array );
+		do_action( 'stolmc_service_tracker_before_drop_tables', $table_names );
 
-		foreach ( $table_array as $tablename ) {
-			// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange -- Dropping tables on uninstall.
-			// phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Table name cannot be parameterized in DROP TABLE.
-			$wpdb->query( "DROP TABLE IF EXISTS $tablename" );
-			// phpcs:enable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange
-			// phpcs:enable WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-
-			/**
-			 * Fires after a database table has been dropped.
-			 *
-			 * @since 1.0.0
-			 *
-			 * @param string $tablename The name of the dropped table.
-			 */
-			do_action( 'stolmc_service_tracker_table_dropped', $tablename );
-		}
+		$manager = new STOLMC_Schema_Manager();
+		$manager->drop_tables();
 	}
 }

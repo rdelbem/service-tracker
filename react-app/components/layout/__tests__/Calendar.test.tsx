@@ -107,8 +107,8 @@ describe("Calendar component", () => {
     mockInViewState.view = "calendar";
     mockInViewState.navigate = vi.fn();
 
-    (globalThis as any).data = {
-      ...(globalThis as any).data,
+    (globalThis as any).stolmcData = {
+      ...(globalThis as any).stolmcData,
       root_url: "http://localhost",
       api_url: "service-tracker-stolmc/v1",
       nonce: "nonce",

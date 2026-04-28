@@ -2,6 +2,7 @@ import { useState, useEffect, Fragment } from "react";
 import { useInViewStore } from "../../stores/inViewStore";
 import { useAnalyticsStore } from "../../stores/analyticsStore";
 import Spinner from "./Spinner";
+import { stolmc_text, Text } from "../../i18n";
 
 export default function Analytics() {
   const inViewState = useInViewStore((state) => state);
@@ -34,7 +35,7 @@ export default function Analytics() {
     return (
       <section className="flex-1 h-full overflow-y-auto">
         <div className="p-8 text-center">
-          <p className="text-on-surface-variant">No analytics data available</p>
+          <p className="text-on-surface-variant">{stolmc_text(Text.AnalyticsNoData)}</p>
         </div>
       </section>
     );
@@ -43,7 +44,7 @@ export default function Analytics() {
   const formatNumber = (num: number) => num.toLocaleString();
 
   const formatDate = (dateStr: string | null) => {
-    if (!dateStr) return "Never";
+    if (!dateStr) return stolmc_text(Text.AnalyticsNever);
     return new Date(dateStr).toLocaleDateString("en-US", {
       year: "numeric",
       month: "short",
@@ -56,15 +57,15 @@ export default function Analytics() {
       <div className="p-8">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-black text-on-surface tracking-tight">Analytics</h1>
+          <h1 className="text-3xl font-black text-on-surface tracking-tight">{stolmc_text(Text.AnalyticsHeading)}</h1>
           <p className="text-on-surface-variant text-sm mt-2">
-            Operational metrics and activity insights
+            {stolmc_text(Text.AnalyticsDescription)}
           </p>
         </div>
 
         {/* Period Filter */}
         <div className="bg-surface-container-low p-4 rounded-xl mb-6 flex items-center gap-4">
-          <span className="text-sm font-bold text-on-surface">Time Period:</span>
+          <span className="text-sm font-bold text-on-surface">{stolmc_text(Text.AnalyticsTimePeriod)}</span>
           {(["7", "30", "90"] as const).map((p) => (
             <button
               key={p}
@@ -75,7 +76,7 @@ export default function Analytics() {
                   : "bg-surface-container-high text-on-surface-variant hover:bg-surface-container-highest"
               }`}
             >
-              {p} Days
+              {p} {stolmc_text(Text.AnalyticsDays)}
             </button>
           ))}
         </div>
@@ -92,7 +93,7 @@ export default function Analytics() {
                   : "text-on-surface-variant hover:text-on-surface"
               }`}
             >
-              {tab}
+              {tab === "summary" ? stolmc_text(Text.AnalyticsTabSummary) : tab === "customers" ? stolmc_text(Text.AnalyticsTabCustomers) : tab === "admins" ? stolmc_text(Text.AnalyticsTabAdmins) : stolmc_text(Text.AnalyticsTabTrends)}
             </button>
           ))}
         </div>
@@ -101,50 +102,50 @@ export default function Analytics() {
         {activeTab === "summary" && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <SummaryCard
-              title="Total Customers"
+              title={stolmc_text(Text.AnalyticsTotalCustomers)}
               value={formatNumber(analytics.summary.total_customers)}
               icon="people"
               color="primary"
             />
             <SummaryCard
-              title="Total Cases"
+              title={stolmc_text(Text.AnalyticsTotalCases)}
               value={formatNumber(analytics.summary.total_cases)}
               icon="folder"
               color="secondary"
             />
             <SummaryCard
-              title="Open Cases"
+              title={stolmc_text(Text.AnalyticsOpenCases)}
               value={formatNumber(analytics.summary.open_cases)}
               icon="folder_open"
               color="secondary"
             />
             <SummaryCard
-              title="Closed Cases"
+              title={stolmc_text(Text.AnalyticsClosedCases)}
               value={formatNumber(analytics.summary.closed_cases)}
               icon="folder_check"
               color="tertiary"
             />
             <SummaryCard
-              title="Progress Updates"
+              title={stolmc_text(Text.AnalyticsProgressUpdates)}
               value={formatNumber(analytics.summary.total_progress_updates)}
               icon="timeline"
               color="primary"
             />
             <SummaryCard
-              title="Emails Sent"
+              title={stolmc_text(Text.AnalyticsEmailsSent)}
               value={formatNumber(analytics.summary.notifications_sent)}
-              subtitle={`${formatNumber(analytics.summary.notifications_attempted)} attempted`}
+              subtitle={`${formatNumber(analytics.summary.notifications_attempted)} ${stolmc_text(Text.AnalyticsEmailsAttempted)}`}
               icon="send"
               color="tertiary"
             />
             <SummaryCard
-              title="Failed Emails"
+              title={stolmc_text(Text.AnalyticsFailedEmails)}
               value={formatNumber(analytics.summary.notifications_failed)}
               icon="error"
               color="error"
             />
             <SummaryCard
-              title="Active Admins (30d)"
+              title={stolmc_text(Text.AnalyticsActiveAdmins)}
               value={formatNumber(analytics.summary.active_admins_last_30_days)}
               icon="admin_panel_settings"
               color="primary"
@@ -159,25 +160,25 @@ export default function Analytics() {
               <thead className="bg-surface-container-high">
                 <tr>
                   <th className="p-4 text-left text-xs font-bold text-on-surface-variant uppercase">
-                    Customer
+                    {stolmc_text(Text.AnalyticsColCustomer)}
                   </th>
                   <th className="p-4 text-left text-xs font-bold text-on-surface-variant uppercase">
-                    Total Cases
+                    {stolmc_text(Text.AnalyticsColTotalCases)}
                   </th>
                   <th className="p-4 text-left text-xs font-bold text-on-surface-variant uppercase">
-                    Open
+                    {stolmc_text(Text.AnalyticsColOpen)}
                   </th>
                   <th className="p-4 text-left text-xs font-bold text-on-surface-variant uppercase">
-                    Closed
+                    {stolmc_text(Text.AnalyticsColClosed)}
                   </th>
                   <th className="p-4 text-left text-xs font-bold text-on-surface-variant uppercase">
-                    Progress
+                    {stolmc_text(Text.AnalyticsColProgress)}
                   </th>
                   <th className="p-4 text-left text-xs font-bold text-on-surface-variant uppercase">
-                    Emails
+                    {stolmc_text(Text.AnalyticsColEmails)}
                   </th>
                   <th className="p-4 text-left text-xs font-bold text-on-surface-variant uppercase">
-                    Last Activity
+                    {stolmc_text(Text.AnalyticsColLastActivity)}
                   </th>
                 </tr>
               </thead>
@@ -185,7 +186,7 @@ export default function Analytics() {
                 {analytics.customer_stats.length === 0 ? (
                   <tr>
                     <td colSpan={7} className="p-8 text-center text-on-surface-variant">
-                      No customer data available
+                      {stolmc_text(Text.AnalyticsNoCustomerData)}
                     </td>
                   </tr>
                 ) : (
@@ -227,25 +228,25 @@ export default function Analytics() {
               <thead className="bg-surface-container-high">
                 <tr>
                   <th className="p-4 text-left text-xs font-bold text-on-surface-variant uppercase">
-                    Admin/Staff
+                    {stolmc_text(Text.AnalyticsColAdmin)}
                   </th>
                   <th className="p-4 text-left text-xs font-bold text-on-surface-variant uppercase">
-                    Cases Created
+                    {stolmc_text(Text.AnalyticsColCasesCreated)}
                   </th>
                   <th className="p-4 text-left text-xs font-bold text-on-surface-variant uppercase">
-                    Cases Updated
+                    {stolmc_text(Text.AnalyticsColCasesUpdated)}
                   </th>
                   <th className="p-4 text-left text-xs font-bold text-on-surface-variant uppercase">
-                    Cases Deleted
+                    {stolmc_text(Text.AnalyticsColCasesDeleted)}
                   </th>
                   <th className="p-4 text-left text-xs font-bold text-on-surface-variant uppercase">
-                    Progress Added
+                    {stolmc_text(Text.AnalyticsColProgressAdded)}
                   </th>
                   <th className="p-4 text-left text-xs font-bold text-on-surface-variant uppercase">
-                    Emails Triggered
+                    {stolmc_text(Text.AnalyticsColEmailsTriggered)}
                   </th>
                   <th className="p-4 text-left text-xs font-bold text-on-surface-variant uppercase">
-                    Last Activity
+                    {stolmc_text(Text.AnalyticsColLastActivity)}
                   </th>
                 </tr>
               </thead>
@@ -253,7 +254,7 @@ export default function Analytics() {
                 {analytics.admin_stats.length === 0 ? (
                   <tr>
                     <td colSpan={7} className="p-8 text-center text-on-surface-variant">
-                      No admin activity recorded
+                      {stolmc_text(Text.AnalyticsNoAdminData)}
                     </td>
                   </tr>
                 ) : (
@@ -294,22 +295,22 @@ export default function Analytics() {
         {activeTab === "trends" && (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <TrendBlock
-              title="Cases Created"
+              title={stolmc_text(Text.TrendCasesCreated)}
               data={analytics.trends.cases_created_by_period}
               icon="add_circle"
             />
             <TrendBlock
-              title="Progress Updates"
+              title={stolmc_text(Text.TrendProgressUpdates)}
               data={analytics.trends.progress_created_by_period}
               icon="timeline"
             />
             <TrendBlock
-              title="Email Notifications"
+              title={stolmc_text(Text.TrendEmailNotifications)}
               data={analytics.trends.notifications_by_period}
               icon="send"
             />
             <TrendBlock
-              title="Admin Actions"
+              title={stolmc_text(Text.TrendAdminActions)}
               data={analytics.trends.admin_actions_by_period}
               icon="admin_panel_settings"
             />
@@ -378,7 +379,7 @@ function TrendBlock({
       </div>
 
       {data.length === 0 ? (
-        <p className="text-xs text-outline">No data available</p>
+        <p className="text-xs text-outline">{stolmc_text(Text.AnalyticsNoTrendsData)}</p>
       ) : (
         <div className="space-y-2">
           {data.slice(0, TRENDS_ROWS_LIMIT).map((item) => (

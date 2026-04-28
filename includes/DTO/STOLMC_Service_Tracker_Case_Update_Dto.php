@@ -16,7 +16,7 @@ class STOLMC_Service_Tracker_Case_Update_Dto {
 	 */
 	public function __construct( int $case_id, array $data ) {
 		if ( $case_id <= 0 ) {
-			throw new Validation_Exception( 'Invalid case ID' );
+			throw new STOLMC_Validation_Exception( 'Invalid case ID' );
 		}
 
 		$this->case_id = $case_id;
@@ -64,7 +64,7 @@ class STOLMC_Service_Tracker_Case_Update_Dto {
 
 		$date = trim( (string) $value );
 		if ( false === strtotime( $date ) ) {
-			throw new Validation_Exception( 'Invalid datetime format' );
+			throw new STOLMC_Validation_Exception( 'Invalid datetime format' );
 		}
 
 		$this->update_data[ $field ] = $date;
@@ -87,7 +87,7 @@ class STOLMC_Service_Tracker_Case_Update_Dto {
 
 		$int_value = (int) $value;
 		if ( $int_value <= 0 ) {
-			throw new Validation_Exception( 'Invalid integer value' );
+			throw new STOLMC_Validation_Exception( 'Invalid integer value' );
 		}
 
 		$this->update_data[ $field ] = $int_value;

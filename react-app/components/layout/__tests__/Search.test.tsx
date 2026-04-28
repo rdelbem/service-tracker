@@ -19,7 +19,7 @@ vi.mock("../../../stores/clientsStore", () => ({
 describe("Search component", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    Object.assign(globalThis.data, {
+    Object.assign(globalThis.stolmcData, {
       search_bar: undefined,
     });
   });
@@ -27,11 +27,11 @@ describe("Search component", () => {
   it("renders default placeholder when localized text is not provided", () => {
     render(<Search />);
 
-    expect(screen.getByPlaceholderText("Search accounts...")).toBeInTheDocument();
+    expect(screen.getByPlaceholderText("search_bar")).toBeInTheDocument();
   });
 
   it("renders localized placeholder when provided", () => {
-    Object.assign(globalThis.data, {
+    Object.assign(globalThis.stolmcData, {
       search_bar: "Buscar clientes...",
     });
 

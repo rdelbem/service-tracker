@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { useInViewStore } from "../../stores/inViewStore";
-
-declare const data: Record<string, any>;
+import { stolmc_text, Text } from "../../i18n";
 
 export default function HowToUse() {
   const inViewState = useInViewStore((state) => state);
@@ -21,7 +20,7 @@ export default function HowToUse() {
             help_outline
           </span>
           <h1 className="text-3xl font-black text-on-surface tracking-tighter">
-            {data.instructions_page_title || "How to Use Service Tracker"}
+            {stolmc_text(Text.InstructionsPageTitle)}
           </h1>
         </div>
 
@@ -33,7 +32,7 @@ export default function HowToUse() {
               className="w-full flex items-center justify-between p-8 text-left"
             >
               <h3 className="text-lg font-bold text-on-surface">
-                1. {data.accordion_first_title || "Getting Started"}
+                1. {stolmc_text(Text.AccordionFirstTitle)}
               </h3>
               <span
                 className="material-symbols-outlined text-on-surface-variant transition-transform"
@@ -51,25 +50,25 @@ export default function HowToUse() {
                     <span className="material-symbols-outlined text-primary text-sm mt-0.5">
                       check_circle
                     </span>
-                    <span>{data.first_accordion_first_li_item || "Select a client from the left sidebar"}</span>
+                    <span>{stolmc_text(Text.FirstAccordionFirstLiItem)}</span>
                   </li>
                   <li className="flex items-start gap-3">
                     <span className="material-symbols-outlined text-primary text-sm mt-0.5">
                       check_circle
                     </span>
-                    <span>{data.first_accordion_second_li_item || "Create or view cases for the selected client"}</span>
+                    <span>{stolmc_text(Text.FirstAccordionSecondLiItem)}</span>
                   </li>
                   <li className="flex items-start gap-3">
                     <span className="material-symbols-outlined text-primary text-sm mt-0.5">
                       check_circle
                     </span>
-                    <span>{data.first_accordion_third_li_item || "Track progress and add status updates"}</span>
+                    <span>{stolmc_text(Text.FirstAccordionThirdLiItem)}</span>
                   </li>
                   <li className="flex items-start gap-3">
                     <span className="material-symbols-outlined text-primary text-sm mt-0.5">
                       check_circle
                     </span>
-                    <span>{data.first_accordion_forth_li_item || "Manage case details and settings"}</span>
+                    <span>{stolmc_text(Text.FirstAccordionForthLiItem)}</span>
                   </li>
                 </ul>
               </div>
@@ -83,7 +82,7 @@ export default function HowToUse() {
               className="w-full flex items-center justify-between p-8 text-left"
             >
               <h3 className="text-lg font-bold text-on-surface">
-                2. {data.accordion_second_title || "Advanced Features"}
+                2. {stolmc_text(Text.AccordionSecondTitle)}
               </h3>
               <span
                 className="material-symbols-outlined text-on-surface-variant transition-transform"
@@ -101,13 +100,13 @@ export default function HowToUse() {
                     <span className="material-symbols-outlined text-primary text-sm mt-0.5">
                       check_circle
                     </span>
-                    <span>{data.second_accordion_firt_li_item || "Toggle case status between open and closed"}</span>
+                    <span>{stolmc_text(Text.SecondAccordionFirtLiItem)}</span>
                   </li>
                   <li className="flex items-start gap-3">
                     <span className="material-symbols-outlined text-primary text-sm mt-0.5">
                       check_circle
                     </span>
-                    <span>{data.second_accordion_second_li_item || "Edit case details and status updates"}</span>
+                    <span>{stolmc_text(Text.SecondAccordionSecondLiItem)}</span>
                   </li>
                 </ul>
               </div>

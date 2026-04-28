@@ -6,6 +6,7 @@ import { toast } from "react-toastify";
 import { get, post, put, del } from "../../utils/fetch";
 import dateformat from "dateformat";
 import type { ProgressState as ProgressStateType, Status } from "../types";
+import { stolmc_text, Text } from "../../i18n";
 
 interface ProgressStateProps {
   children: ReactNode;
@@ -20,7 +21,7 @@ export default function ProgressState({ children }: ProgressStateProps) {
   };
 
   const [state, dispatch] = useReducer(AppReducer, initialState);
-  const apiUrlProgress = `${data.root_url}/wp-json/${data.api_url}/progress`;
+  const apiUrlProgress = `${stolmcData.root_url}/wp-json/${stolmcData.api_url}/progress`;
 
   //onlyFetch means this function will retrieve plain data from api, without state update
   const getStatus = async (id: string | number, onlyFetch: boolean, caseTitle?: string): Promise<Status[] | void> => {
@@ -38,7 +39,7 @@ export default function ProgressState({ children }: ProgressStateProps) {
 
       const res = await get(`${apiUrlProgress}/${id}`, {
         headers: {
-          "X-WP-Nonce": data.nonce,
+          "X-WP-Nonce": stolmcData.nonce,
         },
       });
 
@@ -72,7 +73,7 @@ export default function ProgressState({ children }: ProgressStateProps) {
         dataToPost,
         {
           headers: {
-            "X-WP-Nonce": data.nonce,
+            "X-WP-Nonce": stolmcData.nonce,
             "Content-type": "application/json",
           },
         }
@@ -102,9 +103,9 @@ export default function ProgressState({ children }: ProgressStateProps) {
         },
       });
 
-      toast.success(data.toast_status_added);
+      toast.success(stolmc_text(Text.ToastStatusAdded));
     } catch (error) {
-      alert(data.alert_error_base + error);
+      alert(stolmc_text(Text.AlertErrorBase) + error);
     }
   };
 
@@ -112,7 +113,7 @@ export default function ProgressState({ children }: ProgressStateProps) {
     const status = [...state.status];
 
     const sureToDelete = confirm(
-      `Are you sure you want to delete status from ${dateformat(createdAt, "dd/mm/yyyy, HH:MM")}?`
+      stolmc_text(Text.ConfirmDeleteStatusMsg)
     );
 
     if (!sureToDelete) return;
@@ -120,7 +121,7 @@ export default function ProgressState({ children }: ProgressStateProps) {
     try {
       await del(`${apiUrlProgress}/${id}`, {
         headers: {
-          "X-WP-Nonce": data.nonce,
+          "X-WP-Nonce": stolmcData.nonce,
         },
       });
 
@@ -137,15 +138,15 @@ export default function ProgressState({ children }: ProgressStateProps) {
         },
       });
 
-      toast.success(data.toast_status_deleted);
+      toast.success(stolmc_text(Text.ToastStatusDeleted));
     } catch (error) {
-      alert(data.alert_error_base + error);
+      alert(stolmc_text(Text.AlertErrorBase) + error);
     }
   };
 
   const editStatus = async (id: string | number, _id_user: string | number, newText: string): Promise<void> => {
     if (newText === "") {
-      alert(data.alert_blank_status_title);
+      alert(stolmc_text(Text.AlertBlankStatusTitle));
       return;
     }
 
@@ -154,7 +155,7 @@ export default function ProgressState({ children }: ProgressStateProps) {
     try {
       await put(`${apiUrlProgress}/${id}`, editedObj, {
         headers: {
-          "X-WP-Nonce": data.nonce,
+          "X-WP-Nonce": stolmcData.nonce,
           "Content-type": "application/json",
         },
       });
@@ -175,9 +176,9 @@ export default function ProgressState({ children }: ProgressStateProps) {
         },
       });
 
-      toast.success(data.toast_status_edited);
+      toast.success(stolmc_text(Text.ToastStatusEdited));
     } catch (error) {
-      alert(data.alert_error_base + error);
+      alert(stolmc_text(Text.AlertErrorBase) + error);
     }
   };
 

@@ -28,16 +28,21 @@ describe('casesStore', () => {
     vi.resetModules();
     vi.clearAllMocks();
     vi.stubGlobal('alert', vi.fn());
-    (globalThis as any).data = {
-      ...(globalThis as any).data,
+    (globalThis as any).stolmcData = {
+      ...(globalThis as any).stolmcData,
       root_url: 'http://localhost',
       api_url: 'service-tracker-stolmc/v1',
       nonce: 'nonce',
       toast_case_added: 'Case added',
       toast_case_deleted: 'Case deleted',
       toast_case_edited: 'Case edited',
+      toast_toggle_base_msg: 'Case is now',
+      toast_toggle_state_open_msg: 'open',
+      toast_toggle_state_close_msg: 'closed',
+      toast_case_toggled: 'Case status updated',
       alert_error_base: 'Error: ',
       alert_blank_case_title: 'Blank title',
+      confirm_delete_case_msg: 'Are you sure?',
     };
   });
 

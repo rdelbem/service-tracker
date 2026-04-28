@@ -1,5 +1,6 @@
 import '@testing-library/jest-dom/vitest';
 import { vi } from 'vitest';
+import { Text } from './react-app/i18n';
 
 // Mock WordPress data object
 vi.stubGlobal('data', {
@@ -9,6 +10,17 @@ vi.stubGlobal('data', {
   create_user_api_url: 'http://localhost/wp-json/service-tracker-stolmc/v1/users/create',
   cases_api_url: 'http://localhost/wp-json/service-tracker-stolmc/v1/cases'
 });
+
+// Mock stolmcData (WordPress localized data) with config and all i18n text keys.
+// Text values default to their enum key so stolmc_text() returns predictable strings in tests.
+(globalThis as Record<string, any>).stolmcData = {
+  root_url: 'http://localhost',
+  api_url: 'api',
+  users_api_url: 'http://localhost/api/users',
+  create_user_api_url: 'http://localhost/api/users/create',
+  nonce: 'test-nonce',
+  ...Object.fromEntries(Object.values(Text).map((key) => [key, key])),
+};
 
 // Mock fetch globally
 global.fetch = vi.fn();

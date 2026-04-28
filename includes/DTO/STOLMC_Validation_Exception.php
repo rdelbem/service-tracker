@@ -4,7 +4,7 @@ namespace STOLMC_Service_Tracker\includes\DTO;
 /**
  * Exception thrown when DTO validation fails.
  */
-class Validation_Exception extends \Exception {
+class STOLMC_Validation_Exception extends \Exception {
 
 	/**
 	 * @var array<int, string> Additional validation errors.

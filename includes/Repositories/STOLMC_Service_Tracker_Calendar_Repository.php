@@ -2,7 +2,7 @@
 
 namespace STOLMC_Service_Tracker\includes\Repositories;
 
-use STOLMC_Service_Tracker\includes\DB\Calendar_Index;
+use STOLMC_Service_Tracker\includes\DB\STOLMC_Calendar_Index;
 use STOLMC_Service_Tracker\includes\DTO\STOLMC_Service_Tracker_Calendar_Case_Dto;
 use STOLMC_Service_Tracker\includes\DTO\STOLMC_Service_Tracker_Calendar_Payload_Dto;
 use STOLMC_Service_Tracker\includes\DTO\STOLMC_Service_Tracker_Calendar_Progress_Dto;
@@ -57,7 +57,7 @@ class STOLMC_Service_Tracker_Calendar_Repository {
 		return new STOLMC_Service_Tracker_Calendar_Payload_Dto(
 			$this->find_calendar_cases( $start, $end, $id_user, $status ),
 			$this->find_calendar_progress( $start, $end, $id_user ),
-			Calendar_Index::get()
+			STOLMC_Calendar_Index::get()
 		);
 	}
 
@@ -175,7 +175,7 @@ class STOLMC_Service_Tracker_Calendar_Repository {
 	 * @return array<string, array<string, array<int>>>
 	 */
 	public function find_date_index(): array {
-		return Calendar_Index::get();
+		return STOLMC_Calendar_Index::get();
 	}
 
 	/**
@@ -184,7 +184,7 @@ class STOLMC_Service_Tracker_Calendar_Repository {
 	 * @return void
 	 */
 	public function rebuild_date_index(): void {
-		Calendar_Index::rebuild();
+		STOLMC_Calendar_Index::rebuild();
 	}
 
 	/**
@@ -193,7 +193,7 @@ class STOLMC_Service_Tracker_Calendar_Repository {
 	 * @return void
 	 */
 	public function clear_date_index(): void {
-		Calendar_Index::clear();
+		STOLMC_Calendar_Index::clear();
 	}
 
 	/**

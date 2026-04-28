@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { stolmc_text, Text } from "../../i18n";
 
 export default function Settings() {
   // Initialize from persisted preference first, then DOM class/system preference.
@@ -29,22 +30,22 @@ export default function Settings() {
       <div className="p-8">
         <div className="max-w-3xl mx-auto">
           <div className="mb-8">
-            <h1 className="text-3xl font-bold text-on-surface">Settings</h1>
+            <h1 className="text-3xl font-bold text-on-surface">{stolmc_text(Text.SettingsHeading)}</h1>
             <p className="text-on-surface-variant mt-2">
-              Manage your preferences and application settings
+              {stolmc_text(Text.SettingsDescription)}
             </p>
           </div>
 
           <div className="bg-surface-container-lowest rounded-2xl border border-outline-variant/20 shadow-sm p-6">
             <div className="border-b border-outline-variant pb-4 mb-6">
-              <h2 className="text-xl font-bold text-on-surface">Appearance</h2>
+              <h2 className="text-xl font-bold text-on-surface">{stolmc_text(Text.SettingsAppearance)}</h2>
             </div>
 
             <div className="flex items-center justify-between py-4">
               <div>
-                <h3 className="font-bold text-on-surface">Dark Mode</h3>
+                <h3 className="font-bold text-on-surface">{stolmc_text(Text.SettingsDarkMode)}</h3>
                 <p className="text-on-surface-variant text-sm mt-1">
-                  Toggle between light and dark themes
+                  {stolmc_text(Text.SettingsDarkModeDesc)}
                 </p>
               </div>
               <button
@@ -63,9 +64,9 @@ export default function Settings() {
 
             <div className="flex items-center justify-between py-4 border-t border-outline-variant mt-4">
               <div>
-                <h3 className="font-bold text-on-surface">Theme Preview</h3>
+                <h3 className="font-bold text-on-surface">{stolmc_text(Text.SettingsThemePreview)}</h3>
                 <p className="text-on-surface-variant text-sm mt-1">
-                  Current theme: {darkMode ? "Dark" : "Light"}
+                  Current theme: {darkMode ? stolmc_text(Text.SettingsThemeDark) : stolmc_text(Text.SettingsThemeLight)}
                 </p>
               </div>
               <div className="flex items-center gap-2">
@@ -78,21 +79,21 @@ export default function Settings() {
 
           <div className="bg-surface-container-lowest rounded-2xl border border-outline-variant/20 shadow-sm p-6 mt-6">
             <div className="border-b border-outline-variant pb-4 mb-6">
-              <h2 className="text-xl font-bold text-on-surface">Account</h2>
+              <h2 className="text-xl font-bold text-on-surface">{stolmc_text(Text.SettingsAccount)}</h2>
             </div>
 
             <div className="py-4">
-              <h3 className="font-bold text-on-surface">User Information</h3>
+              <h3 className="font-bold text-on-surface">{stolmc_text(Text.SettingsUserInfo)}</h3>
               <div className="flex items-center gap-4 mt-4">
                 <div className="w-16 h-16 rounded-full bg-primary flex items-center justify-center text-on-primary font-bold text-xl">
                   A
                 </div>
                 <div>
                   <p className="font-bold text-on-surface">
-                    Admin User
+                    {stolmc_text(Text.FallbackAdminUser)}
                   </p>
                   <p className="text-on-surface-variant text-sm">
-                    Master Admin
+                    {stolmc_text(Text.RoleMaster)}
                   </p>
                 </div>
               </div>

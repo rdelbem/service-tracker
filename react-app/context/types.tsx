@@ -5,7 +5,7 @@ export const IN_VIEW = "IN_VIEW";
 export const GET_STATUS = "GET_STATUS";
 
 // Global data object from WordPress wp_localize_script
-declare const data: Record<string, any>;
+declare const stolmcData: Record<string, any>;
 
 // Route types for hash-based routing
 export interface RouteMatch {

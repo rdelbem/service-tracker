@@ -21,7 +21,7 @@ describe("UserAttachments component", () => {
 
     render(<UserAttachments idUser="42" />);
 
-    expect(screen.getByText(/loading attachments/i)).toBeInTheDocument();
+    expect(screen.getByText(/attachments_loading/i)).toBeInTheDocument();
     expect(mockFetchGet).toHaveBeenCalledWith(
       "http://localhost/wp-json/service-tracker-stolmc/v1/progress/user-attachments/42",
       expect.objectContaining({
@@ -38,7 +38,7 @@ describe("UserAttachments component", () => {
     render(<UserAttachments idUser="42" />);
 
     await waitFor(() => {
-      expect(screen.getByText(/no attachments found for this client/i)).toBeInTheDocument();
+      expect(screen.getByText("attachments_empty")).toBeInTheDocument();
     });
   });
 
@@ -122,15 +122,15 @@ describe("UserAttachments component", () => {
 
     render(<UserAttachments idUser="42" />);
 
-    await screen.findByText(/filter by case/i);
-    expect(screen.getByText("2 attachments")).toBeInTheDocument();
+    await screen.findByText(/attachments_filter_label/i);
+    expect(screen.getByText(/2\s+attachment_plural/)).toBeInTheDocument();
 
     const select = screen.getByRole("combobox");
     fireEvent.change(select, { target: { value: "20" } });
 
     expect(screen.queryByRole("link", { name: /a\.png/i })).not.toBeInTheDocument();
     expect(screen.getByRole("link", { name: /b\.pdf/i })).toBeInTheDocument();
-    expect(screen.getByText("1 attachment")).toBeInTheDocument();
+    expect(screen.getByText(/1\s+attachment_singular/)).toBeInTheDocument();
   });
 
   it("handles fetch errors by showing empty state", async () => {
@@ -140,7 +140,7 @@ describe("UserAttachments component", () => {
     render(<UserAttachments idUser="42" />);
 
     await waitFor(() => {
-      expect(screen.getByText(/no attachments found for this client/i)).toBeInTheDocument();
+      expect(screen.getByText("attachments_empty")).toBeInTheDocument();
     });
   });
 });

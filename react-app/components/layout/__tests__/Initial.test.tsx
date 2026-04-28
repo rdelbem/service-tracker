@@ -26,7 +26,10 @@ describe("Initial component", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockInViewState.view = "init";
-    Object.assign(globalThis.data, { home_screen: undefined });
+    (globalThis as any).stolmcData = {
+      home_screen: undefined,
+      brand_name: "Service Tracker",
+    };
   });
 
   it("renders nothing when current view is not init", () => {
@@ -39,12 +42,12 @@ describe("Initial component", () => {
   it("renders default welcome content", () => {
     render(<Initial />);
 
-    expect(screen.getByText("Welcome to Service Tracker")).toBeInTheDocument();
-    expect(screen.getByText("Select a client from the sidebar to get started")).toBeInTheDocument();
+    expect(screen.getByText("Service Tracker")).toBeInTheDocument();
+    expect(screen.getByText("home_screen")).toBeInTheDocument();
   });
 
   it("renders translated home screen message when provided", () => {
-    Object.assign(globalThis.data, { home_screen: "Escolha um cliente para começar" });
+    (globalThis as any).stolmcData.home_screen = "Escolha um cliente para começar";
 
     render(<Initial />);
 

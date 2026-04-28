@@ -7,8 +7,8 @@ describe("react-app index bootstrap", () => {
     document.body.innerHTML = "";
   });
 
-  it("creates a root and renders app when #root exists", async () => {
-    document.body.innerHTML = '<div id="root"></div>';
+  it("creates a root and renders app when #stolmc-root exists", async () => {
+    document.body.innerHTML = '<div id="stolmc-root"></div>';
 
     const renderMock = vi.fn();
     const createRootMock = vi.fn(() => ({
@@ -25,11 +25,11 @@ describe("react-app index bootstrap", () => {
 
     await import("../index");
 
-    expect(createRootMock).toHaveBeenCalledWith(document.getElementById("root"));
+    expect(createRootMock).toHaveBeenCalledWith(document.getElementById("stolmc-root"));
     expect(renderMock).toHaveBeenCalledTimes(1);
   });
 
-  it("does not create a root when #root is missing", async () => {
+  it("does not create a root when #stolmc-root is missing", async () => {
     const createRootMock = vi.fn();
 
     vi.doMock("react-dom/client", () => ({

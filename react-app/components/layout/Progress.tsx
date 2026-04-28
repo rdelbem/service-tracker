@@ -11,8 +11,7 @@ import { toast } from "react-toastify";
 import { showConfirm, showAlert } from "../ui/Modal";
 import { useRef } from "react";
 import type { Attachment } from "../../types";
-
-declare const data: Record<string, any>;
+import { stolmc_text, Text } from "../../i18n";
 
 export default function Progress() {
   const inViewState = useInViewStore((state) => state);
@@ -37,27 +36,22 @@ export default function Progress() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const imageInputRef = useRef<HTMLInputElement>(null);
 
-  // Case ID
   const idCase = inViewState.caseId;
-  // User ID
   const idUser = inViewState.userId;
 
-  // Load progress data when caseId changes
   useEffect(() => {
     if (!idCase) return;
     const title = inViewState.name || progressState.caseTitle;
     getStatus(idCase, false, title);
   }, [idCase]);
 
-  // Fetch case data for dates
   useEffect(() => {
     if (!idUser || !idCase) return;
 
     const fetchCaseData = async () => {
       setLoadingCase(true);
-      const apiUrlCases = `${data.root_url}/wp-json/${data.api_url}/cases`;
+      const apiUrlCases = `${stolmcData.root_url}/wp-json/${stolmcData.api_url}/cases`;
       try {
-        // Fetch all pages of cases for this user to find the one we need.
         let found: any = null;
         let casesPage = 1;
         let casesTotalPages = 1;
@@ -65,7 +59,7 @@ export default function Progress() {
         do {
           const res = await fetchGet(
             `${apiUrlCases}/${idUser}?page=${casesPage}&per_page=6`,
-            { headers: { "X-WP-Nonce": data.nonce } }
+            { headers: { "X-WP-Nonce": stolmcData.nonce } }
           );
           const envelope = res.data;
           const cases: any[] = envelope.data ?? [];
@@ -79,21 +73,20 @@ export default function Progress() {
         setCaseData(found || null);
         setSelectedOwner(found?.owner_id || "");
 
-        // Fetch client name — unpack paginated envelope.
         if (found?.id_user) {
-          const apiUrlUsers = `${data.root_url}/wp-json/service-tracker-stolmc/v1/users`;
+          const apiUrlUsers = `${stolmcData.root_url}/wp-json/service-tracker-stolmc/v1/users`;
           try {
             const usersRes = await fetchGet(
               `${apiUrlUsers}?page=1&per_page=100`,
-              { headers: { "X-WP-Nonce": data.nonce } }
+              { headers: { "X-WP-Nonce": stolmcData.nonce } }
             );
             const userList = normalizeUsers(usersRes.data?.data);
             const client = userList.find(
               (u: any) => String(u.id) === String(found.id_user)
             );
-            setClientName(client?.name || `Client #${found.id_user}`);
+            setClientName(client?.name || `${stolmc_text(Text.ProgressClientPrefix)}${found.id_user}`);
           } catch {
-            setClientName(`Client #${found.id_user}`);
+            setClientName(`${stolmc_text(Text.ProgressClientPrefix)}${found.id_user}`);
           }
         }
       } catch (error) {
@@ -106,13 +99,12 @@ export default function Progress() {
     fetchCaseData();
   }, [idUser, idCase]);
 
-  // Fetch staff users for owner dropdown
   useEffect(() => {
     const fetchStaffUsers = async () => {
-      const apiUrlStaff = `${data.root_url}/wp-json/service-tracker-stolmc/v1/users/staff`;
+      const apiUrlStaff = `${stolmcData.root_url}/wp-json/service-tracker-stolmc/v1/users/staff`;
       try {
         const res = await fetchGet(apiUrlStaff, {
-          headers: { "X-WP-Nonce": data.nonce },
+          headers: { "X-WP-Nonce": stolmcData.nonce },
         });
         setStaffUsers(normalizeUsers(res.data?.data));
       } catch (error) {
@@ -138,7 +130,7 @@ export default function Progress() {
     if (!editingDate || !caseData) return;
 
     const field = editingDate === "start" ? "start_at" : "due_at";
-    const apiUrlCases = `${data.root_url}/wp-json/${data.api_url}/cases`;
+    const apiUrlCases = `${stolmcData.root_url}/wp-json/${stolmcData.api_url}/cases`;
 
     try {
       await put(`${apiUrlCases}/${idCase}`, {
@@ -146,7 +138,7 @@ export default function Progress() {
         [field]: tempDate || null,
       }, {
         headers: {
-          "X-WP-Nonce": data.nonce,
+          "X-WP-Nonce": stolmcData.nonce,
           "Content-type": "application/json",
         },
       });
@@ -155,7 +147,7 @@ export default function Progress() {
       setEditingDate(null);
     } catch (error) {
       console.error("Error updating date:", error);
-      showAlert({ title: "Error", message: "Failed to update date" });
+      showAlert({ title: stolmc_text(Text.ModalNoticeTitle), message: stolmc_text(Text.ToastDateUpdateFailed) });
     }
   };
 
@@ -167,7 +159,7 @@ export default function Progress() {
   const handleOwnerChange = async (newOwnerId: string | number) => {
     setSelectedOwner(newOwnerId);
     setSavingOwner(true);
-    const apiUrlCases = `${data.root_url}/wp-json/${data.api_url}/cases`;
+    const apiUrlCases = `${stolmcData.root_url}/wp-json/${stolmcData.api_url}/cases`;
 
     try {
       await put(`${apiUrlCases}/${idCase}`, {
@@ -175,19 +167,16 @@ export default function Progress() {
         owner_id: newOwnerId || null,
       }, {
         headers: {
-          "X-WP-Nonce": data.nonce,
+          "X-WP-Nonce": stolmcData.nonce,
           "Content-type": "application/json",
         },
       });
 
       setCaseData((prev: any) => ({ ...prev, owner_id: newOwnerId || null }));
-      const ownerName = newOwnerId
-        ? staffUsers.find((u: any) => String(u.id) === String(newOwnerId))?.name || "Unknown"
-        : "Unassigned";
-      toast.success(`Case owner changed to ${ownerName}`);
+      toast.success(stolmc_text(Text.ToastOwnerChanged));
     } catch (error) {
       console.error("Error updating owner:", error);
-      toast.error("Failed to update case owner");
+      toast.error(stolmc_text(Text.ToastOwnerUpdateFailed));
       setSelectedOwner(caseData?.owner_id || "");
     } finally {
       setSavingOwner(false);
@@ -197,62 +186,61 @@ export default function Progress() {
   const handleToggleStatus = async () => {
     const currentStatus = caseData?.status || "open";
     const newStatus = currentStatus === "open" ? "close" : "open";
-    const actionLabel = newStatus === "close" ? "closing" : "reopening";
 
     const confirmed = await showConfirm({
-      title: `${newStatus === "close" ? "Close" : "Reopen"} Case`,
-      message: `Are you sure you want to ${actionLabel} this case?`,
-      confirmText: newStatus === "close" ? "Close Case" : "Reopen Case",
+      title: newStatus === "close" ? stolmc_text(Text.ConfirmCloseCaseTitle) : stolmc_text(Text.ConfirmReopenCaseTitle),
+      message: newStatus === "close" ? stolmc_text(Text.ConfirmCloseCaseMsg) : stolmc_text(Text.ConfirmReopenCaseMsg),
+      confirmText: newStatus === "close" ? stolmc_text(Text.ConfirmCloseCaseTitle) : stolmc_text(Text.ConfirmReopenCaseTitle),
     });
 
     if (!confirmed) return;
 
-    const apiUrlToggle = `${data.root_url}/wp-json/${data.api_url}/cases-status`;
+    const apiUrlToggle = `${stolmcData.root_url}/wp-json/${stolmcData.api_url}/cases-status`;
 
     try {
       await post(`${apiUrlToggle}/${idCase}`, null, {
-        headers: { "X-WP-Nonce": data.nonce },
+        headers: { "X-WP-Nonce": stolmcData.nonce },
       });
 
       setCaseData((prev: any) => ({ ...prev, status: newStatus }));
-      toast.success(`Case is now ${newStatus === "close" ? "closed" : "open"}`);
+      toast.success(`${stolmc_text(Text.ToastToggleBaseMsg)} ${stolmc_text(newStatus === "close" ? Text.ToastToggleStateCloseMsg : Text.ToastToggleStateOpenMsg)}`);
     } catch (error) {
       console.error("Error toggling status:", error);
-      toast.error("Failed to update case status");
+      toast.error(stolmc_text(Text.ToastCaseToggled));
     }
   };
 
   const handleDeleteCase = async () => {
     const confirmed = await showConfirm({
-      title: "Delete Case",
-      message: `Are you sure you want to delete "${progressState.caseTitle || caseData?.title || "this case"}"? This will also delete all associated progress updates.`,
-      confirmText: "Delete Case",
+      title: stolmc_text(Text.ConfirmDeleteCaseTitle),
+      message: stolmc_text(Text.ConfirmDeleteCaseMsg),
+      confirmText: stolmc_text(Text.ConfirmDeleteCaseTitle),
     });
 
     if (!confirmed) return;
 
-    const apiUrlCases = `${data.root_url}/wp-json/${data.api_url}/cases`;
+    const apiUrlCases = `${stolmcData.root_url}/wp-json/${stolmcData.api_url}/cases`;
 
     try {
       await del(`${apiUrlCases}/${idCase}`, {
-        headers: { "X-WP-Nonce": data.nonce },
+        headers: { "X-WP-Nonce": stolmcData.nonce },
       });
 
-      toast.success("Case deleted successfully");
+      toast.success(stolmc_text(Text.ToastCaseDeletedSuccess));
       navigate("cases", "", "", "");
     } catch (error) {
       console.error("Error deleting case:", error);
-      toast.error("Failed to delete case");
+      toast.error(stolmc_text(Text.ToastCaseDeletedSuccess));
     }
   };
 
   const handleSaveTitle = async () => {
     if (newTitle.trim() === "") {
-      showAlert({ title: "Error", message: "Case title cannot be blank" });
+      showAlert({ title: stolmc_text(Text.ModalNoticeTitle), message: stolmc_text(Text.AlertBlankCaseTitle) });
       return;
     }
 
-    const apiUrlCases = `${data.root_url}/wp-json/${data.api_url}/cases`;
+    const apiUrlCases = `${stolmcData.root_url}/wp-json/${stolmcData.api_url}/cases`;
 
     try {
       await put(`${apiUrlCases}/${idCase}`, {
@@ -260,17 +248,17 @@ export default function Progress() {
         title: newTitle.trim(),
       }, {
         headers: {
-          "X-WP-Nonce": data.nonce,
+          "X-WP-Nonce": stolmcData.nonce,
           "Content-type": "application/json",
         },
       });
 
       setCaseData((prev: any) => ({ ...prev, title: newTitle.trim() }));
       setEditingTitle(false);
-      toast.success("Case title updated successfully");
+      toast.success(stolmc_text(Text.ToastCaseTitleUpdated));
     } catch (error) {
       console.error("Error updating title:", error);
-      toast.error("Failed to update case title");
+      toast.error(stolmc_text(Text.ToastTitleUpdateFailed));
     }
   };
 
@@ -280,9 +268,9 @@ export default function Progress() {
   };
 
   const getOwnerName = () => {
-    if (!caseData?.owner_id) return "Unassigned";
+    if (!caseData?.owner_id) return stolmc_text(Text.CaseOwnerUnassigned);
     const owner = staffUsers.find((u: any) => String(u.id) === String(caseData.owner_id));
-    return owner ? owner.name : "Unknown";
+    return owner ? owner.name : stolmc_text(Text.StatusUnknown);
   };
 
   const handleAttachFiles = () => {
@@ -305,7 +293,7 @@ export default function Progress() {
 
   const handlePostStatus = async () => {
     if (newText.trim() === "") {
-      showAlert({ title: "Error", message: data.alert_blank_status_title || "Status title cannot be blank" });
+      showAlert({ title: stolmc_text(Text.ModalNoticeTitle), message: stolmc_text(Text.AlertBlankStatusTitle) });
       return;
     }
 
@@ -327,7 +315,7 @@ export default function Progress() {
       setWritingStatus(false);
     } catch (error) {
       console.error("Error posting status:", error);
-      toast.error("Failed to post status update");
+      toast.error(stolmc_text(Text.ToastStatusPostFailed));
     } finally {
       setUploadingFiles(false);
     }
@@ -339,7 +327,6 @@ export default function Progress() {
     setPendingFiles(newFiles);
   };
 
-  // Keep behavior consistent with view-based layout components.
   if (inViewState.view !== "progress") {
     return null;
   }
@@ -352,19 +339,18 @@ export default function Progress() {
 
   return (
     <section className="flex-1 flex flex-col bg-background relative h-full">
-      {/* Top Action Header */}
       <header className="h-20 px-12 flex items-center justify-between border-b border-outline-variant/5 flex-shrink-0">
         <div className="flex items-center gap-4">
           <div className="w-2 h-2 rounded-full bg-secondary shadow-[0_0_8px_rgba(0,108,73,0.4)]"></div>
           <span className="text-lg font-bold text-on-surface-variant">
-            Client: <span className="text-on-surface">{clientName || "Loading..."}</span>
+            {stolmc_text(Text.ClientLabel)}: <span className="text-on-surface">{clientName || stolmc_text(Text.Na)}</span>
           </span>
         </div>
         <div className="flex items-center gap-3">
           <button
             onClick={handleDeleteCase}
             className="flex items-center gap-2 px-4 py-2 bg-error-container/30 text-error text-xs font-bold rounded-lg shadow-lg hover:bg-error-container/50 active:scale-95 transition-all"
-            title="Delete Case"
+            title={stolmc_text(Text.ConfirmDeleteCaseTitle)}
           >
             <span className="material-symbols-outlined text-sm">delete</span>
           </button>
@@ -375,20 +361,18 @@ export default function Progress() {
             className="flex items-center gap-2 px-4 py-2 bg-surface-container-highest text-on-surface text-xs font-bold rounded-lg shadow-lg hover:shadow-xl active:scale-95 transition-all"
           >
             <span className="material-symbols-outlined text-sm">arrow_back</span>
-            Back to Cases
+            {stolmc_text(Text.BtnBackToCases)}
           </button>
         </div>
       </header>
 
-      {/* Progress Content */}
       <div className="flex-1 overflow-y-auto p-12">
-        {/* Case Title Header */}
         <div className="mb-12">
           <div className="flex items-baseline gap-6">
             {!editingTitle ? (
               <>
                 <h1 className="text-4xl font-black text-on-surface tracking-tighter">
-                  {progressState.caseTitle || caseData?.title || "Case"}
+                  {progressState.caseTitle || caseData?.title || stolmc_text(Text.CaseName)}
                 </h1>
                 <button
                   onClick={() => {
@@ -396,7 +380,7 @@ export default function Progress() {
                     setEditingTitle(true);
                   }}
                   className="p-2 rounded-lg hover:bg-surface-container-high text-on-surface-variant hover:text-primary transition-all"
-                  title="Edit title"
+                  title={stolmc_text(Text.TipEditCase)}
                 >
                   <span className="material-symbols-outlined text-sm">edit</span>
                 </button>
@@ -409,20 +393,20 @@ export default function Progress() {
                     value={newTitle}
                     onChange={(e) => setNewTitle(e.target.value)}
                     className="flex-1 bg-surface-container-low border border-outline-variant/20 rounded-xl py-2 px-4 text-2xl font-black text-on-surface focus:ring-2 focus:ring-primary/10"
-                    placeholder="Enter case title..."
+                    placeholder={stolmc_text(Text.CaseEditPlaceholder)}
                     autoFocus
                   />
                   <button
                     onClick={handleSaveTitle}
                     className="p-2 rounded-lg bg-primary text-white hover:bg-primary-container active:scale-95 transition-all"
-                    title="Save title"
+                    title={stolmc_text(Text.BtnSaveCase)}
                   >
                     <span className="material-symbols-outlined text-sm">check</span>
                   </button>
                   <button
                     onClick={handleCancelEditTitle}
                     className="p-2 rounded-lg bg-surface-container-highest text-on-surface-variant hover:bg-surface-container active:scale-95 transition-all"
-                    title="Cancel"
+                    title={stolmc_text(Text.BtnCancel)}
                   >
                     <span className="material-symbols-outlined text-sm">close</span>
                   </button>
@@ -437,17 +421,16 @@ export default function Progress() {
                     ? "bg-secondary-container/40 text-on-secondary-container hover:bg-secondary-container/60"
                     : "bg-surface-dim/40 text-outline hover:bg-surface-dim/60"
                 }`}
-                title={caseData?.status === "open" ? "Click to close case" : "Click to reopen case"}
+                title={caseData?.status === "open" ? stolmc_text(Text.TipToggleCaseOpen) : stolmc_text(Text.TipToggleCaseClose)}
               >
-                {caseData?.status === "open" ? "Active" : "Closed"}
+                {caseData?.status === "open" ? stolmc_text(Text.StatusActive) : stolmc_text(Text.StatusClosed)}
               </button>
             )}
           </div>
           <p className="text-on-surface-variant mt-4 max-w-2xl leading-relaxed font-body">
-            Track all updates and progress for this case
+            {stolmc_text(Text.ProgressPlaceholder)}
           </p>
 
-          {/* Owner Assignment */}
           <div className="mt-6 max-w-2xl">
             <div className="bg-surface-container-low p-4 rounded-xl">
               <div className="flex items-center justify-between">
@@ -457,7 +440,7 @@ export default function Progress() {
                   </span>
                   <div>
                     <label className="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">
-                      Case Owner
+                      {stolmc_text(Text.CaseOwnerLabel)}
                     </label>
                     <p className="text-sm text-on-surface font-medium">
                       {getOwnerName()}
@@ -470,10 +453,10 @@ export default function Progress() {
                   disabled={savingOwner}
                   className="bg-surface-container-lowest border border-outline-variant/20 rounded-lg py-2 px-3 text-sm focus:ring-2 focus:ring-primary/10 disabled:opacity-50"
                 >
-                  <option value="">Unassigned</option>
+                  <option value="">{stolmc_text(Text.CaseOwnerUnassigned)}</option>
                   {staffUsers.map((user: any) => (
                     <option key={user.id} value={user.id}>
-                      {user.name} {user.role === "administrator" ? "(Admin)" : ""}
+                      {user.name} {user.role === "administrator" ? stolmc_text(Text.CaseOwnerAdminSuffix) : ""}
                     </option>
                   ))}
                 </select>
@@ -481,13 +464,11 @@ export default function Progress() {
             </div>
           </div>
 
-          {/* Editable Dates */}
           <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6 max-w-2xl">
-            {/* Start Date */}
             <div className="bg-surface-container-low p-4 rounded-xl">
               <div className="flex items-center justify-between mb-2">
                 <label className="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">
-                  Start Date
+                  {stolmc_text(Text.LabelStartDate)}
                 </label>
                 {editingDate !== "start" && (
                   <button
@@ -529,16 +510,15 @@ export default function Progress() {
                         hour: "2-digit",
                         minute: "2-digit",
                       })
-                    : "Not set"}
+                    : stolmc_text(Text.NotSet)}
                 </p>
               )}
             </div>
 
-            {/* Due Date */}
             <div className="bg-surface-container-low p-4 rounded-xl">
               <div className="flex items-center justify-between mb-2">
                 <label className="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">
-                  Due Date
+                  {stolmc_text(Text.LabelDueDate)}
                 </label>
                 {editingDate !== "due" && (
                   <button
@@ -580,14 +560,13 @@ export default function Progress() {
                         hour: "2-digit",
                         minute: "2-digit",
                       })
-                    : "Not set"}
+                    : stolmc_text(Text.NotSet)}
                 </p>
               )}
             </div>
           </div>
         </div>
 
-        {/* Tabs: Progress / Attachments */}
         <div className="flex gap-1 mb-8 border-b border-outline-variant/10">
           <button
             onClick={() => setActiveTab("progress")}
@@ -599,7 +578,7 @@ export default function Progress() {
           >
             <span className="flex items-center gap-2">
               <span className="material-symbols-outlined text-sm">timeline</span>
-              Progress
+              {stolmc_text(Text.ProgressTab)}
             </span>
           </button>
           <button
@@ -612,20 +591,18 @@ export default function Progress() {
           >
             <span className="flex items-center gap-2">
               <span className="material-symbols-outlined text-sm">attach_file</span>
-              All Attachments
+              {stolmc_text(Text.AttachmentsTab)}
             </span>
           </button>
         </div>
 
-        {/* Tab: Progress */}
         {activeTab === "progress" && (
           <>
-            {/* Status Update Input */}
             <div className="bg-surface-container-lowest rounded-2xl p-8 shadow-[0px_12px_32px_rgba(11,28,48,0.06)] relative overflow-hidden mb-8">
               <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-secondary to-secondary-container"></div>
               <div className="flex items-center justify-between mb-6">
                 <h3 className="text-xl font-headline font-bold text-primary">
-                  Progress Update
+                  {stolmc_text(Text.ProgressHeading)}
                 </h3>
                 <div className="flex items-center gap-2 bg-secondary-container/20 px-3 py-1.5 rounded-full border border-secondary-container/30">
                   <span
@@ -635,7 +612,7 @@ export default function Progress() {
                     mail
                   </span>
                   <span className="text-[10px] font-bold text-on-secondary-container uppercase tracking-wider">
-                    Client will be notified
+                    {stolmc_text(Text.ProgressNotifyBadge)}
                   </span>
                 </div>
               </div>
@@ -646,16 +623,15 @@ export default function Progress() {
                     <TextareaAutosize
                       onChange={(e) => setNewText(e.target.value)}
                       className="w-full p-4 bg-surface-container-low rounded-xl border-none focus:ring-2 focus:ring-primary/10 text-on-surface font-medium resize-none placeholder:text-on-primary-container"
-                      placeholder="Type progress details here... (e.g., 'Initial site visit completed')"
+                      placeholder={stolmc_text(Text.ProgressPlaceholder)}
                       rows={4}
                       value={newText}
                     />
                   </div>
 
-                  {/* Pending files display */}
                   {pendingFiles.length > 0 && (
                     <div className="mb-4 p-3 bg-surface-container-low rounded-xl">
-                      <p className="text-xs font-bold text-on-surface-variant mb-2">Files to Attach:</p>
+                      <p className="text-xs font-bold text-on-surface-variant mb-2">{stolmc_text(Text.ProgressFilesLabel)}</p>
                       <div className="flex flex-wrap gap-2">
                         {pendingFiles.map((file, index) => (
                           <div key={index} className="flex items-center gap-2 px-3 py-2 bg-surface-container-high rounded-lg">
@@ -682,7 +658,7 @@ export default function Progress() {
                         onClick={handleAttachFiles}
                         disabled={uploadingFiles}
                         className="p-2 text-on-surface-variant hover:bg-surface-container-high rounded-lg transition-all disabled:opacity-50"
-                        title="Attach Files"
+                        title={stolmc_text(Text.ProgressAttachFiles)}
                       >
                         <span className="material-symbols-outlined">attach_file</span>
                       </button>
@@ -691,14 +667,14 @@ export default function Progress() {
                         onClick={handleAddImage}
                         disabled={uploadingFiles}
                         className="p-2 text-on-surface-variant hover:bg-surface-container-high rounded-lg transition-all disabled:opacity-50"
-                        title="Add Image"
+                        title={stolmc_text(Text.ProgressAddImage)}
                       >
                         <span className="material-symbols-outlined">image</span>
                       </button>
                       {uploadingFiles && (
                         <div className="flex items-center gap-2 px-3 py-2">
                           <span className="material-symbols-outlined text-sm animate-spin">progress_activity</span>
-                          <span className="text-xs text-on-surface-variant">Uploading...</span>
+                          <span className="text-xs text-on-surface-variant">{stolmc_text(Text.ProgressUploading)}</span>
                         </div>
                       )}
                     </div>
@@ -710,7 +686,7 @@ export default function Progress() {
                         }}
                         className="px-8 py-3 bg-primary text-on-primary font-bold rounded-xl shadow-lg active:scale-95 transition-transform"
                       >
-                        {data.add_status_btn || "Post Update"}
+                        {stolmc_text(Text.ProgressPostBtn)}
                       </button>
                       <button
                         onClick={(e) => {
@@ -720,12 +696,11 @@ export default function Progress() {
                         }}
                         className="px-6 py-3 bg-surface-container-highest text-on-surface font-bold rounded-xl shadow-lg active:scale-95 transition-all hover:bg-surface-container-high"
                       >
-                        {data.close_box_btn || "Close"}
+                        {stolmc_text(Text.BtnClose)}
                       </button>
                     </div>
                   </div>
 
-                  {/* Hidden file inputs */}
                   <input
                     ref={fileInputRef}
                     type="file"
@@ -755,18 +730,17 @@ export default function Progress() {
                 >
                   <span className="flex items-center justify-center gap-2">
                     <span className="material-symbols-outlined text-sm">add_circle</span>
-                    {data.new_status_btn || "Add Status Update"}
+                    {stolmc_text(Text.NewStatusBtn)}
                   </span>
                 </button>
               )}
             </div>
 
-            {/* Timeline / Activity Log */}
             <div className="space-y-6">
               <div className="flex items-center gap-4 mb-8">
                 <div className="h-[1px] flex-1 bg-outline-variant/20"></div>
                 <span className="text-[10px] font-bold text-on-primary-container uppercase tracking-widest px-4">
-                  Activity Log
+                  {stolmc_text(Text.ActivityLogHeading)}
                 </span>
                 <div className="h-[1px] flex-1 bg-outline-variant/20"></div>
               </div>
@@ -777,10 +751,10 @@ export default function Progress() {
                     timeline
                   </span>
                   <h3 className="text-xl font-bold text-on-surface-variant">
-                    {data.no_progress_yet || "No progress updates yet"}
+                    {stolmc_text(Text.NoProgressYet)}
                   </h3>
                   <p className="text-sm text-outline mt-2">
-                    Add your first status update to get started
+                    {stolmc_text(Text.ActivityLogEmptyDesc)}
                   </p>
                 </div>
               )}
@@ -791,13 +765,12 @@ export default function Progress() {
           </>
         )}
 
-        {/* Tab: All Attachments */}
         {activeTab === "attachments" && (
           <div className="bg-surface-container-lowest rounded-2xl p-8 shadow-[0px_12px_32px_rgba(11,28,48,0.06)]">
             <div className="flex items-center gap-3 mb-6">
               <span className="material-symbols-outlined text-primary">attach_file</span>
               <h3 className="text-xl font-headline font-bold text-primary">
-                Client Attachments
+                {stolmc_text(Text.ClientAttachmentsHeading)}
               </h3>
             </div>
             <UserAttachments idUser={idUser} />

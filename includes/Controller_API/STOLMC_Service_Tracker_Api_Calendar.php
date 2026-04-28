@@ -5,7 +5,7 @@ use STOLMC_Service_Tracker\includes\Application\STOLMC_Service_Tracker_Calendar_
 use STOLMC_Service_Tracker\includes\Application\STOLMC_Service_Tracker_Service_Factory;
 use STOLMC_Service_Tracker\includes\Controller_API\STOLMC_Service_Tracker_Api_Response_Mapper;
 use STOLMC_Service_Tracker\includes\DTO\STOLMC_Service_Tracker_Dto_Factory;
-use STOLMC_Service_Tracker\includes\DTO\Validation_Exception;
+use STOLMC_Service_Tracker\includes\DTO\STOLMC_Validation_Exception;
 use WP_REST_Request;
 use WP_REST_Response;
 use WP_REST_Server;
@@ -62,7 +62,7 @@ class STOLMC_Service_Tracker_Api_Calendar extends STOLMC_Service_Tracker_Api imp
 	public function get_calendar( WP_REST_Request $data ): WP_REST_Response {
 		try {
 			$query_dto = STOLMC_Service_Tracker_Dto_Factory::create_calendar_query_dto( $data );
-		} catch ( Validation_Exception $exception ) {
+		} catch ( STOLMC_Validation_Exception $exception ) {
 			return STOLMC_Service_Tracker_Api_Response_Mapper::to_default_response(
 				[],
 				false,

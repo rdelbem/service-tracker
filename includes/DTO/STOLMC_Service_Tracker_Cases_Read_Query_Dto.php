@@ -9,7 +9,7 @@ class STOLMC_Service_Tracker_Cases_Read_Query_Dto {
 
 	public function __construct( int $user_id, int $page = 1, int $per_page = 6 ) {
 		if ( $user_id <= 0 ) {
-			throw new Validation_Exception( 'Invalid user ID' );
+			throw new STOLMC_Validation_Exception( 'Invalid user ID' );
 		}
 
 		$this->user_id  = $user_id;

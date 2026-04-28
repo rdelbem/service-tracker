@@ -16,7 +16,7 @@ class STOLMC_Service_Tracker_Progress_Update_Dto {
 	 */
 	public function __construct( int $progress_id, array $data ) {
 		if ( $progress_id <= 0 ) {
-			throw new Validation_Exception( 'Invalid progress ID' );
+			throw new STOLMC_Validation_Exception( 'Invalid progress ID' );
 		}
 
 		$this->progress_id = $progress_id;

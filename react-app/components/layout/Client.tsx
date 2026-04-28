@@ -1,5 +1,6 @@
 import { useInViewStore } from "../../stores/inViewStore";
 import { useCasesStore } from "../../stores/casesStore";
+import { stolmc_text, Text } from "../../i18n";
 import type { User } from "../../types";
 
 interface ClientProps extends User {
@@ -42,7 +43,7 @@ export default function Client({ id, name, caseCount, activeSince }: ClientProps
         <div className="flex-1">
           <h3 className="text-sm font-bold text-on-surface">{name}</h3>
           <p className="text-[10px] text-on-surface-variant/70 uppercase tracking-wider font-semibold">
-            {activeSince || `Active Since ${new Date().getFullYear()}`}
+            {activeSince || stolmc_text(Text.ClientActiveSince).replace('%d', String(new Date().getFullYear()))}
           </p>
         </div>
 
@@ -54,7 +55,7 @@ export default function Client({ id, name, caseCount, activeSince }: ClientProps
             {caseCount || 0}
           </span>
           <span className="block text-[8px] uppercase tracking-tighter text-outline">
-            {caseCount === 1 ? "Case" : "Cases"}
+            {caseCount === 1 ? stolmc_text(Text.CaseSingular) : stolmc_text(Text.CasePlural)}
           </span>
         </div>
       </div>

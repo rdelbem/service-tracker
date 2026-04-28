@@ -80,13 +80,6 @@ vi.mock("react-toastify", () => ({
   },
 }));
 
-// Mock global data
-(globalThis as any).data = {
-  root_url: "http://localhost",
-  api_url: "api",
-  nonce: "test-nonce",
-};
-
 describe("ClientDetails component", () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -126,7 +119,7 @@ describe("ClientDetails component", () => {
       expect(screen.getByText("John Doe")).toBeInTheDocument();
     });
 
-    expect(screen.getByText("Contact Information")).toBeInTheDocument();
+    expect(screen.getByText("client_contact_heading")).toBeInTheDocument();
     expect(screen.getByText("john@example.com")).toBeInTheDocument();
     expect(screen.getByText("1234567890")).toBeInTheDocument();
     expect(screen.getByText("0987654321")).toBeInTheDocument();
@@ -156,11 +149,11 @@ describe("ClientDetails component", () => {
       expect(screen.getByText("John Doe")).toBeInTheDocument();
     });
 
-    const editButton = screen.getByRole("button", { name: "Edit" });
+    const editButton = screen.getByRole("button", { name: "btn_edit" });
     await user.click(editButton);
 
     // Should show save and cancel buttons
-    expect(screen.getByRole("button", { name: /^save$/i })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "btn_save" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /cancel/i })).toBeInTheDocument();
   });
 
@@ -172,7 +165,7 @@ describe("ClientDetails component", () => {
       expect(screen.getByText("John Doe")).toBeInTheDocument();
     });
 
-    const backButton = screen.getByRole("button", { name: /back to clients/i });
+    const backButton = screen.getByRole("button", { name: /client_back_to_list/i });
     await user.click(backButton);
 
     expect(mockInViewStoreState.navigate).toHaveBeenCalledWith("clients", "", "", "");
@@ -194,6 +187,6 @@ describe("ClientDetails component", () => {
     });
 
     // The component shows "1 case found" (lowercase)
-    expect(screen.getByText(/1 case found/i)).toBeInTheDocument();
+    expect(screen.getByText(/1 case_singular found/i)).toBeInTheDocument();
   });
 });

@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { get as fetchGet } from "../utils/fetch";
 
-declare const data: Record<string, any>;
+declare const stolmcData: Record<string, any>;
 
 export interface AnalyticsSummary {
   total_customers: number;
@@ -76,7 +76,7 @@ export const useAnalyticsStore = create<AnalyticsStore>((set) => ({
   fetchAnalytics: async (period = "30") => {
     set({ loading: true });
 
-    const apiUrl = `${data.root_url}/wp-json/${data.api_url}/analytics`;
+    const apiUrl = `${stolmcData.root_url}/wp-json/${stolmcData.api_url}/analytics`;
 
     const now = new Date();
     const startDate = new Date(now);
@@ -89,7 +89,7 @@ export const useAnalyticsStore = create<AnalyticsStore>((set) => ({
 
     try {
       const response = await fetchGet(`${apiUrl}?${params.toString()}`, {
-        headers: { "X-WP-Nonce": data.nonce },
+        headers: { "X-WP-Nonce": stolmcData.nonce },
       });
 
       set({ analytics: response.data.data, loading: false });

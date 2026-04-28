@@ -4,20 +4,16 @@ namespace STOLMC_Service_Tracker\includes;
 defined( 'ABSPATH' ) || exit;
 
 use STOLMC_Service_Tracker\admin\STOLMC_Service_Tracker_Admin;
-use STOLMC_Service_Tracker\includes\Analytics\Analytics_Logger;
-use STOLMC_Service_Tracker\includes\Analytics\Analytics_Hooks;
-use STOLMC_Service_Tracker\includes\CLI\Service_Tracker_Commands;
-use STOLMC_Service_Tracker\includes\DB\Calendar_Index;
-use STOLMC_Service_Tracker\includes\DB\Schema_Manager;
-use STOLMC_Service_Tracker\includes\I18n\STOLMC_Service_Tracker_I18n;
+use STOLMC_Service_Tracker\includes\Analytics\STOLMC_Analytics_Logger;
+use STOLMC_Service_Tracker\includes\Analytics\STOLMC_Analytics_Hooks;
+use STOLMC_Service_Tracker\includes\CLI\STOLMC_Service_Tracker_Commands;
+use STOLMC_Service_Tracker\includes\DB\STOLMC_Calendar_Index;
+use STOLMC_Service_Tracker\includes\DB\STOLMC_Schema_Manager;
 use STOLMC_Service_Tracker\includes\Utils\STOLMC_Service_Tracker_Loader;
 use STOLMC_Service_Tracker\includes\Utils\STOLMC_Service_Tracker_Permalink_Validator;
 use STOLMC_Service_Tracker\includes\Publics\STOLMC_Service_Tracker_Public;
 use STOLMC_Service_Tracker\includes\Publics\STOLMC_Service_Tracker_Public_User_Content;
 use STOLMC_Service_Tracker\includes\Application\STOLMC_Service_Tracker_Service_Factory;
-
-// This must be here, since PSR4 determines that define should not be used in an output file.
-define( 'STOLMC_SERVICE_TRACKER_VERSION', '1.0.0' );
 
 /**
  * The file that defines the core plugin class.
@@ -28,8 +24,7 @@ define( 'STOLMC_SERVICE_TRACKER_VERSION', '1.0.0' );
  * @link       http://example.com
  * @since      1.0.0
  *
- * @package    Service_Tracker
- * @subpackage Service_Tracker/includes
+ * @package    STOLMC_Service_Tracker
  */
 
 /**
@@ -44,8 +39,7 @@ define( 'STOLMC_SERVICE_TRACKER_VERSION', '1.0.0' );
  * version of the plugin.
  *
  * @since      1.0.0
- * @package    Service_Tracker
- * @subpackage Service_Tracker/includes
+ * @package    STOLMC_Service_Tracker
  * @author     Rodrigo Del Bem <rodrigodelbem@gmail.com>
  */
 class STOLMC_Service_Tracker {
@@ -181,8 +175,9 @@ class STOLMC_Service_Tracker {
 	/**
 	 * Define the locale for this plugin for internationalization.
 	 *
-	 * Uses the STOLMC_Service_Tracker_I18n class in order to set the domain and to register the hook
-	 * with WordPress.
+	 * WordPress.org loads plugin translations automatically based on
+	 * the plugin headers (`Text Domain` and `Domain Path`), so no
+	 * explicit runtime hook registration is needed here.
 	 *
 	 * @since    1.0.0
 	 * @access   private
@@ -190,8 +185,13 @@ class STOLMC_Service_Tracker {
 	 * @return void
 	 */
 	private function set_locale(): void {
-		$plugin_i18n = new STOLMC_Service_Tracker_I18n();
-		$this->loader->add_action( 'init', $plugin_i18n, 'load_plugin_textdomain' );
+		add_action( 'init', function () {
+			load_plugin_textdomain(
+				'service-tracker-stolmc',
+				false,
+				dirname( plugin_basename( STOLMC_SERVICE_TRACKER_ROOT_FILE ) ) . '/languages'
+			);
+		} );
 	}
 
 	/**
@@ -230,7 +230,7 @@ class STOLMC_Service_Tracker {
 			 * @param array $capabilities The capabilities from the subscriber role.
 			 */
 			$capabilities = apply_filters( 'stolmc_service_tracker_customer_role_capabilities', $subscriber_role->capabilities );
-			add_role( 'customer', __( 'Customer', 'service-tracker-stolmc' ), $capabilities );
+			add_role( 'stolmc_customer', __( 'Service Tracker Client', 'service-tracker-stolmc' ), $capabilities );
 		}
 
 		/**
@@ -254,7 +254,7 @@ class STOLMC_Service_Tracker {
 	 */
 	public function register_staff_role(): void {
 		// Only create the role if it doesn't already exist.
-		if ( null === get_role( 'staff' ) ) {
+		if ( null === get_role( 'stolmc_staff' ) ) {
 			$editor_role = get_role( 'editor' );
 			$capabilities = $editor_role ? $editor_role->capabilities : [];
 
@@ -267,7 +267,7 @@ class STOLMC_Service_Tracker {
 			 */
 			$capabilities = apply_filters( 'stolmc_service_tracker_staff_role_capabilities', $capabilities );
 
-			add_role( 'staff', __( 'Staff', 'service-tracker-stolmc' ), $capabilities );
+			add_role( 'stolmc_staff', __( 'Staff', 'service-tracker-stolmc' ), $capabilities );
 		}
 
 		/**
@@ -338,7 +338,7 @@ class STOLMC_Service_Tracker {
 	/**
 	 * Register database schema synchronization hooks.
 	 *
-	 * The Schema_Manager runs on every `init` to compare the actual
+	 * The STOLMC_Schema_Manager runs on every `init` to compare the actual
 	 * database schema against the declarative definition and apply
 	 * any pending ALTER TABLE migrations.  The fast-path version
 	 * check costs a single option read and returns immediately when
@@ -350,14 +350,14 @@ class STOLMC_Service_Tracker {
 	 * @return void
 	 */
 	private function define_schema_hooks(): void {
-		$schema_manager = new Schema_Manager();
+		$schema_manager = new STOLMC_Schema_Manager();
 		$this->loader->add_action( 'init', $schema_manager, 'sync' );
 	}
 
 	/**
 	 * Register analytics hooks for activity and notification logging.
 	 *
-	 * Sets up the Analytics_Logger and Analytics_Hooks classes to
+	 * Sets up the STOLMC_Analytics_Logger and STOLMC_Analytics_Hooks classes to
 	 * listen to domain events and persist activity/notification records.
 	 *
 	 * @since    1.2.0
@@ -388,7 +388,7 @@ class STOLMC_Service_Tracker {
 
 		// phpcs:ignore Generic.PHP.NoSilencedErrors -- WP-CLI class only exists when running WP-CLI.
 		if ( class_exists( '\WP_CLI' ) ) {
-			\WP_CLI::add_command( 'service-tracker', Service_Tracker_Commands::class );
+			\WP_CLI::add_command( 'stolmc-service-tracker', STOLMC_Service_Tracker_Commands::class );
 		}
 	}
 
@@ -419,7 +419,7 @@ class STOLMC_Service_Tracker {
 	 * @return void
 	 */
 	public function rebuild_calendar_index(): void {
-		Calendar_Index::rebuild();
+		STOLMC_Calendar_Index::rebuild();
 	}
 
 	/**

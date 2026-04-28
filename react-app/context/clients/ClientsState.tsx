@@ -3,6 +3,7 @@ import AppReducer from "../AppReducer";
 import { get, post } from "../../utils/fetch";
 import ClientsContext from "./clientsContext";
 import { GET_USERS } from "../types";
+import { stolmc_text, Text } from "../../i18n";
 import type { ClientsState as ClientsStateType, User } from "../types";
 
 interface ClientsStateProps {
@@ -10,8 +11,8 @@ interface ClientsStateProps {
 }
 
 export default function ClientsState({ children }: ClientsStateProps) {
-  const api_url_users = data.users_api_url;
-  const create_user_api_url = data.create_user_api_url;
+  const api_url_users = stolmcData.users_api_url;
+  const create_user_api_url = stolmcData.create_user_api_url;
 
   const initialState: ClientsStateType = {
     users: [],
@@ -49,7 +50,7 @@ export default function ClientsState({ children }: ClientsStateProps) {
   const getUsers = async () => {
     const res = await get(api_url_users, {
       headers: {
-        "X-WP-Nonce": data.nonce,
+        "X-WP-Nonce": stolmcData.nonce,
       },
     });
 
@@ -66,7 +67,7 @@ export default function ClientsState({ children }: ClientsStateProps) {
         userData,
         {
           headers: {
-            "X-WP-Nonce": data.nonce,
+            "X-WP-Nonce": stolmcData.nonce,
           },
         }
       );
@@ -79,14 +80,14 @@ export default function ClientsState({ children }: ClientsStateProps) {
       const payload = res.data;
       return {
         success: Boolean(payload?.success),
-        message: payload?.message ?? (payload?.success ? "User created successfully." : "Failed to create user."),
+        message: payload?.message ?? (payload?.success ? stolmc_text(Text.ToastUserCreated) : stolmc_text(Text.ToastUserCreateFailed)),
         user: payload?.data,
       };
     } catch (error) {
       console.error("Error creating user:", error);
       return {
         success: false,
-        message: "Failed to create user. Please try again.",
+        message: stolmc_text(Text.ToastUserCreateError),
       };
     }
   };

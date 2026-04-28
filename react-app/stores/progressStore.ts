@@ -1,9 +1,10 @@
 import { create } from "zustand";
 import { get as fetchGet, post, put, del, postMultipart } from "../utils/fetch";
 import { toast } from "react-toastify";
+import { stolmc_text, Text } from "../i18n";
 import type { Status, Attachment } from "../types";
 
-declare const data: Record<string, any>;
+declare const stolmcData: Record<string, any>;
 
 export interface ProgressState {
   status: Status[];
@@ -22,7 +23,7 @@ export interface ProgressActions {
 export interface ProgressStore extends ProgressState, ProgressActions {}
 
 export const useProgressStore = create<ProgressStore>((set, get) => {
-  const apiUrlProgress = `${data.root_url}/wp-json/${data.api_url}/progress`;
+  const apiUrlProgress = `${stolmcData.root_url}/wp-json/${stolmcData.api_url}/progress`;
 
   return {
     status: [],
@@ -35,7 +36,7 @@ export const useProgressStore = create<ProgressStore>((set, get) => {
         }
 
         const res = await fetchGet(`${apiUrlProgress}/${id}`, {
-          headers: { "X-WP-Nonce": data.nonce },
+          headers: { "X-WP-Nonce": stolmcData.nonce },
         });
 
         const statusData = Array.isArray(res.data.data) ? res.data.data : [];
@@ -58,7 +59,7 @@ export const useProgressStore = create<ProgressStore>((set, get) => {
       try {
         await post(`${apiUrlProgress}/${id_case}`, dataToPost, {
           headers: {
-            "X-WP-Nonce": data.nonce,
+            "X-WP-Nonce": stolmcData.nonce,
             "Content-type": "application/json",
           },
         });
@@ -70,9 +71,9 @@ export const useProgressStore = create<ProgressStore>((set, get) => {
 
         set({ status: statusArray, loadingStatus: false });
 
-        toast.success(data.toast_status_added);
+        toast.success(stolmc_text(Text.ToastStatusAdded));
       } catch (error) {
-        alert(data.alert_error_base + error);
+        alert(stolmc_text(Text.AlertErrorBase) + error);
       }
     },
     deleteStatus: async (id: string | number): Promise<void> => {
@@ -80,7 +81,7 @@ export const useProgressStore = create<ProgressStore>((set, get) => {
 
       try {
         await del(`${apiUrlProgress}/${id}`, {
-          headers: { "X-WP-Nonce": data.nonce },
+          headers: { "X-WP-Nonce": stolmcData.nonce },
         });
 
         const filteredStatuses = status.filter((status: Status) => {
@@ -89,21 +90,21 @@ export const useProgressStore = create<ProgressStore>((set, get) => {
 
         set({ status: filteredStatuses, loadingStatus: false });
 
-        toast.success(data.toast_status_deleted);
+        toast.success(stolmc_text(Text.ToastStatusDeleted));
       } catch (error) {
-        alert(data.alert_error_base + error);
+        alert(stolmc_text(Text.AlertErrorBase) + error);
       }
     },
     editStatus: async (id: string | number, _id_user: string | number, newText: string): Promise<void> => {
       if (newText === "") {
-        alert(data.alert_blank_status_title);
+        alert(stolmc_text(Text.AlertBlankStatusTitle));
         return;
       }
 
       try {
         await put(`${apiUrlProgress}/${id}`, { text: newText }, {
           headers: {
-            "X-WP-Nonce": data.nonce,
+            "X-WP-Nonce": stolmcData.nonce,
             "Content-type": "application/json",
           },
         });
@@ -117,9 +118,9 @@ export const useProgressStore = create<ProgressStore>((set, get) => {
 
         set({ status: newStatuses, loadingStatus: false });
 
-        toast.success(data.toast_status_edited);
+        toast.success(stolmc_text(Text.ToastStatusEdited));
       } catch (error) {
-        alert(data.alert_error_base + error);
+        alert(stolmc_text(Text.AlertErrorBase) + error);
       }
     },
     uploadFiles: async (id_user: string | number, id_case: string | number, files: FileList | File[]): Promise<Attachment[]> => {
@@ -132,19 +133,19 @@ export const useProgressStore = create<ProgressStore>((set, get) => {
       }
 
       try {
-        const apiUrlUpload = `${data.root_url}/wp-json/${data.api_url}/progress/upload`;
+        const apiUrlUpload = `${stolmcData.root_url}/wp-json/${stolmcData.api_url}/progress/upload`;
         const res = await postMultipart(apiUrlUpload, formData, {
-          headers: { "X-WP-Nonce": data.nonce },
+          headers: { "X-WP-Nonce": stolmcData.nonce },
         });
 
         if (res.data.success) {
           const files = Array.isArray(res.data.data?.files) ? res.data.data.files : [];
           return files as Attachment[];
         } else {
-          throw new Error(res.data.message || "Upload failed");
+          throw new Error(res.data.message || stolmc_text(Text.ToastUploadFailed));
         }
       } catch (error) {
-        alert(data.alert_error_base + error);
+        alert(stolmc_text(Text.AlertErrorBase) + error);
         return [];
       }
     },

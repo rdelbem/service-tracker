@@ -11,8 +11,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @link       http://example.com
  * @since      1.0.0
  *
- * @package    Service_Tracker
- * @subpackage Service_Tracker/public
+ * @package    STOLMC_Service_Tracker
  */
 
 /**
@@ -21,8 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Defines the plugin name, version, and two examples hooks for how to
  * enqueue the public-facing stylesheet and JavaScript.
  *
- * @package    Service_Tracker
- * @subpackage Service_Tracker/public
+ * @package    STOLMC_Service_Tracker
  * @author     Rodrigo Del Bem <rodrigodelbem@gmail.com>
  */
 class STOLMC_Service_Tracker_Public {

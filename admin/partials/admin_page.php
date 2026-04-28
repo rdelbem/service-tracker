@@ -1,3 +1,3 @@
 <?php if ( ! defined( 'ABSPATH' ) ) {
 	exit;} // Exit if accessed directly ?>
-<div id="root"></div>
+<div id="stolmc-root"></div>

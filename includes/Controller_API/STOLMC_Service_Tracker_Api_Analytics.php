@@ -16,7 +16,7 @@ use WP_REST_Server;
  * Provides aggregated analytics data for the admin dashboard.
  *
  * @since    1.2.0
- * @package  STOLMC_Service_Tracker\includes\Controller_API
+ * @package  STOLMC_Service_Tracker
  */
 class STOLMC_Service_Tracker_Api_Analytics extends STOLMC_Service_Tracker_Api {
 

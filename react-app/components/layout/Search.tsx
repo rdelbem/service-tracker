@@ -1,6 +1,5 @@
 import { useClientsStore } from "../../stores/clientsStore";
-
-declare const data: Record<string, any>;
+import { stolmc_text, Text } from "../../i18n";
 
 interface SearchProps {
   onSearch?: (query: string) => void;
@@ -27,7 +26,7 @@ export default function Search({ onSearch }: SearchProps) {
           handleSearch(e.target.value);
         }}
         type="text"
-        placeholder={data.search_bar || "Search accounts..."}
+        placeholder={stolmc_text(Text.SearchBar)}
         className="w-full bg-surface-container-lowest border-0 rounded-xl py-3 pl-10 pr-4 text-sm focus:ring-2 focus:ring-primary/10 transition-all placeholder:text-outline-variant"
       />
     </div>

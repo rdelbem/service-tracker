@@ -234,7 +234,7 @@ describe("Analytics component", () => {
     mockAnalyticsStore.analytics = null;
     render(<Analytics />);
 
-    expect(screen.getByText(/no analytics data available/i)).toBeInTheDocument();
+    expect(screen.getByText(/analytics_no_data/i)).toBeInTheDocument();
   });
 
   it("calls fetchAnalytics on mount when analytics view is active", async () => {
@@ -249,7 +249,7 @@ describe("Analytics component", () => {
     const user = userEvent.setup();
     render(<Analytics />);
 
-    await user.click(screen.getByRole("button", { name: /7 days/i }));
+    await user.click(screen.getByRole("button", { name: /7 analytics_days/i }));
 
     expect(mockAnalyticsStore.setPeriod).toHaveBeenCalledWith("7");
     expect(mockAnalyticsStore.fetchAnalytics).toHaveBeenCalledWith("7");
@@ -259,17 +259,17 @@ describe("Analytics component", () => {
     const user = userEvent.setup();
     render(<Analytics />);
 
-    expect(screen.getByText(/total customers/i)).toBeInTheDocument();
+    expect(screen.getByText(/analytics_total_customers/i)).toBeInTheDocument();
 
-    await user.click(screen.getByRole("button", { name: "customers" }));
+    await user.click(screen.getByRole("button", { name: "analytics_tab_customers" }));
     expect(screen.getByText("John Doe")).toBeInTheDocument();
 
-    await user.click(screen.getByRole("button", { name: "admins" }));
+    await user.click(screen.getByRole("button", { name: "analytics_tab_admins" }));
     expect(screen.getByText("Admin A")).toBeInTheDocument();
 
-    await user.click(screen.getByRole("button", { name: "trends" }));
-    expect(screen.getByText(/cases created/i)).toBeInTheDocument();
-    expect(screen.getByText(/progress updates/i)).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "analytics_tab_trends" }));
+    expect(screen.getByText(/trend_cases_created/i)).toBeInTheDocument();
+    expect(screen.getByText(/trend_progress_updates/i)).toBeInTheDocument();
   });
 
   it("shows empty customers state", async () => {
@@ -280,9 +280,9 @@ describe("Analytics component", () => {
     } as any;
 
     render(<Analytics />);
-    await user.click(screen.getByRole("button", { name: "customers" }));
+    await user.click(screen.getByRole("button", { name: "analytics_tab_customers" }));
 
-    expect(screen.getByText(/no customer data available/i)).toBeInTheDocument();
+    expect(screen.getByText(/analytics_no_customer_data/i)).toBeInTheDocument();
   });
 
   it("shows empty admins state", async () => {
@@ -293,22 +293,22 @@ describe("Analytics component", () => {
     } as any;
 
     render(<Analytics />);
-    await user.click(screen.getByRole("button", { name: "admins" }));
+    await user.click(screen.getByRole("button", { name: "analytics_tab_admins" }));
 
-    expect(screen.getByText(/no admin activity recorded/i)).toBeInTheDocument();
+    expect(screen.getByText(/analytics_no_admin_data/i)).toBeInTheDocument();
   });
 
   it("shows only 5 items in trend blocks", async () => {
     const user = userEvent.setup();
     render(<Analytics />);
     
-    await user.click(screen.getByRole("button", { name: "trends" }));
+    await user.click(screen.getByRole("button", { name: "analytics_tab_trends" }));
     
     // Check that trend blocks are displayed
-    expect(screen.getByText(/cases created/i)).toBeInTheDocument();
-    expect(screen.getByText(/progress updates/i)).toBeInTheDocument();
-    expect(screen.getByText(/email notifications/i)).toBeInTheDocument();
-    expect(screen.getByText(/admin actions/i)).toBeInTheDocument();
+    expect(screen.getByText(/trend_cases_created/i)).toBeInTheDocument();
+    expect(screen.getByText(/trend_progress_updates/i)).toBeInTheDocument();
+    expect(screen.getByText(/trend_email_notifications/i)).toBeInTheDocument();
+    expect(screen.getByText(/trend_admin_actions/i)).toBeInTheDocument();
     
     // Count all date elements - each trend block should show max 5 items
     // With 4 trend blocks and 5 items each, max would be 20

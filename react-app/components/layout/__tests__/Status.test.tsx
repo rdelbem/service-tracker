@@ -40,7 +40,7 @@ describe("Status component", () => {
     vi.clearAllMocks();
     mockShowConfirm.mockResolvedValue(true);
 
-    Object.assign(globalThis.data, {
+    Object.assign(globalThis.stolmcData, {
       tip_edit_status: "Edit Status",
       tip_delete_status: "Delete Status",
       btn_save_changes_status: "Save",
@@ -51,7 +51,7 @@ describe("Status component", () => {
   it("renders status text and formatted date", () => {
     render(<Status {...baseStatus} />);
 
-    expect(screen.getByText("Progress Update")).toBeInTheDocument();
+    expect(screen.getByText("progress_heading")).toBeInTheDocument();
     expect(screen.getByText("Initial status text")).toBeInTheDocument();
     expect(screen.getByText(dateformat(baseStatus.created_at, "mmm dd, yyyy, hh:MM TT"))).toBeInTheDocument();
   });

@@ -2,27 +2,25 @@
 
 namespace STOLMC_Service_Tracker\includes\Life_Cycle;
 
-use STOLMC_Service_Tracker\includes\DB\Schema_Manager;
-use STOLMC_Service_Tracker\includes\DB\Schema;
-
 /**
- * Handles plugin deactivation and database table removal.
+ * Handles plugin deactivation.
  *
- * On deactivation this class drops all plugin-managed tables and
- * clears the stored schema version.  The plugin can be re-activated
- * at any time, at which point the Activator will recreate the tables
- * from the current declarative schema.
+ * Deactivation is non-destructive: tables and data are preserved so
+ * the plugin can be re-activated without data loss.  Only the
+ * uninstall handler (STOLMC_Service_Tracker_Uninstall) should
+ * remove data permanently.
  *
  * @since    1.1.0
- * @package  STOLMC_Service_Tracker\includes\Life_Cycle
+ * @package  STOLMC_Service_Tracker
  */
 class STOLMC_Service_Tracker_Deactivator {
 
 	/**
-	 * Deactivate the plugin and drop database tables.
+	 * Deactivate the plugin.
 	 *
-	 * All data in the servicetracker_cases and servicetracker_progress
-	 * tables will be permanently lost.
+	 * Performs non-destructive cleanup only (e.g. clearing scheduled
+	 * events or transients).  Database tables and options are left
+	 * intact so re-activation is seamless.
 	 *
 	 * @since    1.1.0
 	 * @access   public
@@ -30,11 +28,6 @@ class STOLMC_Service_Tracker_Deactivator {
 	 * @return void
 	 */
 	public static function deactivate(): void {
-		$manager = new Schema_Manager();
-		$manager->drop_tables();
-
-		// Clear version tracking so re-activation treats this as a fresh install.
-		delete_option( Schema::VERSION_OPTION );
-		delete_option( Schema_Manager::MIGRATIONS_LOG_OPTION );
+		// Nothing to clean up on deactivation.
 	}
 }

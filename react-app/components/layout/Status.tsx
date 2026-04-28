@@ -3,9 +3,8 @@ import { useProgressStore } from "../../stores/progressStore";
 import TextareaAutosize from "react-textarea-autosize";
 import dateformat from "dateformat";
 import { showConfirm } from "../ui/Modal";
+import { stolmc_text, Text } from "../../i18n";
 import type { Status as StatusType } from "../../types";
-
-declare const data: Record<string, any>;
 
 interface StatusProps extends StatusType {}
 
@@ -16,9 +15,9 @@ export default function Status({ id, id_user, created_at, text, attachments }: O
 
   const handleDelete = async () => {
     const confirmed = await showConfirm({
-      title: "Delete Progress Update",
-      message: `Are you sure you want to delete the progress update from ${dateformat(created_at, "mmm dd, yyyy, hh:MM TT")}?`,
-      confirmText: "Delete",
+      title: stolmc_text(Text.ConfirmDeleteStatusTitle),
+      message: stolmc_text(Text.ConfirmDeleteStatusMsg),
+      confirmText: stolmc_text(Text.BtnDelete),
     });
 
     if (confirmed) {
@@ -41,7 +40,7 @@ export default function Status({ id, id_user, created_at, text, attachments }: O
       {/* Header */}
       <div className="flex justify-between items-start">
         <div className="flex-1">
-          <h4 className="text-sm font-bold text-primary">Progress Update</h4>
+          <h4 className="text-sm font-bold text-primary">{stolmc_text(Text.ProgressHeading)}</h4>
           <p className="text-xs text-on-primary-container">
             {dateformat(created_at, "mmm dd, yyyy, hh:MM TT")}
           </p>
@@ -53,7 +52,7 @@ export default function Status({ id, id_user, created_at, text, attachments }: O
             onClick={() => setEditable(!editable)}
             className="p-2 rounded-lg hover:bg-surface-container-high transition-colors text-on-surface-variant hover:text-primary"
             data-tooltip-id="service-tracker"
-            data-tooltip-content={data.tip_edit_status || "Edit Status"}
+            data-tooltip-content={stolmc_text(Text.TipEditStatus)}
           >
             <span className="material-symbols-outlined text-sm">edit</span>
           </button>
@@ -61,7 +60,7 @@ export default function Status({ id, id_user, created_at, text, attachments }: O
             onClick={handleDelete}
             className="p-2 rounded-lg hover:bg-error-container/30 transition-colors text-on-surface-variant hover:text-error"
             data-tooltip-id="service-tracker"
-            data-tooltip-content={data.tip_delete_status || "Delete Status"}
+            data-tooltip-content={stolmc_text(Text.TipDeleteStatus)}
           >
             <span className="material-symbols-outlined text-sm">delete</span>
           </button>
@@ -87,7 +86,7 @@ export default function Status({ id, id_user, created_at, text, attachments }: O
                   setEditable(false);
                 }}
               >
-                {data.btn_save_changes_status || "Save"}
+                {stolmc_text(Text.BtnSaveChangesStatus)}
               </button>
               <button
                 className="px-4 py-2 bg-surface-container-highest text-on-surface text-xs font-bold rounded-lg active:scale-95 transition-all"
@@ -96,7 +95,7 @@ export default function Status({ id, id_user, created_at, text, attachments }: O
                   setEditable(false);
                 }}
               >
-                {data.btn_dismiss_edit || "Cancel"}
+                {stolmc_text(Text.BtnDismissEdit)}
               </button>
             </div>
           </form>

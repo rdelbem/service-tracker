@@ -260,7 +260,7 @@ class STOLMC_Service_Tracker_Users_Service {
 			}
 
 			// Set defaults.
-			$user_data['role']     = $user_data['role'] ?? 'customer';
+			$user_data['role']     = $user_data['role'] ?? 'stolmc_customer';
 			$user_data['username'] = $user_data['username'] ?? $user_data['email'];
 			$user_data['password'] = $user_data['password'] ?? \wp_generate_password( 12, true, true );
 			$has_phone             = array_key_exists( 'phone', $user_data );
