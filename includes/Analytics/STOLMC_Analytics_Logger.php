@@ -2,14 +2,16 @@
 
 namespace STOLMC_Service_Tracker\includes\Analytics;
 
+defined( 'ABSPATH' ) || exit;
+
 /**
  * Analytics Logger — handles persistent logging of notifications
  * and admin/staff activity for the Service Tracker analytics system.
  *
  * @since    1.2.0
- * @package  STOLMC_Service_Tracker\includes\Analytics
+ * @package  STOLMC_Service_Tracker
  */
-class Analytics_Logger {
+class STOLMC_Analytics_Logger {
 
 	/**
 	 * Notifications table name.

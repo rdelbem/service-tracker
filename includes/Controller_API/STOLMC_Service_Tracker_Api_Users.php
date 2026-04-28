@@ -9,7 +9,7 @@ use WP_REST_Server;
 use STOLMC_Service_Tracker\includes\Application\STOLMC_Service_Tracker_Users_Service;
 use STOLMC_Service_Tracker\includes\Application\STOLMC_Service_Tracker_Service_Factory;
 use STOLMC_Service_Tracker\includes\DTO\STOLMC_Service_Tracker_Dto_Factory;
-use STOLMC_Service_Tracker\includes\DTO\Validation_Exception;
+use STOLMC_Service_Tracker\includes\DTO\STOLMC_Validation_Exception;
 
 /**
  * This class handles user-related REST API operations.
@@ -162,7 +162,7 @@ class STOLMC_Service_Tracker_Api_Users extends STOLMC_Service_Tracker_Api {
 	public function create( WP_REST_Request $data ): WP_REST_Response {
 		try {
 			$create_dto = STOLMC_Service_Tracker_Dto_Factory::create_user_create_dto( $data );
-		} catch ( Validation_Exception $exception ) {
+		} catch ( STOLMC_Validation_Exception $exception ) {
 			return STOLMC_Service_Tracker_Api_Response_Mapper::to_default_response(
 				[],
 				false,
@@ -187,7 +187,7 @@ class STOLMC_Service_Tracker_Api_Users extends STOLMC_Service_Tracker_Api {
 	public function update( WP_REST_Request $data ): WP_REST_Response {
 		try {
 			$update_dto = STOLMC_Service_Tracker_Dto_Factory::create_user_update_dto( $data );
-		} catch ( Validation_Exception $exception ) {
+		} catch ( STOLMC_Validation_Exception $exception ) {
 			return STOLMC_Service_Tracker_Api_Response_Mapper::to_default_response(
 				[],
 				false,
@@ -212,7 +212,7 @@ class STOLMC_Service_Tracker_Api_Users extends STOLMC_Service_Tracker_Api {
 	public function delete( WP_REST_Request $data ): WP_REST_Response {
 		try {
 			$delete_dto = STOLMC_Service_Tracker_Dto_Factory::create_user_delete_dto( $data );
-		} catch ( Validation_Exception $exception ) {
+		} catch ( STOLMC_Validation_Exception $exception ) {
 			return STOLMC_Service_Tracker_Api_Response_Mapper::to_default_response(
 				[],
 				false,

@@ -5,7 +5,7 @@ namespace STOLMC_Service_Tracker\includes\DB;
 /**
  * Calendar date index builder and manager.
  *
- * Maintains a lightweight WordPress option (service_tracker_calendar_index)
+ * Maintains a lightweight WordPress option (stolmc_service_tracker_calendar_index)
  * that maps each date string to the case IDs that start or end on that
  * day.  This allows the frontend calendar to render day-level indicators
  * (start/end markers) without iterating every case for every day cell.
@@ -14,9 +14,9 @@ namespace STOLMC_Service_Tracker\includes\DB;
  * via hooks.  It can also be rebuilt manually through WP CLI.
  *
  * @since    1.1.0
- * @package  STOLMC_Service_Tracker\includes\DB
+ * @package  STOLMC_Service_Tracker
  */
-class Calendar_Index {
+class STOLMC_Calendar_Index {
 
 	/**
 	 * Option key for storing the calendar index.
@@ -24,7 +24,7 @@ class Calendar_Index {
 	 * @since 1.1.0
 	 * @var   string
 	 */
-	public const OPTION_KEY = 'service_tracker_calendar_index';
+	public const OPTION_KEY = 'stolmc_service_tracker_calendar_index';
 
 	/**
 	 * Rebuild the entire calendar index from scratch.

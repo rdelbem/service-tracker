@@ -9,8 +9,7 @@ defined( 'ABSPATH' ) || exit;
  * @link       http://delbem.net
  * @since      1.0.0
  *
- * @package    Service_Tracker
- * @subpackage Service_Tracker/includes
+ * @package    STOLMC_Service_Tracker
  */
 
 /**
@@ -20,8 +19,7 @@ defined( 'ABSPATH' ) || exit;
  * the plugin, and register them with the WordPress API. Call the
  * run function to execute the list of actions and filters.
  *
- * @package    Service_Tracker
- * @subpackage Service_Tracker/includes
+ * @package    STOLMC_Service_Tracker
  * @author     Rodrigo Del Bem <rodrigodelbem@gmail.com>
  */
 class STOLMC_Service_Tracker_Loader {

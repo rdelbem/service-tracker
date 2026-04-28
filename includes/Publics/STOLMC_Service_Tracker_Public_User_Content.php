@@ -78,7 +78,7 @@ class STOLMC_Service_Tracker_Public_User_Content {
 			return;
 		}
 
-		if ( ! in_array( 'customer', $user->roles, true ) ) {
+		if ( ! in_array( 'stolmc_customer', $user->roles, true ) ) {
 			return;
 		}
 

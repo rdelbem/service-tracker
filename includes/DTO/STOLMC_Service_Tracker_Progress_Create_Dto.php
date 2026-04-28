@@ -17,7 +17,7 @@ class STOLMC_Service_Tracker_Progress_Create_Dto {
 		$this->user_id = isset( $data['id_user'] ) ? (int) $data['id_user'] : 0;
 
 		if ( $this->case_id <= 0 || '' === trim( $this->text ) ) {
-			throw new Validation_Exception( 'id_case and text are required fields' );
+			throw new STOLMC_Validation_Exception( 'id_case and text are required fields' );
 		}
 
 		$this->attachments = $data['attachments'] ?? null;

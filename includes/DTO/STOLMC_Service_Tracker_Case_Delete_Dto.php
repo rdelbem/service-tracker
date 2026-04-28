@@ -7,7 +7,7 @@ class STOLMC_Service_Tracker_Case_Delete_Dto {
 
 	public function __construct( int $case_id ) {
 		if ( $case_id <= 0 ) {
-			throw new Validation_Exception( 'Invalid case ID' );
+			throw new STOLMC_Validation_Exception( 'Invalid case ID' );
 		}
 
 		$this->case_id = $case_id;

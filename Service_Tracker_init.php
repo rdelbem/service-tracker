@@ -4,7 +4,7 @@
  *
  * @link https://delbem.net/plugins/service-tracker-sto/
  * @since 1.0.0
- * @package Service Tracker STO
+ * @package STOLMC_Service_Tracker
  *
  * Plugin Name: Service Tracker STO
  * Version: 2.0.0
@@ -14,12 +14,15 @@
  * Plugin URI: https://delbem.net/plugins/service-tracker-sto/
  * Text Domain: service-tracker-stolmc
  * Domain Path: /languages
- * Tested up to: 6.9.4
+ * Tested up to: 6.9
  * License: GPL-2.0-or-later
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  */
 
 defined( 'ABSPATH' ) || exit;
+
+define( 'STOLMC_SERVICE_TRACKER_ROOT_FILE', __FILE__ );
+define( 'STOLMC_SERVICE_TRACKER_VERSION', '2.0.0' );
 
 require_once plugin_dir_path( __FILE__ ) . '/vendor/autoload.php';
 
@@ -53,7 +56,6 @@ stolmc_register_service_tracker_fallback_autoloader();
 
 use STOLMC_Service_Tracker\includes\Life_Cycle\STOLMC_Service_Tracker_Activator;
 use STOLMC_Service_Tracker\includes\Life_Cycle\STOLMC_Service_Tracker_Deactivator;
-use STOLMC_Service_Tracker\STOLMC_Service_Tracker_Uninstall;
 use STOLMC_Service_Tracker\includes\STOLMC_Service_Tracker;
 
 /**
@@ -98,37 +100,8 @@ function stolmc_deactivate_service_tracker(): void {
 	do_action( 'stolmc_service_tracker_deactivated' );
 }
 
-/**
- * Uninstall the Service Tracker plugin.
- *
- * Called when the plugin is permanently deleted from WordPress.
- * Drops all plugin data from the database.
- *
- * @since    1.0.0
- *
- * @return void
- */
-function stolmc_uninstall_service_tracker(): void {
-	/**
-	 * Fires before the plugin is uninstalled.
-	 *
-	 * @since 1.0.0
-	 */
-	do_action( 'stolmc_service_tracker_before_uninstall' );
-
-	STOLMC_Service_Tracker_Uninstall::uninstall();
-
-	/**
-	 * Fires after the plugin has been uninstalled.
-	 *
-	 * @since 1.0.0
-	 */
-	do_action( 'stolmc_service_tracker_uninstalled' );
-}
-
 register_activation_hook( __FILE__, 'stolmc_activate_service_tracker' );
 register_deactivation_hook( __FILE__, 'stolmc_deactivate_service_tracker' );
-register_uninstall_hook( __FILE__, 'stolmc_uninstall_service_tracker' );
 
 add_action(
 	'plugins_loaded',
@@ -136,13 +109,13 @@ add_action(
 		$plugin_instance = new STOLMC_Service_Tracker();
 
 		/**
-		 * Filters the plugin instance before it runs.
+		 * Fires before the plugin runs.
 		 *
 		 * @since 1.0.0
 		 *
 		 * @param STOLMC_Service_Tracker $plugin_instance The plugin instance.
 		 */
-		apply_filters( 'stolmc_service_tracker_before_run', $plugin_instance );
+		do_action( 'stolmc_service_tracker_before_run', $plugin_instance );
 
 		$plugin_instance->run();
 	}

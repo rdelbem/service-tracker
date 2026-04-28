@@ -1,6 +1,8 @@
 <?php
 namespace STOLMC_Service_Tracker\admin;
 
+use STOLMC_Service_Tracker\admin\I18n\STOLMC_UI_Copy;
+
 defined( 'ABSPATH' ) || exit;
 
 /**
@@ -9,8 +11,7 @@ defined( 'ABSPATH' ) || exit;
  * @link       https://delbem.net/portfolio/service-tracker-sto/
  * @since      1.0.0
  *
- * @package    Service_Tracker
- * @subpackage Service_Tracker/admin
+ * @package    STOLMC_Service_Tracker
  */
 
 /**
@@ -19,8 +20,7 @@ defined( 'ABSPATH' ) || exit;
  * Defines the plugin name, version, and two examples hooks for how to
  * enqueue the admin-specific stylesheet and JavaScript.
  *
- * @package    Service_Tracker
- * @subpackage Service_Tracker/admin
+ * @package    STOLMC_Service_Tracker
  * @author     Rodrigo Del Bem <rodrigodelbem@gmail.com>
  */
 class STOLMC_Service_Tracker_Admin {
@@ -79,26 +79,28 @@ class STOLMC_Service_Tracker_Admin {
 	 */
 	public function remove_wp_admin_elements(): void {
 
-		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Non-admin data check for page identification.
-		if ( isset( $_GET['page'] ) && 'service_tracker' === $_GET['page'] ) {
+		$screen = get_current_screen();
 
-			/**
-			 * Fires when the admin page is initialized.
-			 *
-			 * @since 1.0.0
-			 */
-			do_action( 'stolmc_service_tracker_admin_page_init' );
-
-			// Remove footer text.
-			add_filter( 'admin_footer_text', '__return_empty_string', 9999 );
-			add_filter( 'update_footer', '__return_empty_string', 9999 );
-
-			// Remove help tabs.
-			add_action( 'admin_head', [ $this, 'remove_help_tabs' ] );
-
-			// Add custom CSS to hide remaining elements.
-			add_action( 'admin_head', [ $this, 'hide_wp_elements' ] );
+		if ( null === $screen || 'toplevel_page_service_tracker' !== $screen->id ) {
+			return;
 		}
+
+		/**
+		 * Fires when the admin page is initialized.
+		 *
+		 * @since 1.0.0
+		 */
+		do_action( 'stolmc_service_tracker_admin_page_init' );
+
+		// Remove footer text.
+		add_filter( 'admin_footer_text', '__return_empty_string', 9999 );
+		add_filter( 'update_footer', '__return_empty_string', 9999 );
+
+		// Remove help tabs.
+		add_action( 'admin_head', [ $this, 'remove_help_tabs' ] );
+
+		// Add custom CSS to hide remaining elements.
+		add_action( 'admin_head', [ $this, 'hide_wp_elements' ] );
 	}
 
 	/**
@@ -123,7 +125,7 @@ class STOLMC_Service_Tracker_Admin {
 	 * @return void
 	 */
 	public function hide_wp_elements(): void {
-		echo '<style>
+		$custom_css = '
 			#wpfooter,
 			#screen-meta-links,
 			#contextual-help-link-wrap,
@@ -132,8 +134,19 @@ class STOLMC_Service_Tracker_Admin {
 			}
 			#wpbody-content {
 				padding-bottom: 0 !important;
+			}';
+
+		$handle = $this->plugin_name . '-tailwind';
+		$styles = wp_styles();
+
+		if ( $styles->query( $handle, 'enqueued' ) ) {
+			wp_add_inline_style( $handle, $custom_css );
+		} else {
+			$handle = $this->plugin_name;
+			if ( $styles->query( $handle, 'enqueued' ) ) {
+				wp_add_inline_style( $handle, $custom_css );
 			}
-		</style>';
+		}
 	}
 
 	/**
@@ -271,7 +284,11 @@ class STOLMC_Service_Tracker_Admin {
 	/**
 	 * Localize scripts with plugin data.
 	 *
+	 * Loads all UI copy from the aggregated translation file via STOLMC_UI_Copy
+	 * and exposes it to the React app as `window.data`.
+	 *
 	 * @since    1.0.0
+	 * @since    2.1.0 Refactored to use STOLMC_UI_Copy for centralised i18n.
 	 *
 	 * @param string $hook The current admin page.
 	 *
@@ -282,24 +299,26 @@ class STOLMC_Service_Tracker_Admin {
 			return;
 		}
 
-		// This file has all the texts inside a variable $stolmc_texts_array.
-		$stolmc_texts_array = [];
-		include wp_normalize_path( plugin_dir_path( __FILE__ ) . 'translation/texts_array.php' );
+		$ui_copy = new STOLMC_UI_Copy(
+			wp_normalize_path( plugin_dir_path( __FILE__ ) . 'translation/ui_copy.php' )
+		);
+
+		$localize_data = $ui_copy->get_localize_data();
 
 		/**
 		 * Filters the data passed to the admin JavaScript.
 		 *
 		 * @since 1.0.0
 		 *
-		 * @param array  $stolmc_texts_array The texts data array.
-		 * @param string $hook        The current admin page.
+		 * @param array  $localize_data The localization data array.
+		 * @param string $hook          The current admin page.
 		 */
-		$stolmc_texts_array = apply_filters( 'stolmc_service_tracker_admin_localize_script_data', $stolmc_texts_array, $hook );
+		$localize_data = apply_filters( 'stolmc_service_tracker_admin_localize_script_data', $localize_data, $hook );
 
 		wp_localize_script(
 			$this->plugin_name,
-			'data',
-			$stolmc_texts_array
+			'stolmcData',
+			$localize_data
 		);
 	}
 
