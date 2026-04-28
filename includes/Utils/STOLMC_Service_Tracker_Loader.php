@@ -6,7 +6,6 @@ defined( 'ABSPATH' ) || exit;
 /**
  * Register all actions and filters for the plugin
  *
- * @link       http://delbem.net
  * @since      1.0.0
  *
  * @package    STOLMC_Service_Tracker
