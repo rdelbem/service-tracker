@@ -24,7 +24,7 @@ defined( 'ABSPATH' ) || exit;
 define( 'STOLMC_SERVICE_TRACKER_ROOT_FILE', __FILE__ );
 define( 'STOLMC_SERVICE_TRACKER_VERSION', '2.0.0' );
 
-require_once plugin_dir_path( __FILE__ ) . '/vendor/autoload.php';
+require_once plugin_dir_path( __FILE__ ) . 'vendor/autoload.php';
 
 /**
  * Register a fallback autoloader for plugin classes.
