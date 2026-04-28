@@ -101,7 +101,7 @@ jobs:
           GIT_COMMITTER_NAME: github-actions[bot]
           GIT_COMMITTER_EMAIL: github-actions[bot]@users.noreply.github.com
         run: |
-          TARGET_BRANCH="service-tracker-stolmc"
+          TARGET_BRANCH="stolmc"
           STABLE_WORKTREE="/tmp/stable-branch"
           rm -rf "${STABLE_WORKTREE}"
 

@@ -1,0 +1,43 @@
+name: Deploy to WordPress SVN
+
+on:
+  workflow_call:
+    inputs:
+      ref:
+        description: "Git ref to checkout (branch, tag, or SHA)"
+        required: true
+        type: string
+      slug:
+        description: "WordPress.org plugin slug"
+        required: true
+        type: string
+    secrets:
+      SVN_USERNAME:
+        required: true
+      SVN_PASSWORD:
+        required: true
+
+jobs:
+  deploy:
+    name: Deploy to SVN
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout stable branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.ref }}
+
+      - name: Read plugin version
+        id: version
+        run: |
+          VERSION=$(grep -oP "Version:\s*\K[0-9]+\.[0-9]+\.[0-9]+" Service_Tracker_init.php)
+          echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
+
+      - name: WordPress Plugin Deploy
+        uses: 10up/action-wordpress-plugin-deploy@stable
+        env:
+          SVN_PASSWORD: ${{ secrets.SVN_PASSWORD }}
+          SVN_USERNAME: ${{ secrets.SVN_USERNAME }}
+          SLUG: ${{ inputs.slug }}
+          VERSION: ${{ steps.version.outputs.version }}
