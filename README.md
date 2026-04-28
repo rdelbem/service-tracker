@@ -1,5 +1,5 @@
 ## Service Tracker STOMLC
-This repository houses a WordPress plugin. If you're searching for a manual or guidance on how to use the Service Tracker STOLMC, please visit this [site](https://delbem.net/portfolio/service-tracker-sto/).
+This repository houses a WordPress plugin. If you're searching for a manual or guidance on how to use the Service Tracker STOLMC, please visit this [site](https://delbem.net/).
 
 ## For developers and WordPress plugin reviewers
 Developers who wish to contribute are encouraged to fork this repo and submit a pull request. **The sections below provide clarity on this plugin's development flow.**
