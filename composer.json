@@ -55,6 +55,7 @@
     ],
     "test:unit": "@phpunit --testsuite Unit",
     "test:integration": "@phpunit --testsuite Integration",
-    "fix": "@phpcbf"
+    "fix": "@phpcbf",
+    "compile:translation": "msgfmt languages/service-tracker-stolmc-pt_BR.po -o languages/service-tracker-stolmc-pt_BR.mo"
   }
 }

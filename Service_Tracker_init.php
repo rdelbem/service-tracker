@@ -2,7 +2,7 @@
 /**
  * Service Tracker bootstrap file
  *
- * @link https://delbem.net/plugins/service-tracker-sto/
+ * @link https://delbem.net/service-tracker/
  * @since 1.0.0
  * @package STOLMC_Service_Tracker
  *
@@ -11,7 +11,7 @@
  * Description: This plugin offers the possibilitie to track the services you provide.
  * Author: Rodrigo Del Bem <rodrigo@delbem.net>
  * Author URI: https://delbem.net/
- * Plugin URI: https://delbem.net/plugins/service-tracker-sto/
+ * Plugin URI: https://delbem.net/service-tracker/
  * Text Domain: service-tracker-stolmc
  * Domain Path: /languages
  * Tested up to: 6.9

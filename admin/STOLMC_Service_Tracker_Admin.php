@@ -8,7 +8,6 @@ defined( 'ABSPATH' ) || exit;
 /**
  * The admin-specific functionality of the plugin.
  *
- * @link       https://delbem.net/portfolio/service-tracker-sto/
  * @since      1.0.0
  *
  * @package    STOLMC_Service_Tracker
