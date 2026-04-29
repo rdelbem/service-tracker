@@ -79,14 +79,16 @@ class STOLMC_Service_Tracker_Api {
 	 * @param string               $api_argument The API argument pattern (e.g., '', '_user', '_case').
 	 * @param string               $method       The HTTP methods allowed (e.g., WP_REST_Server::READABLE).
 	 * @param array{object, string} $callback     The callback function to execute.
+	 * @param array<string, mixed>  $args         Optional endpoint args schema (may include permission_callback).
 	 *
 	 * @return void
 	 */
-	public function register_new_route( string $api_type, string $api_argument, string $method, array $callback ): void {
+	public function register_new_route( string $api_type, string $api_argument, string $method, array $callback, array $args = [] ): void {
 		$this->register_route(
 			'/' . $api_type . '/(?P<id' . $api_argument . '>\d+)',
 			$method,
-			$callback
+			$callback,
+			$args
 		);
 
 		/**
@@ -105,6 +107,11 @@ class STOLMC_Service_Tracker_Api {
 	/**
 	 * Register a REST route using the shared plugin namespace.
 	 *
+	 * If a `permission_callback` is provided in `$args`, it will be used
+	 * instead of the default `permission_check` method. This allows
+	 * individual routes to require higher capabilities (e.g. `manage_options`)
+	 * for sensitive operations.
+	 *
 	 * @param string                $route_path Route path (e.g. '/analytics').
 	 * @param string                $method     HTTP methods allowed.
 	 * @param array{object, string} $callback   Callback to execute.
@@ -113,11 +120,19 @@ class STOLMC_Service_Tracker_Api {
 	 * @return void
 	 */
 	protected function register_route( string $route_path, string $method, array $callback, array $args = [] ): void {
+		// Allow per-route permission callback override via args.
+		$has_custom_permission = isset( $args['permission_callback'] );
+
 		$route_args = [
 			'methods'             => $method,
 			'callback'            => $callback,
-			'permission_callback' => [ $this, 'permission_check' ],
+			'permission_callback' => $has_custom_permission
+				? $args['permission_callback']
+				: [ $this, 'permission_check' ],
 		];
+
+		// Remove permission_callback from args so it doesn't duplicate.
+		unset( $args['permission_callback'] );
 
 		if ( ! empty( $args ) ) {
 			$route_args['args'] = $args;

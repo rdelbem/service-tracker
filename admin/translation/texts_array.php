@@ -8,7 +8,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 $stolmc_texts_array = [
 	'root_url'                        => get_site_url(),
 	'users_api_url'                   => get_rest_url() . 'service-tracker-stolmc/v1/users',
-	'create_user_api_url'             => get_rest_url() . 'service-tracker-stolmc/v1/users',
 	'api_url'                         => 'service-tracker-stolmc/v1',
 	'nonce'                           => wp_create_nonce( 'wp_rest' ),
 	'search_bar'                      => __( 'Search for a client', 'service-tracker-stolmc' ),

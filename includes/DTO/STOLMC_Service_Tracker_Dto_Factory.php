@@ -14,21 +14,6 @@ class STOLMC_Service_Tracker_Dto_Factory {
 		);
 	}
 
-	public static function create_user_create_dto( WP_REST_Request $request ): STOLMC_Service_Tracker_User_Create_Dto {
-		return new STOLMC_Service_Tracker_User_Create_Dto( self::decode_json_body( $request ) );
-	}
-
-	public static function create_user_update_dto( WP_REST_Request $request ): STOLMC_Service_Tracker_User_Update_Dto {
-		return new STOLMC_Service_Tracker_User_Update_Dto(
-			(int) ( $request['id'] ?? 0 ),
-			self::decode_json_body( $request )
-		);
-	}
-
-	public static function create_user_delete_dto( WP_REST_Request $request ): STOLMC_Service_Tracker_User_Delete_Dto {
-		return new STOLMC_Service_Tracker_User_Delete_Dto( (int) ( $request['id'] ?? 0 ) );
-	}
-
 	public static function create_progress_case_query_dto( WP_REST_Request $request ): STOLMC_Service_Tracker_Progress_Case_Query_Dto {
 		return new STOLMC_Service_Tracker_Progress_Case_Query_Dto( (int) ( $request['id_case'] ?? 0 ) );
 	}
