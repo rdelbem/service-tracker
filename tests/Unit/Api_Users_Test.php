@@ -5,7 +5,6 @@ namespace STOLMC_Service_Tracker\Tests\Unit;
 use Mockery;
 use STOLMC_Service_Tracker\includes\Application\STOLMC_Service_Tracker_Users_Service;
 use STOLMC_Service_Tracker\includes\DTO\STOLMC_Service_Tracker_Service_Result_Dto;
-use STOLMC_Service_Tracker\includes\DTO\STOLMC_Service_Tracker_User_Create_Dto;
 use STOLMC_Service_Tracker\includes\DTO\STOLMC_Service_Tracker_Users_Query_Dto;
 use WP_REST_Response;
 
@@ -46,49 +45,6 @@ class Api_Users_Test extends API_TestCase {
 		$this->assertTrue( $response->get_data()['success'] );
 		$this->assertSame( 1, $response->get_data()['meta']['pagination']['total'] );
 		$this->assertSame( 1, $response->get_data()['meta']['pagination']['total_pages'] );
-	}
-
-	public function test_create_returns_400_for_invalid_json(): void {
-		$request = $this->create_mock_request( [], [ 'x_wp_nonce' => [ 'valid_nonce' ] ], 'invalid-json' );
-
-		$response = $this->api->create( $request );
-
-		$this->assertSame( 400, $response->get_status() );
-		$this->assertFalse( $response->get_data()['success'] );
-		$this->assertSame( 'invalid_payload', $response->get_data()['error_code'] );
-	}
-
-	public function test_create_maps_success_service_result(): void {
-		$this->mock_users_service
-			->shouldReceive( 'create_user' )
-			->once()
-			->with( Mockery::type( STOLMC_Service_Tracker_User_Create_Dto::class ) )
-			->andReturn(
-				new STOLMC_Service_Tracker_Service_Result_Dto(
-					true,
-					[ 'id' => 101 ],
-					null,
-					'User created successfully',
-					201
-				)
-			);
-
-		$request = $this->create_mock_request(
-			[],
-			[ 'x_wp_nonce' => [ 'valid_nonce' ] ],
-			json_encode(
-				[
-					'name'  => 'User One',
-					'email' => 'user1@example.com',
-				]
-			)
-		);
-
-		$response = $this->api->create( $request );
-
-		$this->assertSame( 201, $response->get_status() );
-		$this->assertTrue( $response->get_data()['success'] );
-		$this->assertSame( 'User created successfully', $response->get_data()['message'] );
 	}
 
 	public function test_read_staff_returns_passthrough_payload(): void {

@@ -40,7 +40,16 @@ class STOLMC_Service_Tracker_Api_Analytics extends STOLMC_Service_Tracker_Api {
 	 * @return void
 	 */
 	public function run(): void {
-		$this->register_route( '/analytics', WP_REST_Server::READABLE, [ $this, 'get_analytics' ] );
+		$this->register_route(
+			'/analytics',
+			WP_REST_Server::READABLE,
+			[ $this, 'get_analytics' ],
+			[
+				'permission_callback' => function () {
+					return current_user_can( 'manage_options' );
+				},
+			]
+		);
 	}
 
 	/**

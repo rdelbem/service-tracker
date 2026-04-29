@@ -1,8 +1,7 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useInViewStore } from "../../stores/inViewStore";
 import { useClientsStore } from "../../stores/clientsStore";
 import { useCasesStore } from "../../stores/casesStore";
-import { toast } from "react-toastify";
 import type { User } from "../../types";
 import Spinner from "./Spinner";
 import Case from "./Case";
@@ -11,16 +10,8 @@ import { stolmc_text, Text } from "../../i18n";
 export default function ClientDetails() {
   const inViewState = useInViewStore((state) => state);
   const { navigate } = useInViewStore();
-  const { users, updateUser } = useClientsStore();
+  const { users } = useClientsStore();
   const { cases, loadingCases, page, totalPages, total, getCases } = useCasesStore();
-
-  const [isEditing, setIsEditing] = useState(false);
-  const [formData, setFormData] = useState({
-    email: "",
-    phone: "",
-    cellphone: "",
-  });
-  const [saving, setSaving] = useState(false);
 
   // Find the selected user from the clients list.
   const selectedClient = users.find(
@@ -37,22 +28,10 @@ export default function ClientDetails() {
       })
     : stolmc_text(Text.Na);
 
-  // Initialize form data when client changes
-  useEffect(() => {
-    if (selectedClient) {
-      setFormData({
-        email: selectedClient.email || "",
-        phone: selectedClient.phone || "",
-        cellphone: selectedClient.cellphone || "",
-      });
-    }
-  }, [selectedClient]);
-
   // Fetch cases for this client when component mounts or userId changes
   useEffect(() => {
     if (inViewState.userId) {
-      // getCases signature: (id_user, onlyFetch, page)
-      getCases(inViewState.userId as string, false, 1); // Reset to page 1 for this client
+      getCases(inViewState.userId as string, false, 1);
     }
   }, [inViewState.userId, getCases]);
 
@@ -60,40 +39,6 @@ export default function ClientDetails() {
   if (inViewState.view !== "clients" || !inViewState.userId) {
     return null;
   }
-
-  const handleSave = async () => {
-    // Basic email validation
-    if (formData.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      toast.error(stolmc_text(Text.ClientInvalidEmail));
-      return;
-    }
-
-    setSaving(true);
-    try {
-      await updateUser(selectedClient!.id, {
-        email: formData.email,
-        phone: formData.phone,
-        cellphone: formData.cellphone,
-      });
-      toast.success(stolmc_text(Text.ClientUpdateSuccess));
-      setIsEditing(false);
-    } catch (error) {
-      toast.error(stolmc_text(Text.ClientUpdateError));
-      console.error("Update error:", error);
-    } finally {
-      setSaving(false);
-    }
-  };
-
-  const handleCancel = () => {
-    // Reset form to original values
-    setFormData({
-      email: selectedClient?.email || "",
-      phone: selectedClient?.phone || "",
-      cellphone: selectedClient?.cellphone || "",
-    });
-    setIsEditing(false);
-  };
 
   return (
     <section className="flex-1 h-full overflow-y-auto">
@@ -113,37 +58,10 @@ export default function ClientDetails() {
           </div>
         </div>
 
-        {/* Editable Contact Information */}
+        {/* Contact Information (read-only) */}
         <div className="bg-surface-container-lowest rounded-2xl border border-outline-variant/20 shadow-sm p-6 mb-8">
           <div className="border-b border-outline-variant pb-4 mb-6">
-            <div className="flex items-center justify-between">
-              <h2 className="text-xl font-bold text-on-surface">{stolmc_text(Text.ClientContactHeading)}</h2>
-              {!isEditing ? (
-                <button
-                  onClick={() => setIsEditing(true)}
-                  className="px-4 py-2 bg-primary text-on-primary font-bold rounded-xl shadow-sm hover:bg-primary-container transition-colors text-sm"
-                >
-                  {stolmc_text(Text.BtnEdit)}
-                </button>
-              ) : (
-                <div className="flex gap-2">
-                  <button
-                    onClick={handleSave}
-                    disabled={saving}
-                    className="px-4 py-2 bg-primary text-on-primary font-bold rounded-xl shadow-sm hover:bg-primary-container transition-colors text-sm disabled:opacity-50"
-                  >
-                    {saving ? stolmc_text(Text.ClientsCreating) : stolmc_text(Text.BtnSave)}
-                  </button>
-                  <button
-                    onClick={handleCancel}
-                    disabled={saving}
-                    className="px-4 py-2 bg-surface-container-high text-on-surface font-bold rounded-xl shadow-sm hover:bg-surface-container transition-colors text-sm disabled:opacity-50"
-                  >
-                    {stolmc_text(Text.BtnCancel)}
-                  </button>
-                </div>
-              )}
-            </div>
+            <h2 className="text-xl font-bold text-on-surface">{stolmc_text(Text.ClientContactHeading)}</h2>
           </div>
 
           <div className="space-y-6">
@@ -151,57 +69,27 @@ export default function ClientDetails() {
               <label className="block text-sm font-bold text-on-surface mb-2">
                 {stolmc_text(Text.LabelEmail)}
               </label>
-              {isEditing ? (
-                <input
-                  type="email"
-                  value={formData.email}
-                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  className="w-full p-3 bg-surface-container-low rounded-xl border border-outline-variant focus:outline-none focus:ring-2 focus:ring-primary text-on-surface"
-                  placeholder={stolmc_text(Text.PlaceholderEmail)}
-                />
-              ) : (
-                <p className="text-on-surface-variant">
-                  {selectedClient?.email || stolmc_text(Text.Na)}
-                </p>
-              )}
+              <p className="text-on-surface-variant">
+                {selectedClient?.email || stolmc_text(Text.Na)}
+              </p>
             </div>
 
             <div>
               <label className="block text-sm font-bold text-on-surface mb-2">
                 {stolmc_text(Text.LabelPhone)}
               </label>
-              {isEditing ? (
-                <input
-                  type="tel"
-                  value={formData.phone}
-                  onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                  className="w-full p-3 bg-surface-container-low rounded-xl border border-outline-variant focus:outline-none focus:ring-2 focus:ring-primary text-on-surface"
-                  placeholder={stolmc_text(Text.PlaceholderPhone)}
-                />
-              ) : (
-                <p className="text-on-surface-variant">
-                  {selectedClient?.phone || stolmc_text(Text.Na)}
-                </p>
-              )}
+              <p className="text-on-surface-variant">
+                {selectedClient?.phone || stolmc_text(Text.Na)}
+              </p>
             </div>
 
             <div>
               <label className="block text-sm font-bold text-on-surface mb-2">
                 {stolmc_text(Text.LabelCellphone)}
               </label>
-              {isEditing ? (
-                <input
-                  type="tel"
-                  value={formData.cellphone}
-                  onChange={(e) => setFormData({ ...formData, cellphone: e.target.value })}
-                  className="w-full p-3 bg-surface-container-low rounded-xl border border-outline-variant focus:outline-none focus:ring-2 focus:ring-primary text-on-surface"
-                  placeholder={stolmc_text(Text.PlaceholderPhone)}
-                />
-              ) : (
-                <p className="text-on-surface-variant">
-                  {selectedClient?.cellphone || stolmc_text(Text.Na)}
-                </p>
-              )}
+              <p className="text-on-surface-variant">
+                {selectedClient?.cellphone || stolmc_text(Text.Na)}
+              </p>
             </div>
 
             <div>

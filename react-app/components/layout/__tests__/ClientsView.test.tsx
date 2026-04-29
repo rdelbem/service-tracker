@@ -8,8 +8,6 @@ const {
   useInViewStoreMock,
   mockClientsStore,
   useClientsStoreMock,
-  mockToastSuccess,
-  mockToastError,
 } = vi.hoisted(() => {
   const mockInViewState = {
     view: "clients",
@@ -30,7 +28,6 @@ const {
     ],
     loadingUsers: false,
     searchUsers: vi.fn(),
-    createUser: vi.fn(),
     page: 1,
     totalPages: 1,
     total: 2,
@@ -47,8 +44,6 @@ const {
     useInViewStoreMock,
     mockClientsStore,
     useClientsStoreMock,
-    mockToastSuccess: vi.fn(),
-    mockToastError: vi.fn(),
   };
 });
 
@@ -58,13 +53,6 @@ vi.mock("../../../stores/inViewStore", () => ({
 
 vi.mock("../../../stores/clientsStore", () => ({
   useClientsStore: useClientsStoreMock,
-}));
-
-vi.mock("react-toastify", () => ({
-  toast: {
-    success: mockToastSuccess,
-    error: mockToastError,
-  },
 }));
 
 vi.mock("../Spinner", () => ({
@@ -86,7 +74,6 @@ describe("ClientsView component", () => {
     ] as any;
     mockClientsStore.loadingUsers = false;
     mockClientsStore.searchUsers = vi.fn();
-    mockClientsStore.createUser = vi.fn();
     mockClientsStore.page = 1;
     mockClientsStore.totalPages = 1;
     mockClientsStore.total = 2;
@@ -143,78 +130,6 @@ describe("ClientsView component", () => {
     await user.click(screen.getByText("John Doe"));
 
     expect(mockInViewState.navigate).toHaveBeenCalledWith("clients", "user-1", "", "John Doe");
-  });
-
-  it("opens and closes add client form", async () => {
-    const user = userEvent.setup();
-    render(<ClientsView />);
-
-    await user.click(screen.getByRole("button", { name: /clients_add_btn/i }));
-    expect(screen.getByRole("button", { name: /clients_create_btn/i })).toBeInTheDocument();
-
-    await user.click(screen.getByRole("button", { name: /cancel/i }));
-    expect(screen.queryByRole("button", { name: /clients_create_btn/i })).not.toBeInTheDocument();
-  });
-
-  it("shows validation error when creating without required fields", async () => {
-    const user = userEvent.setup();
-    render(<ClientsView />);
-
-    await user.click(screen.getByRole("button", { name: /clients_add_btn/i }));
-
-    const createButton = screen.getByRole("button", { name: /clients_create_btn/i });
-    const form = createButton.closest("form")!;
-    fireEvent.submit(form);
-
-    expect(mockToastError).toHaveBeenCalledWith("clients_name_email_required");
-    expect(mockClientsStore.createUser).not.toHaveBeenCalled();
-  });
-
-  it("creates client successfully and resets form", async () => {
-    const user = userEvent.setup();
-    mockClientsStore.createUser = vi.fn().mockResolvedValue({
-      success: true,
-      message: "Client created",
-    });
-
-    render(<ClientsView />);
-
-    await user.click(screen.getByRole("button", { name: /clients_add_btn/i }));
-    await user.type(screen.getByPlaceholderText(/placeholder_name/i), "New Client");
-    await user.type(screen.getByPlaceholderText(/placeholder_email/i), "new@client.com");
-
-    await user.click(screen.getByRole("button", { name: /clients_create_btn/i }));
-
-    await waitFor(() => {
-      expect(mockClientsStore.createUser).toHaveBeenCalledWith({
-        name: "New Client",
-        email: "new@client.com",
-        phone: undefined,
-        cellphone: undefined,
-      });
-    });
-
-    expect(mockToastSuccess).toHaveBeenCalledWith("Client created");
-    expect(screen.queryByRole("button", { name: /clients_create_btn/i })).not.toBeInTheDocument();
-  });
-
-  it("shows error toast when create client fails", async () => {
-    const user = userEvent.setup();
-    mockClientsStore.createUser = vi.fn().mockResolvedValue({
-      success: false,
-      message: "Duplicate email",
-    });
-
-    render(<ClientsView />);
-
-    await user.click(screen.getByRole("button", { name: /clients_add_btn/i }));
-    await user.type(screen.getByPlaceholderText(/placeholder_name/i), "New Client");
-    await user.type(screen.getByPlaceholderText(/placeholder_email/i), "new@client.com");
-    await user.click(screen.getByRole("button", { name: /clients_create_btn/i }));
-
-    await waitFor(() => {
-      expect(mockToastError).toHaveBeenCalledWith("Duplicate email");
-    });
   });
 
   it("uses pagination controls to call setPage", async () => {

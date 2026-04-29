@@ -7,9 +7,9 @@
  * @package STOLMC_Service_Tracker
  *
  * Plugin Name: Service Tracker STO
- * Version: 2.0.0
+ * Version: 2.0.1
  * Description: This plugin offers the possibilitie to track the services you provide.
- * Author: Rodrigo Del Bem <rodrigo@delbem.net>
+ * Author: Rodrigo Del Bem
  * Author URI: https://delbem.net/
  * Plugin URI: https://delbem.net/service-tracker/
  * Text Domain: service-tracker-stolmc
@@ -22,7 +22,7 @@
 defined( 'ABSPATH' ) || exit;
 
 define( 'STOLMC_SERVICE_TRACKER_ROOT_FILE', __FILE__ );
-define( 'STOLMC_SERVICE_TRACKER_VERSION', '2.0.0' );
+define( 'STOLMC_SERVICE_TRACKER_VERSION', '2.0.1' );
 
 require_once plugin_dir_path( __FILE__ ) . 'vendor/autoload.php';
 

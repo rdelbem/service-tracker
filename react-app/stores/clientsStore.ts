@@ -1,7 +1,6 @@
 import { create } from "zustand";
-import { get as fetchGet, post, put } from "../utils/fetch";
+import { get as fetchGet } from "../utils/fetch";
 import { normalizeUsers } from "../utils/users";
-import { stolmc_text, Text } from "../i18n";
 import type { User } from "../types";
 
 declare const stolmcData: Record<string, any>;
@@ -14,24 +13,19 @@ export interface ClientsState {
   total: number;
   totalPages: number;
   searchQuery: string;
-  loading: boolean;
 }
 
 export interface ClientsActions {
   getUsers: (page?: number) => Promise<void>;
   searchUsers: (query: string) => Promise<void>;
   setPage: (page: number) => Promise<void>;
-  createUser: (userData: { name: string; email: string; phone?: string; cellphone?: string }) => Promise<{ success: boolean; message: string; user?: User }>;
-  updateUser: (id: string | number, userData: Partial<User>) => Promise<void>;
 }
 
 export interface ClientsStore extends ClientsState, ClientsActions {}
 
 export const useClientsStore = create<ClientsStore>((set, get) => {
   const api_url_users = stolmcData.users_api_url;
-  const create_user_api_url = stolmcData.create_user_api_url;
   const search_url = `${stolmcData.root_url}/wp-json/service-tracker-stolmc/v1/users/search`;
-  const update_user_api_url = `${stolmcData.root_url}/wp-json/service-tracker-stolmc/v1/users`;
 
   return {
     users: [],
@@ -41,7 +35,6 @@ export const useClientsStore = create<ClientsStore>((set, get) => {
     total: 0,
     totalPages: 1,
     searchQuery: "",
-    loading: false,
 
     getUsers: async (page?: number) => {
       const currentPage = page ?? get().page;
@@ -143,55 +136,6 @@ export const useClientsStore = create<ClientsStore>((set, get) => {
       }
 
       await get().getUsers(clamped);
-    },
-
-    createUser: async (userData) => {
-      try {
-        const res = await post(create_user_api_url, userData, {
-          headers: { "X-WP-Nonce": stolmcData.nonce },
-        });
-
-        if (res.data.success) {
-          // Refresh current page so the new user appears.
-          // Also bust the search index by going back to page 1.
-          await get().getUsers(1);
-        }
-
-        const payload = res.data;
-        return {
-          success: Boolean(payload?.success),
-          message: payload?.message ?? (payload?.success ? stolmc_text(Text.ToastUserCreated) : stolmc_text(Text.ToastUserCreateFailed)),
-          user: payload?.data,
-        };
-      } catch (error) {
-        console.error("Error creating user:", error);
-        return { success: false, message: stolmc_text(Text.ToastUserCreateError) };
-      }
-    },
-
-    updateUser: async (id, userData) => {
-      set({ loading: true });
-      try {
-        const url = `${update_user_api_url}/${id}`;
-        const res = await put(url, userData, {
-          headers: { "X-WP-Nonce": stolmcData.nonce },
-        });
-
-        if (res.data.success) {
-          // Update the user in the store
-          const updatedUsers = get().users.map(user => 
-            user.id === id ? { ...user, ...userData } : user
-          );
-          set({ users: updatedUsers });
-        } else {
-          throw new Error(res.data.message || "Failed to update user");
-        }
-      } catch (error) {
-        console.error("Error updating user:", error);
-        throw error;
-      } finally {
-        set({ loading: false });
-      }
     },
   };
 });

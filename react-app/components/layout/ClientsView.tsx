@@ -1,5 +1,4 @@
 import { useState, useEffect, useRef } from "react";
-import { toast } from "react-toastify";
 import { useInViewStore } from "../../stores/inViewStore";
 import { useClientsStore } from "../../stores/clientsStore";
 import Spinner from "./Spinner";
@@ -13,7 +12,6 @@ export default function ClientsView() {
     users,
     loadingUsers,
     searchUsers,
-    createUser,
     page,
     totalPages,
     total,
@@ -21,12 +19,6 @@ export default function ClientsView() {
     searchQuery,
   } = useClientsStore();
 
-  const [newClientName, setNewClientName] = useState("");
-  const [newClientEmail, setNewClientEmail] = useState("");
-  const [newClientPhone, setNewClientPhone] = useState("");
-  const [newClientCellphone, setNewClientCellphone] = useState("");
-  const [showAddForm, setShowAddForm] = useState(false);
-  const [isCreating, setIsCreating] = useState(false);
   const [localQuery, setLocalQuery] = useState("");
 
   // Debounce search — fire the API call 350 ms after the user stops typing.
@@ -53,38 +45,6 @@ export default function ClientsView() {
     navigate("clients", client.id, "", client.name);
   };
 
-  const handleAddClient = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (!newClientName.trim() || !newClientEmail.trim()) {
-      toast.error(stolmc_text(Text.ClientsNameEmailRequired));
-      return;
-    }
-
-    setIsCreating(true);
-
-    const result = await createUser({
-      name: newClientName.trim(),
-      email: newClientEmail.trim(),
-      phone: newClientPhone.trim() || undefined,
-      cellphone: newClientCellphone.trim() || undefined,
-    });
-
-    setIsCreating(false);
-
-    if (result.success) {
-      toast.success(result.message);
-      setNewClientName("");
-      setNewClientEmail("");
-      setNewClientPhone("");
-      setNewClientCellphone("");
-      setShowAddForm(false);
-      setLocalQuery("");
-    } else {
-      toast.error(result.message);
-    }
-  };
-
   return (
     <section className="flex-shrink-0 w-[420px] bg-surface-container-low flex flex-col border-r border-outline-variant/20 h-full">
       {/* Header */}
@@ -102,89 +62,7 @@ export default function ClientsView() {
               </p>
             )}
           </div>
-          <button
-            onClick={() => setShowAddForm(!showAddForm)}
-            className="flex items-center gap-2 px-4 py-2 bg-primary text-on-primary text-xs font-bold rounded-lg shadow-sm active:scale-95 transition-all hover:bg-primary-container"
-          >
-            <span className="material-symbols-outlined text-sm">
-              {showAddForm ? "close" : "person_add"}
-            </span>
-            {showAddForm ? stolmc_text(Text.BtnCancel) : stolmc_text(Text.ClientsAddBtn)}
-          </button>
         </div>
-
-        {/* Add Client Form */}
-        {showAddForm && (
-          <form
-            onSubmit={handleAddClient}
-            className="mb-6 p-4 bg-surface-container-lowest rounded-xl border border-outline-variant/20 shadow-sm space-y-3"
-          >
-            <div>
-              <label className="block text-xs font-bold text-on-surface-variant mb-1 uppercase tracking-wider">
-                {stolmc_text(Text.LabelName)} *
-              </label>
-              <input
-                type="text"
-                value={newClientName}
-                onChange={(e) => setNewClientName(e.target.value)}
-                placeholder={stolmc_text(Text.PlaceholderName)}
-                className="w-full bg-surface-container-low border border-outline-variant/20 rounded-lg py-2 px-3 text-sm focus:ring-2 focus:ring-primary/10 transition-all placeholder:text-outline-variant"
-                required
-                disabled={isCreating}
-              />
-            </div>
-            <div>
-              <label className="block text-xs font-bold text-on-surface-variant mb-1 uppercase tracking-wider">
-                {stolmc_text(Text.LabelEmail)} *
-              </label>
-              <input
-                type="email"
-                value={newClientEmail}
-                onChange={(e) => setNewClientEmail(e.target.value)}
-                placeholder={stolmc_text(Text.PlaceholderEmail)}
-                className="w-full bg-surface-container-low border border-outline-variant/20 rounded-lg py-2 px-3 text-sm focus:ring-2 focus:ring-primary/10 transition-all placeholder:text-outline-variant"
-                required
-                disabled={isCreating}
-              />
-            </div>
-            <div>
-              <label className="block text-xs font-bold text-on-surface-variant mb-1 uppercase tracking-wider">
-                {stolmc_text(Text.LabelPhone)}
-              </label>
-              <input
-                type="tel"
-                value={newClientPhone}
-                onChange={(e) => setNewClientPhone(e.target.value)}
-                placeholder={stolmc_text(Text.PlaceholderPhone)}
-                className="w-full bg-surface-container-low border border-outline-variant/20 rounded-lg py-2 px-3 text-sm focus:ring-2 focus:ring-primary/10 transition-all placeholder:text-outline-variant"
-                disabled={isCreating}
-              />
-            </div>
-            <div>
-              <label className="block text-xs font-bold text-on-surface-variant mb-1 uppercase tracking-wider">
-                {stolmc_text(Text.LabelCellphone)}
-              </label>
-              <input
-                type="tel"
-                value={newClientCellphone}
-                onChange={(e) => setNewClientCellphone(e.target.value)}
-                placeholder={stolmc_text(Text.PlaceholderPhone)}
-                className="w-full bg-surface-container-low border border-outline-variant/20 rounded-lg py-2 px-3 text-sm focus:ring-2 focus:ring-primary/10 transition-all placeholder:text-outline-variant"
-                disabled={isCreating}
-              />
-            </div>
-            <button
-              type="submit"
-              disabled={isCreating}
-              className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-primary text-on-primary text-xs font-bold rounded-lg shadow-sm active:scale-95 transition-all hover:bg-primary-container disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              <span className="material-symbols-outlined text-sm">
-                {isCreating ? "progress_activity" : "person_add"}
-              </span>
-              {isCreating ? stolmc_text(Text.ClientsCreating) : stolmc_text(Text.ClientsCreateBtn)}
-            </button>
-          </form>
-        )}
 
         {/* Search input — inline, replaces the Search component so we can
             control the value and debounce it ourselves. */}
@@ -223,11 +101,6 @@ export default function ClientsView() {
                 ? stolmc_text(Text.ClientsEmptySearch)
                 : stolmc_text(Text.ClientsEmpty)}
             </p>
-            {!localQuery && (
-              <p className="text-on-surface-variant/60 text-xs mt-1">
-                {stolmc_text(Text.ClientsAddFirst)}
-              </p>
-            )}
           </div>
         )}
         {!loadingUsers &&

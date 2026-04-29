@@ -11,7 +11,6 @@ const {
   useClientsStoreMock,
   mockCasesStore,
   useCasesStoreMock,
-  mockToastSuccess,
 } = vi.hoisted(() => {
   const mockInViewStoreState = {
     view: "clients",
@@ -28,7 +27,6 @@ const {
     users: [
       { id: "user-1", name: "John Doe", email: "john@example.com", phone: "1234567890", cellphone: "0987654321" },
     ],
-    updateUser: vi.fn(),
   };
   const useClientsStoreMock = vi.fn((selector?: (state: typeof mockClientsStore) => any) =>
     typeof selector === "function" ? selector(mockClientsStore) : mockClientsStore
@@ -49,8 +47,6 @@ const {
     typeof selector === "function" ? selector(mockCasesStore) : mockCasesStore
   );
 
-  const mockToastSuccess = vi.fn();
-
   return {
     mockInViewStoreState,
     useInViewStoreMock,
@@ -58,7 +54,6 @@ const {
     useClientsStoreMock,
     mockCasesStore,
     useCasesStoreMock,
-    mockToastSuccess,
   };
 });
 
@@ -74,12 +69,6 @@ vi.mock("../../../stores/casesStore", () => ({
   useCasesStore: useCasesStoreMock,
 }));
 
-vi.mock("react-toastify", () => ({
-  toast: {
-    success: mockToastSuccess,
-  },
-}));
-
 describe("ClientDetails component", () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -89,8 +78,6 @@ describe("ClientDetails component", () => {
     useInViewStoreMock.mockClear();
     useClientsStoreMock.mockClear();
     useCasesStoreMock.mockClear();
-    mockToastSuccess.mockClear();
-    mockClientsStore.updateUser.mockReset();
     mockCasesStore.getCases.mockReset();
 
     // Mock console.error to suppress error logs
@@ -104,17 +91,11 @@ describe("ClientDetails component", () => {
   it("renders loading spinner when no client is found", () => {
     mockInViewStoreState.userId = "nonexistent";
     render(<ClientDetails />);
-
-    // Should show spinner when no client is found
-    // The component returns null when no client is found and view is not 'clients'
-    // Actually it returns null if selectedClient is undefined
-    // Let's just ensure no error
   });
 
   it("renders client details when client is found and view is 'clients'", async () => {
     render(<ClientDetails />);
 
-    // Wait for client details to appear
     await waitFor(() => {
       expect(screen.getByText("John Doe")).toBeInTheDocument();
     });
@@ -128,33 +109,11 @@ describe("ClientDetails component", () => {
   it("does not render when view is not 'clients'", () => {
     mockInViewStoreState.view = "cases";
     render(<ClientDetails />);
-
-    // Component should return null since view is not 'clients'
-    // Just ensure no error
   });
 
   it("does not render when userId is empty", () => {
     mockInViewStoreState.userId = "";
     render(<ClientDetails />);
-
-    // Component should return null since no client is selected
-    // Just ensure no error
-  });
-
-  it("enables edit mode when edit button is clicked", async () => {
-    const user = userEvent.setup();
-    render(<ClientDetails />);
-
-    await waitFor(() => {
-      expect(screen.getByText("John Doe")).toBeInTheDocument();
-    });
-
-    const editButton = screen.getByRole("button", { name: "btn_edit" });
-    await user.click(editButton);
-
-    // Should show save and cancel buttons
-    expect(screen.getByRole("button", { name: "btn_save" })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /cancel/i })).toBeInTheDocument();
   });
 
   it("navigates back when back button is clicked", async () => {
@@ -186,7 +145,6 @@ describe("ClientDetails component", () => {
       expect(screen.getByText("Test Case")).toBeInTheDocument();
     });
 
-    // The component shows "1 case found" (lowercase)
     expect(screen.getByText(/1 case_singular found/i)).toBeInTheDocument();
   });
 });

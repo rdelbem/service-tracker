@@ -195,9 +195,6 @@ class Api_Contract_V2_Test extends API_TestCase {
 
 		$ok = $api->read( $this->create_mock_request() );
 		$this->assert_response_matches_contract( $ok, 'GET /users', $contract );
-
-		$bad = $api->create( $this->create_mock_request( [], [ 'x_wp_nonce' => [ 'valid_nonce' ] ], 'invalid-json' ) );
-		$this->assert_response_matches_contract( $bad, 'POST /users/(?P<id>\\d+)', $contract );
 	}
 
 	public function test_toggle_responses_match_contract_success_and_error(): void {

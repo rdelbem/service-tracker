@@ -9,12 +9,13 @@ use WP_REST_Server;
 use STOLMC_Service_Tracker\includes\Application\STOLMC_Service_Tracker_Users_Service;
 use STOLMC_Service_Tracker\includes\Application\STOLMC_Service_Tracker_Service_Factory;
 use STOLMC_Service_Tracker\includes\DTO\STOLMC_Service_Tracker_Dto_Factory;
-use STOLMC_Service_Tracker\includes\DTO\STOLMC_Validation_Exception;
 
 /**
  * This class handles user-related REST API operations.
  *
- * Specifically, creating new customer users from the admin interface.
+ * Provides read-only endpoints for listing and searching users.
+ * User creation, update, and deletion are handled through
+ * standard WordPress / WooCommerce flows.
  *
  * ENDPOINT => wp-json/service-tracker-stolmc/v1/users
  */
@@ -79,11 +80,14 @@ class STOLMC_Service_Tracker_Api_Users extends STOLMC_Service_Tracker_Api {
 	/**
 	 * Register custom API routes for users management.
 	 *
+	 * Only read-only endpoints are exposed. User creation, update, and deletion
+	 * are handled through standard WordPress / WooCommerce flows.
+	 *
 	 * @return void
 	 */
 	public function custom_api(): void {
 
-			// GET /users - List users with pagination (no ID required).
+		// GET /users - List users with pagination (no ID required).
 		$this->register_route(
 			'/users',
 			WP_REST_Server::READABLE,
@@ -99,12 +103,6 @@ class STOLMC_Service_Tracker_Api_Users extends STOLMC_Service_Tracker_Api {
 				],
 			]
 		);
-
-		// RegisterNewRoute -> Method from superclass / extended class.
-			// These routes require ID parameter.
-		$this->register_new_route( 'users', '', WP_REST_Server::EDITABLE, [ $this, 'update' ] );
-		$this->register_new_route( 'users', '', WP_REST_Server::DELETABLE, [ $this, 'delete' ] );
-		$this->register_new_route( 'users', '', WP_REST_Server::CREATABLE, [ $this, 'create' ] );
 
 		// GET /service-tracker-stolmc/v1/users/search - Search users with inverted index.
 		$this->register_route(
@@ -148,81 +146,6 @@ class STOLMC_Service_Tracker_Api_Users extends STOLMC_Service_Tracker_Api {
 	public function read( WP_REST_Request $data ): WP_REST_Response {
 		$query_dto = STOLMC_Service_Tracker_Dto_Factory::create_users_query_dto( $data );
 		$result    = $this->users_service->get_users( $query_dto );
-
-		return STOLMC_Service_Tracker_Api_Response_Mapper::from_service_result( $result );
-	}
-
-	/**
-	 * Create a new user entry.
-	 *
-	 * @param WP_REST_Request $data The REST request object.
-	 *
-	 * @return WP_REST_Response Response indicating success or failure.
-	 */
-	public function create( WP_REST_Request $data ): WP_REST_Response {
-		try {
-			$create_dto = STOLMC_Service_Tracker_Dto_Factory::create_user_create_dto( $data );
-		} catch ( STOLMC_Validation_Exception $exception ) {
-			return STOLMC_Service_Tracker_Api_Response_Mapper::to_default_response(
-				[],
-				false,
-				$exception->getMessage(),
-				'invalid_payload',
-				400
-			);
-		}
-
-		$result = $this->users_service->create_user( $create_dto );
-
-		return STOLMC_Service_Tracker_Api_Response_Mapper::from_service_result( $result );
-	}
-
-	/**
-	 * Update an existing user entry.
-	 *
-	 * @param WP_REST_Request $data The REST request object.
-	 *
-	 * @return WP_REST_Response Update result message.
-	 */
-	public function update( WP_REST_Request $data ): WP_REST_Response {
-		try {
-			$update_dto = STOLMC_Service_Tracker_Dto_Factory::create_user_update_dto( $data );
-		} catch ( STOLMC_Validation_Exception $exception ) {
-			return STOLMC_Service_Tracker_Api_Response_Mapper::to_default_response(
-				[],
-				false,
-				$exception->getMessage(),
-				'invalid_payload',
-				400
-			);
-		}
-
-		$result = $this->users_service->update_user( $update_dto );
-
-		return STOLMC_Service_Tracker_Api_Response_Mapper::from_service_result( $result );
-	}
-
-	/**
-	 * Delete a user entry.
-	 *
-	 * @param WP_REST_Request $data The REST request object.
-	 *
-	 * @return WP_REST_Response
-	 */
-	public function delete( WP_REST_Request $data ): WP_REST_Response {
-		try {
-			$delete_dto = STOLMC_Service_Tracker_Dto_Factory::create_user_delete_dto( $data );
-		} catch ( STOLMC_Validation_Exception $exception ) {
-			return STOLMC_Service_Tracker_Api_Response_Mapper::to_default_response(
-				[],
-				false,
-				$exception->getMessage(),
-				'invalid_payload',
-				400
-			);
-		}
-
-		$result = $this->users_service->delete_user( $delete_dto );
 
 		return STOLMC_Service_Tracker_Api_Response_Mapper::from_service_result( $result );
 	}

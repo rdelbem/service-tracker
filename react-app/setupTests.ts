@@ -10,7 +10,6 @@ import { Text } from './i18n';
   root_url: 'http://localhost',
   api_url: 'api',
   users_api_url: 'http://localhost/api/users',
-  create_user_api_url: 'http://localhost/api/users/create',
   nonce: 'test-nonce',
   ...Object.fromEntries(Object.values(Text).map((key) => [key, key])),
 };
