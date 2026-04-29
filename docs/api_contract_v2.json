@@ -66,10 +66,6 @@
       "statuses": [200, 400, 401, 403, 404, 500],
       "meta_required": []
     },
-    "DELETE /users/(?P<id>\\d+)": {
-      "statuses": [200, 400, 401, 403, 404, 500],
-      "meta_required": []
-    },
     "GET /users": {
       "statuses": [200, 400, 401, 403, 500],
       "meta_required": ["pagination"]
@@ -80,14 +76,6 @@
     },
     "GET /users/staff": {
       "statuses": [200, 401, 403, 500],
-      "meta_required": []
-    },
-    "POST /users/(?P<id>\\d+)": {
-      "statuses": [201, 400, 401, 403, 409, 500],
-      "meta_required": []
-    },
-    "POST, PUT, PATCH /users/(?P<id>\\d+)": {
-      "statuses": [200, 400, 401, 403, 404, 500],
       "meta_required": []
     }
   }

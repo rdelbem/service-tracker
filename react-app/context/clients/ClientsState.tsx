@@ -1,9 +1,8 @@
 import { useReducer, useEffect, ReactNode } from "react";
 import AppReducer from "../AppReducer";
-import { get, post } from "../../utils/fetch";
+import { get } from "../../utils/fetch";
 import ClientsContext from "./clientsContext";
 import { GET_USERS } from "../types";
-import { stolmc_text, Text } from "../../i18n";
 import type { ClientsState as ClientsStateType, User } from "../types";
 
 interface ClientsStateProps {
@@ -12,7 +11,6 @@ interface ClientsStateProps {
 
 export default function ClientsState({ children }: ClientsStateProps) {
   const api_url_users = stolmcData.users_api_url;
-  const create_user_api_url = stolmcData.create_user_api_url;
 
   const initialState: ClientsStateType = {
     users: [],
@@ -60,38 +58,6 @@ export default function ClientsState({ children }: ClientsStateProps) {
     });
   };
 
-  const createUser = async (userData: { name: string; email: string; phone?: string; cellphone?: string }) => {
-    try {
-      const res = await post(
-        create_user_api_url,
-        userData,
-        {
-          headers: {
-            "X-WP-Nonce": stolmcData.nonce,
-          },
-        }
-      );
-
-      // If successful, refresh the users list
-      if (res.data.success) {
-        await getUsers();
-      }
-
-      const payload = res.data;
-      return {
-        success: Boolean(payload?.success),
-        message: payload?.message ?? (payload?.success ? stolmc_text(Text.ToastUserCreated) : stolmc_text(Text.ToastUserCreateFailed)),
-        user: payload?.data,
-      };
-    } catch (error) {
-      console.error("Error creating user:", error);
-      return {
-        success: false,
-        message: stolmc_text(Text.ToastUserCreateError),
-      };
-    }
-  };
-
   useEffect(() => {
     getUsers();
   }, []);
@@ -101,7 +67,6 @@ export default function ClientsState({ children }: ClientsStateProps) {
       value={{
         state,
         searchUsers,
-        createUser,
       }}
     >
       {children}

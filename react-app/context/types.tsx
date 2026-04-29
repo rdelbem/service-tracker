@@ -49,7 +49,6 @@ export interface ClientsState {
 export interface ClientsContextType {
   state: ClientsState;
   searchUsers: (query: string) => void;
-  createUser: (userData: { name: string; email: string; phone?: string; cellphone?: string }) => Promise<{ success: boolean; message: string; user?: User }>;
 }
 
 export interface CasesState {

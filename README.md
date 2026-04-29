@@ -4,6 +4,46 @@ This repository houses a WordPress plugin. If you're searching for a manual or g
 ## For developers and WordPress plugin reviewers
 Developers who wish to contribute are encouraged to fork this repo and submit a pull request. **The sections below provide clarity on this plugin's development flow.**
 
+### JavaScript / React Frontend
+
+The admin UI is a React single-page application written in TypeScript, styled with Tailwind CSS, and built with Vite.
+
+**Source code location:** `react-app/` directory at the repository root.
+
+**Build output:** `admin/js/prod/` (minified production bundles).
+
+#### Building the Frontend
+
+```bash
+# Install dependencies
+npm install
+
+# Build for production (outputs to admin/js/prod/)
+npm run build
+
+# Development server with hot reload
+npm run dev
+
+# Type checking
+npm run lint
+
+# Run frontend tests
+npm run test:run
+```
+
+#### Key Frontend Libraries
+
+| Library | Purpose |
+|---------|---------|
+| React 19 | UI framework |
+| Zustand | State management |
+| react-toastify | Toast notifications |
+| react-icons | Icon library |
+| react-textarea-autosize | Auto-sizing textarea |
+| Tailwind CSS 3 | Utility-first CSS |
+| Vite | Build tool and dev server |
+| Vitest | Test runner |
+
 ### PHP Development Workflow
 
 This project uses modern PHP tooling to ensure code quality and consistency. All tools require **PHP 8.2 or higher**.
@@ -91,6 +131,12 @@ composer run fix            # Auto-fix issues
 
 ### 2. WordPress code reviewers
 Please note that this repo serves as the development version of what we intend to offer to WordPress users. The end-users receive a stable, compiled version without any development-related files or folders. **Given this, it's advisable to review both this development repository, which includes human-readable JS, and the stable version.**
+
+The JavaScript source code is in the `react-app/` directory. To build the production bundles:
+```bash
+npm install
+npm run build
+```
 
 ## License
 

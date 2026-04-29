@@ -329,7 +329,7 @@ class STOLMC_Service_Tracker_Admin {
 	 * @return void
 	 */
 	public function admin_page(): void {
-		add_menu_page( 'Service Tracker', 'Service Tracker', 'manage_options', 'service_tracker', [ $this, 'admin_index' ], 'dashicons-money', 10 );
+		add_menu_page( 'Service Tracker', 'Service Tracker', 'manage_options', 'service_tracker', [ $this, 'admin_index' ], 'dashicons-money', 30 );
 	}
 
 	/**

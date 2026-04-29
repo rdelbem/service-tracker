@@ -1,15 +1,11 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 
-const { mockGet, mockPost, mockPut } = vi.hoisted(() => ({
+const { mockGet } = vi.hoisted(() => ({
   mockGet: vi.fn(),
-  mockPost: vi.fn(),
-  mockPut: vi.fn(),
 }));
 
 vi.mock('../../utils/fetch', () => ({
   get: mockGet,
-  post: mockPost,
-  put: mockPut,
 }));
 
 describe('clientsStore', () => {
@@ -19,7 +15,6 @@ describe('clientsStore', () => {
     (globalThis as any).stolmcData = {
       ...(globalThis as any).stolmcData,
       users_api_url: 'http://localhost/wp-json/service-tracker-stolmc/v1/users',
-      create_user_api_url: 'http://localhost/wp-json/service-tracker-stolmc/v1/users/create',
       root_url: 'http://localhost',
       api_url: 'service-tracker-stolmc/v1',
       nonce: 'nonce',
@@ -87,37 +82,5 @@ describe('clientsStore', () => {
     expect(useClientsStore.getState().page).toBe(2);
     expect(useClientsStore.getState().users[0].name).toBe('Jane');
     expect(String(mockGet.mock.calls.at(-1)?.[0])).toContain('page=2');
-  });
-
-  it('createUser refreshes list on success', async () => {
-    mockPost.mockResolvedValue({ data: { success: true, message: 'created' } });
-
-    const { useClientsStore } = await import('../clientsStore');
-    const getUsersSpy = vi.spyOn(useClientsStore.getState(), 'getUsers').mockResolvedValue();
-
-    const res = await useClientsStore.getState().createUser({ name: 'A', email: 'a@a.com' });
-
-    expect(res.success).toBe(true);
-    expect(getUsersSpy).toHaveBeenCalledWith(1);
-  });
-
-  it('updateUser updates only matching user and always clears loading', async () => {
-    mockPut.mockResolvedValue({ data: { success: true } });
-    const { useClientsStore } = await import('../clientsStore');
-
-    useClientsStore.setState({
-      users: [
-        { id: '1', name: 'John', email: 'j@x.com' } as any,
-        { id: '2', name: 'Jane', email: 'ja@x.com' } as any,
-      ],
-      loading: false,
-    });
-
-    await useClientsStore.getState().updateUser('2', { name: 'Jane Updated' });
-
-    const users = useClientsStore.getState().users;
-    expect(users[0].name).toBe('John');
-    expect(users[1].name).toBe('Jane Updated');
-    expect(useClientsStore.getState().loading).toBe(false);
   });
 });
