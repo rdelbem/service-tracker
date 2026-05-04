@@ -4,20 +4,20 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "f202c7f788580c081a36b5426cd946d0",
+    "content-hash": "eb94d66dd701829c278aefc375715258",
     "packages": [
         {
             "name": "fightbulc/moment",
-            "version": "1.33.0",
+            "version": "1.35.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/fightbulc/moment.php.git",
-                "reference": "435d68e481ab0a716358926fb51966e696d297e3"
+                "reference": "2aa67d3b0e3fad635bc16d1f174ddfb3123ad5ab"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/fightbulc/moment.php/zipball/435d68e481ab0a716358926fb51966e696d297e3",
-                "reference": "435d68e481ab0a716358926fb51966e696d297e3",
+                "url": "https://api.github.com/repos/fightbulc/moment.php/zipball/2aa67d3b0e3fad635bc16d1f174ddfb3123ad5ab",
+                "reference": "2aa67d3b0e3fad635bc16d1f174ddfb3123ad5ab",
                 "shasum": ""
             },
             "require": {
@@ -59,9 +59,9 @@
             ],
             "support": {
                 "issues": "https://github.com/fightbulc/moment.php/issues",
-                "source": "https://github.com/fightbulc/moment.php/tree/1.33.0"
+                "source": "https://github.com/fightbulc/moment.php/tree/1.35.0"
             },
-            "time": "2021-03-27T13:10:08+00:00"
+            "time": "2025-07-27T08:46:28+00:00"
         }
     ],
     "packages-dev": [
@@ -2859,5 +2859,5 @@
     "platform-overrides": {
         "php": "8.1"
     },
-    "plugin-api-version": "2.6.0"
+    "plugin-api-version": "2.9.0"
 }
