@@ -10,7 +10,7 @@
   ],
   "require": {
     "php": ">=8.1",
-    "fightbulc/moment": "1.33.0"
+    "fightbulc/moment": "1.35.0"
   },
   "require-dev": {
     "phpstan/phpstan": "2.1.46",
